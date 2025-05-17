@@ -9,13 +9,133 @@ import { CONFIG } from './config.js';
 
 export class Terminal {
     constructor(inputElement, outputElement) {
-        this.input = inputElement;
-        this.output = outputElement;
-        this.commandHistory = [];
-        this.historyIndex = -1;
+        this.inputElement = inputElement;
+        this.outputElement = outputElement;
         this.commands = new Map();
+        this.history = [];
+        this.historyIndex = -1;
+        this.currentInput = '';
+        
         this.initializeCommands();
-        this.initializeEventListeners();
+        this.setupEventListeners();
+    }
+
+    setupEventListeners() {
+        this.inputElement.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                this.executeCommand();
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                this.navigateHistory('up');
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                this.navigateHistory('down');
+            } else if (e.key === 'Tab') {
+                e.preventDefault();
+                this.handleTabCompletion();
+            }
+        });
+
+        this.inputElement.addEventListener('input', () => {
+            this.currentInput = this.inputElement.value;
+        });
+    }
+
+    navigateHistory(direction) {
+        if (this.history.length === 0) return;
+
+        if (direction === 'up') {
+            if (this.historyIndex < this.history.length - 1) {
+                this.historyIndex++;
+            }
+        } else {
+            if (this.historyIndex > -1) {
+                this.historyIndex--;
+            }
+        }
+
+        if (this.historyIndex === -1) {
+            this.inputElement.value = this.currentInput;
+        } else {
+            this.inputElement.value = this.history[this.history.length - 1 - this.historyIndex];
+        }
+    }
+
+    handleTabCompletion() {
+        const input = this.inputElement.value.trim();
+        if (!input) return;
+
+        const matchingCommands = Array.from(this.commands.keys())
+            .filter(cmd => cmd.startsWith(input));
+
+        if (matchingCommands.length === 1) {
+            this.inputElement.value = matchingCommands[0] + ' ';
+        } else if (matchingCommands.length > 1) {
+            this.writeOutput('Possible completions:\n' + matchingCommands.join('\n'));
+        }
+    }
+
+    executeCommand() {
+        const input = this.inputElement.value.trim();
+        if (!input) return;
+
+        this.writeOutput(`<div class="terminal-line">
+            <span class="terminal-prompt">$</span>
+            <span class="terminal-command">${input}</span>
+        </div>`);
+
+        const [command, ...args] = input.split(' ');
+        
+        try {
+            if (this.commands.has(command)) {
+                const result = this.commands.get(command)(args);
+                this.writeOutput(this.formatOutput(result));
+            } else {
+                this.writeOutput(`<div class="terminal-output-error">Command not found: ${command}</div>`);
+            }
+        } catch (error) {
+            this.writeOutput(`<div class="terminal-output-error">Error: ${error.message}</div>`);
+        }
+
+        this.history.push(input);
+        this.historyIndex = -1;
+        this.currentInput = '';
+        this.inputElement.value = '';
+    }
+
+    formatOutput(output) {
+        if (typeof output === 'string') {
+            return `<div class="terminal-output-success">${output}</div>`;
+        } else if (output instanceof Error) {
+            return `<div class="terminal-output-error">Error: ${output.message}</div>`;
+        } else if (Array.isArray(output)) {
+            return `<div class="terminal-output-success">${output.join('\n')}</div>`;
+        } else if (typeof output === 'object') {
+            return `<div class="terminal-output-success">${JSON.stringify(output, null, 2)}</div>`;
+        }
+        return `<div class="terminal-output-success">${String(output)}</div>`;
+    }
+
+    writeOutput(content) {
+        const div = document.createElement('div');
+        div.innerHTML = content;
+        this.outputElement.appendChild(div);
+        this.outputElement.scrollTop = this.outputElement.scrollHeight;
+    }
+
+    clear() {
+        this.outputElement.innerHTML = '';
+        this.writeOutput('<div class="terminal-heading">Terminal cleared</div>');
+    }
+
+    clearInput() {
+        this.inputElement.value = '';
+        this.currentInput = '';
+    }
+
+    reload() {
+        this.clear();
+        this.writeOutput('<div class="terminal-heading">Terminal reloaded</div>');
     }
 
     initializeCommands() {
@@ -53,7 +173,7 @@ export class Terminal {
         // Additional commands
         this.commands.set('show resume', async () => {
             try {
-                const content = await ContentParser.loadAndParseContent(CONFIG.PATHS.RESUME, this.output);
+                const content = await ContentParser.loadAndParseContent(CONFIG.PATHS.RESUME, this.outputElement);
                 return content;
             } catch (error) {
                 if (error instanceof AppError) {
@@ -65,7 +185,7 @@ export class Terminal {
 
         this.commands.set('show jared', async () => {
             try {
-                const content = await ContentParser.loadAndParseContent(CONFIG.PATHS.RESUME, this.output);
+                const content = await ContentParser.loadAndParseContent(CONFIG.PATHS.RESUME, this.outputElement);
                 return content;
             } catch (error) {
                 if (error instanceof AppError) {
@@ -111,97 +231,6 @@ export class Terminal {
                 default: return 'Error: Invalid action (use in/out/reset)';
             }
         });
-    }
-
-    /**
-     * Initialize terminal event listeners
-     */
-    initializeEventListeners() {
-        this.input.addEventListener('keypress', async (e) => {
-            if (e.key === 'Enter') {
-                const command = this.input.value.trim();
-                
-                // Validate command
-                if (!validateCommand(command)) {
-                    this.appendOutput(command, 'Error: Invalid command format');
-                    this.input.value = '';
-                    return;
-                }
-
-                // Add to command history
-                this.commandHistory.push(command);
-                this.historyIndex = this.commandHistory.length;
-
-                // Process command
-                const result = await this.processCommand(command);
-                this.appendOutput(command, result);
-                
-                this.input.value = '';
-            }
-        });
-
-        // Command history navigation
-        this.input.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                if (this.historyIndex > 0) {
-                    this.historyIndex--;
-                    this.input.value = this.commandHistory[this.historyIndex];
-                }
-            } else if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                if (this.historyIndex < this.commandHistory.length - 1) {
-                    this.historyIndex++;
-                    this.input.value = this.commandHistory[this.historyIndex];
-                } else {
-                    this.historyIndex = this.commandHistory.length;
-                    this.input.value = '';
-                }
-            }
-        });
-    }
-
-    /**
-     * Append output to the terminal
-     * @param {string} command - The command that was executed
-     * @param {string} result - The result of the command
-     */
-    appendOutput(command, result) {
-        const timestamp = new Date().toLocaleTimeString();
-        this.output.innerHTML += `
-            <div class="terminal-line">
-                <span class="timestamp">[${timestamp}]</span>
-                <span class="prompt">></span>
-                <span class="command">${command}</span>
-            </div>
-            <div class="terminal-result">${result}</div>
-        `;
-        this.output.scrollTop = this.output.scrollHeight;
-    }
-
-    /**
-     * Process command with arguments
-     * @param {string} command - The command to process
-     * @returns {Promise<string>} Command output
-     */
-    async processCommand(command) {
-        const parts = command.split(' ');
-        const cmd = parts[0].toLowerCase();
-        const args = parts.slice(1);
-
-        const handler = this.commands.get(cmd);
-        if (!handler) {
-            return 'Command not found. Type "help" for available commands.';
-        }
-
-        try {
-            if (typeof handler.execute === 'function') {
-                return await handler.execute(args);
-            }
-            return handler.description;
-        } catch (error) {
-            return `Error: ${error.message}`;
-        }
     }
 
     handlePing(args) {
@@ -311,7 +340,7 @@ export class Terminal {
     }
 
     clearTerminal() {
-        this.output.innerHTML = '';
+        this.outputElement.innerHTML = '';
         return '';
     }
 

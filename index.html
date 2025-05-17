@@ -135,7 +135,7 @@
 
     <!-- Taskbar with Start menu -->
     <div class="taskbar">
-        <button class="start-btn">Start</button>
+        <button class="start-btn" id="startBtn">Start</button>
         <div class="start-menu" id="startMenu">
             <button data-tool="network-monitor">Network Monitor</button>
             <button data-tool="device-manager">Device Manager</button>
@@ -192,35 +192,70 @@
         const helpManager = new HelpManager();
         const searchManager = new SearchManager();
 
-        // Load Codex content
-        ContentParser.loadAndParseContent(CONFIG.PATHS.CODEX)
-            .then(content => {
-                document.getElementById('codexContent').innerHTML = content;
-                // Index content for search
-                searchManager.indexContent(content);
-            })
-            .catch(error => {
-                console.error('Error loading Codex content:', error);
-                document.getElementById('codexContent').innerHTML = '<p>Error loading Codex content.</p>';
-            });
+        // Initialize start menu
+        const startBtn = document.getElementById('startBtn');
+        const startMenu = document.getElementById('startMenu');
+        
+        startBtn.addEventListener('click', () => {
+            startMenu.style.display = startMenu.style.display === 'flex' ? 'none' : 'flex';
+        });
 
-        // Start network updates
-        network.startUpdates();
+        // Close start menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.start-btn') && !e.target.closest('.start-menu')) {
+                startMenu.style.display = 'none';
+            }
+        });
 
         // Initialize icon and taskbar button clicks
         document.querySelectorAll('.icon, .taskbar-icon, .start-menu button').forEach(el => {
             el.addEventListener('click', () => {
                 const tool = el.dataset.tool;
-                if (tool === 'terminal') {
-                    windowManager.showWindow('terminalWindow');
-                } else if (tool === 'network-monitor') {
-                    windowManager.showWindow('topologyWindow');
-                    windowManager.showWindow('widgetsWindow');
-                } else if (tool === 'codex') {
-                    windowManager.showWindow('codexWindow');
+                switch (tool) {
+                    case 'terminal':
+                        windowManager.createWindow('terminalWindow', 'Terminal', `
+                            <div id="terminalOutput"></div>
+                            <input type="text" id="terminalInput" placeholder="Type command...">
+                        `, { width: 600, height: 400 });
+                        break;
+                    case 'network-monitor':
+                        windowManager.createWindow('topologyWindow', 'Network Topology', `
+                            <div class="topology-map" id="networkTopology"></div>
+                        `, { width: 800, height: 600 });
+                        windowManager.createWindow('widgetsWindow', 'Network Status', `
+                            <div class="widgets">
+                                <div class="widget">
+                                    <h3>Bandwidth Usage</h3>
+                                    <p id="bandwidth">0 Mbps</p>
+                                </div>
+                                <div class="widget">
+                                    <h3>Network Alerts</h3>
+                                    <p id="alerts">No alerts</p>
+                                </div>
+                            </div>
+                        `, { width: 300, height: 200 });
+                        break;
+                    case 'codex':
+                        windowManager.createWindow('codexWindow', 'Codex of Financial Instruments', `
+                            <div id="codexContent"></div>
+                        `, { width: 800, height: 600 });
+                        // Load Codex content
+                        ContentParser.loadAndParseContent(CONFIG.PATHS.CODEX)
+                            .then(content => {
+                                document.getElementById('codexContent').innerHTML = content;
+                                searchManager.indexContent(content);
+                            })
+                            .catch(error => {
+                                console.error('Error loading Codex content:', error);
+                                document.getElementById('codexContent').innerHTML = '<p>Error loading Codex content.</p>';
+                            });
+                        break;
                 }
             });
         });
+
+        // Start network updates
+        network.startUpdates();
 
         // Initialize help system
         document.querySelectorAll('.help-tab').forEach(tab => {
