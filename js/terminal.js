@@ -104,7 +104,12 @@ export class Terminal {
                     result.then(output => {
                         const resultElement = document.createElement('div');
                         resultElement.className = 'terminal-result';
-                        resultElement.textContent = output;
+                        // If output looks like HTML (contains tags), use innerHTML, else use textContent
+                        if (typeof output === 'string' && /<\w+/.test(output)) {
+                            resultElement.innerHTML = output;
+                        } else {
+                            resultElement.textContent = output;
+                        }
                         this.outputElement.appendChild(resultElement);
                         this.outputElement.scrollTop = this.outputElement.scrollHeight;
                     }).catch(error => {
