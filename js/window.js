@@ -293,8 +293,13 @@ export class WindowManager {
         const header = windowElement.querySelector('.window-header');
         let startX, startY, startLeft, startTop;
 
+        // Prevent text selection while dragging
+        header.style.userSelect = 'none';
+        header.style.cursor = 'move';
+
         header.addEventListener('mousedown', (e) => {
             if (e.target.closest('.window-controls')) return;
+            e.preventDefault(); // Prevent text selection
             // Debug log
             console.log('Drag start');
             startX = e.clientX;
@@ -310,41 +315,42 @@ export class WindowManager {
                 startTop
             };
 
-            document.addEventListener('mousemove', this.handleDrag);
-            document.addEventListener('mouseup', this.stopDrag);
+            const handleDrag = (e) => {
+                if (!this.dragState) return;
+                e.preventDefault(); // Prevent text selection
+                // Debug log
+                console.log('Dragging...');
+                const { window, startX, startY, startLeft, startTop } = this.dragState;
+                const deltaX = e.clientX - startX;
+                const deltaY = e.clientY - startY;
+
+                let newLeft = startLeft + deltaX;
+                let newTop = startTop + deltaY;
+
+                // Constrain to viewport
+                newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - window.offsetWidth));
+                newTop = Math.max(0, Math.min(newTop, window.innerHeight - window.offsetHeight - 40));
+
+                window.style.left = `${newLeft}px`;
+                window.style.top = `${newTop}px`;
+
+                // Check for snapping
+                this.checkSnapping(window);
+            };
+
+            const stopDrag = () => {
+                if (this.dragState) {
+                    // Debug log
+                    console.log('Drag stop');
+                    document.removeEventListener('mousemove', handleDrag);
+                    document.removeEventListener('mouseup', stopDrag);
+                    this.dragState = null;
+                }
+            };
+
+            document.addEventListener('mousemove', handleDrag);
+            document.addEventListener('mouseup', stopDrag);
         });
-    }
-
-    handleDrag = (e) => {
-        if (!this.dragState) return;
-        // Debug log
-        console.log('Dragging...');
-        const { window, startX, startY, startLeft, startTop } = this.dragState;
-        const deltaX = e.clientX - startX;
-        const deltaY = e.clientY - startY;
-
-        let newLeft = startLeft + deltaX;
-        let newTop = startTop + deltaY;
-
-        // Constrain to viewport
-        newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - window.offsetWidth));
-        newTop = Math.max(0, Math.min(newTop, window.innerHeight - window.offsetHeight - 40));
-
-        window.style.left = `${newLeft}px`;
-        window.style.top = `${newTop}px`;
-
-        // Check for snapping
-        this.checkSnapping(window);
-    }
-
-    stopDrag = () => {
-        if (this.dragState) {
-            // Debug log
-            console.log('Drag stop');
-            document.removeEventListener('mousemove', this.handleDrag);
-            document.removeEventListener('mouseup', this.stopDrag);
-            this.dragState = null;
-        }
     }
 
     initResize(windowElement) {
@@ -374,63 +380,63 @@ export class WindowManager {
                     startTop
                 };
 
-                document.addEventListener('mousemove', this.handleResize);
-                document.addEventListener('mouseup', this.stopResize);
+                const handleResize = (e) => {
+                    if (!this.resizeState) return;
+                    // Debug log
+                    console.log('Resizing...');
+                    const { window, direction, startX, startY, startWidth, startHeight, startLeft, startTop } = this.resizeState;
+                    const deltaX = e.clientX - startX;
+                    const deltaY = e.clientY - startY;
+
+                    let newWidth = startWidth;
+                    let newHeight = startHeight;
+                    let newLeft = startLeft;
+                    let newTop = startTop;
+
+                    // Handle horizontal resizing
+                    if (direction.includes('e')) {
+                        newWidth = Math.max(300, startWidth + deltaX);
+                    }
+                    if (direction.includes('w')) {
+                        const width = Math.max(300, startWidth - deltaX);
+                        newWidth = width;
+                        newLeft = startLeft + (startWidth - width);
+                    }
+
+                    // Handle vertical resizing
+                    if (direction.includes('s')) {
+                        newHeight = Math.max(200, startHeight + deltaY);
+                    }
+                    if (direction.includes('n')) {
+                        const height = Math.max(200, startHeight - deltaY);
+                        newHeight = height;
+                        newTop = startTop + (startHeight - height);
+                    }
+
+                    // Apply new dimensions
+                    window.style.width = `${newWidth}px`;
+                    window.style.height = `${newHeight}px`;
+                    window.style.left = `${newLeft}px`;
+                    window.style.top = `${newTop}px`;
+
+                    // Constrain to viewport
+                    this.constrainToViewport(window);
+                };
+
+                const stopResize = () => {
+                    if (this.resizeState) {
+                        // Debug log
+                        console.log('Resize stop');
+                        document.removeEventListener('mousemove', handleResize);
+                        document.removeEventListener('mouseup', stopResize);
+                        this.resizeState = null;
+                    }
+                };
+
+                document.addEventListener('mousemove', handleResize);
+                document.addEventListener('mouseup', stopResize);
             });
         });
-    }
-
-    handleResize = (e) => {
-        if (!this.resizeState) return;
-        // Debug log
-        console.log('Resizing...');
-        const { window, direction, startX, startY, startWidth, startHeight, startLeft, startTop } = this.resizeState;
-        const deltaX = e.clientX - startX;
-        const deltaY = e.clientY - startY;
-
-        let newWidth = startWidth;
-        let newHeight = startHeight;
-        let newLeft = startLeft;
-        let newTop = startTop;
-
-        // Handle horizontal resizing
-        if (direction.includes('e')) {
-            newWidth = Math.max(300, startWidth + deltaX);
-        }
-        if (direction.includes('w')) {
-            const width = Math.max(300, startWidth - deltaX);
-            newWidth = width;
-            newLeft = startLeft + (startWidth - width);
-        }
-
-        // Handle vertical resizing
-        if (direction.includes('s')) {
-            newHeight = Math.max(200, startHeight + deltaY);
-        }
-        if (direction.includes('n')) {
-            const height = Math.max(200, startHeight - deltaY);
-            newHeight = height;
-            newTop = startTop + (startHeight - height);
-        }
-
-        // Apply new dimensions
-        window.style.width = `${newWidth}px`;
-        window.style.height = `${newHeight}px`;
-        window.style.left = `${newLeft}px`;
-        window.style.top = `${newTop}px`;
-
-        // Constrain to viewport
-        this.constrainToViewport(window);
-    }
-
-    stopResize = () => {
-        if (this.resizeState) {
-            // Debug log
-            console.log('Resize stop');
-            document.removeEventListener('mousemove', this.handleResize);
-            document.removeEventListener('mouseup', this.stopResize);
-            this.resizeState = null;
-        }
     }
 
     constrainToViewport(windowElement) {
