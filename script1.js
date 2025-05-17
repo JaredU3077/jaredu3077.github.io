@@ -48,16 +48,16 @@ terminalInput.addEventListener('keypress', (e) => {
 
 // Function to parse and format codex.txt content
 function parseCodexContent(text) {
-    const lines = text.split('\n');
+    const lines = text.trim().split('\n'); // Trim leading/trailing whitespace from the entire text
     let htmlContent = '';
     let currentList = null;
     let listLevel = 0;
 
-    lines.forEach(line => {
-        line = line.trim();
+    lines.forEach((line, index) => {
+        // Skip empty lines unless they are part of a list
+        if (!line.trim() && !currentList) return;
 
-        // Skip empty lines
-        if (!line) return;
+        line = line.replace(/\r/g, ''); // Remove any carriage returns
 
         // Check for main heading (e.g., "Codex of Financial Instruments ver A1.0")
         if (line.match(/^Codex of Financial Instruments/)) {
@@ -108,6 +108,7 @@ function parseCodexContent(text) {
             } else {
                 htmlContent += `<li>${line}</li>`;
             }
+            currentList = true;
             return;
         }
 
@@ -117,7 +118,7 @@ function parseCodexContent(text) {
             currentList = null;
             listLevel = 0;
         }
-        htmlContent += `<p>${line}</p>`;
+        htmlContent += `<p>${line.trim()}</p>`;
     });
 
     // Close any remaining lists
@@ -137,7 +138,9 @@ function loadCodexContent() {
         })
         .then(text => {
             const formattedContent = parseCodexContent(text);
-            document.getElementById('codexContent').innerHTML = formattedContent;
+            const codexContent = document.getElementById('codexContent');
+            codexContent.innerHTML = formattedContent;
+            codexContent.scrollTop = 0; // Ensure the window starts at the top
         })
         .catch(error => {
             console.error(error);
@@ -193,17 +196,30 @@ document.querySelectorAll('.window').forEach(window => {
     const closeBtn = window.querySelector('.close-btn');
     const body = window.querySelector('.window-body');
 
+    // Reset window to initial size and position when opened
+    window.addEventListener('click', () => {
+        if (window.style.display === 'block' && !window.classList.contains('maximized')) {
+            window.style.width = window.dataset.initialWidth || '500px';
+            window.style.height = window.dataset.initialHeight || '400px';
+            window.style.transform = 'translate(0, 0)';
+            window.setAttribute('data-x', 0);
+            window.setAttribute('data-y', 0);
+            window.scrollTop = 0; // Scroll to top
+        }
+    });
+
     minimizeBtn.addEventListener('click', () => {
         body.style.display = body.style.display === 'none' ? 'block' : 'none';
     });
 
     maximizeBtn.addEventListener('click', () => {
-        if (window.style.width === '90%') {
-            window.style.width = window.dataset.originalWidth || '500px';
-            window.style.height = window.dataset.originalHeight || '400px';
+        if (window.classList.contains('maximized')) {
+            window.style.width = window.dataset.initialWidth || '500px';
+            window.style.height = window.dataset.initialHeight || '400px';
+            window.classList.remove('maximized');
         } else {
-            window.dataset.originalWidth = window.style.width || '500px';
-            window.dataset.originalHeight = window.style.height || '400px';
+            window.dataset.initialWidth = window.style.width || '500px';
+            window.dataset.initialHeight = window.style.height || '400px';
             window.style.width = '90%';
             window.style.height = '80%';
             window.style.left = '5%';
@@ -211,6 +227,7 @@ document.querySelectorAll('.window').forEach(window => {
             window.style.transform = 'translate(0, 0)';
             window.setAttribute('data-x', 0);
             window.setAttribute('data-y', 0);
+            window.classList.add('maximized');
         }
         if (window.id === 'topologyWindow') {
             const topology = document.getElementById('networkTopology');
@@ -218,10 +235,12 @@ document.querySelectorAll('.window').forEach(window => {
             topology.style.height = (window.offsetHeight - 40) + 'px';
             network.fit();
         }
+        window.scrollTop = 0; // Scroll to top after resizing
     });
 
     closeBtn.addEventListener('click', () => {
         window.style.display = 'none';
+        window.classList.remove('maximized'); // Reset maximized state
     });
 });
 
@@ -238,13 +257,21 @@ document.querySelectorAll('.icon, .taskbar-icon, .start-menu button').forEach(el
     el.addEventListener('click', () => {
         const tool = el.dataset.tool;
         if (tool === 'terminal') {
-            document.getElementById('terminalWindow').style.display = 'block';
+            const window = document.getElementById('terminalWindow');
+            window.style.display = 'block';
+            window.scrollTop = 0;
         } else if (tool === 'network-monitor') {
-            document.getElementById('topologyWindow').style.display = 'block';
+            const window = document.getElementById('topologyWindow');
+            window.style.display = 'block';
+            window.scrollTop = 0;
         } else if (tool === 'device-manager') {
-            document.getElementById('widgetsWindow').style.display = 'block';
+            const window = document.getElementById('widgetsWindow');
+            window.style.display = 'block';
+            window.scrollTop = 0;
         } else if (tool === 'codex') {
-            document.getElementById('codexWindow').style.display = 'block';
+            const window = document.getElementById('codexWindow');
+            window.style.display = 'block';
+            window.scrollTop = 0;
             loadCodexContent(); // Load codex.txt content dynamically
         }
         document.getElementById('startMenu').style.display = 'none'; // Close Start menu
