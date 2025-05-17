@@ -86,6 +86,13 @@ body {
     left: 400px;
 }
 
+#codexWindow {
+    top: 50px;
+    left: 300px;
+    width: 600px;
+    height: 500px;
+}
+
 .window-header {
     background: #1C2526;
     padding: 10px;
@@ -132,8 +139,55 @@ body {
 .window-body {
     padding: 10px;
     background: #2A3435;
-    height: calc(100% - 40px);
+    height: auto;
+    max-height: calc(100% - 40px);
     overflow-y: auto;
+}
+
+/* Styles for Codex content */
+#codexContent h2 {
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: #4682B4;
+}
+
+#codexContent h3 {
+    font-size: 18px;
+    margin: 15px 0 10px;
+    color: #5A9BD4;
+}
+
+#codexContent h4 {
+    font-size: 16px;
+    margin: 10px 0 5px;
+    color: #E0E0E0;
+}
+
+#codexContent p {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+#codexContent ul {
+    list-style-type: disc;
+    margin-left: 20px;
+    margin-bottom: 10px;
+}
+
+#codexContent ul ul {
+    list-style-type: circle;
+    margin-left: 20px;
+}
+
+#codexContent li {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 5px;
+}
+
+#codexContent strong {
+    color: #4682B4;
 }
 
 /* Network topology map */
@@ -210,7 +264,7 @@ body {
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
-    line-height: 16px; /* Match height of taskbar icons */
+    line-height: 16px;
     transition: background 0.2s;
 }
 
@@ -255,7 +309,7 @@ body {
 .taskbar-icon {
     background: #1C2526;
     border: none;
-    padding: 4px; /* Reduced padding */
+    padding: 4px;
     border-radius: 4px;
     cursor: pointer;
     transition: background 0.2s;
