@@ -48,16 +48,17 @@ terminalInput.addEventListener('keypress', (e) => {
 
 // Function to parse and format codex.txt content
 function parseCodexContent(text) {
-    const lines = text.trim().split('\n'); // Trim leading/trailing whitespace from the entire text
+    const lines = text.trim().split('\n');
     let htmlContent = '';
     let currentList = null;
     let listLevel = 0;
+    let inLayer = false;
 
     lines.forEach((line, index) => {
         // Skip empty lines unless they are part of a list
         if (!line.trim() && !currentList) return;
 
-        line = line.replace(/\r/g, ''); // Remove any carriage returns
+        line = line.replace(/\r/g, '');
 
         // Check for main heading (e.g., "Codex of Financial Instruments ver A1.0")
         if (line.match(/^Codex of Financial Instruments/)) {
@@ -68,18 +69,22 @@ function parseCodexContent(text) {
         // Check for layer headings (e.g., "Layer 1: Basic Instruments")
         if (line.match(/^Layer \d+:/)) {
             if (currentList) {
-                htmlContent += '</ul>'.repeat(listLevel); // Close any open lists
+                htmlContent += '</ul>'.repeat(listLevel);
                 currentList = null;
                 listLevel = 0;
             }
-            htmlContent += `<h3>${line}</h3>`;
+            if (inLayer) {
+                htmlContent += '</div>'; // Close previous layer-section
+            }
+            htmlContent += `<div class="layer-section"><h3>${line}</h3>`;
+            inLayer = true;
             return;
         }
 
         // Check for subheadings (e.g., "Education and Awareness:")
         if (line.match(/^\w.*:$/)) {
             if (currentList) {
-                htmlContent += '</ul>'.repeat(listLevel); // Close any open lists
+                htmlContent += '</ul>'.repeat(listLevel);
                 currentList = null;
                 listLevel = 0;
             }
@@ -89,10 +94,9 @@ function parseCodexContent(text) {
 
         // Check for list items (indented lines)
         if (line.match(/^\s{4,}/)) {
-            const indentLevel = Math.floor(line.match(/^\s*/)[0].length / 4); // Each 4 spaces = 1 level
+            const indentLevel = Math.floor(line.match(/^\s*/)[0].length / 4);
             line = line.trim();
 
-            // Handle list items
             if (indentLevel > listLevel) {
                 htmlContent += '<ul>';
                 listLevel++;
@@ -101,7 +105,6 @@ function parseCodexContent(text) {
                 listLevel = indentLevel;
             }
 
-            // Parse list items with bold terms (e.g., "Stocks (Equities):")
             if (line.match(/^\w.*:/)) {
                 const [term, description] = line.split(': ', 2);
                 htmlContent += `<li><strong>${term}:</strong> ${description || ''}</li>`;
@@ -114,16 +117,19 @@ function parseCodexContent(text) {
 
         // Treat as paragraph
         if (currentList) {
-            htmlContent += '</ul>'.repeat(listLevel); // Close any open lists
+            htmlContent += '</ul>'.repeat(listLevel);
             currentList = null;
             listLevel = 0;
         }
         htmlContent += `<p>${line.trim()}</p>`;
     });
 
-    // Close any remaining lists
+    // Close any remaining lists and layer sections
     if (listLevel > 0) {
         htmlContent += '</ul>'.repeat(listLevel);
+    }
+    if (inLayer) {
+        htmlContent += '</div>';
     }
 
     return htmlContent;
@@ -140,7 +146,7 @@ function loadCodexContent() {
             const formattedContent = parseCodexContent(text);
             const codexContent = document.getElementById('codexContent');
             codexContent.innerHTML = formattedContent;
-            codexContent.scrollTop = 0; // Ensure the window starts at the top
+            codexContent.scrollTop = 0;
         })
         .catch(error => {
             console.error(error);
@@ -182,7 +188,7 @@ interact('.window').draggable({
             if (target.id === 'topologyWindow') {
                 const topology = document.getElementById('networkTopology');
                 topology.style.width = event.rect.width + 'px';
-                topology.style.height = (event.rect.height - 40) + 'px'; // Adjust for header
+                topology.style.height = (event.rect.height - 40) + 'px';
                 network.fit();
             }
         }
@@ -196,15 +202,15 @@ document.querySelectorAll('.window').forEach(window => {
     const closeBtn = window.querySelector('.close-btn');
     const body = window.querySelector('.window-body');
 
-    // Reset window to initial size and position when opened
+    // Reset window to initial size and position when opened (except for Codex)
     window.addEventListener('click', () => {
-        if (window.style.display === 'block' && !window.classList.contains('maximized')) {
+        if (window.style.display === 'block' && !window.classList.contains('maximized') && window.id !== 'codexWindow') {
             window.style.width = window.dataset.initialWidth || '500px';
             window.style.height = window.dataset.initialHeight || '400px';
             window.style.transform = 'translate(0, 0)';
             window.setAttribute('data-x', 0);
             window.setAttribute('data-y', 0);
-            window.scrollTop = 0; // Scroll to top
+            window.scrollTop = 0;
         }
     });
 
@@ -235,12 +241,12 @@ document.querySelectorAll('.window').forEach(window => {
             topology.style.height = (window.offsetHeight - 40) + 'px';
             network.fit();
         }
-        window.scrollTop = 0; // Scroll to top after resizing
+        window.scrollTop = 0;
     });
 
     closeBtn.addEventListener('click', () => {
         window.style.display = 'none';
-        window.classList.remove('maximized'); // Reset maximized state
+        window.classList.remove('maximized');
     });
 });
 
@@ -271,10 +277,19 @@ document.querySelectorAll('.icon, .taskbar-icon, .start-menu button').forEach(el
         } else if (tool === 'codex') {
             const window = document.getElementById('codexWindow');
             window.style.display = 'block';
+            // Open in maximized mode by default
+            window.style.width = '90%';
+            window.style.height = '80%';
+            window.style.left = '5%';
+            window.style.top = '5%';
+            window.style.transform = 'translate(0, 0)';
+            window.setAttribute('data-x', 0);
+            window.setAttribute('data-y', 0);
+            window.classList.add('maximized');
             window.scrollTop = 0;
-            loadCodexContent(); // Load codex.txt content dynamically
+            loadCodexContent();
         }
-        document.getElementById('startMenu').style.display = 'none'; // Close Start menu
+        document.getElementById('startMenu').style.display = 'none';
     });
 });
 
