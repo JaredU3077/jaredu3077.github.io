@@ -577,18 +577,23 @@ body {
 #terminalOutput {
     margin-bottom: 15px;
     font-size: 14px;
-    color: #E0E0E0; /* Default text color for non-heading content */
+    color: #E0E0E0;
     background: #1C2526;
     padding: 10px;
     border: 1px solid #4682B4;
     border-bottom: none;
     border-radius: 4px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 400px;
+    overflow-y: auto;
 }
 
 #terminalOutput div {
     margin: 5px 0;
     line-height: 1.5;
-    list-style: none;
 }
 
 #terminalOutput .terminal-heading {
@@ -597,22 +602,25 @@ body {
     border-bottom: 1px solid #4682B4;
     padding-bottom: 3px;
     margin-bottom: 10px;
+    font-weight: bold;
 }
 
 #terminalOutput .terminal-section {
     margin: 15px 0;
+    padding-left: 10px;
+    border-left: 2px solid #4682B4;
 }
 
 #terminalOutput .terminal-subheading {
     font-size: 15px;
-    color: #4682B4;
+    color: #5A9BD4;
     margin-bottom: 8px;
     font-weight: bold;
 }
 
 #terminalOutput .terminal-subheading2 {
     font-size: 14px;
-    color: #4682B4;
+    color: #5A9BD4;
     margin: 5px 0;
     font-style: italic;
 }
@@ -638,7 +646,182 @@ body {
     outline: none;
     font-size: 14px;
     color: #5A9BD4;
-    font-family: Consolas, 'Courier New', monospace;
+    font-family: 'Consolas', 'Courier New', monospace;
+}
+
+#terminalInput:focus {
+    border-color: #5A9BD4;
+    box-shadow: 0 0 5px rgba(70, 130, 180, 0.3);
+}
+
+/* Terminal Command History */
+.terminal-history {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #1C2526;
+    border: 1px solid #4682B4;
+    border-radius: 4px;
+    margin-top: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+    z-index: 1000;
+}
+
+.terminal-history-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.terminal-history-item:hover {
+    background: rgba(70, 130, 180, 0.2);
+}
+
+/* Terminal Command Output Styling */
+.terminal-output-success {
+    color: #28c840;
+}
+
+.terminal-output-error {
+    color: #ff5f57;
+}
+
+.terminal-output-warning {
+    color: #febc2e;
+}
+
+.terminal-output-info {
+    color: #5A9BD4;
+}
+
+/* Terminal Prompt */
+.terminal-prompt {
+    color: #28c840;
+    font-weight: bold;
+}
+
+.terminal-prompt::before {
+    content: '>';
+    margin-right: 5px;
+}
+
+/* Terminal Loading Indicator */
+.terminal-loading {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid #4682B4;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: terminal-spin 1s linear infinite;
+    margin-right: 5px;
+}
+
+@keyframes terminal-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Terminal Scrollbar */
+#terminalOutput::-webkit-scrollbar {
+    width: 8px;
+}
+
+#terminalOutput::-webkit-scrollbar-track {
+    background: #1C2526;
+}
+
+#terminalOutput::-webkit-scrollbar-thumb {
+    background: #4682B4;
+    border-radius: 4px;
+}
+
+#terminalOutput::-webkit-scrollbar-thumb:hover {
+    background: #5A9BD4;
+}
+
+/* Terminal Command Autocomplete */
+.terminal-autocomplete {
+    position: absolute;
+    background: #1C2526;
+    border: 1px solid #4682B4;
+    border-radius: 4px;
+    margin-top: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.terminal-autocomplete-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.terminal-autocomplete-item:hover {
+    background: rgba(70, 130, 180, 0.2);
+}
+
+.terminal-autocomplete-command {
+    color: #5A9BD4;
+    font-weight: bold;
+}
+
+.terminal-autocomplete-description {
+    color: #E0E0E0;
+    font-size: 12px;
+    margin-left: 10px;
+}
+
+/* Terminal Window Specific Styles */
+#terminalWindow {
+    min-width: 600px;
+    min-height: 400px;
+}
+
+#terminalWindow .window-content {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    background: #1C2526;
+}
+
+#terminalWindow .window-header {
+    background: linear-gradient(to bottom, #2c3e50, #1a2530);
+    border-bottom: 1px solid #4682B4;
+}
+
+#terminalWindow .window-title {
+    color: #5A9BD4;
+}
+
+/* Terminal Responsive Design */
+@media (max-width: 768px) {
+    #terminalWindow {
+        min-width: 100%;
+        min-height: 300px;
+    }
+
+    #terminalOutput {
+        font-size: 12px;
+        padding: 8px;
+    }
+
+    #terminalInput {
+        font-size: 12px;
+        padding: 8px;
+    }
+
+    .terminal-history,
+    .terminal-autocomplete {
+        max-height: 150px;
+    }
 }
 
 /* Taskbar */

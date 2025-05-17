@@ -32,12 +32,17 @@
   - [x] Improve window transitions
   - [x] Add window constraints
 
-- [ ] Improve Terminal Experience
-  - [ ] Add command history
-  - [ ] Implement command autocomplete
-  - [ ] Add network command responses
-  - [ ] Improve terminal styling
-  - [ ] Add command output formatting
+- [x] Improve Terminal Experience
+  - [x] Add command history
+  - [x] Implement command autocomplete
+  - [x] Add network command responses
+  - [x] Improve terminal styling
+  - [x] Add command output formatting
+  - [x] Add network device commands
+  - [x] Implement command help system
+  - [x] Add terminal loading states
+  - [x] Improve terminal responsiveness
+  - [x] Add terminal scrollbar styling
 
 ### Performance
 - [ ] Optimize Loading
