@@ -209,7 +209,7 @@ body {
 /* Network topology map */
 .topology-map {
     width: 100%;
-    height: 450px; /* Increased height for better visibility */
+    height: 450px;
     background: #1C2526;
     border-radius: 4px;
 }
@@ -246,6 +246,55 @@ body {
 
 #terminalOutput div {
     margin: 5px 0;
+    line-height: 1.5;
+}
+
+#terminalOutput .terminal-heading {
+    font-size: 16px;
+    color: #00FF00;
+    border-bottom: 1px solid #00FF00;
+    padding-bottom: 3px;
+    margin-bottom: 10px;
+}
+
+#terminalOutput .terminal-section {
+    margin: 15px 0;
+}
+
+#terminalOutput .terminal-subheading {
+    font-size: 15px;
+    color: #00FF00;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+#terminalOutput .terminal-subheading2 {
+    font-size: 14px;
+    color: #00FF00;
+    margin: 5px 0;
+    font-style: italic;
+}
+
+#terminalOutput ul {
+    list-style-type: disc;
+    margin-left: 20px;
+    margin-bottom: 10px;
+}
+
+#terminalOutput ul ul {
+    list-style-type: circle;
+    margin-left: 20px;
+}
+
+#terminalOutput li {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 5px;
+}
+
+#terminalOutput strong {
+    color: #00FF00;
+    font-weight: bold;
 }
 
 #terminalInput {
@@ -363,7 +412,7 @@ body {
     }
 
     .topology-map {
-        height: 300px; /* Reduced height for smaller screens */
+        height: 300px;
     }
 
     .taskbar-tools {
@@ -394,5 +443,22 @@ body {
     #codexContent p,
     #codexContent li {
         font-size: 14px;
+    }
+
+    #terminalOutput .terminal-heading {
+        font-size: 14px;
+    }
+
+    #terminalOutput .terminal-subheading {
+        font-size: 13px;
+    }
+
+    #terminalOutput .terminal-subheading2 {
+        font-size: 12px;
+    }
+
+    #terminalOutput div,
+    #terminalOutput li {
+        font-size: 12px;
     }
 }
