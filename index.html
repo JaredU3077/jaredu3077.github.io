@@ -103,6 +103,7 @@
         const helpManager = new HelpManager();
         const searchManager = new SearchManager();
         let network = null;
+        let terminal = null;
 
         // Initialize start menu
         const startBtn = document.getElementById('startBtn');
@@ -137,7 +138,7 @@
                             icon: 'fa-terminal'
                         });
                         // Dynamically initialize Terminal for this window
-                        new Terminal(
+                        terminal = new Terminal(
                             win.querySelector('#terminalInput'),
                             win.querySelector('#terminalOutput')
                         );
@@ -229,6 +230,9 @@
             }
             helpManager.showHelp('terminal');
         });
+
+        // After all modules are initialized, connect KeyboardManager
+        const keyboardManager = new KeyboardManager(windowManager, terminal, network);
 
         // Only start network updates when the network window is opened
         // Only show help when help window is opened
