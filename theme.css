@@ -1293,3 +1293,195 @@ mark {
 #helpWindow .window-content {
     display: block;
 }
+
+/* Network Tooltip Styles */
+.network-tooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.9);
+    color: #fff;
+    padding: 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+    max-width: 300px;
+    transition: opacity 0.2s ease;
+}
+
+.tooltip-content h3 {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    color: #4CAF50;
+}
+
+.tooltip-details p {
+    margin: 4px 0;
+    font-size: 13px;
+}
+
+.tooltip-details strong {
+    color: #2196F3;
+    margin-right: 8px;
+}
+
+/* Error Notification Styles */
+.error-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #f44336;
+    color: white;
+    padding: 16px;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 2000;
+    min-width: 300px;
+    animation: slideIn 0.3s ease;
+}
+
+.error-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.error-header i {
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+.error-message {
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Node Details Window Styles */
+.node-details {
+    padding: 16px;
+    color: #333;
+}
+
+.detail-section {
+    margin-bottom: 24px;
+}
+
+.detail-section h3 {
+    margin: 0 0 12px 0;
+    color: #2196F3;
+    font-size: 18px;
+}
+
+.detail-section table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.detail-section td {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.detail-section td:first-child {
+    font-weight: 500;
+    color: #666;
+    width: 40%;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+    margin-top: 12px;
+}
+
+.metric {
+    background: #f5f5f5;
+    padding: 12px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.metric-label {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.metric-value {
+    display: block;
+    font-size: 18px;
+    font-weight: 500;
+    color: #2196F3;
+}
+
+/* Window Transition Animations */
+.window {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.window.opening {
+    transform: scale(0.9);
+    opacity: 0;
+}
+
+.window.closing {
+    transform: scale(0.9);
+    opacity: 0;
+}
+
+.window.maximizing,
+.window.unmaximizing {
+    transition: all 0.3s ease;
+}
+
+/* Accessibility Improvements */
+.window:focus {
+    outline: 2px solid #2196F3;
+    outline-offset: 2px;
+}
+
+.window-control:focus {
+    outline: 2px solid #2196F3;
+    outline-offset: 2px;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .network-tooltip {
+        background: rgba(30, 30, 30, 0.95);
+        border: 1px solid #444;
+    }
+
+    .node-details {
+        color: #e0e0e0;
+    }
+
+    .detail-section td {
+        border-bottom-color: #444;
+    }
+
+    .detail-section td:first-child {
+        color: #aaa;
+    }
+
+    .metric {
+        background: #2a2a2a;
+    }
+
+    .metric-label {
+        color: #aaa;
+    }
+}

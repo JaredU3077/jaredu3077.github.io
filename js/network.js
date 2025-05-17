@@ -1,6 +1,7 @@
 /**
  * Network Visualization Module
  * Handles network topology visualization and updates
+ * Enhanced with tooltips, error handling, and performance optimizations
  */
 
 import { CONFIG, configManager } from './config.js';
@@ -8,11 +9,24 @@ import { CONFIG, configManager } from './config.js';
 export class NetworkVisualization {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
+        if (!this.container) {
+            console.error(`Container element with id "${containerId}" not found`);
+            return;
+        }
+        
         this.network = null;
         this.updateInterval = null;
         this.networkState = this.loadNetworkState();
-        this.initializeNetwork();
-        this.initializeConfigListener();
+        this.tooltipTimeout = null;
+        this.tooltip = this.createTooltip();
+        this.errorHandler = this.createErrorHandler();
+        
+        try {
+            this.initializeNetwork();
+            this.initializeConfigListener();
+        } catch (error) {
+            this.errorHandler.handleError('Failed to initialize network visualization', error);
+        }
     }
 
     /**
@@ -85,50 +99,122 @@ export class NetworkVisualization {
         }
     }
 
+    createTooltip() {
+        const tooltip = document.createElement('div');
+        tooltip.className = 'network-tooltip';
+        tooltip.style.display = 'none';
+        document.body.appendChild(tooltip);
+        return tooltip;
+    }
+
+    createErrorHandler() {
+        return {
+            handleError: (message, error) => {
+                console.error(message, error);
+                // Create error notification
+                const notification = document.createElement('div');
+                notification.className = 'error-notification';
+                notification.innerHTML = `
+                    <div class="error-header">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Error</span>
+                    </div>
+                    <div class="error-message">${message}</div>
+                `;
+                document.body.appendChild(notification);
+                
+                // Auto-remove after 5 seconds
+                setTimeout(() => notification.remove(), 5000);
+            }
+        };
+    }
+
     /**
      * Initialize the network visualization
      */
     initializeNetwork() {
-        const nodes = new vis.DataSet(this.networkState.nodes);
-        const edges = new vis.DataSet(this.networkState.edges);
-        const options = {
-            ...CONFIG.NETWORK.DEFAULT_OPTIONS,
-            ...this.networkState.options,
-            nodes: {
-                ...CONFIG.NETWORK.DEFAULT_OPTIONS.nodes,
-                ...this.networkState.options.nodes
-            },
-            edges: {
-                ...CONFIG.NETWORK.DEFAULT_OPTIONS.edges,
-                ...this.networkState.options.edges
-            }
-        };
+        try {
+            const nodes = new vis.DataSet(this.networkState.nodes);
+            const edges = new vis.DataSet(this.networkState.edges);
+            const options = {
+                ...CONFIG.NETWORK.DEFAULT_OPTIONS,
+                ...this.networkState.options,
+                nodes: {
+                    ...CONFIG.NETWORK.DEFAULT_OPTIONS.nodes,
+                    ...this.networkState.options.nodes,
+                    font: {
+                        ...CONFIG.NETWORK.DEFAULT_OPTIONS.nodes.font,
+                        ...this.networkState.options.nodes.font,
+                        multi: true // Enable HTML in labels
+                    }
+                },
+                edges: {
+                    ...CONFIG.NETWORK.DEFAULT_OPTIONS.edges,
+                    ...this.networkState.options.edges,
+                    font: {
+                        ...CONFIG.NETWORK.DEFAULT_OPTIONS.edges.font,
+                        ...this.networkState.options.edges.font,
+                        multi: true
+                    }
+                },
+                interaction: {
+                    hover: true,
+                    tooltipDelay: 200,
+                    zoomView: true,
+                    dragView: true
+                }
+            };
 
-        this.network = new vis.Network(this.container, { nodes, edges }, options);
+            this.network = new vis.Network(this.container, { nodes, edges }, options);
 
-        // Restore saved layout
-        if (this.networkState.layout) {
-            this.network.moveTo({
-                position: this.networkState.layout.position,
-                scale: this.networkState.layout.zoom
+            // Enhanced event listeners
+            this.network.on('hoverNode', (params) => {
+                this.showNodeTooltip(params);
             });
+
+            this.network.on('blurNode', () => {
+                this.hideTooltip();
+            });
+
+            this.network.on('click', (params) => {
+                if (params.nodes.length > 0) {
+                    this.handleNodeClick(params);
+                }
+            });
+
+            // Restore saved layout
+            if (this.networkState.layout) {
+                this.network.moveTo({
+                    position: this.networkState.layout.position,
+                    scale: this.networkState.layout.zoom
+                });
+            }
+
+            // Add event listeners for state persistence
+            this.network.on('stabilizationIterationsDone', () => {
+                this.saveNetworkState();
+            });
+
+            this.network.on('dragEnd', () => {
+                this.saveNetworkState();
+            });
+
+            this.network.on('zoom', () => {
+                this.saveNetworkState();
+            });
+
+            // Add customization controls
+            this.initializeCustomizationControls();
+
+            // Add error handling for network events
+            this.network.on('stabilizationFailed', () => {
+                this.errorHandler.handleError('Network stabilization failed. The visualization may be unstable.');
+            });
+
+        } catch (error) {
+            this.errorHandler.handleError('Failed to initialize network visualization', error);
+            throw error;
         }
-
-        // Add event listeners for state persistence
-        this.network.on('stabilizationIterationsDone', () => {
-            this.saveNetworkState();
-        });
-
-        this.network.on('dragEnd', () => {
-            this.saveNetworkState();
-        });
-
-        this.network.on('zoom', () => {
-            this.saveNetworkState();
-        });
-
-        // Add customization controls
-        this.initializeCustomizationControls();
     }
 
     /**
@@ -318,5 +404,89 @@ export class NetworkVisualization {
         };
         localStorage.removeItem('networkState');
         this.initializeNetwork();
+    }
+
+    showNodeTooltip(params) {
+        const nodeId = params.node;
+        const node = this.network.body.data.nodes.get(nodeId);
+        
+        if (!node) return;
+
+        const tooltipContent = `
+            <div class="tooltip-content">
+                <h3>${node.label}</h3>
+                <div class="tooltip-details">
+                    <p><strong>Type:</strong> ${node.type || 'Unknown'}</p>
+                    <p><strong>Status:</strong> ${node.status || 'Unknown'}</p>
+                    <p><strong>IP:</strong> ${node.ip || 'N/A'}</p>
+                    <p><strong>Last Update:</strong> ${node.lastUpdate || 'N/A'}</p>
+                </div>
+            </div>
+        `;
+
+        this.tooltip.innerHTML = tooltipContent;
+        this.tooltip.style.display = 'block';
+        
+        // Position tooltip near the node
+        const position = this.network.getPositions([nodeId])[nodeId];
+        const canvasPosition = this.network.canvasToDOM(position);
+        
+        this.tooltip.style.left = `${canvasPosition.x + 10}px`;
+        this.tooltip.style.top = `${canvasPosition.y + 10}px`;
+    }
+
+    hideTooltip() {
+        if (this.tooltipTimeout) {
+            clearTimeout(this.tooltipTimeout);
+        }
+        this.tooltipTimeout = setTimeout(() => {
+            this.tooltip.style.display = 'none';
+        }, 200);
+    }
+
+    handleNodeClick(params) {
+        const nodeId = params.nodes[0];
+        const node = this.network.body.data.nodes.get(nodeId);
+        
+        // Create a detailed view window
+        const windowManager = window.windowManager;
+        if (windowManager) {
+            windowManager.createWindow({
+                id: `node-details-${nodeId}`,
+                title: `Node Details: ${node.label}`,
+                content: `
+                    <div class="node-details">
+                        <div class="detail-section">
+                            <h3>Basic Information</h3>
+                            <table>
+                                <tr><td>Type:</td><td>${node.type || 'Unknown'}</td></tr>
+                                <tr><td>Status:</td><td>${node.status || 'Unknown'}</td></tr>
+                                <tr><td>IP Address:</td><td>${node.ip || 'N/A'}</td></tr>
+                                <tr><td>Last Update:</td><td>${node.lastUpdate || 'N/A'}</td></tr>
+                            </table>
+                        </div>
+                        <div class="detail-section">
+                            <h3>Performance Metrics</h3>
+                            <div class="metrics-grid">
+                                <div class="metric">
+                                    <span class="metric-label">CPU Usage</span>
+                                    <span class="metric-value">${node.cpu || 'N/A'}</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-label">Memory Usage</span>
+                                    <span class="metric-value">${node.memory || 'N/A'}</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-label">Network Traffic</span>
+                                    <span class="metric-value">${node.traffic || 'N/A'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                width: 500,
+                height: 400
+            });
+        }
     }
 }

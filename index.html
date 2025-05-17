@@ -97,10 +97,9 @@
 
         // Initialize modules
         const windowManager = new WindowManager();
-        const network = new NetworkVisualization('networkTopology');
-        const keyboardManager = new KeyboardManager(windowManager, null, network);
         const helpManager = new HelpManager();
         const searchManager = new SearchManager();
+        let network = null;
 
         // Initialize start menu
         const startBtn = document.getElementById('startBtn');
@@ -141,8 +140,8 @@
                         );
                         break;
                     }
-                    case 'network-monitor':
-                        windowManager.createWindow({
+                    case 'network-monitor': {
+                        const topologyWin = windowManager.createWindow({
                             id: 'topologyWindow',
                             title: 'Network Topology',
                             content: `
@@ -152,7 +151,11 @@
                             height: 600,
                             icon: 'fa-network-wired'
                         });
-                        windowManager.createWindow({
+                        
+                        // Initialize network visualization after window is created
+                        network = new NetworkVisualization('networkTopology');
+                        
+                        const widgetsWin = windowManager.createWindow({
                             id: 'widgetsWindow',
                             title: 'Network Status',
                             content: `
@@ -172,8 +175,9 @@
                             icon: 'fa-chart-line'
                         });
                         break;
-                    case 'codex':
-                        windowManager.createWindow({
+                    }
+                    case 'codex': {
+                        const win = windowManager.createWindow({
                             id: 'codexWindow',
                             title: 'Codex of Financial Instruments',
                             content: `
@@ -186,6 +190,7 @@
                         // Initialize search for the Codex window
                         searchManager.loadAndIndexContent();
                         break;
+                    }
                 }
             });
         });

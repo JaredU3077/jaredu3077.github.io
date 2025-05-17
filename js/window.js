@@ -1,6 +1,7 @@
 /**
  * Window Management Module
  * Handles window dragging, resizing, and controls
+ * Enhanced with accessibility features and smooth transitions
  */
 
 import { CONFIG } from './config.js';
@@ -15,9 +16,13 @@ export class WindowManager {
         this.snapZones = new Map();
         this.contextMenu = null;
         this.zIndexCounter = 1000;
+        this.windowStack = [];
         
         // Initialize event listeners
         this.initEventListeners();
+        
+        // Make windowManager globally accessible
+        window.windowManager = this;
     }
 
     initEventListeners() {
@@ -28,6 +33,30 @@ export class WindowManager {
                 this.focusWindow(windowElement);
             } else {
                 this.blurActiveWindow();
+            }
+        });
+
+        // Enhanced keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.altKey) {
+                switch(e.key) {
+                    case 'Tab':
+                        e.preventDefault();
+                        this.cycleWindows(e.shiftKey);
+                        break;
+                    case 'F4':
+                        e.preventDefault();
+                        if (this.activeWindow) {
+                            this.closeWindow(this.activeWindow);
+                        }
+                        break;
+                    case 'Space':
+                        e.preventDefault();
+                        if (this.activeWindow) {
+                            this.toggleMaximize(this.activeWindow);
+                        }
+                        break;
+                }
             }
         });
 
@@ -71,7 +100,9 @@ export class WindowManager {
             height = 400,
             x = Math.random() * (window.innerWidth - width),
             y = Math.random() * (window.innerHeight - height - 40),
-            icon = 'fa-window-maximize'
+            icon = 'fa-window-maximize',
+            role = 'dialog',
+            ariaLabel = title
         } = options;
 
         // Check if window already exists
@@ -100,13 +131,13 @@ export class WindowManager {
                     ${title}
                 </div>
                 <div class="window-controls">
-                    <button class="window-control minimize" title="Minimize">
+                    <button class="window-control minimize" title="Minimize" aria-label="Minimize window">
                         <i class="fas fa-minus"></i>
                     </button>
-                    <button class="window-control maximize" title="Maximize">
+                    <button class="window-control maximize" title="Maximize" aria-label="Maximize window">
                         <i class="fas fa-expand"></i>
                     </button>
-                    <button class="window-control close" title="Close">
+                    <button class="window-control close" title="Close" aria-label="Close window">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -124,6 +155,10 @@ export class WindowManager {
             <div class="window-resize sw"></div>
         `;
 
+        windowElement.setAttribute('role', role);
+        windowElement.setAttribute('aria-label', ariaLabel);
+        windowElement.setAttribute('tabindex', '0');
+        
         document.body.appendChild(windowElement);
         this.windows.set(id, windowElement);
 
@@ -168,16 +203,26 @@ export class WindowManager {
 
         if (this.activeWindow) {
             this.activeWindow.classList.remove('focused');
+            this.activeWindow.setAttribute('aria-hidden', 'true');
         }
 
         windowElement.classList.add('focused');
+        windowElement.setAttribute('aria-hidden', 'false');
         this.activeWindow = windowElement;
         windowElement.style.zIndex = this.getNextZIndex();
+        
+        // Update window stack
+        this.windowStack = this.windowStack.filter(w => w !== windowElement);
+        this.windowStack.unshift(windowElement);
+        
+        // Focus the window for keyboard navigation
+        windowElement.focus();
     }
 
     blurActiveWindow() {
         if (this.activeWindow) {
             this.activeWindow.classList.remove('focused');
+            this.activeWindow.setAttribute('aria-hidden', 'true');
             this.activeWindow = null;
         }
     }
@@ -489,6 +534,17 @@ export class WindowManager {
             this.contextMenu.remove();
             this.contextMenu = null;
         }
+    }
+
+    cycleWindows(reverse = false) {
+        if (this.windowStack.length < 2) return;
+        
+        const currentIndex = this.windowStack.indexOf(this.activeWindow);
+        const nextIndex = reverse 
+            ? (currentIndex + 1) % this.windowStack.length
+            : (currentIndex - 1 + this.windowStack.length) % this.windowStack.length;
+            
+        this.focusWindow(this.windowStack[nextIndex]);
     }
 }
 
