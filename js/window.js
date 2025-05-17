@@ -7,464 +7,402 @@ import { CONFIG } from './config.js';
 
 export class WindowManager {
     constructor() {
-        this.windowStates = new Map();
-        this.snapThreshold = 20; // pixels
+        this.windows = new Map();
+        this.activeWindow = null;
+        this.dragState = null;
+        this.resizeState = null;
+        this.snapThreshold = 20;
         this.snapZones = {
-            top: 0,
-            bottom: window.innerHeight,
-            left: 0,
-            right: window.innerWidth,
-            center: window.innerWidth / 2
+            top: { y: 0, height: this.snapThreshold },
+            bottom: { y: window.innerHeight - this.snapThreshold, height: this.snapThreshold },
+            left: { x: 0, width: this.snapThreshold },
+            right: { x: window.innerWidth - this.snapThreshold, width: this.snapThreshold },
+            center: { x: window.innerWidth / 2 - this.snapThreshold, width: this.snapThreshold * 2 }
         };
-        this.loadWindowStates();
-        this.initializeDraggable();
-        this.initializeResizable();
-        this.initializeWindowControls();
-        this.initializeWindowConstraints();
-        this.initializeWindowSnapping();
+        
+        this.initializeEventListeners();
     }
 
-    /**
-     * Load saved window states from localStorage
-     */
-    loadWindowStates() {
-        const savedStates = localStorage.getItem('windowStates');
-        if (savedStates) {
-            this.windowStates = new Map(JSON.parse(savedStates));
-        }
-    }
-
-    /**
-     * Save window states to localStorage
-     */
-    saveWindowStates() {
-        localStorage.setItem('windowStates', JSON.stringify(Array.from(this.windowStates.entries())));
-    }
-
-    /**
-     * Get window state
-     * @param {string} windowId - The ID of the window
-     * @returns {Object} Window state object
-     */
-    getWindowState(windowId) {
-        return this.windowStates.get(windowId) || {
-            x: 0,
-            y: 0,
-            width: CONFIG.WINDOW.DEFAULT_WIDTH,
-            height: CONFIG.WINDOW.DEFAULT_HEIGHT,
-            isMaximized: false,
-            isMinimized: false
-        };
-    }
-
-    /**
-     * Update window state
-     * @param {string} windowId - The ID of the window
-     * @param {Object} state - New window state
-     */
-    updateWindowState(windowId, state) {
-        this.windowStates.set(windowId, state);
-        this.saveWindowStates();
-    }
-
-    /**
-     * Initialize window position constraints
-     */
-    initializeWindowConstraints() {
-        document.querySelectorAll('.window').forEach(window => {
-            const state = this.getWindowState(window.id);
-            
-            // Apply saved state
-            window.style.width = state.width;
-            window.style.height = state.height;
-            window.style.transform = `translate(${state.x}px, ${state.y}px)`;
-            window.setAttribute('data-x', state.x);
-            window.setAttribute('data-y', state.y);
-            
-            if (state.isMaximized) {
-                window.classList.add('maximized');
-                window.style.width = CONFIG.WINDOW.MAXIMIZED_WIDTH;
-                window.style.height = CONFIG.WINDOW.MAXIMIZED_HEIGHT;
-                window.style.left = CONFIG.WINDOW.MAXIMIZED_MARGIN;
-                window.style.top = CONFIG.WINDOW.MAXIMIZED_MARGIN;
-            }
-            
-            if (state.isMinimized) {
-                window.querySelector('.window-body').style.display = 'none';
-            }
-        });
-    }
-
-    /**
-     * Initialize draggable functionality for window headers
-     */
-    initializeDraggable() {
-        interact('.window-header').draggable({
-            listeners: {
-                move: (event) => {
-                    const target = event.target.parentElement;
-                    const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-                    const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-                    
-                    // Constrain to viewport
-                    const maxX = window.innerWidth - target.offsetWidth;
-                    const maxY = window.innerHeight - target.offsetHeight;
-                    const constrainedX = Math.max(0, Math.min(x, maxX));
-                    const constrainedY = Math.max(0, Math.min(y, maxY));
-                    
-                    target.style.transform = `translate(${constrainedX}px, ${constrainedY}px)`;
-                    target.setAttribute('data-x', constrainedX);
-                    target.setAttribute('data-y', constrainedY);
-                    
-                    // Update window state
-                    this.updateWindowState(target.id, {
-                        ...this.getWindowState(target.id),
-                        x: constrainedX,
-                        y: constrainedY
-                    });
-                }
-            }
-        });
-    }
-
-    /**
-     * Initialize resizable functionality for windows
-     */
-    initializeResizable() {
-        interact('.window').resizable({
-            edges: { left: true, right: true, bottom: true, top: true },
-            listeners: {
-                move: (event) => {
-                    const target = event.target;
-                    let x = (parseFloat(target.getAttribute('data-x')) || 0);
-                    let y = (parseFloat(target.getAttribute('data-y')) || 0);
-
-                    // Constrain minimum size
-                    const minWidth = 200;
-                    const minHeight = 150;
-                    const width = Math.max(event.rect.width, minWidth);
-                    const height = Math.max(event.rect.height, minHeight);
-
-                    target.style.width = width + 'px';
-                    target.style.height = height + 'px';
-
-                    x += event.deltaRect.left;
-                    y += event.deltaRect.top;
-
-                    // Constrain to viewport
-                    const maxX = window.innerWidth - width;
-                    const maxY = window.innerHeight - height;
-                    const constrainedX = Math.max(0, Math.min(x, maxX));
-                    const constrainedY = Math.max(0, Math.min(y, maxY));
-
-                    target.style.transform = `translate(${constrainedX}px, ${constrainedY}px)`;
-                    target.setAttribute('data-x', constrainedX);
-                    target.setAttribute('data-y', constrainedY);
-
-                    // Update window state
-                    this.updateWindowState(target.id, {
-                        ...this.getWindowState(target.id),
-                        x: constrainedX,
-                        y: constrainedY,
-                        width: width + 'px',
-                        height: height + 'px'
-                    });
-
-                    if (target.id === 'topologyWindow') {
-                        const topology = document.getElementById('networkTopology');
-                        topology.style.width = width + 'px';
-                        topology.style.height = (height - 40) + 'px';
-                        if (window.network) {
-                            window.network.fit();
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    /**
-     * Initialize window controls (minimize, maximize, close)
-     */
-    initializeWindowControls() {
-        document.querySelectorAll('.window').forEach(window => {
-            const minimizeBtn = window.querySelector('.minimize-btn');
-            const maximizeBtn = window.querySelector('.maximize-btn');
-            const closeBtn = window.querySelector('.close-btn');
-            const body = window.querySelector('.window-body');
-
-            window.addEventListener('click', () => {
-                if (window.style.display === 'block' && !window.classList.contains('maximized') && window.id !== 'codexWindow') {
-                    const state = this.getWindowState(window.id);
-                    window.style.width = state.width;
-                    window.style.height = state.height;
-                    window.style.transform = `translate(${state.x}px, ${state.y}px)`;
-                    window.setAttribute('data-x', state.x);
-                    window.setAttribute('data-y', state.y);
-                    window.scrollTop = 0;
-                }
-            });
-
-            minimizeBtn.addEventListener('click', () => {
-                const isMinimized = body.style.display === 'none';
-                
-                if (!isMinimized) {
-                    // Minimize animation
-                    const x = parseFloat(window.getAttribute('data-x')) || 0;
-                    const y = parseFloat(window.getAttribute('data-y')) || 0;
-                    window.style.setProperty('--x', `${x}px`);
-                    window.style.setProperty('--y', `${y}px`);
-                    window.classList.add('minimizing');
-                    
-                    // Wait for animation to complete
-                    setTimeout(() => {
-                        body.style.display = 'none';
-                        window.classList.remove('minimizing');
-                    }, 300);
-                } else {
-                    // Restore animation
-                    const x = parseFloat(window.getAttribute('data-x')) || 0;
-                    const y = parseFloat(window.getAttribute('data-y')) || 0;
-                    window.style.setProperty('--x', `${x}px`);
-                    window.style.setProperty('--y', `${y}px`);
-                    window.classList.add('restoring');
-                    body.style.display = 'block';
-                    
-                    // Wait for animation to complete
-                    setTimeout(() => {
-                        window.classList.remove('restoring');
-                    }, 300);
-                }
-                
-                // Update window state
-                this.updateWindowState(window.id, {
-                    ...this.getWindowState(window.id),
-                    isMinimized: !isMinimized
-                });
-            });
-
-            maximizeBtn.addEventListener('click', () => {
-                const state = this.getWindowState(window.id);
-                const isMaximized = window.classList.contains('maximized');
-                
-                if (isMaximized) {
-                    window.style.width = state.width;
-                    window.style.height = state.height;
-                    window.style.transform = `translate(${state.x}px, ${state.y}px)`;
-                    window.classList.remove('maximized');
-                } else {
-                    // Save current state before maximizing
-                    this.updateWindowState(window.id, {
-                        ...state,
-                        width: window.style.width,
-                        height: window.style.height,
-                        x: parseFloat(window.getAttribute('data-x')) || 0,
-                        y: parseFloat(window.getAttribute('data-y')) || 0
-                    });
-                    
-                    window.style.width = CONFIG.WINDOW.MAXIMIZED_WIDTH;
-                    window.style.height = CONFIG.WINDOW.MAXIMIZED_HEIGHT;
-                    window.style.left = CONFIG.WINDOW.MAXIMIZED_MARGIN;
-                    window.style.top = CONFIG.WINDOW.MAXIMIZED_MARGIN;
-                    window.style.transform = 'translate(0, 0)';
-                    window.setAttribute('data-x', 0);
-                    window.setAttribute('data-y', 0);
-                    window.classList.add('maximized');
-                }
-                
-                // Update window state
-                this.updateWindowState(window.id, {
-                    ...state,
-                    isMaximized: !isMaximized
-                });
-
-                if (window.id === 'topologyWindow') {
-                    const topology = document.getElementById('networkTopology');
-                    topology.style.width = '100%';
-                    topology.style.height = (window.offsetHeight - 40) + 'px';
-                    if (window.network) {
-                        window.network.fit();
-                    }
-                }
-                window.scrollTop = 0;
-            });
-
-            closeBtn.addEventListener('click', () => {
-                window.style.display = 'none';
-                window.classList.remove('maximized');
-                
-                // Update window state
-                this.updateWindowState(window.id, {
-                    ...this.getWindowState(window.id),
-                    isMaximized: false
-                });
-            });
-        });
-    }
-
-    /**
-     * Show a window
-     * @param {string} windowId - The ID of the window to show
-     */
-    showWindow(windowId) {
-        const window = document.getElementById(windowId);
-        if (window) {
-            const state = this.getWindowState(windowId);
-            window.style.display = 'block';
-            
-            // Restore window state
-            if (state.isMaximized) {
-                window.classList.add('maximized');
-                window.style.width = CONFIG.WINDOW.MAXIMIZED_WIDTH;
-                window.style.height = CONFIG.WINDOW.MAXIMIZED_HEIGHT;
-                window.style.left = CONFIG.WINDOW.MAXIMIZED_MARGIN;
-                window.style.top = CONFIG.WINDOW.MAXIMIZED_MARGIN;
-                window.style.transform = 'translate(0, 0)';
+    initializeEventListeners() {
+        // Window focus management
+        document.addEventListener('mousedown', (e) => {
+            const windowElement = e.target.closest('.window');
+            if (windowElement) {
+                this.focusWindow(windowElement.id);
             } else {
-                window.style.width = state.width;
-                window.style.height = state.height;
-                window.style.transform = `translate(${state.x}px, ${state.y}px)`;
-                window.setAttribute('data-x', state.x);
-                window.setAttribute('data-y', state.y);
-            }
-            
-            if (state.isMinimized) {
-                window.querySelector('.window-body').style.display = 'none';
-            }
-            
-            window.scrollTop = 0;
-        }
-    }
-
-    /**
-     * Hide a window
-     * @param {string} windowId - The ID of the window to hide
-     */
-    hideWindow(windowId) {
-        const window = document.getElementById(windowId);
-        if (window) {
-            window.style.display = 'none';
-        }
-    }
-
-    /**
-     * Initialize window snapping functionality
-     */
-    initializeWindowSnapping() {
-        interact('.window').on('dragmove', (event) => {
-            const target = event.target;
-            const rect = target.getBoundingClientRect();
-            
-            // Check for snapping to edges
-            this.checkSnapToEdges(target, rect);
-            
-            // Check for snapping to other windows
-            this.checkSnapToWindows(target, rect);
-        });
-    }
-
-    /**
-     * Check and apply snapping to screen edges
-     * @param {HTMLElement} window - The window element
-     * @param {DOMRect} rect - The window's bounding rectangle
-     */
-    checkSnapToEdges(window, rect) {
-        const x = parseFloat(window.getAttribute('data-x')) || 0;
-        const y = parseFloat(window.getAttribute('data-y')) || 0;
-        let newX = x;
-        let newY = y;
-
-        // Snap to top
-        if (Math.abs(rect.top - this.snapZones.top) < this.snapThreshold) {
-            newY = 0;
-        }
-        // Snap to bottom
-        else if (Math.abs(rect.bottom - this.snapZones.bottom) < this.snapThreshold) {
-            newY = window.innerHeight - rect.height;
-        }
-
-        // Snap to left
-        if (Math.abs(rect.left - this.snapZones.left) < this.snapThreshold) {
-            newX = 0;
-        }
-        // Snap to right
-        else if (Math.abs(rect.right - this.snapZones.right) < this.snapThreshold) {
-            newX = window.innerWidth - rect.width;
-        }
-        // Snap to center
-        else if (Math.abs(rect.left + rect.width/2 - this.snapZones.center) < this.snapThreshold) {
-            newX = (window.innerWidth - rect.width) / 2;
-        }
-
-        if (newX !== x || newY !== y) {
-            window.style.transform = `translate(${newX}px, ${newY}px)`;
-            window.setAttribute('data-x', newX);
-            window.setAttribute('data-y', newY);
-            
-            // Update window state
-            this.updateWindowState(window.id, {
-                ...this.getWindowState(window.id),
-                x: newX,
-                y: newY
-            });
-        }
-    }
-
-    /**
-     * Check and apply snapping to other windows
-     * @param {HTMLElement} window - The window element
-     * @param {DOMRect} rect - The window's bounding rectangle
-     */
-    checkSnapToWindows(window, rect) {
-        const x = parseFloat(window.getAttribute('data-x')) || 0;
-        const y = parseFloat(window.getAttribute('data-y')) || 0;
-        let newX = x;
-        let newY = y;
-
-        document.querySelectorAll('.window').forEach(otherWindow => {
-            if (otherWindow === window || otherWindow.style.display === 'none') return;
-
-            const otherRect = otherWindow.getBoundingClientRect();
-            
-            // Snap to other window's edges
-            if (Math.abs(rect.left - otherRect.right) < this.snapThreshold) {
-                newX = parseFloat(otherWindow.getAttribute('data-x')) + otherRect.width;
-            }
-            else if (Math.abs(rect.right - otherRect.left) < this.snapThreshold) {
-                newX = parseFloat(otherWindow.getAttribute('data-x')) - rect.width;
-            }
-            else if (Math.abs(rect.top - otherRect.bottom) < this.snapThreshold) {
-                newY = parseFloat(otherWindow.getAttribute('data-y')) + otherRect.height;
-            }
-            else if (Math.abs(rect.bottom - otherRect.top) < this.snapThreshold) {
-                newY = parseFloat(otherWindow.getAttribute('data-y')) - rect.height;
+                this.blurAllWindows();
             }
         });
 
-        if (newX !== x || newY !== y) {
-            window.style.transform = `translate(${newX}px, ${newY}px)`;
-            window.setAttribute('data-x', newX);
-            window.setAttribute('data-y', newY);
+        // Window drag and resize
+        document.addEventListener('mousemove', (e) => this.handleMouseMove(e));
+        document.addEventListener('mouseup', () => this.handleMouseUp());
+
+        // Window context menu
+        document.addEventListener('contextmenu', (e) => {
+            const windowElement = e.target.closest('.window');
+            if (windowElement) {
+                e.preventDefault();
+                this.showContextMenu(e, windowElement);
+            }
+        });
+
+        // Close context menu on click outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.window-context-menu')) {
+                this.hideContextMenu();
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => this.handleWindowResize());
+    }
+
+    createWindow(id, title, content, options = {}) {
+        const windowElement = document.createElement('div');
+        windowElement.id = id;
+        windowElement.className = 'window';
+        windowElement.innerHTML = `
+            <div class="window-header">
+                <div class="window-title">
+                    <i class="${options.icon || 'fas fa-window-maximize'}"></i>
+                    ${title}
+                </div>
+                <div class="window-controls">
+                    <button class="window-control minimize" title="Minimize"></button>
+                    <button class="window-control maximize" title="Maximize"></button>
+                    <button class="window-control close" title="Close"></button>
+                </div>
+            </div>
+            <div class="window-content">${content}</div>
+            <div class="window-resize n"></div>
+            <div class="window-resize e"></div>
+            <div class="window-resize s"></div>
+            <div class="window-resize w"></div>
+            <div class="window-resize ne"></div>
+            <div class="window-resize nw"></div>
+            <div class="window-resize se"></div>
+            <div class="window-resize sw"></div>
+        `;
+
+        document.body.appendChild(windowElement);
+        this.initializeWindowControls(windowElement);
+        this.initializeWindowDragging(windowElement);
+        this.initializeWindowResizing(windowElement);
+        
+        // Set initial position and size
+        const { x = 100, y = 100, width = 500, height = 400 } = options;
+        windowElement.style.left = `${x}px`;
+        windowElement.style.top = `${y}px`;
+        windowElement.style.width = `${width}px`;
+        windowElement.style.height = `${height}px`;
+
+        // Add opening animation
+        windowElement.classList.add('opening');
+        setTimeout(() => windowElement.classList.remove('opening'), 300);
+
+        this.windows.set(id, windowElement);
+        this.focusWindow(id);
+        return windowElement;
+    }
+
+    initializeWindowControls(windowElement) {
+        const controls = windowElement.querySelector('.window-controls');
+        
+        controls.querySelector('.minimize').addEventListener('click', () => {
+            this.minimizeWindow(windowElement);
+        });
+
+        controls.querySelector('.maximize').addEventListener('click', () => {
+            this.toggleMaximize(windowElement);
+        });
+
+        controls.querySelector('.close').addEventListener('click', () => {
+            this.closeWindow(windowElement);
+        });
+    }
+
+    initializeWindowDragging(windowElement) {
+        const header = windowElement.querySelector('.window-header');
+        
+        header.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.window-controls')) return;
             
-            // Update window state
-            this.updateWindowState(window.id, {
-                ...this.getWindowState(window.id),
-                x: newX,
-                y: newY
+            this.dragState = {
+                window: windowElement,
+                startX: e.clientX,
+                startY: e.clientY,
+                startLeft: parseInt(windowElement.style.left),
+                startTop: parseInt(windowElement.style.top)
+            };
+
+            // Create drag preview
+            const preview = document.createElement('div');
+            preview.className = 'window-drag-preview';
+            document.body.appendChild(preview);
+        });
+    }
+
+    initializeWindowResizing(windowElement) {
+        const resizeHandles = windowElement.querySelectorAll('.window-resize');
+        
+        resizeHandles.forEach(handle => {
+            handle.addEventListener('mousedown', (e) => {
+                e.stopPropagation();
+                
+                this.resizeState = {
+                    window: windowElement,
+                    handle: handle.className.split(' ')[1],
+                    startX: e.clientX,
+                    startY: e.clientY,
+                    startWidth: windowElement.offsetWidth,
+                    startHeight: windowElement.offsetHeight,
+                    startLeft: parseInt(windowElement.style.left),
+                    startTop: parseInt(windowElement.style.top)
+                };
             });
+        });
+    }
+
+    handleMouseMove(e) {
+        if (this.dragState) {
+            const dx = e.clientX - this.dragState.startX;
+            const dy = e.clientY - this.dragState.startY;
+            
+            let newLeft = this.dragState.startLeft + dx;
+            let newTop = this.dragState.startTop + dy;
+
+            // Constrain to viewport
+            newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - this.dragState.window.offsetWidth));
+            newTop = Math.max(0, Math.min(newTop, window.innerHeight - this.dragState.window.offsetHeight));
+
+            this.dragState.window.style.left = `${newLeft}px`;
+            this.dragState.window.style.top = `${newTop}px`;
+
+            // Update drag preview
+            const preview = document.querySelector('.window-drag-preview');
+            if (preview) {
+                preview.style.left = `${newLeft}px`;
+                preview.style.top = `${newTop}px`;
+                preview.style.width = `${this.dragState.window.offsetWidth}px`;
+                preview.style.height = `${this.dragState.window.offsetHeight}px`;
+            }
+
+            // Check for snapping
+            this.checkSnapping(this.dragState.window);
+        }
+
+        if (this.resizeState) {
+            const dx = e.clientX - this.resizeState.startX;
+            const dy = e.clientY - this.resizeState.startY;
+            
+            let newWidth = this.resizeState.startWidth;
+            let newHeight = this.resizeState.startHeight;
+            let newLeft = this.resizeState.startLeft;
+            let newTop = this.resizeState.startTop;
+
+            // Handle different resize directions
+            if (this.resizeState.handle.includes('e')) {
+                newWidth = Math.max(300, this.resizeState.startWidth + dx);
+            }
+            if (this.resizeState.handle.includes('w')) {
+                newWidth = Math.max(300, this.resizeState.startWidth - dx);
+                newLeft = this.resizeState.startLeft + (this.resizeState.startWidth - newWidth);
+            }
+            if (this.resizeState.handle.includes('s')) {
+                newHeight = Math.max(200, this.resizeState.startHeight + dy);
+            }
+            if (this.resizeState.handle.includes('n')) {
+                newHeight = Math.max(200, this.resizeState.startHeight - dy);
+                newTop = this.resizeState.startTop + (this.resizeState.startHeight - newHeight);
+            }
+
+            // Apply new dimensions
+            this.resizeState.window.style.width = `${newWidth}px`;
+            this.resizeState.window.style.height = `${newHeight}px`;
+            this.resizeState.window.style.left = `${newLeft}px`;
+            this.resizeState.window.style.top = `${newTop}px`;
         }
     }
 
-    /**
-     * Update snap zones when window is resized
-     */
-    updateSnapZones() {
+    handleMouseUp() {
+        if (this.dragState) {
+            const preview = document.querySelector('.window-drag-preview');
+            if (preview) preview.remove();
+        }
+        this.dragState = null;
+        this.resizeState = null;
+    }
+
+    checkSnapping(windowElement) {
+        const rect = windowElement.getBoundingClientRect();
+        
+        // Check screen edges
+        if (rect.top <= this.snapThreshold) {
+            windowElement.style.top = '0';
+        }
+        if (rect.bottom >= window.innerHeight - this.snapThreshold) {
+            windowElement.style.top = `${window.innerHeight - rect.height}px`;
+        }
+        if (rect.left <= this.snapThreshold) {
+            windowElement.style.left = '0';
+        }
+        if (rect.right >= window.innerWidth - this.snapThreshold) {
+            windowElement.style.left = `${window.innerWidth - rect.width}px`;
+        }
+
+        // Check other windows
+        this.windows.forEach(otherWindow => {
+            if (otherWindow !== windowElement && !otherWindow.classList.contains('minimized')) {
+                const otherRect = otherWindow.getBoundingClientRect();
+                
+                // Snap to other window edges
+                if (Math.abs(rect.left - otherRect.right) <= this.snapThreshold) {
+                    windowElement.style.left = `${otherRect.right}px`;
+                }
+                if (Math.abs(rect.right - otherRect.left) <= this.snapThreshold) {
+                    windowElement.style.left = `${otherRect.left - rect.width}px`;
+                }
+                if (Math.abs(rect.top - otherRect.bottom) <= this.snapThreshold) {
+                    windowElement.style.top = `${otherRect.bottom}px`;
+                }
+                if (Math.abs(rect.bottom - otherRect.top) <= this.snapThreshold) {
+                    windowElement.style.top = `${otherRect.top - rect.height}px`;
+                }
+            }
+        });
+    }
+
+    focusWindow(id) {
+        const windowElement = this.windows.get(id);
+        if (!windowElement) return;
+
+        this.blurAllWindows();
+        windowElement.classList.add('focused');
+        windowElement.style.zIndex = this.getNextZIndex();
+        this.activeWindow = windowElement;
+    }
+
+    blurAllWindows() {
+        this.windows.forEach(window => {
+            window.classList.remove('focused');
+        });
+    }
+
+    getNextZIndex() {
+        let maxZ = 0;
+        this.windows.forEach(window => {
+            const z = parseInt(window.style.zIndex) || 0;
+            maxZ = Math.max(maxZ, z);
+        });
+        return maxZ + 1;
+    }
+
+    minimizeWindow(windowElement) {
+        windowElement.classList.add('minimizing');
+        setTimeout(() => {
+            windowElement.classList.add('minimized');
+            windowElement.style.display = 'none';
+            windowElement.classList.remove('minimizing');
+        }, 300);
+    }
+
+    restoreWindow(windowElement) {
+        windowElement.classList.add('restoring');
+        windowElement.style.display = 'block';
+        setTimeout(() => {
+            windowElement.classList.remove('minimized', 'restoring');
+        }, 300);
+    }
+
+    toggleMaximize(windowElement) {
+        if (windowElement.classList.contains('maximized')) {
+            windowElement.classList.add('unmaximizing');
+            windowElement.classList.remove('maximized');
+            setTimeout(() => {
+                windowElement.classList.remove('unmaximizing');
+            }, 300);
+        } else {
+            windowElement.classList.add('maximizing');
+            windowElement.classList.add('maximized');
+            setTimeout(() => {
+                windowElement.classList.remove('maximizing');
+            }, 300);
+        }
+    }
+
+    closeWindow(windowElement) {
+        windowElement.classList.add('closing');
+        setTimeout(() => {
+            this.windows.delete(windowElement.id);
+            windowElement.remove();
+        }, 200);
+    }
+
+    showContextMenu(e, windowElement) {
+        this.hideContextMenu();
+
+        const menu = document.createElement('div');
+        menu.className = 'window-context-menu';
+        menu.innerHTML = `
+            <div class="window-context-menu-item" data-action="minimize">
+                <i class="fas fa-window-minimize"></i> Minimize
+            </div>
+            <div class="window-context-menu-item" data-action="maximize">
+                <i class="fas fa-window-maximize"></i> Maximize
+            </div>
+            <div class="window-context-menu-item" data-action="close">
+                <i class="fas fa-times"></i> Close
+            </div>
+        `;
+
+        menu.style.left = `${e.clientX}px`;
+        menu.style.top = `${e.clientY}px`;
+        document.body.appendChild(menu);
+
+        menu.addEventListener('click', (e) => {
+            const action = e.target.closest('.window-context-menu-item')?.dataset.action;
+            if (action) {
+                switch (action) {
+                    case 'minimize':
+                        this.minimizeWindow(windowElement);
+                        break;
+                    case 'maximize':
+                        this.toggleMaximize(windowElement);
+                        break;
+                    case 'close':
+                        this.closeWindow(windowElement);
+                        break;
+                }
+            }
+            this.hideContextMenu();
+        });
+    }
+
+    hideContextMenu() {
+        const menu = document.querySelector('.window-context-menu');
+        if (menu) menu.remove();
+    }
+
+    handleWindowResize() {
+        // Update snap zones
         this.snapZones = {
-            top: 0,
-            bottom: window.innerHeight,
-            left: 0,
-            right: window.innerWidth,
-            center: window.innerWidth / 2
+            top: { y: 0, height: this.snapThreshold },
+            bottom: { y: window.innerHeight - this.snapThreshold, height: this.snapThreshold },
+            left: { x: 0, width: this.snapThreshold },
+            right: { x: window.innerWidth - this.snapThreshold, width: this.snapThreshold },
+            center: { x: window.innerWidth / 2 - this.snapThreshold, width: this.snapThreshold * 2 }
         };
+
+        // Constrain windows to viewport
+        this.windows.forEach(window => {
+            const rect = window.getBoundingClientRect();
+            if (rect.right > window.innerWidth) {
+                window.style.left = `${window.innerWidth - rect.width}px`;
+            }
+            if (rect.bottom > window.innerHeight) {
+                window.style.top = `${window.innerHeight - rect.height}px`;
+            }
+        });
     }
 }

@@ -58,48 +58,378 @@ body {
     transition: color 0.2s;
 }
 
-/* Window styles */
+/* Window Styles */
 .window {
     position: absolute;
-    width: 500px;
-    background: #2A3435;
-    border: 1px solid #4682B4;
+    background: var(--window-bg);
     border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-    display: none;
-    z-index: 10;
-    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2),
+                0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden;
+    min-width: 300px;
+    min-height: 200px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.window.minimizing {
-    transform-origin: top left;
-    animation: minimizeWindow 0.3s ease-out forwards;
+.window.focused {
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3),
+                0 1px 3px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.window.restoring {
-    transform-origin: top left;
-    animation: restoreWindow 0.3s ease-out forwards;
+.window-header {
+    background: linear-gradient(to bottom, #2c3e50, #1a2530);
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: move;
+    user-select: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.window-title {
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.window-title i {
+    font-size: 16px;
+    opacity: 0.8;
+}
+
+.window-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.window-control {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.window-control:hover {
+    transform: scale(1.1);
+    opacity: 0.8;
+}
+
+.window-control.close {
+    background: #ff5f57;
+}
+
+.window-control.minimize {
+    background: #febc2e;
+}
+
+.window-control.maximize {
+    background: #28c840;
+}
+
+/* Window Animations */
+@keyframes windowOpen {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes windowClose {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+}
+
+.window.opening {
+    animation: windowOpen 0.3s ease forwards;
+}
+
+.window.closing {
+    animation: windowClose 0.2s ease forwards;
+}
+
+/* Window Resize Handles */
+.window-resize {
+    position: absolute;
+    background: transparent;
+    z-index: 1000;
+}
+
+.window-resize.n {
+    top: 0;
+    left: 5px;
+    right: 5px;
+    height: 5px;
+    cursor: ns-resize;
+}
+
+.window-resize.e {
+    top: 5px;
+    right: 0;
+    bottom: 5px;
+    width: 5px;
+    cursor: ew-resize;
+}
+
+.window-resize.s {
+    bottom: 0;
+    left: 5px;
+    right: 5px;
+    height: 5px;
+    cursor: ns-resize;
+}
+
+.window-resize.w {
+    top: 5px;
+    left: 0;
+    bottom: 5px;
+    width: 5px;
+    cursor: ew-resize;
+}
+
+.window-resize.ne {
+    top: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    cursor: ne-resize;
+}
+
+.window-resize.nw {
+    top: 0;
+    left: 0;
+    width: 10px;
+    height: 10px;
+    cursor: nw-resize;
+}
+
+.window-resize.se {
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    cursor: se-resize;
+}
+
+.window-resize.sw {
+    bottom: 0;
+    left: 0;
+    width: 10px;
+    height: 10px;
+    cursor: sw-resize;
+}
+
+/* Window Content */
+.window-content {
+    padding: 16px;
+    height: calc(100% - 37px);
+    overflow: auto;
+    background: var(--window-content-bg);
+}
+
+/* Scrollbar Styling */
+.window-content::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.window-content::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+.window-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.window-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Window Minimize Animation */
 @keyframes minimizeWindow {
     0% {
-        transform: scale(1) translate(var(--x), var(--y));
+        transform: scale(1) translateY(0);
         opacity: 1;
     }
     100% {
-        transform: scale(0.1) translate(var(--x), var(--y));
+        transform: scale(0.8) translateY(20px);
         opacity: 0;
     }
 }
 
 @keyframes restoreWindow {
     0% {
-        transform: scale(0.1) translate(var(--x), var(--y));
+        transform: scale(0.8) translateY(20px);
         opacity: 0;
     }
     100% {
-        transform: scale(1) translate(var(--x), var(--y));
+        transform: scale(1) translateY(0);
         opacity: 1;
+    }
+}
+
+.window.minimizing {
+    animation: minimizeWindow 0.3s ease forwards;
+}
+
+.window.restoring {
+    animation: restoreWindow 0.3s ease forwards;
+}
+
+/* Window Maximize Animation */
+@keyframes maximizeWindow {
+    0% {
+        transform: scale(1);
+        border-radius: 8px;
+    }
+    100% {
+        transform: scale(1);
+        border-radius: 0;
+    }
+}
+
+@keyframes unmaximizeWindow {
+    0% {
+        transform: scale(1);
+        border-radius: 0;
+    }
+    100% {
+        transform: scale(1);
+        border-radius: 8px;
+    }
+}
+
+.window.maximizing {
+    animation: maximizeWindow 0.3s ease forwards;
+}
+
+.window.unmaximizing {
+    animation: unmaximizeWindow 0.3s ease forwards;
+}
+
+/* Window Focus Effects */
+.window::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    pointer-events: none;
+    transition: border-color 0.2s ease;
+}
+
+.window.focused::after {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Window Drag Preview */
+.window-drag-preview {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px dashed rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+/* Window Snap Zones */
+.snap-zone {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    pointer-events: none;
+    z-index: 999;
+    transition: all 0.2s ease;
+}
+
+.snap-zone.active {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Window Context Menu */
+.window-context-menu {
+    position: absolute;
+    background: var(--window-bg);
+    border-radius: 4px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    padding: 4px 0;
+    min-width: 150px;
+    z-index: 1000;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.window-context-menu-item {
+    padding: 8px 16px;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s ease;
+}
+
+.window-context-menu-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.window-context-menu-item i {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+/* Window Loading State */
+.window-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.window-loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
     }
 }
 
@@ -126,35 +456,8 @@ body {
     height: 500px;
 }
 
-.window-header {
-    background: #1C2526;
-    padding: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #4682B4;
-    cursor: move;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-}
-
 .window-header span {
     font-size: 16px;
-}
-
-.window-controls {
-    display: flex;
-    gap: 5px;
-}
-
-.window-controls button {
-    background: none;
-    border: none;
-    color: #E0E0E0;
-    font-size: 14px;
-    cursor: pointer;
-    padding: 2px 6px;
-    border-radius: 3px;
 }
 
 .minimize-btn:hover {
