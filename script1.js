@@ -17,7 +17,23 @@ const data = { nodes, edges };
 const options = {
     nodes: { shape: 'dot', size: 20 },
     edges: { arrows: 'to', color: '#4682B4', font: { align: 'middle' } },
-    physics: { enabled: true }
+    physics: {
+        enabled: true,
+        barnesHut: {
+            gravitationalConstant: -3000, // Increase repulsion to reduce spread
+            centralGravity: 0.3,
+            springLength: 100, // Reduce spring length for tighter layout
+            springConstant: 0.05
+        },
+        stabilization: {
+            iterations: 500 // Stabilize layout faster
+        }
+    },
+    interaction: {
+        dragView: true, // Enable panning
+        zoomView: true, // Enable zooming
+        dragNodes: true // Allow dragging nodes
+    }
 };
 const network = new vis.Network(container, data, options);
 // Animate edges to show traffic
@@ -55,18 +71,15 @@ function parseCodexContent(text) {
     let inLayer = false;
 
     lines.forEach((line, index) => {
-        // Skip empty lines unless they are part of a list
         if (!line.trim() && !currentList) return;
 
         line = line.replace(/\r/g, '');
 
-        // Check for main heading (e.g., "Codex of Financial Instruments ver A1.0")
         if (line.match(/^Codex of Financial Instruments/)) {
             htmlContent += `<h2>${line}</h2>`;
             return;
         }
 
-        // Check for layer headings (e.g., "Layer 1: Basic Instruments")
         if (line.match(/^Layer \d+:/)) {
             if (currentList) {
                 htmlContent += '</ul>'.repeat(listLevel);
@@ -74,14 +87,13 @@ function parseCodexContent(text) {
                 listLevel = 0;
             }
             if (inLayer) {
-                htmlContent += '</div>'; // Close previous layer-section
+                htmlContent += '</div>';
             }
             htmlContent += `<div class="layer-section"><h3>${line}</h3>`;
             inLayer = true;
             return;
         }
 
-        // Check for subheadings (e.g., "Education and Awareness:")
         if (line.match(/^\w.*:$/)) {
             if (currentList) {
                 htmlContent += '</ul>'.repeat(listLevel);
@@ -92,7 +104,6 @@ function parseCodexContent(text) {
             return;
         }
 
-        // Check for list items (indented lines)
         if (line.match(/^\s{4,}/)) {
             const indentLevel = Math.floor(line.match(/^\s*/)[0].length / 4);
             line = line.trim();
@@ -115,7 +126,6 @@ function parseCodexContent(text) {
             return;
         }
 
-        // Treat as paragraph
         if (currentList) {
             htmlContent += '</ul>'.repeat(listLevel);
             currentList = null;
@@ -124,7 +134,6 @@ function parseCodexContent(text) {
         htmlContent += `<p>${line.trim()}</p>`;
     });
 
-    // Close any remaining lists and layer sections
     if (listLevel > 0) {
         htmlContent += '</ul>'.repeat(listLevel);
     }
@@ -155,10 +164,10 @@ function loadCodexContent() {
 }
 
 // Draggable and resizable windows
-interact('.window').draggable({
+interact('.window-header').draggable({
     listeners: {
         move(event) {
-            const target = event.target;
+            const target = event.target.parentElement; // Target the window, not the header
             const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
             const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
             target.style.transform = `translate(${x}px, ${y}px)`;
@@ -166,7 +175,9 @@ interact('.window').draggable({
             target.setAttribute('data-y', y);
         }
     }
-}).resizable({
+});
+
+interact('.window').resizable({
     edges: { left: true, right: true, bottom: true, top: true },
     listeners: {
         move(event) {
@@ -202,7 +213,6 @@ document.querySelectorAll('.window').forEach(window => {
     const closeBtn = window.querySelector('.close-btn');
     const body = window.querySelector('.window-body');
 
-    // Reset window to initial size and position when opened (except for Codex)
     window.addEventListener('click', () => {
         if (window.style.display === 'block' && !window.classList.contains('maximized') && window.id !== 'codexWindow') {
             window.style.width = window.dataset.initialWidth || '500px';
@@ -270,6 +280,11 @@ document.querySelectorAll('.icon, .taskbar-icon, .start-menu button').forEach(el
             const window = document.getElementById('topologyWindow');
             window.style.display = 'block';
             window.scrollTop = 0;
+            // Fit the network graph to the window on open
+            const topology = document.getElementById('networkTopology');
+            topology.style.width = '100%';
+            topology.style.height = (window.offsetHeight - 40) + 'px';
+            network.fit();
         } else if (tool === 'device-manager') {
             const window = document.getElementById('widgetsWindow');
             window.style.display = 'block';
@@ -277,7 +292,6 @@ document.querySelectorAll('.icon, .taskbar-icon, .start-menu button').forEach(el
         } else if (tool === 'codex') {
             const window = document.getElementById('codexWindow');
             window.style.display = 'block';
-            // Open in maximized mode by default
             window.style.width = '90%';
             window.style.height = '80%';
             window.style.left = '5%';
