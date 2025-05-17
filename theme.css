@@ -45,11 +45,11 @@ body {
 }
 
 .icon:hover svg {
-    background: rgba(70, 130, 180, 0.3); /* Hover effect on SVG only */
+    background: rgba(70, 130, 180, 0.3);
 }
 
 .icon:hover span {
-    color: #5A9BD4; /* Subtle color change for label */
+    color: #5A9BD4;
 }
 
 .icon span {
@@ -137,7 +137,7 @@ body {
 }
 
 .window-body {
-    padding: 10px;
+    padding: 15px;
     background: #2A3435;
     height: auto;
     max-height: calc(100% - 40px);
@@ -145,55 +145,71 @@ body {
 }
 
 /* Styles for Codex content */
+#codexContent {
+    padding: 10px;
+}
+
 #codexContent h2 {
-    font-size: 20px;
-    margin-bottom: 15px;
+    font-size: 24px;
+    margin-bottom: 20px;
     color: #4682B4;
+    border-bottom: 2px solid #4682B4;
+    padding-bottom: 5px;
+}
+
+#codexContent .layer-section {
+    margin: 20px 0;
+    padding: 15px;
+    background: #1C2526;
+    border-left: 3px solid #4682B4;
+    border-radius: 4px;
 }
 
 #codexContent h3 {
-    font-size: 18px;
-    margin: 15px 0 10px;
+    font-size: 20px;
+    margin: 0 0 15px;
     color: #5A9BD4;
 }
 
 #codexContent h4 {
-    font-size: 16px;
-    margin: 10px 0 5px;
+    font-size: 18px;
+    margin: 15px 0 10px;
     color: #E0E0E0;
+    font-weight: 600;
 }
 
 #codexContent p {
-    font-size: 14px;
-    line-height: 1.5;
-    margin-bottom: 10px;
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 15px;
 }
 
 #codexContent ul {
     list-style-type: disc;
-    margin-left: 20px;
-    margin-bottom: 10px;
+    margin-left: 25px;
+    margin-bottom: 15px;
 }
 
 #codexContent ul ul {
     list-style-type: circle;
-    margin-left: 20px;
+    margin-left: 25px;
 }
 
 #codexContent li {
-    font-size: 14px;
-    line-height: 1.5;
-    margin-bottom: 5px;
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 8px;
 }
 
 #codexContent strong {
     color: #4682B4;
+    font-weight: 600;
 }
 
 /* Network topology map */
 .topology-map {
     width: 100%;
-    height: 350px;
+    height: 450px; /* Increased height for better visibility */
     background: #1C2526;
     border-radius: 4px;
 }
@@ -347,7 +363,7 @@ body {
     }
 
     .topology-map {
-        height: 200px;
+        height: 300px; /* Reduced height for smaller screens */
     }
 
     .taskbar-tools {
@@ -361,5 +377,22 @@ body {
     .start-btn {
         padding: 4px 8px;
         font-size: 12px;
+    }
+
+    #codexContent h2 {
+        font-size: 20px;
+    }
+
+    #codexContent h3 {
+        font-size: 18px;
+    }
+
+    #codexContent h4 {
+        font-size: 16px;
+    }
+
+    #codexContent p,
+    #codexContent li {
+        font-size: 14px;
     }
 }
