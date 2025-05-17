@@ -47,12 +47,10 @@ setInterval(() => {
 function parseTextContent(text) {
     const lines = text.trim().split('\n');
     let htmlContent = '';
-    let currentList = null;
-    let listLevel = 0;
     let inSection = false;
 
     lines.forEach((line, index) => {
-        if (!line.trim() && !currentList) return;
+        if (!line.trim()) return;
 
         line = line.replace(/\r/g, '');
 
@@ -64,11 +62,6 @@ function parseTextContent(text) {
 
         // Check for section headings (e.g., "Professional Experience")
         if (line.match(/^[A-Za-z\s]+$/)) {
-            if (currentList) {
-                htmlContent += '</ul>'.repeat(listLevel);
-                currentList = null;
-                listLevel = 0;
-            }
             if (inSection) {
                 htmlContent += '</div>';
             }
@@ -79,50 +72,14 @@ function parseTextContent(text) {
 
         // Check for subheadings (e.g., "Senior Network Engineer, Denali Advanced Integrations, Redmond, WA")
         if (line.match(/^\s{4}[A-Za-z\s,-]+$/)) {
-            if (currentList) {
-                htmlContent += '</ul>'.repeat(listLevel);
-                currentList = null;
-                listLevel = 0;
-            }
             htmlContent += `<div class="terminal-subheading2">${line.trim()}</div>`;
             return;
         }
 
-        // Check for list items (indented lines)
-        if (line.match(/^\s{4,}/)) {
-            const indentLevel = Math.floor(line.match(/^\s*/)[0].length / 4);
-            line = line.trim();
-
-            if (indentLevel > listLevel) {
-                htmlContent += '<ul>';
-                listLevel++;
-            } else if (indentLevel < listLevel) {
-                htmlContent += '</ul>'.repeat(listLevel - indentLevel);
-                listLevel = indentLevel;
-            }
-
-            if (line.match(/^\w.*:/)) {
-                const [term, description] = line.split(': ', 2);
-                htmlContent += `<li><strong>${term}:</strong> ${description || ''}</li>`;
-            } else {
-                htmlContent += `<li>${line}</li>`;
-            }
-            currentList = true;
-            return;
-        }
-
-        // Treat as paragraph
-        if (currentList) {
-            htmlContent += '</ul>'.repeat(listLevel);
-            currentList = null;
-            listLevel = 0;
-        }
+        // Treat all other lines as plain text (including those starting with "-")
         htmlContent += `<div>${line.trim()}</div>`;
     });
 
-    if (listLevel > 0) {
-        htmlContent += '</ul>'.repeat(listLevel);
-    }
     if (inSection) {
         htmlContent += '</div>';
     }
