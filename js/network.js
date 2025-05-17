@@ -3,58 +3,169 @@
  * Handles network topology visualization and updates
  */
 
+import { CONFIG } from './config.js';
+
 export class NetworkVisualization {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
         this.network = null;
         this.updateInterval = null;
+        this.networkState = this.loadNetworkState();
         this.initializeNetwork();
+    }
+
+    /**
+     * Load saved network state from localStorage
+     * @returns {Object} Network state object
+     */
+    loadNetworkState() {
+        const savedState = localStorage.getItem('networkState');
+        if (savedState) {
+            return JSON.parse(savedState);
+        }
+        return {
+            nodes: CONFIG.NETWORK.DEFAULT_NODES,
+            edges: CONFIG.NETWORK.DEFAULT_EDGES,
+            options: CONFIG.NETWORK.DEFAULT_OPTIONS,
+            layout: {
+                zoom: 1,
+                position: { x: 0, y: 0 }
+            }
+        };
+    }
+
+    /**
+     * Save network state to localStorage
+     */
+    saveNetworkState() {
+        if (this.network) {
+            const view = this.network.getViewPosition();
+            const zoom = this.network.getScale();
+            
+            this.networkState.layout = {
+                zoom,
+                position: view
+            };
+            
+            localStorage.setItem('networkState', JSON.stringify(this.networkState));
+        }
     }
 
     /**
      * Initialize the network visualization
      */
     initializeNetwork() {
-        // Create nodes and edges for the network visualization
-        const nodes = new vis.DataSet([
-            { id: 1, label: 'Router 1', group: 'router' },
-            { id: 2, label: 'Router 2', group: 'router' },
-            { id: 3, label: 'Switch 1', group: 'switch' },
-            { id: 4, label: 'Switch 2', group: 'switch' },
-            { id: 5, label: 'Server 1', group: 'server' },
-            { id: 6, label: 'Server 2', group: 'server' }
-        ]);
-
-        const edges = new vis.DataSet([
-            { from: 1, to: 2, label: '10Gbps' },
-            { from: 1, to: 3, label: '1Gbps' },
-            { from: 2, to: 4, label: '1Gbps' },
-            { from: 3, to: 5, label: '1Gbps' },
-            { from: 4, to: 6, label: '1Gbps' }
-        ]);
-
+        const nodes = new vis.DataSet(this.networkState.nodes);
+        const edges = new vis.DataSet(this.networkState.edges);
         const options = {
+            ...CONFIG.NETWORK.DEFAULT_OPTIONS,
+            ...this.networkState.options,
             nodes: {
-                shape: 'dot',
-                size: 20,
-                font: {
-                    size: 12
-                }
+                ...CONFIG.NETWORK.DEFAULT_OPTIONS.nodes,
+                ...this.networkState.options.nodes
             },
             edges: {
-                width: 2,
-                font: {
-                    size: 10
-                }
-            },
-            groups: {
-                router: { color: { background: '#ff0000' } },
-                switch: { color: { background: '#00ff00' } },
-                server: { color: { background: '#0000ff' } }
+                ...CONFIG.NETWORK.DEFAULT_OPTIONS.edges,
+                ...this.networkState.options.edges
             }
         };
 
         this.network = new vis.Network(this.container, { nodes, edges }, options);
+
+        // Restore saved layout
+        if (this.networkState.layout) {
+            this.network.moveTo({
+                position: this.networkState.layout.position,
+                scale: this.networkState.layout.zoom
+            });
+        }
+
+        // Add event listeners for state persistence
+        this.network.on('stabilizationIterationsDone', () => {
+            this.saveNetworkState();
+        });
+
+        this.network.on('dragEnd', () => {
+            this.saveNetworkState();
+        });
+
+        this.network.on('zoom', () => {
+            this.saveNetworkState();
+        });
+
+        // Add customization controls
+        this.initializeCustomizationControls();
+    }
+
+    /**
+     * Initialize network customization controls
+     */
+    initializeCustomizationControls() {
+        const controls = document.createElement('div');
+        controls.className = 'network-controls';
+        controls.innerHTML = `
+            <div class="control-group">
+                <label>Node Size:</label>
+                <input type="range" min="10" max="50" value="${this.networkState.options.nodes.size || 20}" id="nodeSize">
+            </div>
+            <div class="control-group">
+                <label>Edge Width:</label>
+                <input type="range" min="1" max="5" value="${this.networkState.options.edges.width || 2}" id="edgeWidth">
+            </div>
+            <div class="control-group">
+                <label>Font Size:</label>
+                <input type="range" min="8" max="24" value="${this.networkState.options.nodes.font.size || 12}" id="fontSize">
+            </div>
+        `;
+
+        this.container.parentElement.insertBefore(controls, this.container);
+
+        // Add event listeners for controls
+        controls.querySelector('#nodeSize').addEventListener('input', (e) => {
+            this.updateNodeSize(parseInt(e.target.value));
+        });
+
+        controls.querySelector('#edgeWidth').addEventListener('input', (e) => {
+            this.updateEdgeWidth(parseInt(e.target.value));
+        });
+
+        controls.querySelector('#fontSize').addEventListener('input', (e) => {
+            this.updateFontSize(parseInt(e.target.value));
+        });
+    }
+
+    /**
+     * Update node size
+     * @param {number} size - New node size
+     */
+    updateNodeSize(size) {
+        this.networkState.options.nodes.size = size;
+        this.network.setOptions({ nodes: { size } });
+        this.saveNetworkState();
+    }
+
+    /**
+     * Update edge width
+     * @param {number} width - New edge width
+     */
+    updateEdgeWidth(width) {
+        this.networkState.options.edges.width = width;
+        this.network.setOptions({ edges: { width } });
+        this.saveNetworkState();
+    }
+
+    /**
+     * Update font size
+     * @param {number} size - New font size
+     */
+    updateFontSize(size) {
+        this.networkState.options.nodes.font.size = size;
+        this.networkState.options.edges.font.size = Math.max(8, size - 2);
+        this.network.setOptions({
+            nodes: { font: { size } },
+            edges: { font: { size: Math.max(8, size - 2) } }
+        });
+        this.saveNetworkState();
     }
 
     /**
@@ -63,7 +174,7 @@ export class NetworkVisualization {
     startUpdates() {
         this.updateInterval = setInterval(() => {
             this.updateWidgets();
-        }, 3000);
+        }, CONFIG.NETWORK.UPDATE_INTERVAL);
         this.updateWidgets(); // Initial update
     }
 
@@ -99,6 +210,24 @@ export class NetworkVisualization {
     fit() {
         if (this.network) {
             this.network.fit();
+            this.saveNetworkState();
         }
+    }
+
+    /**
+     * Reset network to default state
+     */
+    resetToDefault() {
+        this.networkState = {
+            nodes: CONFIG.NETWORK.DEFAULT_NODES,
+            edges: CONFIG.NETWORK.DEFAULT_EDGES,
+            options: CONFIG.NETWORK.DEFAULT_OPTIONS,
+            layout: {
+                zoom: 1,
+                position: { x: 0, y: 0 }
+            }
+        };
+        localStorage.removeItem('networkState');
+        this.initializeNetwork();
     }
 }

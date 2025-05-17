@@ -16,22 +16,49 @@ export const CONFIG = {
     // Network visualization
     NETWORK: {
         UPDATE_INTERVAL: 3000,
-        NODE_GROUPS: {
-            ROUTER: { color: { background: '#ff0000' } },
-            SWITCH: { color: { background: '#00ff00' } },
-            SERVER: { color: { background: '#0000ff' } }
-        },
-        NODE_OPTIONS: {
-            shape: 'dot',
-            size: 20,
-            font: {
-                size: 12
-            }
-        },
-        EDGE_OPTIONS: {
-            width: 2,
-            font: {
-                size: 10
+        DEFAULT_NODES: [
+            { id: 1, label: 'Router 1', group: 'router' },
+            { id: 2, label: 'Router 2', group: 'router' },
+            { id: 3, label: 'Switch 1', group: 'switch' },
+            { id: 4, label: 'Switch 2', group: 'switch' },
+            { id: 5, label: 'Server 1', group: 'server' },
+            { id: 6, label: 'Server 2', group: 'server' }
+        ],
+        DEFAULT_EDGES: [
+            { from: 1, to: 2, label: '10Gbps' },
+            { from: 1, to: 3, label: '1Gbps' },
+            { from: 2, to: 4, label: '1Gbps' },
+            { from: 3, to: 5, label: '1Gbps' },
+            { from: 4, to: 6, label: '1Gbps' }
+        ],
+        DEFAULT_OPTIONS: {
+            nodes: {
+                shape: 'dot',
+                size: 20,
+                font: {
+                    size: 12
+                }
+            },
+            edges: {
+                width: 2,
+                font: {
+                    size: 10
+                }
+            },
+            groups: {
+                router: { color: { background: '#ff0000' } },
+                switch: { color: { background: '#00ff00' } },
+                server: { color: { background: '#0000ff' } }
+            },
+            physics: {
+                stabilization: {
+                    iterations: 100
+                }
+            },
+            interaction: {
+                dragNodes: true,
+                dragView: true,
+                zoomView: true
             }
         }
     },

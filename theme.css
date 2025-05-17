@@ -459,3 +459,65 @@ body {
         font-size: 12px;
     }
 }
+
+/* Loading Indicator */
+.loading-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 1rem;
+    border-radius: 4px;
+    z-index: 1000;
+}
+
+.loading-indicator .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.loading-indicator .message {
+    color: #fff;
+    font-size: 14px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Terminal Improvements */
+.terminal-line {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.terminal-line .timestamp {
+    color: #666;
+    font-size: 0.8em;
+}
+
+.terminal-line .prompt {
+    color: #0f0;
+}
+
+.terminal-line .command {
+    color: #fff;
+}
+
+.terminal-result {
+    margin-bottom: 1rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
