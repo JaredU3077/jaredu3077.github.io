@@ -149,31 +149,6 @@ export class Terminal {
         this.commands.set('date', () => new Date().toLocaleString());
         this.commands.set('echo', (args) => args.join(' '));
 
-        // Handle show resume and show jared commands
-        this.commands.set('show resume', async () => {
-            try {
-                const response = await fetch(CONFIG.PATHS.RESUME);
-                if (!response.ok) throw new Error('Failed to load resume');
-                const text = await response.text();
-                return ContentParser.parseTextContent(text);
-            } catch (error) {
-                console.error('Error loading resume:', error);
-                return 'Error loading resume content: ' + error.message;
-            }
-        });
-
-        this.commands.set('show jared', async () => {
-            try {
-                const response = await fetch(CONFIG.PATHS.RESUME);
-                if (!response.ok) throw new Error('Failed to load resume');
-                const text = await response.text();
-                return ContentParser.parseTextContent(text);
-            } catch (error) {
-                console.error('Error loading resume:', error);
-                return 'Error loading resume content: ' + error.message;
-            }
-        });
-
         this.commands.set('network status', () => {
             const bandwidth = document.getElementById('bandwidth')?.textContent || 'N/A';
             const alerts = document.getElementById('alerts')?.textContent || 'N/A';
@@ -246,9 +221,29 @@ export class Terminal {
         return responses.join('\n');
     }
 
-    handleShow(args) {
-        if (!args[0]) return 'Usage: show [interfaces|routes|config]';
+    async showResume() {
+        try {
+            console.log('Loading resume from:', CONFIG.PATHS.RESUME);
+            const response = await fetch(CONFIG.PATHS.RESUME);
+            if (!response.ok) {
+                console.error('Failed to load resume:', response.status, response.statusText);
+                throw new Error(`Failed to load resume: ${response.status} ${response.statusText}`);
+            }
+            const text = await response.text();
+            console.log('Resume content loaded:', text.substring(0, 100) + '...');
+            const formattedContent = ContentParser.parseTextContent(text);
+            console.log('Formatted content:', formattedContent.substring(0, 100) + '...');
+            return formattedContent;
+        } catch (error) {
+            console.error('Error in showResume:', error);
+            return `Error loading resume content: ${error.message}`;
+        }
+    }
 
+    handleShow(args) {
+        if (!args[0]) return 'Usage: show [interfaces|routes|config|resume|jared]';
+
+        console.log('Handling show command with args:', args);
         switch (args[0].toLowerCase()) {
             case 'interfaces':
                 return this.showInterfaces();
@@ -256,6 +251,10 @@ export class Terminal {
                 return this.showRoutes();
             case 'config':
                 return this.showConfig();
+            case 'resume':
+            case 'jared':
+                console.log('Showing resume content');
+                return this.showResume();
             default:
                 return `Invalid option: ${args[0]}`;
         }
