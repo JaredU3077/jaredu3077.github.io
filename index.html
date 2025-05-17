@@ -45,140 +45,7 @@
         </div>
     </div>
 
-    <!-- Topology map window -->
-    <div class="window" id="topologyWindow">
-        <div class="window-header">
-            <div class="window-title">
-                <i class="fas fa-network-wired"></i>
-                Network Topology
-            </div>
-            <div class="window-controls">
-                <button class="window-control minimize" title="Minimize">
-                    <i class="fas fa-minus"></i>
-                </button>
-                <button class="window-control maximize" title="Maximize">
-                    <i class="fas fa-expand"></i>
-                </button>
-                <button class="window-control close" title="Close">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        </div>
-        <div class="window-content">
-            <div class="topology-map" id="networkTopology"></div>
-        </div>
-    </div>
-
-    <!-- Widgets window -->
-    <div class="window" id="widgetsWindow">
-        <div class="window-header">
-            <div class="window-title">
-                <i class="fas fa-chart-line"></i>
-                Network Status
-            </div>
-            <div class="window-controls">
-                <button class="window-control minimize" title="Minimize">
-                    <i class="fas fa-minus"></i>
-                </button>
-                <button class="window-control maximize" title="Maximize">
-                    <i class="fas fa-expand"></i>
-                </button>
-                <button class="window-control close" title="Close">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        </div>
-        <div class="window-content">
-            <div class="widgets">
-                <div class="widget">
-                    <h3>Bandwidth Usage</h3>
-                    <p id="bandwidth">0 Mbps</p>
-                </div>
-                <div class="widget">
-                    <h3>Network Alerts</h3>
-                    <p id="alerts">No alerts</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Terminal window -->
-    <div class="window" id="terminalWindow">
-        <div class="window-header">
-            <div class="window-title">
-                <i class="fas fa-terminal"></i>
-                Terminal
-            </div>
-            <div class="window-controls">
-                <button class="window-control minimize" title="Minimize">
-                    <i class="fas fa-minus"></i>
-                </button>
-                <button class="window-control maximize" title="Maximize">
-                    <i class="fas fa-expand"></i>
-                </button>
-                <button class="window-control close" title="Close">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        </div>
-        <div class="window-content">
-            <div id="terminalOutput"></div>
-            <input type="text" id="terminalInput" placeholder="Type command...">
-        </div>
-    </div>
-
-    <!-- Codex window -->
-    <div class="window" id="codexWindow">
-        <div class="window-header">
-            <div class="window-title">
-                <i class="fas fa-book"></i>
-                Codex of Financial Instruments
-            </div>
-            <div class="window-controls">
-                <button class="window-control minimize" title="Minimize">
-                    <i class="fas fa-minus"></i>
-                </button>
-                <button class="window-control maximize" title="Maximize">
-                    <i class="fas fa-expand"></i>
-                </button>
-                <button class="window-control close" title="Close">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        </div>
-        <div class="window-content">
-            <div id="codexContent"></div>
-        </div>
-    </div>
-
-    <!-- Help Window -->
-    <div id="helpWindow" class="window">
-        <div class="window-header">
-            <div class="window-title">
-                <i class="fas fa-question-circle"></i>
-                Help
-            </div>
-            <div class="window-controls">
-                <button class="window-control minimize" title="Minimize">
-                    <i class="fas fa-minus"></i>
-                </button>
-                <button class="window-control maximize" title="Maximize">
-                    <i class="fas fa-expand"></i>
-                </button>
-                <button class="window-control close" title="Close">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        </div>
-        <div class="window-content">
-            <div class="help-tabs">
-                <button class="help-tab active" data-section="terminal">Terminal</button>
-                <button class="help-tab" data-section="shortcuts">Shortcuts</button>
-                <button class="help-tab" data-section="windows">Windows</button>
-            </div>
-            <div id="helpContent"></div>
-        </div>
-    </div>
+    <!-- Remove all static window HTML here. Only keep desktop, taskbar, and help content. -->
 
     <!-- Taskbar with Start menu -->
     <div class="taskbar">
@@ -322,22 +189,12 @@
         });
 
         // Start network updates
-        network.startUpdates();
+        // Only start when the network window is opened
+        // network.startUpdates();
 
         // Initialize help system
-        document.querySelectorAll('.help-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                // Update active tab
-                document.querySelectorAll('.help-tab').forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                
-                // Show help content
-                helpManager.showHelp(tab.dataset.section);
-            });
-        });
-
-        // Show initial help content
-        helpManager.showHelp('terminal');
+        // Only show help when help window is opened
+        // helpManager.showHelp('terminal');
     </script>
 </body>
 </html>
