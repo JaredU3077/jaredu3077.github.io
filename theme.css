@@ -520,24 +520,14 @@ body {
     font-size: 16px;
 }
 
-.minimize-btn:hover {
-    background: #555;
-}
-
-.maximize-btn:hover {
-    background: #555;
-}
-
-.close-btn:hover {
-    background: #FF5555;
+.minimize-btn,
+.maximize-btn,
+.close-btn {
+    display: none;
 }
 
 .window-body {
-    padding: 15px;
-    background: #2A3435;
-    height: auto;
-    max-height: calc(100% - 40px);
-    overflow-y: auto;
+    display: none;
 }
 
 /* Styles for Codex content */
@@ -1293,4 +1283,13 @@ mark {
 #codexWindow .window-header {
     display: flex;
     align-items: center;
+}
+
+/* Ensure all windows use window-content */
+#terminalWindow .window-content,
+#topologyWindow .window-content,
+#widgetsWindow .window-content,
+#codexWindow .window-content,
+#helpWindow .window-content {
+    display: block;
 }

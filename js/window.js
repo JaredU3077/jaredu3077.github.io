@@ -14,6 +14,7 @@ export class WindowManager {
         this.snapThreshold = 20;
         this.snapZones = new Map();
         this.contextMenu = null;
+        this.zIndexCounter = 1000;
         
         // Initialize event listeners
         this.initEventListeners();
@@ -52,6 +53,13 @@ export class WindowManager {
                 this.constrainToViewport(window);
             });
         });
+
+        // Handle escape key for closing windows
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.activeWindow) {
+                this.closeWindow(this.activeWindow);
+            }
+        });
     }
 
     createWindow(options) {
@@ -66,6 +74,16 @@ export class WindowManager {
             icon = 'fa-window-maximize'
         } = options;
 
+        // Check if window already exists
+        if (this.windows.has(id)) {
+            const existingWindow = this.windows.get(id);
+            if (existingWindow.style.display === 'none') {
+                this.restoreWindow(existingWindow);
+                return existingWindow;
+            }
+            return existingWindow;
+        }
+
         const windowElement = document.createElement('div');
         windowElement.className = 'window';
         windowElement.id = id;
@@ -73,6 +91,7 @@ export class WindowManager {
         windowElement.style.height = `${height}px`;
         windowElement.style.left = `${x}px`;
         windowElement.style.top = `${y}px`;
+        windowElement.style.zIndex = this.getNextZIndex();
 
         windowElement.innerHTML = `
             <div class="window-header">
@@ -164,12 +183,7 @@ export class WindowManager {
     }
 
     getNextZIndex() {
-        let maxZ = 0;
-        this.windows.forEach(window => {
-            const z = parseInt(window.style.zIndex) || 0;
-            maxZ = Math.max(maxZ, z);
-        });
-        return maxZ + 1;
+        return this.zIndexCounter++;
     }
 
     minimizeWindow(windowElement) {
@@ -224,6 +238,9 @@ export class WindowManager {
         setTimeout(() => {
             windowElement.remove();
             this.windows.delete(windowElement.id);
+            if (this.activeWindow === windowElement) {
+                this.activeWindow = null;
+            }
         }, 200);
     }
 

@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Network Engineer OS Theme</title>
     <link rel="stylesheet" href="theme.css">
+    <!-- Include Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Include vis.js for network topology map -->
     <script src="https://unpkg.com/vis-network@9.1.2/dist/vis-network.min.js"></script>
     <!-- Include interact.js for draggable and resizable windows -->
@@ -46,14 +48,23 @@
     <!-- Topology map window -->
     <div class="window" id="topologyWindow">
         <div class="window-header">
-            <span>Network Topology</span>
+            <div class="window-title">
+                <i class="fas fa-network-wired"></i>
+                Network Topology
+            </div>
             <div class="window-controls">
-                <button class="minimize-btn">-</button>
-                <button class="maximize-btn">□</button>
-                <button class="close-btn">×</button>
+                <button class="window-control minimize" title="Minimize">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button class="window-control maximize" title="Maximize">
+                    <i class="fas fa-expand"></i>
+                </button>
+                <button class="window-control close" title="Close">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
         </div>
-        <div class="window-body">
+        <div class="window-content">
             <div class="topology-map" id="networkTopology"></div>
         </div>
     </div>
@@ -61,14 +72,23 @@
     <!-- Widgets window -->
     <div class="window" id="widgetsWindow">
         <div class="window-header">
-            <span>Network Status</span>
+            <div class="window-title">
+                <i class="fas fa-chart-line"></i>
+                Network Status
+            </div>
             <div class="window-controls">
-                <button class="minimize-btn">-</button>
-                <button class="maximize-btn">□</button>
-                <button class="close-btn">×</button>
+                <button class="window-control minimize" title="Minimize">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button class="window-control maximize" title="Maximize">
+                    <i class="fas fa-expand"></i>
+                </button>
+                <button class="window-control close" title="Close">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
         </div>
-        <div class="window-body">
+        <div class="window-content">
             <div class="widgets">
                 <div class="widget">
                     <h3>Bandwidth Usage</h3>
@@ -85,14 +105,23 @@
     <!-- Terminal window -->
     <div class="window" id="terminalWindow">
         <div class="window-header">
-            <span>Terminal</span>
+            <div class="window-title">
+                <i class="fas fa-terminal"></i>
+                Terminal
+            </div>
             <div class="window-controls">
-                <button class="minimize-btn">-</button>
-                <button class="maximize-btn">□</button>
-                <button class="close-btn">×</button>
+                <button class="window-control minimize" title="Minimize">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button class="window-control maximize" title="Maximize">
+                    <i class="fas fa-expand"></i>
+                </button>
+                <button class="window-control close" title="Close">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
         </div>
-        <div class="window-body">
+        <div class="window-content">
             <div id="terminalOutput"></div>
             <input type="text" id="terminalInput" placeholder="Type command...">
         </div>
@@ -101,29 +130,47 @@
     <!-- Codex window -->
     <div class="window" id="codexWindow">
         <div class="window-header">
-            <span>Codex of Financial Instruments</span>
+            <div class="window-title">
+                <i class="fas fa-book"></i>
+                Codex of Financial Instruments
+            </div>
             <div class="window-controls">
-                <button class="minimize-btn">-</button>
-                <button class="maximize-btn">□</button>
-                <button class="close-btn">×</button>
+                <button class="window-control minimize" title="Minimize">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button class="window-control maximize" title="Maximize">
+                    <i class="fas fa-expand"></i>
+                </button>
+                <button class="window-control close" title="Close">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
         </div>
-        <div class="window-body" id="codexContent">
-            <!-- Content will be loaded dynamically -->
+        <div class="window-content">
+            <div id="codexContent"></div>
         </div>
     </div>
 
     <!-- Help Window -->
     <div id="helpWindow" class="window">
         <div class="window-header">
-            <span>Help</span>
+            <div class="window-title">
+                <i class="fas fa-question-circle"></i>
+                Help
+            </div>
             <div class="window-controls">
-                <button class="minimize-btn">-</button>
-                <button class="maximize-btn">□</button>
-                <button class="close-btn">×</button>
+                <button class="window-control minimize" title="Minimize">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button class="window-control maximize" title="Maximize">
+                    <i class="fas fa-expand"></i>
+                </button>
+                <button class="window-control close" title="Close">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
         </div>
-        <div class="window-body">
+        <div class="window-content">
             <div class="help-tabs">
                 <button class="help-tab active" data-section="terminal">Terminal</button>
                 <button class="help-tab" data-section="shortcuts">Shortcuts</button>
@@ -213,32 +260,60 @@
                 const tool = el.dataset.tool;
                 switch (tool) {
                     case 'terminal':
-                        windowManager.createWindow('terminalWindow', 'Terminal', `
-                            <div id="terminalOutput"></div>
-                            <input type="text" id="terminalInput" placeholder="Type command...">
-                        `, { width: 600, height: 400 });
+                        windowManager.createWindow({
+                            id: 'terminalWindow',
+                            title: 'Terminal',
+                            content: `
+                                <div id="terminalOutput"></div>
+                                <input type="text" id="terminalInput" placeholder="Type command...">
+                            `,
+                            width: 600,
+                            height: 400,
+                            icon: 'fa-terminal'
+                        });
                         break;
                     case 'network-monitor':
-                        windowManager.createWindow('topologyWindow', 'Network Topology', `
-                            <div class="topology-map" id="networkTopology"></div>
-                        `, { width: 800, height: 600 });
-                        windowManager.createWindow('widgetsWindow', 'Network Status', `
-                            <div class="widgets">
-                                <div class="widget">
-                                    <h3>Bandwidth Usage</h3>
-                                    <p id="bandwidth">0 Mbps</p>
+                        windowManager.createWindow({
+                            id: 'topologyWindow',
+                            title: 'Network Topology',
+                            content: `
+                                <div class="topology-map" id="networkTopology"></div>
+                            `,
+                            width: 800,
+                            height: 600,
+                            icon: 'fa-network-wired'
+                        });
+                        windowManager.createWindow({
+                            id: 'widgetsWindow',
+                            title: 'Network Status',
+                            content: `
+                                <div class="widgets">
+                                    <div class="widget">
+                                        <h3>Bandwidth Usage</h3>
+                                        <p id="bandwidth">0 Mbps</p>
+                                    </div>
+                                    <div class="widget">
+                                        <h3>Network Alerts</h3>
+                                        <p id="alerts">No alerts</p>
+                                    </div>
                                 </div>
-                                <div class="widget">
-                                    <h3>Network Alerts</h3>
-                                    <p id="alerts">No alerts</p>
-                                </div>
-                            </div>
-                        `, { width: 300, height: 200 });
+                            `,
+                            width: 300,
+                            height: 200,
+                            icon: 'fa-chart-line'
+                        });
                         break;
                     case 'codex':
-                        windowManager.createWindow('codexWindow', 'Codex of Financial Instruments', `
-                            <div id="codexContent"></div>
-                        `, { width: 800, height: 600 });
+                        windowManager.createWindow({
+                            id: 'codexWindow',
+                            title: 'Codex of Financial Instruments',
+                            content: `
+                                <div id="codexContent"></div>
+                            `,
+                            width: 800,
+                            height: 600,
+                            icon: 'fa-book'
+                        });
                         // Initialize search for the Codex window
                         searchManager.loadAndIndexContent();
                         break;
