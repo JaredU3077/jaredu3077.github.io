@@ -7,65 +7,118 @@
     <link rel="stylesheet" href="theme.css">
     <!-- Include vis.js for network topology map -->
     <script src="https://unpkg.com/vis-network@9.1.2/dist/vis-network.min.js"></script>
-    <!-- Include interact.js for draggable terminal -->
+    <!-- Include interact.js for draggable and resizable windows -->
     <script src="https://unpkg.com/interactjs@1.10.27/dist/interact.min.js"></script>
 </head>
 <body>
-    <!-- Animated background canvas for subtle network pulses -->
-    <canvas id="backgroundCanvas"></canvas>
-
-    <!-- Desktop container for icons and widgets -->
+    <!-- Desktop container for icons -->
     <div class="desktop">
         <!-- Desktop icons for network tools -->
         <div class="icon" data-tool="network-monitor">
-            <img src="https://via.placeholder.com/64?text=NM" alt="Network Monitor">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4682B4" stroke-width="2">
+                <path d="M1 12h22M12 1v22M3 3l18 18M3 21L21 3"/>
+            </svg>
             <span>Network Monitor</span>
         </div>
         <div class="icon" data-tool="device-manager">
-            <img src="https://via.placeholder.com/64?text=DM" alt="Device Manager">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4682B4" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
             <span>Device Manager</span>
         </div>
         <div class="icon" data-tool="terminal">
-            <img src="https://via.placeholder.com/64?text=Term" alt="Terminal">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4682B4" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <path d="M7 15l4-4-4-4M12 15h5"/>
+            </svg>
             <span>Terminal</span>
         </div>
+    </div>
 
-        <!-- Network topology map -->
-        <div class="topology-map" id="networkTopology"></div>
-
-        <!-- Widgets sidebar -->
-        <div class="widgets">
-            <div class="widget">
-                <h3>Bandwidth Usage</h3>
-                <p id="bandwidth">0 Mbps</p>
+    <!-- Topology map window -->
+    <div class="window" id="topologyWindow">
+        <div class="window-header">
+            <span>Network Topology</span>
+            <div class="window-controls">
+                <button class="minimize-btn">-</button>
+                <button class="maximize-btn">□</button>
+                <button class="close-btn">×</button>
             </div>
-            <div class="widget">
-                <h3>Network Alerts</h3>
-                <p id="alerts">No alerts</p>
+        </div>
+        <div class="window-body">
+            <div class="topology-map" id="networkTopology"></div>
+        </div>
+    </div>
+
+    <!-- Widgets window -->
+    <div class="window" id="widgetsWindow">
+        <div class="window-header">
+            <span>Network Status</span>
+            <div class="window-controls">
+                <button class="minimize-btn">-</button>
+                <button class="maximize-btn">□</button>
+                <button class="close-btn">×</button>
+            </div>
+        </div>
+        <div class="window-body">
+            <div class="widgets">
+                <div class="widget">
+                    <h3>Bandwidth Usage</h3>
+                    <p id="bandwidth">0 Mbps</p>
+                </div>
+                <div class="widget">
+                    <h3>Network Alerts</h3>
+                    <p id="alerts">No alerts</p>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Taskbar with branding -->
+    <!-- Terminal window -->
+    <div class="window" id="terminalWindow">
+        <div class="window-header">
+            <span>Terminal</span>
+            <div class="window-controls">
+                <button class="minimize-btn">-</button>
+                <button class="maximize-btn">□</button>
+                <button class="close-btn">×</button>
+            </div>
+        </div>
+        <div class="window-body">
+            <div id="terminalOutput"></div>
+            <input type="text" id="terminalInput" placeholder="Type command...">
+        </div>
+    </div>
+
+    <!-- Taskbar with Start menu -->
     <div class="taskbar">
-        <div class="branding">@JaredU_</div>
-        <div class="taskbar-tools">
+        <button class="start-btn">Start</button>
+        <div class="start-menu" id="startMenu">
             <button data-tool="network-monitor">Network Monitor</button>
             <button data-tool="device-manager">Device Manager</button>
             <button data-tool="terminal">Terminal</button>
         </div>
-    </div>
-
-    <!-- Terminal window (draggable) -->
-    <div class="terminal-window" id="terminalWindow">
-        <div class="terminal-header">
-            <span>Terminal</span>
-            <button class="close-btn">×</button>
+        <div class="taskbar-tools">
+            <button data-tool="network-monitor" class="taskbar-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E0E0E0" stroke-width="2">
+                    <path d="M1 12h22M12 1v22M3 3l18 18M3 21L21 3"/>
+                </svg>
+            </button>
+            <button data-tool="device-manager" class="taskbar-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E0E0E0" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+            </button>
+            <button data-tool="terminal" class="taskbar-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E0E0E0" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <path d="M7 15l4-4-4-4M12 15h5"/>
+                </svg>
+            </button>
         </div>
-        <div class="terminal-body">
-            <div id="terminalOutput"></div>
-            <input type="text" id="terminalInput" placeholder="Type command...">
-        </div>
+        <div class="branding">@JaredU_</div>
     </div>
 
     <!-- Link to external JavaScript -->
