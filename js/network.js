@@ -3,7 +3,7 @@
  * Handles network topology visualization and updates
  */
 
-import { CONFIG } from './config.js';
+import { CONFIG, configManager } from './config.js';
 
 export class NetworkVisualization {
     constructor(containerId) {
@@ -12,6 +12,40 @@ export class NetworkVisualization {
         this.updateInterval = null;
         this.networkState = this.loadNetworkState();
         this.initializeNetwork();
+        this.initializeConfigListener();
+    }
+
+    /**
+     * Initialize configuration change listener
+     */
+    initializeConfigListener() {
+        window.addEventListener('configChanged', (event) => {
+            const newConfig = event.detail;
+            this.handleConfigUpdate(newConfig);
+        });
+    }
+
+    /**
+     * Handle configuration updates
+     * @param {Object} newConfig - New configuration
+     */
+    handleConfigUpdate(newConfig) {
+        // Update network update interval
+        if (this.updateInterval) {
+            clearInterval(this.updateInterval);
+            this.startUpdates();
+        }
+
+        // Update network options if needed
+        if (this.network) {
+            const networkConfig = newConfig.NETWORK;
+            if (networkConfig) {
+                this.network.setOptions({
+                    ...networkConfig.DEFAULT_OPTIONS,
+                    ...this.networkState.options
+                });
+            }
+        }
     }
 
     /**
@@ -116,6 +150,10 @@ export class NetworkVisualization {
                 <label>Font Size:</label>
                 <input type="range" min="8" max="24" value="${this.networkState.options.nodes.font.size || 12}" id="fontSize">
             </div>
+            <div class="control-group">
+                <label>Update Interval:</label>
+                <input type="range" min="1000" max="10000" step="1000" value="${CONFIG.NETWORK.UPDATE_INTERVAL}" id="updateInterval">
+            </div>
         `;
 
         this.container.parentElement.insertBefore(controls, this.container);
@@ -131,6 +169,15 @@ export class NetworkVisualization {
 
         controls.querySelector('#fontSize').addEventListener('input', (e) => {
             this.updateFontSize(parseInt(e.target.value));
+        });
+
+        controls.querySelector('#updateInterval').addEventListener('input', (e) => {
+            this.updateInterval = parseInt(e.target.value);
+            configManager.updateConfig({
+                NETWORK: {
+                    UPDATE_INTERVAL: this.updateInterval
+                }
+            });
         });
     }
 
@@ -192,6 +239,10 @@ export class NetworkVisualization {
      * Update network widgets with mock data
      */
     updateWidgets() {
+        if (!CONFIG.NETWORK.MOCK_DATA) {
+            return;
+        }
+
         const bandwidth = document.getElementById('bandwidth');
         const alerts = document.getElementById('alerts');
         
