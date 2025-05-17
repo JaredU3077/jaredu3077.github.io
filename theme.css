@@ -71,6 +71,7 @@ body {
     min-height: 200px;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    pointer-events: auto;
 }
 
 .window.focused {
@@ -855,26 +856,22 @@ body {
     opacity: 0.8;
 }
 
-/* Terminal Window Specific Styles */
-#terminalWindow {
-    min-width: 600px;
-    min-height: 400px;
-}
-
+/* Terminal Window Layout Fix */
 #terminalWindow .window-content {
     display: flex;
     flex-direction: column;
+    height: 100%;
     padding: 0;
-    background: #1C2526;
 }
-
-#terminalWindow .window-header {
-    background: linear-gradient(to bottom, #2c3e50, #1a2530);
-    border-bottom: 1px solid #4682B4;
+#terminalWindow #terminalOutput {
+    flex: 1 1 auto;
+    overflow: auto;
+    margin-bottom: 0;
+    max-height: none;
+    min-height: 0;
 }
-
-#terminalWindow .window-title {
-    color: #5A9BD4;
+#terminalWindow #terminalInput {
+    flex: 0 0 auto;
 }
 
 /* Terminal Responsive Design */

@@ -297,7 +297,6 @@ export class WindowManager {
             if (!this.dragState) return;
             e.preventDefault();
             // Debug log
-            console.log('Dragging...', e.clientX, e.clientY);
             const { window, startX, startY, startLeft, startTop } = this.dragState;
             const deltaX = e.clientX - startX;
             const deltaY = e.clientY - startY;
@@ -311,6 +310,7 @@ export class WindowManager {
 
             window.style.left = `${newLeft}px`;
             window.style.top = `${newTop}px`;
+            console.log('Dragging window:', window.id, 'to', newLeft, newTop);
 
             // Check for snapping
             this.checkSnapping(window);
