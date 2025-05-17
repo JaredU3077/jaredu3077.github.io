@@ -18,7 +18,7 @@ body {
 /* Desktop layout */
 .desktop {
     padding: 20px;
-    min-height: calc(100vh - 50px);
+    min-height: calc(100vh - 40px);
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
     gap: 20px;
@@ -32,13 +32,14 @@ body {
     width: 80px;
     text-align: center;
     cursor: pointer;
-    padding: 10px;
+    padding: 5px;
     border-radius: 8px;
     transition: background 0.2s;
 }
 
 .icon:hover {
     background: rgba(70, 130, 180, 0.3);
+    padding: 5px; /* Keep padding consistent to avoid size change */
 }
 
 .icon svg {
@@ -215,7 +216,7 @@ body {
     position: absolute;
     bottom: 40px;
     left: 10px;
-    background: #2A3435;
+    background: #1C2526; /* Ensure dark background */
     border: 1px solid #4682B4;
     border-radius: 4px;
     display: none;
@@ -225,7 +226,7 @@ body {
 }
 
 .start-menu button {
-    background: none;
+    background: #1C2526; /* Match taskbar background */
     border: none;
     padding: 8px 12px;
     text-align: left;
@@ -246,7 +247,7 @@ body {
 }
 
 .taskbar-icon {
-    background: none;
+    background: #1C2526; /* Match taskbar background */
     border: none;
     padding: 6px;
     border-radius: 4px;
@@ -261,6 +262,8 @@ body {
 .taskbar-icon svg {
     width: 16px;
     height: 16px;
+    stroke: #E0E0E0; /* Ensure SVG stroke matches theme */
+    fill: none; /* Prevent white fill */
 }
 
 .branding {
