@@ -32,25 +32,30 @@ body {
     width: 80px;
     text-align: center;
     cursor: pointer;
-    padding: 5px;
     border-radius: 8px;
-    transition: background 0.2s;
-}
-
-.icon:hover {
-    background: rgba(70, 130, 180, 0.3);
-    padding: 5px; /* Keep padding consistent to avoid size change */
 }
 
 .icon svg {
     width: 48px;
     height: 48px;
     margin-bottom: 5px;
+    padding: 5px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.icon:hover svg {
+    background: rgba(70, 130, 180, 0.3); /* Hover effect on SVG only */
+}
+
+.icon:hover span {
+    color: #5A9BD4; /* Subtle color change for label */
 }
 
 .icon span {
     font-size: 14px;
     word-wrap: break-word;
+    transition: color 0.2s;
 }
 
 /* Window styles */
@@ -205,6 +210,7 @@ body {
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
+    line-height: 16px; /* Match height of taskbar icons */
     transition: background 0.2s;
 }
 
@@ -216,7 +222,7 @@ body {
     position: absolute;
     bottom: 40px;
     left: 10px;
-    background: #1C2526; /* Ensure dark background */
+    background: #1C2526;
     border: 1px solid #4682B4;
     border-radius: 4px;
     display: none;
@@ -226,7 +232,7 @@ body {
 }
 
 .start-menu button {
-    background: #1C2526; /* Match taskbar background */
+    background: #1C2526;
     border: none;
     padding: 8px 12px;
     text-align: left;
@@ -247,12 +253,15 @@ body {
 }
 
 .taskbar-icon {
-    background: #1C2526; /* Match taskbar background */
+    background: #1C2526;
     border: none;
-    padding: 6px;
+    padding: 4px; /* Reduced padding */
     border-radius: 4px;
     cursor: pointer;
     transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .taskbar-icon:hover {
@@ -262,8 +271,8 @@ body {
 .taskbar-icon svg {
     width: 16px;
     height: 16px;
-    stroke: #E0E0E0; /* Ensure SVG stroke matches theme */
-    fill: none; /* Prevent white fill */
+    stroke: #E0E0E0;
+    fill: none;
 }
 
 .branding {
@@ -292,7 +301,7 @@ body {
     }
 
     .taskbar-icon {
-        padding: 4px;
+        padding: 2px;
     }
 
     .start-btn {
