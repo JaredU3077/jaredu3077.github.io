@@ -48,6 +48,7 @@ function parseTextContent(text) {
     const lines = text.trim().split('\n');
     let htmlContent = '';
     let inSection = false;
+    let inJobDetails = false;
 
     lines.forEach((line, index) => {
         if (!line.trim()) return;
@@ -57,6 +58,7 @@ function parseTextContent(text) {
         // Check for main heading (e.g., "Jared - Senior Network Engineer Resume")
         if (line.match(/^[A-Za-z\s-]+Resume$/)) {
             htmlContent += `<div class="terminal-heading">${line}</div>`;
+            inJobDetails = false;
             return;
         }
 
@@ -67,17 +69,38 @@ function parseTextContent(text) {
             }
             htmlContent += `<div class="terminal-section"><div class="terminal-subheading">${line}</div>`;
             inSection = true;
+            inJobDetails = false;
             return;
         }
 
-        // Check for subheadings (e.g., "Senior Network Engineer, Denali Advanced Integrations, Redmond, WA")
-        if (line.match(/^\s{4}[A-Za-z\s,-]+$/)) {
+        // Check for job titles (e.g., "Senior Network Engineer")
+        if (line.match(/^\s{4}[A-Za-z\s]+$/)) {
             htmlContent += `<div class="terminal-subheading2">${line.trim()}</div>`;
+            inJobDetails = false;
             return;
         }
 
-        // Treat all other lines as plain text (including those starting with "-")
-        htmlContent += `<div>${line.trim()}</div>`;
+        // Check for company and date lines (e.g., "ArenaNet, Bellevue, WA", "July 2019 - April 2022")
+        if (line.match(/^\s{4}[A-Za-z\s,-]+, [A-Z]{2}$/) || line.match(/^\s{4}[A-Za-z]+ \d{4} - (?:[A-Za-z]+ \d{4}|Present)$/)) {
+            htmlContent += `<div class="terminal-subheading2">${line.trim()}</div>`;
+            inJobDetails = true; // Next lines will be job details
+            return;
+        }
+
+        // Check for skill categories (e.g., "Networking Technologies: Cisco, Brocade...")
+        if (line.match(/^\s{4}- [A-Za-z\s&]+:/)) {
+            const [category, details] = line.split(':', 2);
+            htmlContent += `<div><span class="terminal-subheading2">${category.trim()}:</span> <span class="terminal-detail">${details.trim()}</span></div>`;
+            inJobDetails = false;
+            return;
+        }
+
+        // Treat as job details or other lines
+        if (inJobDetails) {
+            htmlContent += `<div class="terminal-detail">${line.trim()}</div>`;
+        } else {
+            htmlContent += `<div>${line.trim()}</div>`;
+        }
     });
 
     if (inSection) {
