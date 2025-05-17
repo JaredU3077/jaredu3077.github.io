@@ -46,6 +46,105 @@ terminalInput.addEventListener('keypress', (e) => {
     }
 });
 
+// Function to parse and format codex.txt content
+function parseCodexContent(text) {
+    const lines = text.split('\n');
+    let htmlContent = '';
+    let currentList = null;
+    let listLevel = 0;
+
+    lines.forEach(line => {
+        line = line.trim();
+
+        // Skip empty lines
+        if (!line) return;
+
+        // Check for main heading (e.g., "Codex of Financial Instruments ver A1.0")
+        if (line.match(/^Codex of Financial Instruments/)) {
+            htmlContent += `<h2>${line}</h2>`;
+            return;
+        }
+
+        // Check for layer headings (e.g., "Layer 1: Basic Instruments")
+        if (line.match(/^Layer \d+:/)) {
+            if (currentList) {
+                htmlContent += '</ul>'.repeat(listLevel); // Close any open lists
+                currentList = null;
+                listLevel = 0;
+            }
+            htmlContent += `<h3>${line}</h3>`;
+            return;
+        }
+
+        // Check for subheadings (e.g., "Education and Awareness:")
+        if (line.match(/^\w.*:$/)) {
+            if (currentList) {
+                htmlContent += '</ul>'.repeat(listLevel); // Close any open lists
+                currentList = null;
+                listLevel = 0;
+            }
+            htmlContent += `<h4>${line.replace(/:$/, '')}</h4>`;
+            return;
+        }
+
+        // Check for list items (indented lines)
+        if (line.match(/^\s{4,}/)) {
+            const indentLevel = Math.floor(line.match(/^\s*/)[0].length / 4); // Each 4 spaces = 1 level
+            line = line.trim();
+
+            // Handle list items
+            if (indentLevel > listLevel) {
+                htmlContent += '<ul>';
+                listLevel++;
+            } else if (indentLevel < listLevel) {
+                htmlContent += '</ul>'.repeat(listLevel - indentLevel);
+                listLevel = indentLevel;
+            }
+
+            // Parse list items with bold terms (e.g., "Stocks (Equities):")
+            if (line.match(/^\w.*:/)) {
+                const [term, description] = line.split(': ', 2);
+                htmlContent += `<li><strong>${term}:</strong> ${description || ''}</li>`;
+            } else {
+                htmlContent += `<li>${line}</li>`;
+            }
+            return;
+        }
+
+        // Treat as paragraph
+        if (currentList) {
+            htmlContent += '</ul>'.repeat(listLevel); // Close any open lists
+            currentList = null;
+            listLevel = 0;
+        }
+        htmlContent += `<p>${line}</p>`;
+    });
+
+    // Close any remaining lists
+    if (listLevel > 0) {
+        htmlContent += '</ul>'.repeat(listLevel);
+    }
+
+    return htmlContent;
+}
+
+// Function to load codex.txt and display it
+function loadCodexContent() {
+    fetch('codex.txt')
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to load codex.txt');
+            return response.text();
+        })
+        .then(text => {
+            const formattedContent = parseCodexContent(text);
+            document.getElementById('codexContent').innerHTML = formattedContent;
+        })
+        .catch(error => {
+            console.error(error);
+            document.getElementById('codexContent').innerHTML = '<p>Error loading Codex content.</p>';
+        });
+}
+
 // Draggable and resizable windows
 interact('.window').draggable({
     listeners: {
@@ -144,6 +243,9 @@ document.querySelectorAll('.icon, .taskbar-icon, .start-menu button').forEach(el
             document.getElementById('topologyWindow').style.display = 'block';
         } else if (tool === 'device-manager') {
             document.getElementById('widgetsWindow').style.display = 'block';
+        } else if (tool === 'codex') {
+            document.getElementById('codexWindow').style.display = 'block';
+            loadCodexContent(); // Load codex.txt content dynamically
         }
         document.getElementById('startMenu').style.display = 'none'; // Close Start menu
     });
