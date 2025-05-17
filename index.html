@@ -97,12 +97,8 @@
 
         // Initialize modules
         const windowManager = new WindowManager();
-        const terminal = new Terminal(
-            document.getElementById('terminalInput'),
-            document.getElementById('terminalOutput')
-        );
         const network = new NetworkVisualization('networkTopology');
-        const keyboardManager = new KeyboardManager(windowManager, terminal, network);
+        const keyboardManager = new KeyboardManager(windowManager, null, network);
         const helpManager = new HelpManager();
         const searchManager = new SearchManager();
 
@@ -126,8 +122,8 @@
             el.addEventListener('click', () => {
                 const tool = el.dataset.tool;
                 switch (tool) {
-                    case 'terminal':
-                        windowManager.createWindow({
+                    case 'terminal': {
+                        const win = windowManager.createWindow({
                             id: 'terminalWindow',
                             title: 'Terminal',
                             content: `
@@ -138,7 +134,13 @@
                             height: 400,
                             icon: 'fa-terminal'
                         });
+                        // Dynamically initialize Terminal for this window
+                        new Terminal(
+                            win.querySelector('#terminalInput'),
+                            win.querySelector('#terminalOutput')
+                        );
                         break;
+                    }
                     case 'network-monitor':
                         windowManager.createWindow({
                             id: 'topologyWindow',
@@ -188,13 +190,8 @@
             });
         });
 
-        // Start network updates
-        // Only start when the network window is opened
-        // network.startUpdates();
-
-        // Initialize help system
+        // Only start network updates when the network window is opened
         // Only show help when help window is opened
-        // helpManager.showHelp('terminal');
     </script>
 </body>
 </html>
