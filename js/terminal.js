@@ -75,33 +75,51 @@ export class Terminal {
         }
     }
 
-    async executeCommand() {
-        const input = this.inputElement.value.trim();
-        if (!input) return;
+    executeCommand() {
+        const command = this.inputElement.value.trim();
+        if (!command) return;
 
-        this.writeOutput(`<div class="terminal-line">
-            <span class="terminal-prompt">$</span>
-            <span class="terminal-command">${input}</span>
-        </div>`);
+        // Add command to history
+        this.history.push(command);
+        this.historyIndex = this.history.length;
 
-        const [command, ...args] = input.split(' ');
+        // Display command in output
+        const commandLine = document.createElement('div');
+        commandLine.className = 'terminal-line';
+        commandLine.innerHTML = `
+            <span class="prompt">$</span>
+            <span class="command">${command}</span>
+        `;
+        this.outputElement.appendChild(commandLine);
+
+        // Execute command
         try {
-            if (this.commands.has(command)) {
-                const result = this.commands.get(command)(args);
-                // Await if result is a Promise
-                const output = result instanceof Promise ? await result : result;
-                this.writeOutput(this.formatOutput(output));
+            const [cmd, ...args] = command.split(' ');
+            const handler = this.commands.get(cmd);
+            
+            if (handler) {
+                const result = handler(args);
+                const resultElement = document.createElement('div');
+                resultElement.className = 'terminal-result';
+                resultElement.textContent = result;
+                this.outputElement.appendChild(resultElement);
             } else {
-                this.writeOutput(`<div class="terminal-output-error">Command not found: ${command}</div>`);
+                const errorElement = document.createElement('div');
+                errorElement.className = 'terminal-error';
+                errorElement.textContent = `Command not found: ${cmd}`;
+                this.outputElement.appendChild(errorElement);
             }
         } catch (error) {
-            this.writeOutput(`<div class="terminal-output-error">Error: ${error.message}</div>`);
+            const errorElement = document.createElement('div');
+            errorElement.className = 'terminal-error';
+            errorElement.textContent = `Error: ${error.message}`;
+            this.outputElement.appendChild(errorElement);
         }
 
-        this.history.push(input);
-        this.historyIndex = -1;
-        this.currentInput = '';
+        // Clear input and scroll to bottom
         this.inputElement.value = '';
+        this.currentInput = '';
+        this.outputElement.scrollTop = this.outputElement.scrollHeight;
     }
 
     formatOutput(output) {

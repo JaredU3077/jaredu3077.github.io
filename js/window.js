@@ -296,30 +296,26 @@ export class WindowManager {
         const handleDrag = (e) => {
             if (!this.dragState) return;
             e.preventDefault();
-            // Debug log
-            const { window, startX, startY, startLeft, startTop } = this.dragState;
-            const deltaX = e.clientX - startX;
-            const deltaY = e.clientY - startY;
+            
+            const deltaX = e.clientX - this.dragState.startX;
+            const deltaY = e.clientY - this.dragState.startY;
 
-            let newLeft = startLeft + deltaX;
-            let newTop = startTop + deltaY;
+            let newLeft = this.dragState.startLeft + deltaX;
+            let newTop = this.dragState.startTop + deltaY;
 
             // Constrain to viewport
-            newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - window.offsetWidth));
-            newTop = Math.max(0, Math.min(newTop, window.innerHeight - window.offsetHeight - 40));
+            newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - windowElement.offsetWidth));
+            newTop = Math.max(0, Math.min(newTop, window.innerHeight - windowElement.offsetHeight - 40));
 
-            window.style.left = `${newLeft}px`;
-            window.style.top = `${newTop}px`;
-            console.log('Dragging window:', window.id, 'to', newLeft, newTop);
+            windowElement.style.left = `${newLeft}px`;
+            windowElement.style.top = `${newTop}px`;
 
             // Check for snapping
-            this.checkSnapping(window);
+            this.checkSnapping(windowElement);
         };
 
         const stopDrag = () => {
             if (this.dragState) {
-                // Debug log
-                console.log('Drag stop');
                 document.removeEventListener('mousemove', handleDrag);
                 document.removeEventListener('mouseup', stopDrag);
                 this.dragState = null;
@@ -329,12 +325,11 @@ export class WindowManager {
         header.addEventListener('mousedown', (e) => {
             if (e.target.closest('.window-controls')) return;
             e.preventDefault();
-            // Debug log
-            console.log('Drag start', e.clientX, e.clientY);
+            
             startX = e.clientX;
             startY = e.clientY;
-            startLeft = parseInt(windowElement.style.left);
-            startTop = parseInt(windowElement.style.top);
+            startLeft = parseInt(windowElement.style.left) || 0;
+            startTop = parseInt(windowElement.style.top) || 0;
 
             this.dragState = {
                 window: windowElement,
