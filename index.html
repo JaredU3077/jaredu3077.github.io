@@ -150,7 +150,49 @@
         <div class="branding">@JaredU_</div>
     </div>
 
-    <!-- Link to external JavaScript -->
-    <script src="script1.js"></script>
+    <!-- Link to modular JavaScript files -->
+    <script type="module">
+        import { ContentParser } from './js/parser.js';
+        import { Terminal } from './js/terminal.js';
+        import { WindowManager } from './js/window.js';
+        import { NetworkVisualization } from './js/network.js';
+        import { CONFIG } from './js/config.js';
+
+        // Initialize modules
+        const windowManager = new WindowManager();
+        const terminal = new Terminal(
+            document.getElementById('terminalInput'),
+            document.getElementById('terminalOutput')
+        );
+        const network = new NetworkVisualization('networkTopology');
+
+        // Load Codex content
+        ContentParser.loadAndParseContent(CONFIG.PATHS.CODEX)
+            .then(content => {
+                document.getElementById('codexContent').innerHTML = content;
+            })
+            .catch(error => {
+                console.error('Error loading Codex content:', error);
+                document.getElementById('codexContent').innerHTML = '<p>Error loading Codex content.</p>';
+            });
+
+        // Start network updates
+        network.startUpdates();
+
+        // Initialize icon and taskbar button clicks
+        document.querySelectorAll('.icon, .taskbar-icon, .start-menu button').forEach(el => {
+            el.addEventListener('click', () => {
+                const tool = el.dataset.tool;
+                if (tool === 'terminal') {
+                    windowManager.showWindow('terminalWindow');
+                } else if (tool === 'network-monitor') {
+                    windowManager.showWindow('topologyWindow');
+                    windowManager.showWindow('widgetsWindow');
+                } else if (tool === 'codex') {
+                    windowManager.showWindow('codexWindow');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
