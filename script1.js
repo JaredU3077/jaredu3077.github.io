@@ -20,19 +20,19 @@ const options = {
     physics: {
         enabled: true,
         barnesHut: {
-            gravitationalConstant: -3000, // Increase repulsion to reduce spread
+            gravitationalConstant: -3000,
             centralGravity: 0.3,
-            springLength: 100, // Reduce spring length for tighter layout
+            springLength: 100,
             springConstant: 0.05
         },
         stabilization: {
-            iterations: 500 // Stabilize layout faster
+            iterations: 500
         }
     },
     interaction: {
-        dragView: true, // Enable panning
-        zoomView: true, // Enable zooming
-        dragNodes: true // Allow dragging nodes
+        dragView: true,
+        zoomView: true,
+        dragNodes: true
     }
 };
 const network = new vis.Network(container, data, options);
@@ -43,67 +43,52 @@ setInterval(() => {
     });
 }, 1000);
 
-// Terminal functionality
-const terminalInput = document.getElementById('terminalInput');
-const terminalOutput = document.getElementById('terminalOutput');
-const commands = {
-    'help': 'Available commands: ping, clear, help',
-    'ping': 'Pinging 8.8.8.8... Reply from 8.8.8.8: 32ms',
-    'clear': () => { terminalOutput.innerHTML = ''; return ''; }
-};
-terminalInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        const command = terminalInput.value.trim().toLowerCase();
-        let output = commands[command] || 'Command not found';
-        if (typeof output === 'function') output = output();
-        terminalOutput.innerHTML += `<div>> ${command}</div><div>${output}</div>`;
-        terminalOutput.scrollTop = terminalOutput.scrollHeight;
-        terminalInput.value = '';
-    }
-});
-
-// Function to parse and format codex.txt content
-function parseCodexContent(text) {
+// Function to parse and format text content (for both codex.txt and resume.txt)
+function parseTextContent(text) {
     const lines = text.trim().split('\n');
     let htmlContent = '';
     let currentList = null;
     let listLevel = 0;
-    let inLayer = false;
+    let inSection = false;
 
     lines.forEach((line, index) => {
         if (!line.trim() && !currentList) return;
 
         line = line.replace(/\r/g, '');
 
-        if (line.match(/^Codex of Financial Instruments/)) {
-            htmlContent += `<h2>${line}</h2>`;
+        // Check for main heading (e.g., "Jared - Senior Network Engineer Resume")
+        if (line.match(/^[A-Za-z\s-]+Resume$/)) {
+            htmlContent += `<div class="terminal-heading">${line}</div>`;
             return;
         }
 
-        if (line.match(/^Layer \d+:/)) {
+        // Check for section headings (e.g., "Professional Experience")
+        if (line.match(/^[A-Za-z\s]+$/)) {
             if (currentList) {
                 htmlContent += '</ul>'.repeat(listLevel);
                 currentList = null;
                 listLevel = 0;
             }
-            if (inLayer) {
+            if (inSection) {
                 htmlContent += '</div>';
             }
-            htmlContent += `<div class="layer-section"><h3>${line}</h3>`;
-            inLayer = true;
+            htmlContent += `<div class="terminal-section"><div class="terminal-subheading">${line}</div>`;
+            inSection = true;
             return;
         }
 
-        if (line.match(/^\w.*:$/)) {
+        // Check for subheadings (e.g., "Senior Network Engineer, Denali Advanced Integrations, Redmond, WA")
+        if (line.match(/^\s{4}[A-Za-z\s,-]+$/)) {
             if (currentList) {
                 htmlContent += '</ul>'.repeat(listLevel);
                 currentList = null;
                 listLevel = 0;
             }
-            htmlContent += `<h4>${line.replace(/:$/, '')}</h4>`;
+            htmlContent += `<div class="terminal-subheading2">${line.trim()}</div>`;
             return;
         }
 
+        // Check for list items (indented lines)
         if (line.match(/^\s{4,}/)) {
             const indentLevel = Math.floor(line.match(/^\s*/)[0].length / 4);
             line = line.trim();
@@ -126,25 +111,26 @@ function parseCodexContent(text) {
             return;
         }
 
+        // Treat as paragraph
         if (currentList) {
             htmlContent += '</ul>'.repeat(listLevel);
             currentList = null;
             listLevel = 0;
         }
-        htmlContent += `<p>${line.trim()}</p>`;
+        htmlContent += `<div>${line.trim()}</div>`;
     });
 
     if (listLevel > 0) {
         htmlContent += '</ul>'.repeat(listLevel);
     }
-    if (inLayer) {
+    if (inSection) {
         htmlContent += '</div>';
     }
 
     return htmlContent;
 }
 
-// Function to load codex.txt and display it
+// Function to load and display codex.txt
 function loadCodexContent() {
     fetch('codex.txt')
         .then(response => {
@@ -152,7 +138,7 @@ function loadCodexContent() {
             return response.text();
         })
         .then(text => {
-            const formattedContent = parseCodexContent(text);
+            const formattedContent = parseTextContent(text);
             const codexContent = document.getElementById('codexContent');
             codexContent.innerHTML = formattedContent;
             codexContent.scrollTop = 0;
@@ -163,11 +149,62 @@ function loadCodexContent() {
         });
 }
 
+// Function to load and display resume.txt in the Terminal
+function loadResumeContent(callback) {
+    fetch('resume.txt')
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to load resume.txt');
+            return response.text();
+        })
+        .then(text => {
+            const formattedContent = parseTextContent(text);
+            callback(formattedContent);
+        })
+        .catch(error => {
+            console.error(error);
+            callback('Error loading resume content.');
+        });
+}
+
+// Terminal functionality
+const terminalInput = document.getElementById('terminalInput');
+const terminalOutput = document.getElementById('terminalOutput');
+const commands = {
+    'help': 'Available commands: ping, clear, help, show resume, show jared',
+    'ping': 'Pinging 8.8.8.8... Reply from 8.8.8.8: 32ms',
+    'clear': () => { terminalOutput.innerHTML = ''; return ''; },
+    'show resume': (callback) => {
+        loadResumeContent(content => callback(content));
+        return '';
+    },
+    'show jared': (callback) => {
+        loadResumeContent(content => callback(content));
+        return '';
+    }
+};
+terminalInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        const command = terminalInput.value.trim().toLowerCase();
+        let output = commands[command] || 'Command not found';
+        
+        if (typeof output === 'function') {
+            output((result) => {
+                terminalOutput.innerHTML += `<div>> ${command}</div><div>${result}</div>`;
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            });
+        } else {
+            terminalOutput.innerHTML += `<div>> ${command}</div><div>${output}</div>`;
+            terminalOutput.scrollTop = terminalOutput.scrollHeight;
+        }
+        terminalInput.value = '';
+    }
+});
+
 // Draggable and resizable windows
 interact('.window-header').draggable({
     listeners: {
         move(event) {
-            const target = event.target.parentElement; // Target the window, not the header
+            const target = event.target.parentElement;
             const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
             const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
             target.style.transform = `translate(${x}px, ${y}px)`;
@@ -195,7 +232,6 @@ interact('.window').resizable({
             target.setAttribute('data-x', x);
             target.setAttribute('data-y', y);
 
-            // Resize topology map if needed
             if (target.id === 'topologyWindow') {
                 const topology = document.getElementById('networkTopology');
                 topology.style.width = event.rect.width + 'px';
@@ -280,7 +316,6 @@ document.querySelectorAll('.icon, .taskbar-icon, .start-menu button').forEach(el
             const window = document.getElementById('topologyWindow');
             window.style.display = 'block';
             window.scrollTop = 0;
-            // Fit the network graph to the window on open
             const topology = document.getElementById('networkTopology');
             topology.style.width = '100%';
             topology.style.height = (window.offsetHeight - 40) + 'px';
