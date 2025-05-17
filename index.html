@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Engineer OS Theme</title>
+    <link rel="stylesheet" href="theme.css">
+    <!-- Include vis.js for network topology map -->
+    <script src="https://unpkg.com/vis-network@9.1.2/dist/vis-network.min.js"></script>
+    <!-- Include interact.js for draggable terminal -->
+    <script src="https://unpkg.com/interactjs@1.10.27/dist/interact.min.js"></script>
+</head>
+<body>
+    <!-- Animated background canvas for subtle network pulses -->
+    <canvas id="backgroundCanvas"></canvas>
+
+    <!-- Desktop container for icons and widgets -->
+    <div class="desktop">
+        <!-- Desktop icons for network tools -->
+        <div class="icon" data-tool="network-monitor">
+            <img src="https://via.placeholder.com/64?text=NM" alt="Network Monitor">
+            <span>Network Monitor</span>
+        </div>
+        <div class="icon" data-tool="device-manager">
+            <img src="https://via.placeholder.com/64?text=DM" alt="Device Manager">
+            <span>Device Manager</span>
+        </div>
+        <div class="icon" data-tool="terminal">
+            <img src="https://via.placeholder.com/64?text=Term" alt="Terminal">
+            <span>Terminal</span>
+        </div>
+
+        <!-- Network topology map -->
+        <div class="topology-map" id="networkTopology"></div>
+
+        <!-- Widgets sidebar -->
+        <div class="widgets">
+            <div class="widget">
+                <h3>Bandwidth Usage</h3>
+                <p id="bandwidth">0 Mbps</p>
+            </div>
+            <div class="widget">
+                <h3>Network Alerts</h3>
+                <p id="alerts">No alerts</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Taskbar with branding -->
+    <div class="taskbar">
+        <div class="branding">@JaredU_</div>
+        <div class="taskbar-tools">
+            <button data-tool="network-monitor">Network Monitor</button>
+            <button data-tool="device-manager">Device Manager</button>
+            <button data-tool="terminal">Terminal</button>
+        </div>
+    </div>
+
+    <!-- Terminal window (draggable) -->
+    <div class="terminal-window" id="terminalWindow">
+        <div class="terminal-header">
+            <span>Terminal</span>
+            <button class="close-btn">×</button>
+        </div>
+        <div class="terminal-body">
+            <div id="terminalOutput"></div>
+            <input type="text" id="terminalInput" placeholder="Type command...">
+        </div>
+    </div>
+
+    <!-- Link to external JavaScript -->
+    <script src="script1.js"></script>
+</body>
+</html>
