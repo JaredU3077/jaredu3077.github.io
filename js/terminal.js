@@ -14,7 +14,7 @@ export class Terminal {
         this.commandHistory = [];
         this.historyIndex = -1;
         this.commands = {
-            'help': () => CONFIG.COMMANDS.HELP,
+            'help': () => this.getHelpText(),
             'ping': () => CONFIG.COMMANDS.PING,
             'clear': () => { this.output.innerHTML = ''; return ''; },
             'show resume': async () => {
@@ -38,10 +38,61 @@ export class Terminal {
                     }
                     return 'Error loading resume content.';
                 }
+            },
+            'date': () => new Date().toLocaleString(),
+            'echo': (args) => args.join(' '),
+            'network status': () => {
+                const bandwidth = document.getElementById('bandwidth')?.textContent || 'N/A';
+                const alerts = document.getElementById('alerts')?.textContent || 'N/A';
+                return `Bandwidth: ${bandwidth}\nAlerts: ${alerts}`;
+            },
+            'window list': () => {
+                const windows = Array.from(document.querySelectorAll('.window'))
+                    .map(w => `${w.id}: ${w.style.display === 'none' ? 'closed' : 'open'}`)
+                    .join('\n');
+                return windows || 'No windows found';
+            },
+            'window focus': (args) => {
+                const windowId = args[0];
+                if (!windowId) return 'Error: Window ID required';
+                const window = document.getElementById(windowId);
+                if (!window) return `Error: Window '${windowId}' not found`;
+                window.style.zIndex = '100';
+                return `Focused window: ${windowId}`;
+            },
+            'network zoom': (args) => {
+                const action = args[0];
+                if (!action) return 'Error: Action required (in/out/reset)';
+                switch (action) {
+                    case 'in': window.network?.zoomIn(); return 'Zoomed in';
+                    case 'out': window.network?.zoomOut(); return 'Zoomed out';
+                    case 'reset': window.network?.resetZoom(); return 'Zoom reset';
+                    default: return 'Error: Invalid action (use in/out/reset)';
+                }
             }
         };
 
         this.initializeEventListeners();
+    }
+
+    /**
+     * Get help text for available commands
+     * @returns {string} Help text
+     */
+    getHelpText() {
+        return `Available commands:
+help - Show this help message
+ping - Test network connectivity
+clear - Clear terminal output
+show resume - Display resume content
+show jared - Display resume content
+date - Show current date and time
+echo [text] - Echo the provided text
+network status - Show network status
+window list - List all windows
+window focus [id] - Focus a specific window
+network zoom [in/out/reset] - Control network zoom
+`;
     }
 
     /**
@@ -64,19 +115,8 @@ export class Terminal {
                 this.historyIndex = this.commandHistory.length;
 
                 // Process command
-                const commandLower = command.toLowerCase();
-                let output = this.commands[commandLower] || 'Command not found';
-                
-                if (typeof output === 'function') {
-                    try {
-                        const result = await output();
-                        this.appendOutput(command, result);
-                    } catch (error) {
-                        this.appendOutput(command, `Error: ${error.message}`);
-                    }
-                } else {
-                    this.appendOutput(command, output);
-                }
+                const result = await this.processCommand(command);
+                this.appendOutput(command, result);
                 
                 this.input.value = '';
             }
@@ -131,5 +171,53 @@ export class Terminal {
             throw new AppError('Invalid command name', ErrorTypes.VALIDATION);
         }
         this.commands[name.toLowerCase()] = handler;
+    }
+
+    /**
+     * Clear the terminal output
+     */
+    clear() {
+        this.output.innerHTML = '';
+        return '';
+    }
+
+    /**
+     * Clear the terminal input
+     */
+    clearInput() {
+        this.input.value = '';
+    }
+
+    /**
+     * Reload the terminal
+     */
+    reload() {
+        this.clear();
+        this.appendOutput('Terminal reloaded', '');
+    }
+
+    /**
+     * Process command with arguments
+     * @param {string} command - The command to process
+     * @returns {Promise<string>} Command output
+     */
+    async processCommand(command) {
+        const parts = command.split(' ');
+        const cmd = parts[0].toLowerCase();
+        const args = parts.slice(1);
+
+        const handler = this.commands[cmd];
+        if (!handler) {
+            return 'Command not found. Type "help" for available commands.';
+        }
+
+        try {
+            if (typeof handler === 'function') {
+                return await handler(args);
+            }
+            return handler;
+        } catch (error) {
+            return `Error: ${error.message}`;
+        }
     }
 }

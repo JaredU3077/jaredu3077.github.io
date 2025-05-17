@@ -1,0 +1,27 @@
+{
+    "source": {
+        "include": ["js"],
+        "includePattern": "\\.js$",
+        "excludePattern": "(node_modules/|docs)"
+    },
+    "plugins": ["plugins/markdown"],
+    "opts": {
+        "destination": "./docs/",
+        "recurse": true,
+        "readme": "./README.md",
+        "template": "node_modules/clean-jsdoc-theme"
+    },
+    "templates": {
+        "cleverLinks": true,
+        "monospaceLinks": true,
+        "search": true,
+        "default": {
+            "outputSourceFiles": true,
+            "includeDate": false
+        }
+    },
+    "markdown": {
+        "parser": "gfm",
+        "hardwrap": true
+    }
+} 

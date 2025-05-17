@@ -8,11 +8,20 @@ import { CONFIG } from './config.js';
 export class WindowManager {
     constructor() {
         this.windowStates = new Map();
+        this.snapThreshold = 20; // pixels
+        this.snapZones = {
+            top: 0,
+            bottom: window.innerHeight,
+            left: 0,
+            right: window.innerWidth,
+            center: window.innerWidth / 2
+        };
         this.loadWindowStates();
         this.initializeDraggable();
         this.initializeResizable();
         this.initializeWindowControls();
         this.initializeWindowConstraints();
+        this.initializeWindowSnapping();
     }
 
     /**
@@ -198,7 +207,34 @@ export class WindowManager {
 
             minimizeBtn.addEventListener('click', () => {
                 const isMinimized = body.style.display === 'none';
-                body.style.display = isMinimized ? 'block' : 'none';
+                
+                if (!isMinimized) {
+                    // Minimize animation
+                    const x = parseFloat(window.getAttribute('data-x')) || 0;
+                    const y = parseFloat(window.getAttribute('data-y')) || 0;
+                    window.style.setProperty('--x', `${x}px`);
+                    window.style.setProperty('--y', `${y}px`);
+                    window.classList.add('minimizing');
+                    
+                    // Wait for animation to complete
+                    setTimeout(() => {
+                        body.style.display = 'none';
+                        window.classList.remove('minimizing');
+                    }, 300);
+                } else {
+                    // Restore animation
+                    const x = parseFloat(window.getAttribute('data-x')) || 0;
+                    const y = parseFloat(window.getAttribute('data-y')) || 0;
+                    window.style.setProperty('--x', `${x}px`);
+                    window.style.setProperty('--y', `${y}px`);
+                    window.classList.add('restoring');
+                    body.style.display = 'block';
+                    
+                    // Wait for animation to complete
+                    setTimeout(() => {
+                        window.classList.remove('restoring');
+                    }, 300);
+                }
                 
                 // Update window state
                 this.updateWindowState(window.id, {
@@ -309,5 +345,126 @@ export class WindowManager {
         if (window) {
             window.style.display = 'none';
         }
+    }
+
+    /**
+     * Initialize window snapping functionality
+     */
+    initializeWindowSnapping() {
+        interact('.window').on('dragmove', (event) => {
+            const target = event.target;
+            const rect = target.getBoundingClientRect();
+            
+            // Check for snapping to edges
+            this.checkSnapToEdges(target, rect);
+            
+            // Check for snapping to other windows
+            this.checkSnapToWindows(target, rect);
+        });
+    }
+
+    /**
+     * Check and apply snapping to screen edges
+     * @param {HTMLElement} window - The window element
+     * @param {DOMRect} rect - The window's bounding rectangle
+     */
+    checkSnapToEdges(window, rect) {
+        const x = parseFloat(window.getAttribute('data-x')) || 0;
+        const y = parseFloat(window.getAttribute('data-y')) || 0;
+        let newX = x;
+        let newY = y;
+
+        // Snap to top
+        if (Math.abs(rect.top - this.snapZones.top) < this.snapThreshold) {
+            newY = 0;
+        }
+        // Snap to bottom
+        else if (Math.abs(rect.bottom - this.snapZones.bottom) < this.snapThreshold) {
+            newY = window.innerHeight - rect.height;
+        }
+
+        // Snap to left
+        if (Math.abs(rect.left - this.snapZones.left) < this.snapThreshold) {
+            newX = 0;
+        }
+        // Snap to right
+        else if (Math.abs(rect.right - this.snapZones.right) < this.snapThreshold) {
+            newX = window.innerWidth - rect.width;
+        }
+        // Snap to center
+        else if (Math.abs(rect.left + rect.width/2 - this.snapZones.center) < this.snapThreshold) {
+            newX = (window.innerWidth - rect.width) / 2;
+        }
+
+        if (newX !== x || newY !== y) {
+            window.style.transform = `translate(${newX}px, ${newY}px)`;
+            window.setAttribute('data-x', newX);
+            window.setAttribute('data-y', newY);
+            
+            // Update window state
+            this.updateWindowState(window.id, {
+                ...this.getWindowState(window.id),
+                x: newX,
+                y: newY
+            });
+        }
+    }
+
+    /**
+     * Check and apply snapping to other windows
+     * @param {HTMLElement} window - The window element
+     * @param {DOMRect} rect - The window's bounding rectangle
+     */
+    checkSnapToWindows(window, rect) {
+        const x = parseFloat(window.getAttribute('data-x')) || 0;
+        const y = parseFloat(window.getAttribute('data-y')) || 0;
+        let newX = x;
+        let newY = y;
+
+        document.querySelectorAll('.window').forEach(otherWindow => {
+            if (otherWindow === window || otherWindow.style.display === 'none') return;
+
+            const otherRect = otherWindow.getBoundingClientRect();
+            
+            // Snap to other window's edges
+            if (Math.abs(rect.left - otherRect.right) < this.snapThreshold) {
+                newX = parseFloat(otherWindow.getAttribute('data-x')) + otherRect.width;
+            }
+            else if (Math.abs(rect.right - otherRect.left) < this.snapThreshold) {
+                newX = parseFloat(otherWindow.getAttribute('data-x')) - rect.width;
+            }
+            else if (Math.abs(rect.top - otherRect.bottom) < this.snapThreshold) {
+                newY = parseFloat(otherWindow.getAttribute('data-y')) + otherRect.height;
+            }
+            else if (Math.abs(rect.bottom - otherRect.top) < this.snapThreshold) {
+                newY = parseFloat(otherWindow.getAttribute('data-y')) - rect.height;
+            }
+        });
+
+        if (newX !== x || newY !== y) {
+            window.style.transform = `translate(${newX}px, ${newY}px)`;
+            window.setAttribute('data-x', newX);
+            window.setAttribute('data-y', newY);
+            
+            // Update window state
+            this.updateWindowState(window.id, {
+                ...this.getWindowState(window.id),
+                x: newX,
+                y: newY
+            });
+        }
+    }
+
+    /**
+     * Update snap zones when window is resized
+     */
+    updateSnapZones() {
+        this.snapZones = {
+            top: 0,
+            bottom: window.innerHeight,
+            left: 0,
+            right: window.innerWidth,
+            center: window.innerWidth / 2
+        };
     }
 }

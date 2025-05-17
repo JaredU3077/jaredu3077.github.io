@@ -113,6 +113,26 @@
         </div>
     </div>
 
+    <!-- Help Window -->
+    <div id="helpWindow" class="window">
+        <div class="window-header">
+            <span>Help</span>
+            <div class="window-controls">
+                <button class="minimize-btn">-</button>
+                <button class="maximize-btn">□</button>
+                <button class="close-btn">×</button>
+            </div>
+        </div>
+        <div class="window-body">
+            <div class="help-tabs">
+                <button class="help-tab active" data-section="terminal">Terminal</button>
+                <button class="help-tab" data-section="shortcuts">Shortcuts</button>
+                <button class="help-tab" data-section="windows">Windows</button>
+            </div>
+            <div id="helpContent"></div>
+        </div>
+    </div>
+
     <!-- Taskbar with Start menu -->
     <div class="taskbar">
         <button class="start-btn">Start</button>
@@ -150,12 +170,15 @@
         <div class="branding">@JaredU_</div>
     </div>
 
-    <!-- Link to modular JavaScript files -->
+    <!-- Scripts -->
     <script type="module">
         import { ContentParser } from './js/parser.js';
         import { Terminal } from './js/terminal.js';
         import { WindowManager } from './js/window.js';
         import { NetworkVisualization } from './js/network.js';
+        import { KeyboardManager } from './js/keyboard.js';
+        import { HelpManager } from './js/help.js';
+        import { SearchManager } from './js/search.js';
         import { CONFIG } from './js/config.js';
 
         // Initialize modules
@@ -165,11 +188,16 @@
             document.getElementById('terminalOutput')
         );
         const network = new NetworkVisualization('networkTopology');
+        const keyboardManager = new KeyboardManager(windowManager, terminal, network);
+        const helpManager = new HelpManager();
+        const searchManager = new SearchManager();
 
         // Load Codex content
         ContentParser.loadAndParseContent(CONFIG.PATHS.CODEX)
             .then(content => {
                 document.getElementById('codexContent').innerHTML = content;
+                // Index content for search
+                searchManager.indexContent(content);
             })
             .catch(error => {
                 console.error('Error loading Codex content:', error);
@@ -193,6 +221,21 @@
                 }
             });
         });
+
+        // Initialize help system
+        document.querySelectorAll('.help-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Update active tab
+                document.querySelectorAll('.help-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Show help content
+                helpManager.showHelp(tab.dataset.section);
+            });
+        });
+
+        // Show initial help content
+        helpManager.showHelp('terminal');
     </script>
 </body>
 </html>

@@ -67,6 +67,10 @@
 
 ### User Experience
 - [x] Add keyboard shortcuts for common operations
+  - [x] Window management shortcuts (Alt+N, Alt+T, Alt+C, Alt+W)
+  - [x] Terminal shortcuts (Ctrl+L, Ctrl+U, Ctrl+R)
+  - [x] Network shortcuts (Ctrl+F, Ctrl+Plus, Ctrl+Minus, Ctrl+0)
+  - [x] Window close shortcuts (Escape, Alt+F4)
 - [x] Implement window state persistence
 - [x] Add loading indicators for async operations
 - [x] Improve error messages and user feedback
@@ -74,15 +78,63 @@
 ## Medium Priority
 
 ### Features
-- [ ] Add more terminal commands
-- [ ] Implement window snapping
-- [ ] Add window minimize animation
-- [ ] Create a proper help system
-- [ ] Add search functionality to Codex
+- [x] Add more terminal commands
+  - [x] Add date command to show current date/time
+  - [x] Add echo command for text output
+  - [x] Add network status command
+  - [x] Add window management commands (list, focus)
+  - [x] Add network zoom control command
+  - [x] Improve help command with detailed documentation
+  - [x] Add command argument support
+  - [x] Add error handling for invalid commands
+- [x] Implement window snapping
+  - [x] Add snapping to screen edges (top, bottom, left, right)
+  - [x] Add snapping to screen center
+  - [x] Add snapping to other windows
+  - [x] Add configurable snap threshold
+  - [x] Update snap zones on window resize
+  - [x] Persist snapped window positions
+- [x] Add window minimize animation
+  - [x] Add smooth minimize/restore animations
+  - [x] Implement scale and opacity transitions
+  - [x] Add transform origin for natural animation
+  - [x] Handle window position during animation
+  - [x] Add animation timing controls
+- [x] Create a proper help system
+  - [x] Add dedicated help window
+  - [x] Implement tabbed interface for different help sections
+  - [x] Add terminal commands documentation
+  - [x] Add keyboard shortcuts documentation
+  - [x] Add window controls documentation
+  - [x] Implement dynamic help content generation
+  - [x] Add help navigation
+- [x] Add search functionality to Codex
+  - [x] Implement real-time search with debouncing
+  - [x] Add search result highlighting
+  - [x] Add context-aware search results
+  - [x] Implement smooth scrolling to results
+  - [x] Add search result animations
+  - [x] Optimize search performance with indexing
+  - [x] Add keyboard navigation for results
 
 ### Code Quality
-- [ ] Add JSDoc documentation
-- [ ] Implement unit tests
+- [x] Add JSDoc documentation
+  - [x] Module-level documentation
+  - [x] Class and method documentation
+  - [x] Type definitions and property documentation
+  - [x] Private method documentation
+  - [x] Parameter and return value documentation
+  - [x] Description blocks for complex functionality
+  - [x] JSDoc configuration file
+  - [x] Documentation generation setup
+- [x] Implement unit tests
+  - [x] Set up Jest testing framework
+  - [x] Configure test environment
+  - [x] Add test utilities and mocks
+  - [x] Implement SearchManager tests
+  - [x] Add test coverage reporting
+  - [x] Set up continuous testing
+  - [x] Add test documentation
 - [ ] Add ESLint configuration
 - [ ] Set up continuous integration
 - [ ] Add TypeScript support

@@ -68,6 +68,39 @@ body {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
     display: none;
     z-index: 10;
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+.window.minimizing {
+    transform-origin: top left;
+    animation: minimizeWindow 0.3s ease-out forwards;
+}
+
+.window.restoring {
+    transform-origin: top left;
+    animation: restoreWindow 0.3s ease-out forwards;
+}
+
+@keyframes minimizeWindow {
+    0% {
+        transform: scale(1) translate(var(--x), var(--y));
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0.1) translate(var(--x), var(--y));
+        opacity: 0;
+    }
+}
+
+@keyframes restoreWindow {
+    0% {
+        transform: scale(0.1) translate(var(--x), var(--y));
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1) translate(var(--x), var(--y));
+        opacity: 1;
+    }
 }
 
 #topologyWindow {
@@ -520,4 +553,179 @@ body {
     margin-bottom: 1rem;
     white-space: pre-wrap;
     word-break: break-word;
+}
+
+/* Help Window Styles */
+#helpWindow {
+    width: 600px;
+    height: 500px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.help-section {
+    margin: 20px 0;
+    padding: 15px;
+    background: #1C2526;
+    border-left: 3px solid #4682B4;
+    border-radius: 4px;
+}
+
+.help-section h3 {
+    color: #5A9BD4;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.help-commands,
+.help-shortcuts,
+.help-controls {
+    display: grid;
+    gap: 10px;
+}
+
+.help-command,
+.help-shortcut,
+.help-control {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 15px;
+    padding: 8px;
+    background: rgba(70, 130, 180, 0.1);
+    border-radius: 4px;
+}
+
+.command-name,
+.shortcut-key,
+.control-name {
+    color: #4682B4;
+    font-family: 'Consolas', monospace;
+    font-weight: bold;
+}
+
+.command-desc,
+.shortcut-desc,
+.control-desc {
+    color: #E0E0E0;
+}
+
+.help-tabs {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #4682B4;
+    padding-bottom: 5px;
+}
+
+.help-tab {
+    padding: 8px 15px;
+    background: #1C2526;
+    border: 1px solid #4682B4;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.help-tab:hover {
+    background: #4682B4;
+}
+
+.help-tab.active {
+    background: #4682B4;
+    color: #fff;
+}
+
+/* Search Styles */
+.search-container {
+    position: relative;
+    margin-left: 15px;
+    flex: 1;
+    max-width: 300px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 5px 10px;
+    background: #1C2526;
+    border: 1px solid #4682B4;
+    border-radius: 4px;
+    color: #E0E0E0;
+    font-size: 14px;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #5A9BD4;
+}
+
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #1C2526;
+    border: 1px solid #4682B4;
+    border-radius: 4px;
+    margin-top: 5px;
+    max-height: 300px;
+    overflow-y: auto;
+    display: none;
+    z-index: 1000;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.search-result {
+    padding: 10px;
+    border-bottom: 1px solid #4682B4;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.search-result:last-child {
+    border-bottom: none;
+}
+
+.search-result:hover {
+    background: rgba(70, 130, 180, 0.2);
+}
+
+.result-title {
+    color: #5A9BD4;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.result-context {
+    color: #E0E0E0;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.no-results {
+    padding: 10px;
+    color: #E0E0E0;
+    text-align: center;
+}
+
+mark {
+    background: rgba(70, 130, 180, 0.3);
+    color: #5A9BD4;
+    padding: 0 2px;
+    border-radius: 2px;
+}
+
+.highlight {
+    animation: highlight-fade 2s ease-out;
+}
+
+@keyframes highlight-fade {
+    0% { background: rgba(70, 130, 180, 0.3); }
+    100% { background: transparent; }
+}
+
+/* Update Codex window header for search */
+#codexWindow .window-header {
+    display: flex;
+    align-items: center;
 }

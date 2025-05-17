@@ -266,6 +266,44 @@ export class NetworkVisualization {
     }
 
     /**
+     * Zoom in the network visualization
+     */
+    zoomIn() {
+        if (this.network) {
+            const currentScale = this.network.getScale();
+            this.network.moveTo({
+                scale: currentScale * 1.2
+            });
+            this.saveNetworkState();
+        }
+    }
+
+    /**
+     * Zoom out the network visualization
+     */
+    zoomOut() {
+        if (this.network) {
+            const currentScale = this.network.getScale();
+            this.network.moveTo({
+                scale: currentScale / 1.2
+            });
+            this.saveNetworkState();
+        }
+    }
+
+    /**
+     * Reset zoom level to default
+     */
+    resetZoom() {
+        if (this.network) {
+            this.network.moveTo({
+                scale: 1
+            });
+            this.saveNetworkState();
+        }
+    }
+
+    /**
      * Reset network to default state
      */
     resetToDefault() {
