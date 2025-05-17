@@ -146,24 +146,33 @@ export class Terminal {
         this.commands.set('show', (args) => this.handleShow(args));
         this.commands.set('clear', () => this.clearTerminal());
         this.commands.set('help', (args) => this.showHelp(args));
-        this.commands.set('show resume', async () => {
-            try {
-                const content = await ContentParser.loadAndParseContent(CONFIG.PATHS.RESUME, this.outputElement);
-                return content;
-            } catch (error) {
-                return 'Error loading resume content.';
-            }
-        });
-        this.commands.set('show jared', async () => {
-            try {
-                const content = await ContentParser.loadAndParseContent(CONFIG.PATHS.RESUME, this.outputElement);
-                return content;
-            } catch (error) {
-                return 'Error loading resume content.';
-            }
-        });
         this.commands.set('date', () => new Date().toLocaleString());
         this.commands.set('echo', (args) => args.join(' '));
+
+        // Handle show resume and show jared commands
+        this.commands.set('show resume', async () => {
+            try {
+                const response = await fetch(CONFIG.PATHS.RESUME);
+                if (!response.ok) throw new Error('Failed to load resume');
+                const text = await response.text();
+                return ContentParser.parseTextContent(text);
+            } catch (error) {
+                console.error('Error loading resume:', error);
+                return 'Error loading resume content: ' + error.message;
+            }
+        });
+
+        this.commands.set('show jared', async () => {
+            try {
+                const response = await fetch(CONFIG.PATHS.RESUME);
+                if (!response.ok) throw new Error('Failed to load resume');
+                const text = await response.text();
+                return ContentParser.parseTextContent(text);
+            } catch (error) {
+                console.error('Error loading resume:', error);
+                return 'Error loading resume content: ' + error.message;
+            }
+        });
 
         this.commands.set('network status', () => {
             const bandwidth = document.getElementById('bandwidth')?.textContent || 'N/A';

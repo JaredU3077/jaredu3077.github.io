@@ -125,7 +125,7 @@ export class WindowManager {
         windowElement.style.zIndex = this.getNextZIndex();
 
         windowElement.innerHTML = `
-            <div class="window-header">
+            <div class="window-header" style="cursor: move; user-select: none;">
                 <div class="window-title">
                     <i class="fas ${icon}"></i>
                     ${title}
@@ -293,15 +293,44 @@ export class WindowManager {
         const header = windowElement.querySelector('.window-header');
         let startX, startY, startLeft, startTop;
 
-        // Prevent text selection while dragging
-        header.style.userSelect = 'none';
-        header.style.cursor = 'move';
+        const handleDrag = (e) => {
+            if (!this.dragState) return;
+            e.preventDefault();
+            // Debug log
+            console.log('Dragging...', e.clientX, e.clientY);
+            const { window, startX, startY, startLeft, startTop } = this.dragState;
+            const deltaX = e.clientX - startX;
+            const deltaY = e.clientY - startY;
+
+            let newLeft = startLeft + deltaX;
+            let newTop = startTop + deltaY;
+
+            // Constrain to viewport
+            newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - window.offsetWidth));
+            newTop = Math.max(0, Math.min(newTop, window.innerHeight - window.offsetHeight - 40));
+
+            window.style.left = `${newLeft}px`;
+            window.style.top = `${newTop}px`;
+
+            // Check for snapping
+            this.checkSnapping(window);
+        };
+
+        const stopDrag = () => {
+            if (this.dragState) {
+                // Debug log
+                console.log('Drag stop');
+                document.removeEventListener('mousemove', handleDrag);
+                document.removeEventListener('mouseup', stopDrag);
+                this.dragState = null;
+            }
+        };
 
         header.addEventListener('mousedown', (e) => {
             if (e.target.closest('.window-controls')) return;
-            e.preventDefault(); // Prevent text selection
+            e.preventDefault();
             // Debug log
-            console.log('Drag start');
+            console.log('Drag start', e.clientX, e.clientY);
             startX = e.clientX;
             startY = e.clientY;
             startLeft = parseInt(windowElement.style.left);
@@ -313,39 +342,6 @@ export class WindowManager {
                 startY,
                 startLeft,
                 startTop
-            };
-
-            const handleDrag = (e) => {
-                if (!this.dragState) return;
-                e.preventDefault(); // Prevent text selection
-                // Debug log
-                console.log('Dragging...');
-                const { window, startX, startY, startLeft, startTop } = this.dragState;
-                const deltaX = e.clientX - startX;
-                const deltaY = e.clientY - startY;
-
-                let newLeft = startLeft + deltaX;
-                let newTop = startTop + deltaY;
-
-                // Constrain to viewport
-                newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - window.offsetWidth));
-                newTop = Math.max(0, Math.min(newTop, window.innerHeight - window.offsetHeight - 40));
-
-                window.style.left = `${newLeft}px`;
-                window.style.top = `${newTop}px`;
-
-                // Check for snapping
-                this.checkSnapping(window);
-            };
-
-            const stopDrag = () => {
-                if (this.dragState) {
-                    // Debug log
-                    console.log('Drag stop');
-                    document.removeEventListener('mousemove', handleDrag);
-                    document.removeEventListener('mouseup', stopDrag);
-                    this.dragState = null;
-                }
             };
 
             document.addEventListener('mousemove', handleDrag);
