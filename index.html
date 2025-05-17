@@ -80,6 +80,9 @@
                     <path d="M7 7h10M7 12h10M7 17h10"/>
                 </svg>
             </button>
+            <button class="taskbar-icon" title="Help">
+                <i class="fas fa-question-circle"></i>
+            </button>
         </div>
         <div class="branding">@JaredU_</div>
     </div>
@@ -188,11 +191,43 @@
                             icon: 'fa-book'
                         });
                         // Initialize search for the Codex window
-                        searchManager.loadAndIndexContent();
+                        searchManager.initializeSearch();
+                        break;
+                    }
+                    case 'device-manager': {
+                        windowManager.createWindow({
+                            id: 'deviceManagerWindow',
+                            title: 'Device Manager',
+                            content: `<div class="device-list">No devices found. (Demo)</div>`,
+                            width: 500,
+                            height: 300,
+                            icon: 'fa-server'
+                        });
                         break;
                     }
                 }
             });
+        });
+
+        // Add Help button to taskbar
+        const helpBtn = document.createElement('button');
+        helpBtn.className = 'taskbar-icon';
+        helpBtn.title = 'Help';
+        helpBtn.innerHTML = `<i class="fas fa-question-circle"></i>`;
+        document.querySelector('.taskbar-tools').appendChild(helpBtn);
+        helpBtn.addEventListener('click', () => {
+            let helpWin = document.getElementById('helpWindow');
+            if (!helpWin) {
+                helpWin = windowManager.createWindow({
+                    id: 'helpWindow',
+                    title: 'Help',
+                    content: `<div id="helpContent"></div>`,
+                    width: 600,
+                    height: 500,
+                    icon: 'fa-question-circle'
+                });
+            }
+            helpManager.showHelp('terminal');
         });
 
         // Only start network updates when the network window is opened

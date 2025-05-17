@@ -25,17 +25,17 @@ export class SearchManager {
         this.searchResults = [];
         /** @private */
         this.currentQuery = '';
-        this.initializeSearch();
     }
 
     /**
-     * Initializes the search functionality
-     * @private
-     * @description Sets up the search input, results container, and event listeners
+     * Call this after the Codex window is created and in the DOM.
      */
     initializeSearch() {
         // Add search input to Codex window
         const codexHeader = document.querySelector('#codexWindow .window-header');
+        if (!codexHeader) return; // Defensive: only run if window exists
+        // Prevent duplicate search bar
+        if (codexHeader.querySelector('.search-container')) return;
         const searchContainer = document.createElement('div');
         searchContainer.className = 'search-container';
         searchContainer.innerHTML = `

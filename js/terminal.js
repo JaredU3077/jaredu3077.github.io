@@ -140,63 +140,28 @@ export class Terminal {
 
     initializeCommands() {
         // Network commands
-        this.commands.set('ping', {
-            description: 'Test network connectivity',
-            usage: 'ping <host>',
-            execute: (args) => this.handlePing(args)
-        });
-
-        this.commands.set('traceroute', {
-            description: 'Trace route to host',
-            usage: 'traceroute <host>',
-            execute: (args) => this.handleTraceroute(args)
-        });
-
-        this.commands.set('show', {
-            description: 'Show network information',
-            usage: 'show [interfaces|routes|config]',
-            execute: (args) => this.handleShow(args)
-        });
-
-        this.commands.set('clear', {
-            description: 'Clear terminal screen',
-            usage: 'clear',
-            execute: () => this.clearTerminal()
-        });
-
-        this.commands.set('help', {
-            description: 'Show available commands',
-            usage: 'help [command]',
-            execute: (args) => this.showHelp(args)
-        });
-
-        // Additional commands
+        this.commands.set('ping', (args) => this.handlePing(args));
+        this.commands.set('traceroute', (args) => this.handleTraceroute(args));
+        this.commands.set('show', (args) => this.handleShow(args));
+        this.commands.set('clear', () => this.clearTerminal());
+        this.commands.set('help', (args) => this.showHelp(args));
         this.commands.set('show resume', async () => {
             try {
                 const content = await ContentParser.loadAndParseContent(CONFIG.PATHS.RESUME, this.outputElement);
                 return content;
             } catch (error) {
-                if (error instanceof AppError) {
-                    return `Error: ${error.message}`;
-                }
                 return 'Error loading resume content.';
             }
         });
-
         this.commands.set('show jared', async () => {
             try {
                 const content = await ContentParser.loadAndParseContent(CONFIG.PATHS.RESUME, this.outputElement);
                 return content;
             } catch (error) {
-                if (error instanceof AppError) {
-                    return `Error: ${error.message}`;
-                }
                 return 'Error loading resume content.';
             }
         });
-
         this.commands.set('date', () => new Date().toLocaleString());
-
         this.commands.set('echo', (args) => args.join(' '));
 
         this.commands.set('network status', () => {
