@@ -290,6 +290,13 @@ export class WindowManager {
     }
 
     initDrag(windowElement) {
+        // IMPORTANT: This window dragging implementation is working correctly.
+        // DO NOT modify this function without thorough testing as it affects core window functionality.
+        // The current implementation handles:
+        // - Proper drag state management
+        // - Viewport constraints
+        // - Window snapping
+        // - Event cleanup
         const header = windowElement.querySelector('.window-header');
         let startX, startY, startLeft, startTop;
 

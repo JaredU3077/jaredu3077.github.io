@@ -99,10 +99,27 @@ export class Terminal {
             
             if (handler) {
                 const result = handler(args);
-                const resultElement = document.createElement('div');
-                resultElement.className = 'terminal-result';
-                resultElement.textContent = result;
-                this.outputElement.appendChild(resultElement);
+                // Handle both Promise and non-Promise results
+                if (result instanceof Promise) {
+                    result.then(output => {
+                        const resultElement = document.createElement('div');
+                        resultElement.className = 'terminal-result';
+                        resultElement.textContent = output;
+                        this.outputElement.appendChild(resultElement);
+                        this.outputElement.scrollTop = this.outputElement.scrollHeight;
+                    }).catch(error => {
+                        const errorElement = document.createElement('div');
+                        errorElement.className = 'terminal-error';
+                        errorElement.textContent = `Error: ${error.message}`;
+                        this.outputElement.appendChild(errorElement);
+                        this.outputElement.scrollTop = this.outputElement.scrollHeight;
+                    });
+                } else {
+                    const resultElement = document.createElement('div');
+                    resultElement.className = 'terminal-result';
+                    resultElement.textContent = result;
+                    this.outputElement.appendChild(resultElement);
+                }
             } else {
                 const errorElement = document.createElement('div');
                 errorElement.className = 'terminal-error';
