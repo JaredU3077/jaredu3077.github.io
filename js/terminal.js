@@ -75,7 +75,7 @@ export class Terminal {
         }
     }
 
-    executeCommand() {
+    async executeCommand() {
         const input = this.inputElement.value.trim();
         if (!input) return;
 
@@ -85,11 +85,12 @@ export class Terminal {
         </div>`);
 
         const [command, ...args] = input.split(' ');
-        
         try {
             if (this.commands.has(command)) {
                 const result = this.commands.get(command)(args);
-                this.writeOutput(this.formatOutput(result));
+                // Await if result is a Promise
+                const output = result instanceof Promise ? await result : result;
+                this.writeOutput(this.formatOutput(output));
             } else {
                 this.writeOutput(`<div class="terminal-output-error">Command not found: ${command}</div>`);
             }

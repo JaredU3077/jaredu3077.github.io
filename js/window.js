@@ -295,7 +295,8 @@ export class WindowManager {
 
         header.addEventListener('mousedown', (e) => {
             if (e.target.closest('.window-controls')) return;
-            
+            // Debug log
+            console.log('Drag start');
             startX = e.clientX;
             startY = e.clientY;
             startLeft = parseInt(windowElement.style.left);
@@ -316,7 +317,8 @@ export class WindowManager {
 
     handleDrag = (e) => {
         if (!this.dragState) return;
-
+        // Debug log
+        console.log('Dragging...');
         const { window, startX, startY, startLeft, startTop } = this.dragState;
         const deltaX = e.clientX - startX;
         const deltaY = e.clientY - startY;
@@ -337,6 +339,8 @@ export class WindowManager {
 
     stopDrag = () => {
         if (this.dragState) {
+            // Debug log
+            console.log('Drag stop');
             document.removeEventListener('mousemove', this.handleDrag);
             document.removeEventListener('mouseup', this.stopDrag);
             this.dragState = null;
@@ -349,7 +353,8 @@ export class WindowManager {
         resizeHandles.forEach(handle => {
             handle.addEventListener('mousedown', (e) => {
                 e.preventDefault();
-                
+                // Debug log
+                console.log('Resize start');
                 const direction = handle.className.split(' ')[1];
                 const startX = e.clientX;
                 const startY = e.clientY;
@@ -377,7 +382,8 @@ export class WindowManager {
 
     handleResize = (e) => {
         if (!this.resizeState) return;
-
+        // Debug log
+        console.log('Resizing...');
         const { window, direction, startX, startY, startWidth, startHeight, startLeft, startTop } = this.resizeState;
         const deltaX = e.clientX - startX;
         const deltaY = e.clientY - startY;
@@ -419,6 +425,8 @@ export class WindowManager {
 
     stopResize = () => {
         if (this.resizeState) {
+            // Debug log
+            console.log('Resize stop');
             document.removeEventListener('mousemove', this.handleResize);
             document.removeEventListener('mouseup', this.stopResize);
             this.resizeState = null;
