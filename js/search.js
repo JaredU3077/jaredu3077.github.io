@@ -3,6 +3,9 @@
  * @description Handles search functionality for the Codex content
  */
 
+import { ContentParser } from './parser.js';
+import { CONFIG } from './config.js';
+
 /**
  * @class SearchManager
  * @classdesc Manages the search functionality for the Codex window
@@ -60,6 +63,27 @@ export class SearchManager {
                 searchResults.style.display = 'none';
             }
         });
+
+        // Load and index initial content
+        this.loadAndIndexContent();
+    }
+
+    /**
+     * Loads and indexes the Codex content
+     * @private
+     * @description Loads the content from codex.txt and creates a searchable index
+     */
+    async loadAndIndexContent() {
+        try {
+            const content = await ContentParser.loadAndParseContent(CONFIG.PATHS.CODEX);
+            const codexContent = document.getElementById('codexContent');
+            if (codexContent) {
+                codexContent.innerHTML = content;
+                this.indexContent(content);
+            }
+        } catch (error) {
+            console.error('Error loading Codex content:', error);
+        }
     }
 
     /**

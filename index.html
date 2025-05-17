@@ -239,16 +239,8 @@
                         windowManager.createWindow('codexWindow', 'Codex of Financial Instruments', `
                             <div id="codexContent"></div>
                         `, { width: 800, height: 600 });
-                        // Load Codex content
-                        ContentParser.loadAndParseContent(CONFIG.PATHS.CODEX)
-                            .then(content => {
-                                document.getElementById('codexContent').innerHTML = content;
-                                searchManager.indexContent(content);
-                            })
-                            .catch(error => {
-                                console.error('Error loading Codex content:', error);
-                                document.getElementById('codexContent').innerHTML = '<p>Error loading Codex content.</p>';
-                            });
+                        // Initialize search for the Codex window
+                        searchManager.loadAndIndexContent();
                         break;
                 }
             });
