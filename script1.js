@@ -1,20 +1,3 @@
-// Background animation (subtle network pulses)
-const canvas = document.getElementById('backgroundCanvas');
-const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-function drawBackground() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = 'rgba(0, 0, 255, 0.05)';
-    for (let i = 0; i < 5; i++) {
-        ctx.beginPath();
-        ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 50, 0, Math.PI * 2);
-        ctx.fill();
-    }
-    requestAnimationFrame(drawBackground);
-}
-drawBackground();
-
 // Network topology map with vis.js
 const nodes = new vis.DataSet([
     { id: 1, label: 'Router 1' },
@@ -63,8 +46,8 @@ terminalInput.addEventListener('keypress', (e) => {
     }
 });
 
-// Draggable terminal window
-interact('#terminalWindow').draggable({
+// Draggable and resizable windows
+interact('.window').draggable({
     listeners: {
         move(event) {
             const target = event.target;
@@ -75,6 +58,72 @@ interact('#terminalWindow').draggable({
             target.setAttribute('data-y', y);
         }
     }
+}).resizable({
+    edges: { left: true, right: true, bottom: true, top: true },
+    listeners: {
+        move(event) {
+            const target = event.target;
+            let x = (parseFloat(target.getAttribute('data-x')) || 0);
+            let y = (parseFloat(target.getAttribute('data-y')) || 0);
+
+            target.style.width = event.rect.width + 'px';
+            target.style.height = event.rect.height + 'px';
+
+            x += event.deltaRect.left;
+            y += event.deltaRect.top;
+
+            target.style.transform = `translate(${x}px, ${y}px)`;
+            target.setAttribute('data-x', x);
+            target.setAttribute('data-y', y);
+
+            // Resize topology map if needed
+            if (target.id === 'topologyWindow') {
+                const topology = document.getElementById('networkTopology');
+                topology.style.width = event.rect.width + 'px';
+                topology.style.height = (event.rect.height - 40) + 'px'; // Adjust for header
+                network.fit();
+            }
+        }
+    }
+});
+
+// Window controls
+document.querySelectorAll('.window').forEach(window => {
+    const minimizeBtn = window.querySelector('.minimize-btn');
+    const maximizeBtn = window.querySelector('.maximize-btn');
+    const closeBtn = window.querySelector('.close-btn');
+    const body = window.querySelector('.window-body');
+
+    minimizeBtn.addEventListener('click', () => {
+        body.style.display = body.style.display === 'none' ? 'block' : 'none';
+    });
+
+    maximizeBtn.addEventListener('click', () => {
+        if (window.style.width === '90%') {
+            window.style.width = window.dataset.originalWidth || '500px';
+            window.style.height = window.dataset.originalHeight || '400px';
+        } else {
+            window.dataset.originalWidth = window.style.width || '500px';
+            window.dataset.originalHeight = window.style.height || '400px';
+            window.style.width = '90%';
+            window.style.height = '80%';
+            window.style.left = '5%';
+            window.style.top = '5%';
+            window.style.transform = 'translate(0, 0)';
+            window.setAttribute('data-x', 0);
+            window.setAttribute('data-y', 0);
+        }
+        if (window.id === 'topologyWindow') {
+            const topology = document.getElementById('networkTopology');
+            topology.style.width = '100%';
+            topology.style.height = (window.offsetHeight - 40) + 'px';
+            network.fit();
+        }
+    });
+
+    closeBtn.addEventListener('click', () => {
+        window.style.display = 'none';
+    });
 });
 
 // Widget updates (mock data)
@@ -86,18 +135,22 @@ setInterval(updateWidgets, 3000);
 updateWidgets();
 
 // Icon and taskbar button clicks
-document.querySelectorAll('.icon, .taskbar-tools button').forEach(el => {
+document.querySelectorAll('.icon, .taskbar-icon, .start-menu button').forEach(el => {
     el.addEventListener('click', () => {
         const tool = el.dataset.tool;
         if (tool === 'terminal') {
             document.getElementById('terminalWindow').style.display = 'block';
-        } else {
-            alert(`Opening ${tool.replace('-', ' ')}... (Placeholder)`);
+        } else if (tool === 'network-monitor') {
+            document.getElementById('topologyWindow').style.display = 'block';
+        } else if (tool === 'device-manager') {
+            document.getElementById('widgetsWindow').style.display = 'block';
         }
+        document.getElementById('startMenu').style.display = 'none'; // Close Start menu
     });
 });
 
-// Close terminal
-document.querySelector('.close-btn').addEventListener('click', () => {
-    document.getElementById('terminalWindow').style.display = 'none';
+// Start menu toggle
+document.querySelector('.start-btn').addEventListener('click', () => {
+    const startMenu = document.getElementById('startMenu');
+    startMenu.style.display = startMenu.style.display === 'block' ? 'none' : 'block';
 });
