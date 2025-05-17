@@ -1,4 +1,4 @@
-Jared - Senior Network Engineer Resume
+@JaredU_   |  Senior Network Engineer, Special Projects, Technical Consulting, Sales Engineering
 
 Summary
     Seasoned network engineer with 15+ years of experience. Known as 'The Cleaner' for expertise in resolving complex projects and technical debt across healthcare, national retail, video gaming, public transportation, managed service provider, space communications, and manufacturing.
@@ -7,48 +7,48 @@ Experience
     Senior Network Engineer
     Denali Advanced Integrations, Redmond, WA
     December 2023 - Present
-        - Designed and deployed mission-critical network infrastructure for space-to-ground communications, ensuring uninterrupted connectivity for orbital hardware testing under stringent timelines.
-        - Achieved a pivotal two-day turnaround to integrate a satellite into the local network, averting costly delays and enabling seamless data flow between space and ground systems.
-        - Pioneered network segmentation for multi-site scientific environments, completely eliminating cross-contamination risks and reducing testing incident recovery time by 48 hours.
+        - Designed and deployed mission-critical network infrastructure for space-to-ground communications, ensuring uninterrupted connectivity for orbital hardware testing under stringent timelines
+        - Achieved a pivotal two-day turnaround to integrate a satellite into the local network, averting costly delays and enabling seamless data flow between space and ground systems
+        - Pioneered network segmentation for multi-site scientific environments, completely eliminating cross-contamination risks and reducing testing incident recovery time by 48 hours
 
     Senior Technology Consultant
     Riverstrong, Redmond, WA
     May 2023 - October 2023
-        - Deployed Cisco Meraki and Fortinet solutions for SMB clients, modernizing and updating infrastructure for Utility, Medical, and Government sectors.
-        - Fostered trust and restored confidence in critical client relationships through exceptional communication and strategic problem-solving, resolving complex pre-existing technical issues to retain six-figure hardware investments and secure multimillion-dollar project outcomes.
+        - Deployed Cisco Meraki and Fortinet solutions for SMB clients, modernizing and updating infrastructure for Utility, Medical, and Government sectors
+        - Fostered trust and restored confidence in critical client relationships through exceptional communication and strategic problem-solving, resolving complex pre-existing technical issues to retain six-figure hardware investments and secure multimillion-dollar project outcomes
 
     Senior Network Engineer
     Sound Transit, Seattle, WA
     April 2022 - March 2023
-        - Modernized a deprecated SolarWinds infrastructure on outdated Windows servers, increasing device inventory accuracy from 78% to 100% visibility for a multi-billion-dollar statewide public transportation agency; leveraged Ansible and Python, meeting PCI compliance auditing.
-        - Led a statewide Retail Point of Sale system refresh, coordinating with field technicians to replace all customer-facing ORCA card systems at bus and train stations, ensuring secure and reliable transactions; earned a challenge coin for exceptional project delivery.
-        - Resolved multiple Priority 1 and Major Incidents for a statewide public transportation agency, addressing critical issues including a poorly deployed Cisco ISE causing wireless disruptions, data center overheating, NTP failures risking train signaling safety, and site-to-site VPN tunnel outages impacting payment processing and public Wi-Fi; restored operational stability and ensured passenger safety and service continuity.
+        - Modernized a deprecated SolarWinds infrastructure on outdated Windows servers, increasing device inventory accuracy from 78% to 100% visibility for a multi-billion-dollar statewide public transportation agency; leveraged Ansible and Python, meeting PCI compliance auditing
+        - Led a statewide Retail Point of Sale system refresh, coordinating with field technicians to replace all customer-facing ORCA card systems at bus and train stations, ensuring secure and reliable transactions; earned a challenge coin for exceptional project delivery
+        - Resolved multiple Priority 1 and Major Incidents for a statewide public transportation agency, addressing critical issues including a poorly deployed Cisco ISE causing wireless disruptions, data center overheating, NTP failures risking train signaling safety, and site-to-site VPN tunnel outages impacting payment processing and public Wi-Fi; restored operational stability and ensured passenger safety and service continuity
 
     Senior Network Engineer
     ArenaNet, Bellevue, WA
     July 2019 - April 2022
-        - Spearheaded a network modernization project, implementing a state-of-the-art Arista leaf-spine architecture, Arista Cloud Vision Wireless, and Arista IDF and access-layer solutions, fully upgrading the entire network infrastructure.
-        - Designed and deployed Palo Alto 5250 NGFWs in HA, replacing aging single firewall design.
-        - Created security posture and policies implementing hundreds of unique remote workflows over client VPN to ensure operational continuity.
-        - Mentored help desk team over multiple years, delegating junior-level network engineering tasks like cable creation and IOS upgrades, racking and stacking, how to use IPAM, and even simple core switch changes, inspiring one member to earn their CCNA certification and enhancing overall team technical proficiency.
+        - Spearheaded a network modernization project, implementing a state-of-the-art Arista leaf-spine architecture, Arista Cloud Vision Wireless, and Arista IDF and access-layer solutions, fully upgrading the entire network infrastructure
+        - Designed and deployed Palo Alto 5250 NGFWs in HA, replacing aging single firewall design
+        - Created security posture and policies implementing hundreds of unique remote workflows over client VPN to ensure operational continuity
+        - Mentored help desk team over multiple years, delegating junior-level network engineering tasks like cable creation and IOS upgrades, racking and stacking, how to use IPAM, and even simple core switch changes, inspiring one member to earn their CCNA certification and enhancing overall team technical proficiency
 
     Network Engineer
     Bealls, Bradenton, FL
     April 2015 - December 2018
-        - Orchestrated Cisco Meraki deployments across 50+ retail locations for a new boutique brand, ensuring flawless connectivity and operational continuity throughout Florida.
-        - Led ISP auditing and accounts initiative, saving $250,000 monthly on wasted circuit costs that were never terminated.
-        - Restored critical communications infrastructure for a national retailer with 550+ stores across the continental U.S. within 24 hours post-disaster, minimizing downtime and protecting $100,000–$4M in daily revenue per store using Cradlepoint 3G/4G solutions.
+        - Orchestrated Cisco Meraki deployments across 50+ retail locations for a new boutique brand, ensuring flawless connectivity and operational continuity throughout Florida
+        - Led ISP auditing and accounts initiative, saving $250,000 monthly on wasted circuit costs that were never terminated
+        - Restored critical communications infrastructure for a national retailer with 550+ stores across the continental U.S. within 24 hours post-disaster, minimizing downtime and protecting $100,000–$4M in daily revenue per store using Cradlepoint 3G/4G solutions
 
 Skills
-    Networking Technologies: Cisco, Brocade, Juniper, Palo Alto, Fortinet, Arista, Meraki, IPV4/IPV6, F5
-    Security: Isolation and Segmentation, UBAC, NGFW, VPN, Posture and Profiling, PCI, HIPAA
-    Cloud & Virtualization: AWS, Azure, VMware, Hyper-V
-    Monitoring & Analytics: SolarWinds, Splunk, Grafana, Wireshark, NetFlow, SNMP
-    Automation & Scripting: Python, Ansible, bash, git, PowerShell, IaC
-    Management & Operations: Project Management, Stakeholder Engagement, Vendor Management, Circuit Procurement, Capacity Planning, Change Management, Disaster Recovery, Priority Support
-    Soft Skills: Contracts and Negotiations, Cross-Functional Collaboration, Mentorship, Leadership, Auditing and Accounting
-    For Fun: OSINT, Web Scraping, NLP, Vibe Coding, Crypto, NFTs
-    Studying: NEBIUS AI LLM 12 week course, Nvidia Cumulus Linux AI Networking
+    - Networking Technologies: Cisco, Brocade, Juniper, Palo Alto, Fortinet, Arista, Meraki, IPV4/IPV6, F5
+    - Security: Isolation and Segmentation, UBAC, NGFW, VPN, Posture and Profiling, PCI, HIPAA
+    - Cloud & Virtualization: AWS, Azure, VMware, Hyper-V
+    - Monitoring & Analytics: SolarWinds, Splunk, Grafana, Wireshark, NetFlow, SNMP
+    - Automation & Scripting: Python, Ansible, bash, git, PowerShell, IaC
+    - Management & Operations: Project Management, Stakeholder Engagement, Vendor Management, Circuit Procurement, Capacity Planning, Change Management, Disaster Recovery, Priority Support
+    - Soft Skills: Contracts and Negotiations, Cross-Functional Collaboration, Mentorship, Leadership, Auditing and Accounting
+    - For Fun: OSINT, Web Scraping, NLP, Vibe Coding, Crypto, NFTs
+    - Studying: NEBIUS AI LLM 12 week course, Nvidia Cumulus Linux AI Networking
 
 Certifications
     - Cisco CCNA (e789b6372c2b4632ac9d485919e3e863)
