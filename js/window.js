@@ -1,10 +1,11 @@
 /**
  * Window Management Module
  * Handles window dragging, resizing, and controls
- * Enhanced with accessibility features and smooth transitions
+ * Enhanced with accessibility features, performance optimizations, and state management
  */
 
 import { CONFIG } from './config.js';
+import { debounce, throttle } from './utils.js';
 
 export class WindowManager {
     constructor() {
@@ -17,17 +18,120 @@ export class WindowManager {
         this.contextMenu = null;
         this.zIndexCounter = 1000;
         this.windowStack = [];
+        this.stateChangeCallbacks = new Set();
+        this.rafId = null;
+        this.isDragging = false;
         
-        // Initialize event listeners
+        // Initialize event listeners with proper cleanup
+        this.boundEventListeners = new Map();
         this.initEventListeners();
+        
+        // Load saved state
+        this.loadWindowState();
+        
+        // Setup state persistence
+        this.setupStatePersistence();
         
         // Make windowManager globally accessible
         window.windowManager = this;
     }
 
+    setupStatePersistence() {
+        // Debounce state saving to prevent excessive writes
+        this.saveState = debounce(() => {
+            const state = this.getWindowState();
+            localStorage.setItem('windowState', JSON.stringify(state));
+        }, 1000);
+
+        // Add state change callback
+        this.addStateChangeCallback(() => this.saveState());
+    }
+
+    getWindowState() {
+        const state = {
+            windows: {},
+            activeWindow: this.activeWindow?.id,
+            zIndexCounter: this.zIndexCounter
+        };
+
+        this.windows.forEach((window, id) => {
+            const rect = window.getBoundingClientRect();
+            state.windows[id] = {
+                position: { x: rect.left, y: rect.top },
+                size: { width: rect.width, height: rect.height },
+                isMaximized: window.classList.contains('maximized'),
+                isMinimized: window.style.display === 'none',
+                zIndex: window.style.zIndex
+            };
+        });
+
+        return state;
+    }
+
+    loadWindowState() {
+        try {
+            const savedState = localStorage.getItem('windowState');
+            if (!savedState) return;
+
+            const state = JSON.parse(savedState);
+            
+            // Restore z-index counter
+            if (state.zIndexCounter) {
+                this.zIndexCounter = state.zIndexCounter;
+            }
+
+            // Restore window states
+            Object.entries(state.windows || {}).forEach(([id, data]) => {
+                const window = this.windows.get(id);
+                if (window) {
+                    this.restoreWindowState(window, data);
+                }
+            });
+
+            // Restore active window
+            if (state.activeWindow) {
+                const window = this.windows.get(state.activeWindow);
+                if (window) {
+                    this.focusWindow(window);
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load window state:', error);
+        }
+    }
+
+    restoreWindowState(window, data) {
+        if (data.position) {
+            window.style.left = `${data.position.x}px`;
+            window.style.top = `${data.position.y}px`;
+        }
+        if (data.size) {
+            window.style.width = `${data.size.width}px`;
+            window.style.height = `${data.size.height}px`;
+        }
+        if (data.isMaximized) {
+            window.classList.add('maximized');
+        }
+        if (data.isMinimized) {
+            window.style.display = 'none';
+        }
+        if (data.zIndex) {
+            window.style.zIndex = data.zIndex;
+        }
+    }
+
+    addStateChangeCallback(callback) {
+        this.stateChangeCallbacks.add(callback);
+        return () => this.stateChangeCallbacks.delete(callback);
+    }
+
+    notifyStateChange() {
+        this.stateChangeCallbacks.forEach(callback => callback());
+    }
+
     initEventListeners() {
-        // Window focus management
-        document.addEventListener('mousedown', (e) => {
+        // Window focus management with passive listener for better performance
+        this.boundEventListeners.set('mousedown', (e) => {
             const windowElement = e.target.closest('.window');
             if (windowElement) {
                 this.focusWindow(windowElement);
@@ -35,9 +139,10 @@ export class WindowManager {
                 this.blurActiveWindow();
             }
         });
+        document.addEventListener('mousedown', this.boundEventListeners.get('mousedown'), { passive: true });
 
-        // Enhanced keyboard navigation
-        document.addEventListener('keydown', (e) => {
+        // Enhanced keyboard navigation with proper cleanup
+        this.boundEventListeners.set('keydown', (e) => {
             if (e.altKey) {
                 switch(e.key) {
                     case 'Tab':
@@ -59,36 +164,60 @@ export class WindowManager {
                 }
             }
         });
+        document.addEventListener('keydown', this.boundEventListeners.get('keydown'));
 
-        // Context menu
-        document.addEventListener('contextmenu', (e) => {
+        // Context menu with proper cleanup
+        this.boundEventListeners.set('contextmenu', (e) => {
             const windowElement = e.target.closest('.window');
             if (windowElement) {
                 e.preventDefault();
                 this.showContextMenu(e, windowElement);
             }
         });
+        document.addEventListener('contextmenu', this.boundEventListeners.get('contextmenu'));
 
         // Close context menu on click outside
-        document.addEventListener('click', (e) => {
+        this.boundEventListeners.set('click', (e) => {
             if (this.contextMenu && !e.target.closest('.window-context-menu')) {
                 this.hideContextMenu();
             }
         });
+        document.addEventListener('click', this.boundEventListeners.get('click'));
 
-        // Window resize
-        window.addEventListener('resize', () => {
+        // Window resize with throttling for better performance
+        this.boundEventListeners.set('resize', throttle(() => {
             this.windows.forEach(window => {
                 this.constrainToViewport(window);
             });
-        });
+        }, 100));
+        window.addEventListener('resize', this.boundEventListeners.get('resize'));
 
         // Handle escape key for closing windows
-        document.addEventListener('keydown', (e) => {
+        this.boundEventListeners.set('escape', (e) => {
             if (e.key === 'Escape' && this.activeWindow) {
                 this.closeWindow(this.activeWindow);
             }
         });
+        document.addEventListener('keydown', this.boundEventListeners.get('escape'));
+    }
+
+    cleanup() {
+        // Remove all event listeners
+        this.boundEventListeners.forEach((handler, event) => {
+            document.removeEventListener(event, handler);
+        });
+        this.boundEventListeners.clear();
+
+        // Clear any pending RAF
+        if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
+        }
+
+        // Clear state change callbacks
+        this.stateChangeCallbacks.clear();
+
+        // Save final state
+        this.saveState();
     }
 
     createWindow(options) {
@@ -217,6 +346,9 @@ export class WindowManager {
         
         // Focus the window for keyboard navigation
         windowElement.focus();
+
+        // Notify state change
+        this.notifyStateChange();
     }
 
     blurActiveWindow() {

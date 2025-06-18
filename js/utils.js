@@ -3,22 +3,64 @@
  * Contains common utility functions and error handling
  */
 
+/**
+ * Utility functions for performance optimization and error handling
+ */
+
+/**
+ * Debounce function to limit the rate at which a function can fire
+ * @param {Function} func - The function to debounce
+ * @param {number} wait - The number of milliseconds to delay
+ * @returns {Function} - Debounced function
+ */
+export function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+/**
+ * Throttle function to limit the rate at which a function can fire
+ * @param {Function} func - The function to throttle
+ * @param {number} limit - The number of milliseconds to throttle by
+ * @returns {Function} - Throttled function
+ */
+export function throttle(func, limit) {
+    let inThrottle;
+    return function executedFunction(...args) {
+        if (!inThrottle) {
+            func(...args);
+            inThrottle = true;
+            setTimeout(() => inThrottle = false, limit);
+        }
+    };
+}
+
+/**
+ * Custom error types for better error handling
+ */
 export class AppError extends Error {
     constructor(message, type, details = {}) {
         super(message);
         this.name = 'AppError';
         this.type = type;
         this.details = details;
-        this.timestamp = new Date().toISOString();
+        this.timestamp = new Date();
     }
 }
 
 export const ErrorTypes = {
-    MODULE_LOAD: 'MODULE_LOAD',
-    NETWORK_INIT: 'NETWORK_INIT',
-    FILE_LOAD: 'FILE_LOAD',
-    WINDOW_OP: 'WINDOW_OP',
-    VALIDATION: 'VALIDATION'
+    NETWORK: 'NETWORK_ERROR',
+    VALIDATION: 'VALIDATION_ERROR',
+    STATE: 'STATE_ERROR',
+    UI: 'UI_ERROR',
+    SYSTEM: 'SYSTEM_ERROR'
 };
 
 /**
@@ -71,33 +113,134 @@ export function sanitizeHTML(html) {
 
 /**
  * Validate command input
- * @param {string} command - Command to validate
- * @returns {boolean} Whether the command is valid
+ * @param {string} command - The command to validate
+ * @param {Array} args - The command arguments
+ * @returns {boolean} - Whether the command is valid
  */
-export function validateCommand(command) {
-    // Basic command validation
-    if (!command || typeof command !== 'string') {
-        return false;
+export function validateCommand(command, args) {
+    if (!command) {
+        throw new AppError('Command is required', ErrorTypes.VALIDATION);
     }
-
-    // Remove leading/trailing whitespace
-    command = command.trim();
-
-    // Check for minimum length
-    if (command.length === 0) {
-        return false;
-    }
-
-    // Check for maximum length
-    if (command.length > 100) {
-        return false;
-    }
-
-    // Check for allowed characters
-    const allowedChars = /^[a-zA-Z0-9\s\-_.,!?]+$/;
-    if (!allowedChars.test(command)) {
-        return false;
-    }
-
     return true;
-} 
+}
+
+/**
+ * Performance monitoring utility
+ */
+export class PerformanceMonitor {
+    constructor() {
+        this.metrics = new Map();
+        this.marks = new Map();
+    }
+
+    startMeasure(name) {
+        if (!this.marks.has(name)) {
+            this.marks.set(name, performance.now());
+        }
+    }
+
+    endMeasure(name) {
+        if (this.marks.has(name)) {
+            const startTime = this.marks.get(name);
+            const duration = performance.now() - startTime;
+            this.marks.delete(name);
+            
+            if (!this.metrics.has(name)) {
+                this.metrics.set(name, []);
+            }
+            this.metrics.get(name).push(duration);
+            
+            // Keep only last 100 measurements
+            if (this.metrics.get(name).length > 100) {
+                this.metrics.get(name).shift();
+            }
+            
+            return duration;
+        }
+        return null;
+    }
+
+    getMetrics(name) {
+        if (!this.metrics.has(name)) return null;
+        
+        const measurements = this.metrics.get(name);
+        return {
+            average: measurements.reduce((a, b) => a + b, 0) / measurements.length,
+            min: Math.min(...measurements),
+            max: Math.max(...measurements),
+            count: measurements.length
+        };
+    }
+
+    clearMetrics() {
+        this.metrics.clear();
+        this.marks.clear();
+    }
+}
+
+/**
+ * Memory management utility
+ */
+export class MemoryManager {
+    constructor() {
+        this.weakRefs = new WeakMap();
+        this.cleanupCallbacks = new Set();
+    }
+
+    trackObject(obj, cleanup) {
+        if (cleanup) {
+            this.cleanupCallbacks.add(cleanup);
+        }
+        this.weakRefs.set(obj, new WeakRef(obj));
+        return obj;
+    }
+
+    cleanup() {
+        this.cleanupCallbacks.forEach(callback => callback());
+        this.cleanupCallbacks.clear();
+    }
+}
+
+/**
+ * Event emitter for better event management
+ */
+export class EventEmitter {
+    constructor() {
+        this.events = new Map();
+    }
+
+    on(event, callback) {
+        if (!this.events.has(event)) {
+            this.events.set(event, new Set());
+        }
+        this.events.get(event).add(callback);
+        return () => this.off(event, callback);
+    }
+
+    off(event, callback) {
+        if (this.events.has(event)) {
+            this.events.get(event).delete(callback);
+        }
+    }
+
+    emit(event, ...args) {
+        if (this.events.has(event)) {
+            this.events.get(event).forEach(callback => {
+                try {
+                    callback(...args);
+                } catch (error) {
+                    console.error(`Error in event handler for ${event}:`, error);
+                }
+            });
+        }
+    }
+
+    clear() {
+        this.events.clear();
+    }
+}
+
+// Export singleton instances
+export const performanceMonitor = new PerformanceMonitor();
+export const memoryManager = new MemoryManager();
+export const eventEmitter = new EventEmitter(); 

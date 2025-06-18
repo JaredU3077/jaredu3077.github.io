@@ -1,17 +1,17 @@
 /**
  * Network Visualization Module
  * Handles network topology visualization and updates
- * Enhanced with tooltips, error handling, and performance optimizations
+ * Enhanced with performance optimizations, error handling, and memory management
  */
 
 import { CONFIG, configManager } from './config.js';
+import { AppError, ErrorTypes, performanceMonitor, memoryManager, eventEmitter } from './utils.js';
 
 export class NetworkVisualization {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
         if (!this.container) {
-            console.error(`Container element with id "${containerId}" not found`);
-            return;
+            throw new AppError(`Container element with id "${containerId}" not found`, ErrorTypes.UI);
         }
         
         this.network = null;
@@ -20,23 +20,50 @@ export class NetworkVisualization {
         this.tooltipTimeout = null;
         this.tooltip = this.createTooltip();
         this.errorHandler = this.createErrorHandler();
+        this.performanceMetrics = new Map();
+        this.isUpdating = false;
+        
+        // Track this instance for memory management
+        memoryManager.trackObject(this, () => this.cleanup());
         
         try {
+            performanceMonitor.startMeasure('networkInit');
             this.initializeNetwork();
             this.initializeConfigListener();
+            performanceMonitor.endMeasure('networkInit');
         } catch (error) {
             this.errorHandler.handleError('Failed to initialize network visualization', error);
+            throw error;
         }
+    }
+
+    cleanup() {
+        this.stopUpdates();
+        if (this.network) {
+            this.network.destroy();
+            this.network = null;
+        }
+        if (this.tooltip) {
+            this.tooltip.remove();
+            this.tooltip = null;
+        }
+        if (this.tooltipTimeout) {
+            clearTimeout(this.tooltipTimeout);
+            this.tooltipTimeout = null;
+        }
+        this.saveNetworkState();
     }
 
     /**
      * Initialize configuration change listener
      */
     initializeConfigListener() {
-        window.addEventListener('configChanged', (event) => {
-            const newConfig = event.detail;
+        const unsubscribe = eventEmitter.on('configChanged', (newConfig) => {
             this.handleConfigUpdate(newConfig);
         });
+        
+        // Store unsubscribe function for cleanup
+        this.configUnsubscribe = unsubscribe;
     }
 
     /**
@@ -44,21 +71,34 @@ export class NetworkVisualization {
      * @param {Object} newConfig - New configuration
      */
     handleConfigUpdate(newConfig) {
-        // Update network update interval
-        if (this.updateInterval) {
-            clearInterval(this.updateInterval);
-            this.startUpdates();
-        }
-
-        // Update network options if needed
-        if (this.network) {
-            const networkConfig = newConfig.NETWORK;
-            if (networkConfig) {
-                this.network.setOptions({
-                    ...networkConfig.DEFAULT_OPTIONS,
-                    ...this.networkState.options
-                });
+        if (this.isUpdating) return;
+        
+        try {
+            this.isUpdating = true;
+            performanceMonitor.startMeasure('configUpdate');
+            
+            // Update network update interval
+            if (this.updateInterval) {
+                clearInterval(this.updateInterval);
+                this.startUpdates();
             }
+
+            // Update network options if needed
+            if (this.network) {
+                const networkConfig = newConfig.NETWORK;
+                if (networkConfig) {
+                    this.network.setOptions({
+                        ...networkConfig.DEFAULT_OPTIONS,
+                        ...this.networkState.options
+                    });
+                }
+            }
+            
+            performanceMonitor.endMeasure('configUpdate');
+        } catch (error) {
+            this.errorHandler.handleError('Failed to update network configuration', error);
+        } finally {
+            this.isUpdating = false;
         }
     }
 
@@ -67,10 +107,15 @@ export class NetworkVisualization {
      * @returns {Object} Network state object
      */
     loadNetworkState() {
-        const savedState = localStorage.getItem('networkState');
-        if (savedState) {
-            return JSON.parse(savedState);
+        try {
+            const savedState = localStorage.getItem('networkState');
+            if (savedState) {
+                return JSON.parse(savedState);
+            }
+        } catch (error) {
+            this.errorHandler.handleError('Failed to load network state', error);
         }
+        
         return {
             nodes: CONFIG.NETWORK.DEFAULT_NODES,
             edges: CONFIG.NETWORK.DEFAULT_EDGES,
@@ -86,7 +131,9 @@ export class NetworkVisualization {
      * Save network state to localStorage
      */
     saveNetworkState() {
-        if (this.network) {
+        if (!this.network) return;
+        
+        try {
             const view = this.network.getViewPosition();
             const zoom = this.network.getScale();
             
@@ -96,6 +143,8 @@ export class NetworkVisualization {
             };
             
             localStorage.setItem('networkState', JSON.stringify(this.networkState));
+        } catch (error) {
+            this.errorHandler.handleError('Failed to save network state', error);
         }
     }
 
@@ -111,6 +160,7 @@ export class NetworkVisualization {
         return {
             handleError: (message, error) => {
                 console.error(message, error);
+                
                 // Create error notification
                 const notification = document.createElement('div');
                 notification.className = 'error-notification';
@@ -125,6 +175,9 @@ export class NetworkVisualization {
                 
                 // Auto-remove after 5 seconds
                 setTimeout(() => notification.remove(), 5000);
+                
+                // Emit error event
+                eventEmitter.emit('networkError', { message, error });
             }
         };
     }
@@ -134,8 +187,11 @@ export class NetworkVisualization {
      */
     initializeNetwork() {
         try {
+            performanceMonitor.startMeasure('networkSetup');
+            
             const nodes = new vis.DataSet(this.networkState.nodes);
             const edges = new vis.DataSet(this.networkState.edges);
+            
             const options = {
                 ...CONFIG.NETWORK.DEFAULT_OPTIONS,
                 ...this.networkState.options,
@@ -145,7 +201,7 @@ export class NetworkVisualization {
                     font: {
                         ...CONFIG.NETWORK.DEFAULT_OPTIONS.nodes.font,
                         ...this.networkState.options.nodes.font,
-                        multi: true // Enable HTML in labels
+                        multi: true
                     }
                 },
                 edges: {
@@ -162,14 +218,24 @@ export class NetworkVisualization {
                     tooltipDelay: 200,
                     zoomView: true,
                     dragView: true
+                },
+                physics: {
+                    ...CONFIG.NETWORK.DEFAULT_OPTIONS.physics,
+                    stabilization: {
+                        iterations: 100,
+                        updateInterval: 50,
+                        fit: true
+                    }
                 }
             };
 
             this.network = new vis.Network(this.container, { nodes, edges }, options);
 
-            // Enhanced event listeners
+            // Enhanced event listeners with performance monitoring
             this.network.on('hoverNode', (params) => {
+                performanceMonitor.startMeasure('nodeHover');
                 this.showNodeTooltip(params);
+                performanceMonitor.endMeasure('nodeHover');
             });
 
             this.network.on('blurNode', () => {
@@ -178,7 +244,9 @@ export class NetworkVisualization {
 
             this.network.on('click', (params) => {
                 if (params.nodes.length > 0) {
+                    performanceMonitor.startMeasure('nodeClick');
                     this.handleNodeClick(params);
+                    performanceMonitor.endMeasure('nodeClick');
                 }
             });
 
@@ -190,7 +258,7 @@ export class NetworkVisualization {
                 });
             }
 
-            // Add event listeners for state persistence
+            // Add event listeners for state persistence with debouncing
             this.network.on('stabilizationIterationsDone', () => {
                 this.saveNetworkState();
             });
@@ -211,6 +279,8 @@ export class NetworkVisualization {
                 this.errorHandler.handleError('Network stabilization failed. The visualization may be unstable.');
             });
 
+            performanceMonitor.endMeasure('networkSetup');
+            
         } catch (error) {
             this.errorHandler.handleError('Failed to initialize network visualization', error);
             throw error;
