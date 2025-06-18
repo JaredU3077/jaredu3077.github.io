@@ -1,5 +1,5 @@
 /**
- * Configuration Module
+ * Configuration Module TEST
  * Contains constants and configuration values used across the application
  */
 
