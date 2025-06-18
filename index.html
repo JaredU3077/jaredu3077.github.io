@@ -17,29 +17,31 @@
     <div class="desktop">
         <!-- Desktop icons for network tools -->
         <div class="icon" data-tool="network-monitor">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4682B4" stroke-width="2">
-                <path d="M1 12h22M12 1v22M3 3l18 18M3 21L21 3"/>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                <path d="M12 6v6l4 2"/>
             </svg>
             <span>Network Monitor</span>
         </div>
         <div class="icon" data-tool="device-manager">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4682B4" stroke-width="2">
-                <rect x="3" y="3" width="18" height="18" rx="2"/>
-                <circle cx="12" cy="12" r="3"/>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <path d="M12 8v8M8 12h8"/>
             </svg>
             <span>Device Manager</span>
         </div>
         <div class="icon" data-tool="terminal">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4682B4" stroke-width="2">
-                <rect x="3" y="3" width="18" height="18" rx="2"/>
-                <path d="M7 15l4-4-4-4M12 15h5"/>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <path d="M8 12l4 4 4-4M12 8v8"/>
             </svg>
             <span>Terminal</span>
         </div>
         <div class="icon" data-tool="codex">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4682B4" stroke-width="2">
-                <rect x="3" y="3" width="18" height="18" rx="2"/>
-                <path d="M7 7h10M7 12h10M7 17h10"/>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                <path d="M8 7h8M8 12h8M8 17h4"/>
             </svg>
             <span>Codex</span>
         </div>
@@ -49,39 +51,74 @@
 
     <!-- Taskbar with Start menu -->
     <div class="taskbar">
-        <button class="start-btn" id="startBtn">Start</button>
+        <button class="start-btn" id="startBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12h18M3 6h18M3 18h18"/>
+            </svg>
+            <span>Start</span>
+        </button>
         <div class="start-menu" id="startMenu">
-            <button data-tool="network-monitor">Network Monitor</button>
-            <button data-tool="device-manager">Device Manager</button>
-            <button data-tool="terminal">Terminal</button>
-            <button data-tool="codex">Codex</button>
+            <button data-tool="network-monitor">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                    <path d="M12 6v6l4 2"/>
+                </svg>
+                <span>Network Monitor</span>
+            </button>
+            <button data-tool="device-manager">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                    <path d="M12 8v8M8 12h8"/>
+                </svg>
+                <span>Device Manager</span>
+            </button>
+            <button data-tool="terminal">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                    <path d="M8 12l4 4 4-4M12 8v8"/>
+                </svg>
+                <span>Terminal</span>
+            </button>
+            <button data-tool="codex">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                    <path d="M8 7h8M8 12h8M8 17h4"/>
+                </svg>
+                <span>Codex</span>
+            </button>
         </div>
         <div class="taskbar-tools">
             <button data-tool="network-monitor" class="taskbar-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E0E0E0" stroke-width="2">
-                    <path d="M1 12h22M12 1v22M3 3l18 18M3 21L21 3"/>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                    <path d="M12 6v6l4 2"/>
                 </svg>
             </button>
             <button data-tool="device-manager" class="taskbar-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E0E0E0" stroke-width="2">
-                    <rect x="3" y="3" width="18" height="18" rx="2"/>
-                    <circle cx="12" cy="12" r="3"/>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                    <path d="M12 8v8M8 12h8"/>
                 </svg>
             </button>
             <button data-tool="terminal" class="taskbar-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E0E0E0" stroke-width="2">
-                    <rect x="3" y="3" width="18" height="18" rx="2"/>
-                    <path d="M7 15l4-4-4-4M12 15h5"/>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                    <path d="M8 12l4 4 4-4M12 8v8"/>
                 </svg>
             </button>
             <button data-tool="codex" class="taskbar-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E0E0E0" stroke-width="2">
-                    <rect x="3" y="3" width="18" height="18" rx="2"/>
-                    <path d="M7 7h10M7 12h10M7 17h10"/>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                    <path d="M8 7h8M8 12h8M8 17h4"/>
                 </svg>
             </button>
             <button class="taskbar-icon" title="Help">
-                <i class="fas fa-question-circle"></i>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 16v-4M12 8h.01"/>
+                </svg>
             </button>
         </div>
         <div class="branding">@JaredU_</div>

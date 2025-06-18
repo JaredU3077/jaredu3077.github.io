@@ -7,16 +7,27 @@
 import { CONFIG } from './config.js';
 import { debounce, throttle } from './utils.js';
 
+const DEFAULT_WINDOW_CONFIG = {
+    minWidth: 400,
+    minHeight: 300,
+    maxWidth: window.innerWidth * 0.9,
+    maxHeight: window.innerHeight * 0.9,
+    defaultWidth: 800,
+    defaultHeight: 600,
+    snapThreshold: 20,
+    zIndex: 1000
+};
+
 export class WindowManager {
     constructor() {
         this.windows = new Map();
         this.activeWindow = null;
         this.dragState = null;
         this.resizeState = null;
-        this.snapThreshold = 20;
+        this.snapThreshold = DEFAULT_WINDOW_CONFIG.snapThreshold;
         this.snapZones = new Map();
         this.contextMenu = null;
-        this.zIndexCounter = 1000;
+        this.zIndexCounter = DEFAULT_WINDOW_CONFIG.zIndex;
         this.windowStack = [];
         this.stateChangeCallbacks = new Set();
         this.rafId = null;
@@ -220,19 +231,14 @@ export class WindowManager {
         this.saveState();
     }
 
-    createWindow(options) {
-        const {
-            id,
-            title,
-            content,
-            width = 600,
-            height = 400,
-            x = Math.random() * (window.innerWidth - width),
-            y = Math.random() * (window.innerHeight - height - 40),
-            icon = 'fa-window-maximize',
-            role = 'dialog',
-            ariaLabel = title
-        } = options;
+    createWindow({ id, title, content, width = DEFAULT_WINDOW_CONFIG.defaultWidth, height = DEFAULT_WINDOW_CONFIG.defaultHeight, icon = 'fa-window-maximize', role = 'dialog', ariaLabel = title }) {
+        // Ensure window dimensions are within bounds
+        width = Math.min(Math.max(width, DEFAULT_WINDOW_CONFIG.minWidth), DEFAULT_WINDOW_CONFIG.maxWidth);
+        height = Math.min(Math.max(height, DEFAULT_WINDOW_CONFIG.minHeight), DEFAULT_WINDOW_CONFIG.maxHeight);
+
+        // Center the window on screen
+        const left = (window.innerWidth - width) / 2;
+        const top = (window.innerHeight - height) / 2;
 
         // Check if window already exists
         if (this.windows.has(id)) {
@@ -249,8 +255,8 @@ export class WindowManager {
         windowElement.id = id;
         windowElement.style.width = `${width}px`;
         windowElement.style.height = `${height}px`;
-        windowElement.style.left = `${x}px`;
-        windowElement.style.top = `${y}px`;
+        windowElement.style.left = `${left}px`;
+        windowElement.style.top = `${top}px`;
         windowElement.style.zIndex = this.getNextZIndex();
 
         windowElement.innerHTML = `
@@ -689,6 +695,52 @@ export class WindowManager {
             : (currentIndex - 1 + this.windowStack.length) % this.windowStack.length;
             
         this.focusWindow(this.windowStack[nextIndex]);
+    }
+
+    setupEventListeners() {
+        // Add window resize observer
+        const resizeObserver = new ResizeObserver(entries => {
+            for (const entry of entries) {
+                const window = this.windows.get(entry.target.id);
+                if (window) {
+                    this.updateWindowSize(window, entry.contentRect.width, entry.contentRect.height);
+                }
+            }
+        });
+
+        // Add window move observer
+        const moveObserver = new MutationObserver(mutations => {
+            for (const mutation of mutations) {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                    const window = this.windows.get(mutation.target.id);
+                    if (window) {
+                        this.updateWindowPosition(window);
+                    }
+                }
+            }
+        });
+    }
+
+    updateWindowSize(window, width, height) {
+        // Ensure window stays within bounds
+        width = Math.min(Math.max(width, DEFAULT_WINDOW_CONFIG.minWidth), DEFAULT_WINDOW_CONFIG.maxWidth);
+        height = Math.min(Math.max(height, DEFAULT_WINDOW_CONFIG.minHeight), DEFAULT_WINDOW_CONFIG.maxHeight);
+        
+        window.style.width = `${width}px`;
+        window.style.height = `${height}px`;
+    }
+
+    updateWindowPosition(window) {
+        // Ensure window stays within viewport
+        const rect = window.getBoundingClientRect();
+        const maxX = window.innerWidth - rect.width;
+        const maxY = window.innerHeight - rect.height;
+
+        let left = Math.max(0, Math.min(rect.left, maxX));
+        let top = Math.max(0, Math.min(rect.top, maxY));
+
+        window.style.left = `${left}px`;
+        window.style.top = `${top}px`;
     }
 }
 
