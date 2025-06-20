@@ -302,3 +302,173 @@ class ConfigManager {
 
 // Create and export a singleton instance
 export const configManager = new ConfigManager();
+
+/**
+ * UI Configuration
+ * This file contains all UI-related configurations including icons, window settings,
+ * and application definitions.
+ */
+
+export const UI_CONFIG = {
+    // Application definitions
+    applications: {
+        'network-monitor': {
+            id: 'network-monitor',
+            title: 'Network Monitor',
+            description: 'Monitor network topology and traffic',
+            icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12h18M3 6h18M3 18h18"/>
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>
+            </svg>`,
+            windows: [{
+                id: 'topologyWindow',
+                title: 'Network Topology',
+                content: '<div id="networkTopology" style="width: 100%; height: 100%;"></div>',
+                width: 800,
+                height: 600
+            }]
+        },
+        'device-manager': {
+            id: 'device-manager',
+            title: 'Device Manager',
+            description: 'Manage network devices',
+            icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="4" width="20" height="16" rx="2"/>
+                <path d="M8 8h8M8 12h8M8 16h4"/>
+            </svg>`,
+            windows: [{
+                id: 'devicesWindow',
+                title: 'Device Manager',
+                content: '<div id="deviceList"></div>',
+                width: 600,
+                height: 400
+            }]
+        },
+        'terminal': {
+            id: 'terminal',
+            title: 'Terminal',
+            description: 'Command line interface',
+            icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="4" width="20" height="16" rx="2"/>
+                <path d="M8 8h8M8 12h8M8 16h4"/>
+            </svg>`,
+            windows: [{
+                id: 'terminalWindow',
+                title: 'Terminal',
+                content: `
+                    <div id="terminalOutput"></div>
+                    <div id="terminalInput">
+                        <span class="prompt">$</span>
+                        <input type="text" autofocus>
+                    </div>
+                `,
+                width: 600,
+                height: 400
+            }]
+        },
+        'codex': {
+            id: 'codex',
+            title: 'Codex',
+            description: 'Search and browse documentation',
+            icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                <path d="M10 10l4 4"/>
+            </svg>`,
+            windows: [{
+                id: 'codexWindow',
+                title: 'Codex',
+                content: `
+                    <div class="search-container">
+                        <input type="text" id="searchInput" placeholder="Search documentation...">
+                        <div id="searchResults"></div>
+                    </div>
+                `,
+                width: 800,
+                height: 600
+            }]
+        }
+    },
+
+    // Window configuration
+    window: {
+        minWidth: 300,
+        maxWidth: window.innerWidth * 0.9,
+        minHeight: 200,
+        maxHeight: window.innerHeight * 0.9,
+        defaultWidth: 800,
+        defaultHeight: 600,
+        snapThreshold: 50,
+        zIndex: 1000
+    },
+
+    // Start menu configuration
+    startMenu: {
+        width: 300,
+        itemHeight: 40,
+        iconSize: 24
+    },
+
+    // Taskbar configuration
+    taskbar: {
+        height: 40,
+        iconSize: 20,
+        spacing: 4
+    },
+
+    // Desktop configuration
+    desktop: {
+        iconSize: 64,
+        iconSpacing: 20,
+        labelHeight: 40
+    }
+};
+
+/**
+ * Helper function to create SVG icon
+ * @param {Object} config - Icon configuration
+ * @param {string} size - Size of the icon
+ * @returns {string} SVG markup
+ */
+export function createIcon(config, size = '16') {
+    const { viewBox, paths } = config;
+    return `
+        <svg width="${size}" height="${size}" viewBox="${viewBox}" fill="none" stroke="currentColor" stroke-width="2">
+            ${paths.map(path => `<path d="${path}"/>`).join('')}
+        </svg>
+    `;
+}
+
+/**
+ * Helper function to create application button
+ * @param {Object} app - Application configuration
+ * @param {string} type - Type of button (desktop, taskbar, or start-menu)
+ * @returns {string} Button markup
+ */
+export function createAppButton(app, type) {
+    const config = UI_CONFIG[type === 'desktop' ? 'desktop' : type === 'start-menu' ? 'startMenu' : 'taskbar'];
+    const iconSize = config.iconSize;
+    
+    const button = document.createElement('button');
+    button.className = type === 'desktop' ? 'desktop-icon' : type === 'start-menu' ? 'start-menu-item' : 'taskbar-icon';
+    button.dataset.tool = app.id;
+    button.title = app.description;
+
+    if (type === 'desktop') {
+        button.innerHTML = `
+            <div class="icon">
+                ${app.icon}
+            </div>
+            <span class="label">${app.title}</span>
+        `;
+    } else {
+        button.innerHTML = `
+            <div class="icon">
+                ${app.icon}
+            </div>
+            ${type === 'start-menu' ? `<span class="label">${app.title}</span>` : ''}
+        `;
+    }
+
+    return button.outerHTML;
+}

@@ -1,14 +1,14 @@
 /* Theme Variables */
 :root {
     /* Colors */
-    --primary-color: #4682B4;
-    --primary-hover: #5A9BD4;
-    --background-dark: #1C2526;
-    --background-light: #2A3435;
-    --text-primary: #E0E0E0;
-    --text-secondary: #A0A0A0;
-    --border-color: rgba(255, 255, 255, 0.1);
-    --border-hover: rgba(255, 255, 255, 0.2);
+    --primary-color: #4682b4;
+    --primary-hover: #5c9bd4;
+    --hover-color: rgba(255, 255, 255, 0.1);
+    --background-dark: #1a1a1a;
+    --window-bg: #2d2d2d;
+    --taskbar-bg: #1a1a1a;
+    --text-color: #ffffff;
+    --border-color: #404040;
     
     /* Window Controls */
     --close-color: #ff5f57;
@@ -21,24 +21,49 @@
     /* Spacing */
     --spacing-xs: 4px;
     --spacing-sm: 8px;
-    --spacing-md: 12px;
-    --spacing-lg: 20px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
     --spacing-xl: 32px;
     
     /* Border Radius */
-    --border-radius-sm: 4px;
-    --border-radius-md: 8px;
-    --border-radius-lg: 12px;
+    --border-radius: 4px;
+    --border-radius-sm: 2px;
+    --border-radius-md: 6px;
+    --border-radius-lg: 8px;
     
     /* Shadows */
-    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
-    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.1);
     
     /* Transitions */
     --transition-fast: 0.2s ease;
     --transition-normal: 0.3s ease;
     --transition-slow: 0.5s ease;
+
+    /* Z-index */
+    --z-index-window: 1000;
+    --z-index-taskbar: 2000;
+    --z-index-start-menu: 3000;
+
+    /* Window */
+    --window-header-height: 32px;
+    --window-control-size: 24px;
+    --window-border-width: 1px;
+
+    /* Taskbar */
+    --taskbar-height: 40px;
+    --taskbar-icon-size: 32px;
+    --taskbar-spacing: 4px;
+
+    /* Start menu */
+    --start-menu-width: 300px;
+    --start-menu-item-height: 40px;
+    --start-menu-icon-size: 24px;
+
+    /* Desktop */
+    --desktop-icon-size: 64px;
+    --desktop-label-height: 40px;
 }
 
 /* Reset and base styles */
@@ -68,42 +93,46 @@ body {
 }
 
 /* Desktop icons */
-.icon {
+.desktop-icon {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 80px;
-    text-align: center;
+    width: var(--desktop-icon-size);
+    height: calc(var(--desktop-icon-size) + var(--desktop-label-height));
+    padding: 8px;
+    background: none;
+    border: none;
     cursor: pointer;
-    border-radius: var(--border-radius-md);
-    transition: transform var(--transition-fast);
+    transition: all 0.2s ease;
 }
 
-.icon:hover {
-    transform: translateY(-2px);
+.desktop-icon:hover {
+    background: var(--hover-color);
+    border-radius: var(--border-radius);
 }
 
-.icon svg {
-    width: 48px;
-    height: 48px;
-    margin-bottom: var(--spacing-xs);
-    padding: var(--spacing-xs);
-    border-radius: var(--border-radius-md);
-    transition: background var(--transition-fast);
+.desktop-icon .icon {
+    width: var(--desktop-icon-size);
+    height: var(--desktop-icon-size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
 }
 
-.icon:hover svg {
-    background: rgba(70, 130, 180, 0.3);
+.desktop-icon .icon svg {
+    width: 100%;
+    height: 100%;
+    stroke: var(--primary-color);
 }
 
-.icon:hover span {
-    color: var(--primary-hover);
-}
-
-.icon span {
-    font-size: 14px;
-    word-wrap: break-word;
-    transition: color var(--transition-fast);
+.desktop-icon .label {
+    font-size: 12px;
+    color: var(--text-color);
+    text-align: center;
+    word-break: break-word;
+    max-width: 100%;
+    line-height: 1.2;
 }
 
 /* Window Styles */
@@ -946,47 +975,54 @@ body {
 /* Start Menu */
 .start-menu {
     position: absolute;
-    bottom: 40px;
+    bottom: var(--taskbar-height);
     left: 0;
-    background: var(--background-dark);
+    width: var(--start-menu-width);
+    background: var(--window-bg);
     border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-md);
-    box-shadow: var(--shadow-lg);
-    padding: var(--spacing-sm);
+    border-radius: var(--border-radius);
+    padding: 8px;
     display: none;
     flex-direction: column;
-    gap: var(--spacing-xs);
-    min-width: 200px;
-    z-index: 10000;
+    gap: 4px;
+    z-index: var(--z-index-start-menu);
 }
 
-.start-menu button {
+.start-menu-item {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-sm) var(--spacing-md);
+    width: 100%;
+    height: var(--start-menu-item-height);
+    padding: 8px;
     background: none;
     border: none;
-    color: var(--text-primary);
+    border-radius: var(--border-radius);
     cursor: pointer;
-    border-radius: var(--border-radius-sm);
-    transition: background var(--transition-fast);
+    transition: all 0.2s ease;
+}
+
+.start-menu-item:hover {
+    background: var(--hover-color);
+}
+
+.start-menu-item .icon {
+    width: var(--start-menu-icon-size);
+    height: var(--start-menu-icon-size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+}
+
+.start-menu-item .icon svg {
     width: 100%;
-    text-align: left;
-}
-
-.start-menu button:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.start-menu button svg {
-    width: 16px;
-    height: 16px;
+    height: 100%;
     stroke: var(--primary-color);
 }
 
-.start-menu button span {
+.start-menu-item .label {
     font-size: 14px;
+    color: var(--text-color);
 }
 
 /* Taskbar */
@@ -994,76 +1030,44 @@ body {
     position: fixed;
     bottom: 0;
     left: 0;
-    right: 0;
-    height: 40px;
-    background: var(--background-dark);
-    display: flex;
-    align-items: center;
-    padding: 0 var(--spacing-md);
+    width: 100%;
+    height: var(--taskbar-height);
+    background: var(--taskbar-bg);
     border-top: 1px solid var(--border-color);
-    z-index: 9999;
-    gap: var(--spacing-md);
-}
-
-.start-btn {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
-    background: var(--primary-color);
-    color: var(--text-primary);
-    border: none;
-    padding: var(--spacing-xs) var(--spacing-md);
-    border-radius: var(--border-radius-sm);
-    cursor: pointer;
-    transition: background var(--transition-fast);
-    height: 32px;
-}
-
-.start-btn:hover {
-    background: var(--primary-hover);
-}
-
-.start-btn svg {
-    width: 16px;
-    height: 16px;
-    stroke: currentColor;
-}
-
-.start-btn span {
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.taskbar-tools {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-    margin-left: auto;
+    padding: 0 8px;
+    z-index: var(--z-index-taskbar);
 }
 
 .taskbar-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: var(--taskbar-icon-size);
+    height: var(--taskbar-icon-size);
+    padding: 4px;
     background: none;
     border: none;
-    color: var(--text-primary);
+    border-radius: var(--border-radius);
     cursor: pointer;
-    border-radius: var(--border-radius-sm);
-    transition: background var(--transition-fast);
-    padding: var(--spacing-xs);
+    transition: all 0.2s ease;
+    margin-right: var(--taskbar-spacing);
 }
 
 .taskbar-icon:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--hover-color);
 }
 
-.taskbar-icon svg {
-    width: 16px;
-    height: 16px;
-    stroke: currentColor;
+.taskbar-icon .icon {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.taskbar-icon .icon svg {
+    width: 100%;
+    height: 100%;
+    stroke: var(--primary-color);
 }
 
 .branding {
@@ -1086,14 +1090,6 @@ body {
 
     .taskbar {
         padding: 0 var(--spacing-sm);
-    }
-
-    .start-btn span {
-        display: none;
-    }
-
-    .taskbar-tools {
-        gap: var(--spacing-xs);
     }
 
     .taskbar-icon {
@@ -1542,4 +1538,50 @@ mark {
     .metric-label {
         color: #aaa;
     }
+}
+
+/* Start button */
+.start-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    background: var(--primary-color);
+    color: var(--text-color);
+    border: none;
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    height: 32px;
+}
+
+.start-btn:hover {
+    background: var(--primary-hover);
+}
+
+.start-btn svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+}
+
+.start-btn span {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Taskbar tools */
+.taskbar-tools {
+    display: flex;
+    align-items: center;
+    gap: var(--taskbar-spacing);
+    margin-left: auto;
+}
+
+/* Branding */
+.branding {
+    font-size: 12px;
+    color: var(--text-color);
+    opacity: 0.7;
+    margin-left: var(--spacing-md);
 }
