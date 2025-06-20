@@ -96,7 +96,7 @@ body {
     border-radius: var(--border-radius);
     box-shadow: 0 12px 48px 0 #101624, var(--neu-shadow);
     padding: 24px 0 16px 0;
-    display: flex;
+    display: none;
     flex-direction: column;
     gap: 10px;
     z-index: 3000;
@@ -110,6 +110,7 @@ body {
 }
 
 .start-menu.show {
+    display: flex;
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
