@@ -1,4 +1,4 @@
-import { UI_CONFIG } from './config.js';
+import { CONFIG as UI_CONFIG } from './config.js';
 import { debounce, throttle } from './utils.js';
 
 export class WindowManager {

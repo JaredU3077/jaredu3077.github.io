@@ -1,6 +1,6 @@
 # Network Engineer OS (Web Edition)
 
-A modern, interactive website that simulates a desktop operating system for network engineers. Built with HTML5, CSS, and JavaScript, this project showcases advanced UI/UX concepts, window management, and network visualization tools in a browser environment.
+A modern, interactive website that simulates a desktop operating system for network engineers. Built with HTML5, CSS, and vanilla JavaScript, this project showcases advanced UI/UX concepts, window management, and network visualization tools in a browser environment.
 
 ## Project Overview
 
@@ -12,11 +12,14 @@ A modern, interactive website that simulates a desktop operating system for netw
   - [interact.js](https://interactjs.io/) for window management
 - **Design:** Inspired by macOS and modern desktop environments, with a focus on usability and aesthetics.
 
+## Contributing
+
+Contributions are welcome! If you have any ideas, suggestions, or bug reports, please open an issue or submit a pull request.
+
 ## Main Features
 
 ### Desktop Environment
 - **Desktop UI:** 
-  - Clickable desktop icons with SVG graphics
   - Taskbar with Start menu and running applications
   - Application icons with custom SVG graphics
   - Window management system
@@ -51,21 +54,33 @@ A modern, interactive website that simulates a desktop operating system for netw
    - Searchable reference of financial and network instruments
    - Categorized content
    - Real-time search with highlighting
-   - Responsive layout
-
-4. **Device Manager:**
-   - Network device inventory
-   - Status monitoring
-   - Configuration management
-   - Performance metrics
 
 ### System Features
 - **Help System:** In-app help for commands, shortcuts, and window controls
 - **Keyboard Shortcuts:** Power-user shortcuts for window and terminal management
 - **Search:** Global search functionality across applications
-- **Responsive Design:** Works on desktop and tablets
 - **Accessibility:** Full keyboard navigation and screen reader support
 - **Error Handling:** Comprehensive error handling with user notifications
+
+## Code Documentation
+
+This project uses [JSDoc](https://jsdoc.app/) to generate documentation from the source code. The configuration can be found in `jsdoc.json`.
+
+### Generating the Documentation
+
+To generate the documentation, you need to have Node.js and JSDoc installed.
+
+1.  **Install JSDoc and the theme:**
+    ```bash
+    npm install -g jsdoc
+    npm install clean-jsdoc-theme
+    ```
+
+2.  **Generate the documentation:**
+    ```bash
+    jsdoc -c jsdoc.json
+    ```
+    The documentation will be generated in the `docs` directory.
 
 ## Technical Architecture
 
@@ -122,23 +137,33 @@ A modern, interactive website that simulates a desktop operating system for netw
 
 ### File Structure
 ```
-├── index.html          # Main HTML file
-├── theme.css          # Global styles
-├── js/                # JavaScript modules
-│   ├── window.js      # Window management
-│   ├── network.js     # Network visualization
-│   ├── terminal.js    # Terminal emulator
-│   ├── help.js        # Help system
-│   ├── search.js      # Search functionality
-│   ├── config.js      # Configuration
-│   ├── parser.js      # Command parsing
-│   ├── keyboard.js    # Keyboard shortcuts
-│   └── utils.js       # Utility functions
-├── codex.txt          # Codex content
-└── resume.txt         # Resume/terminal content
+.
+├── codex.txt
+├── index.html
+├── js
+│   ├── config.js
+│   ├── help.js
+│   ├── keyboard.js
+│   ├── network.js
+│   ├── parser.js
+│   ├── search.js
+│   ├── terminal.js
+│   ├── utils.js
+│   └── window.js
+├── jsdoc.json
+├── README.md
+├── resume.txt
+└── theme.css
 ```
 
 ## Getting Started
+
+### Prerequisites
+
+- A modern web browser (Chrome, Firefox, Safari, Edge)
+- [Node.js](https://nodejs.org/) and [npm](https://www.npmjs.com/) (for generating documentation)
+
+### Installation
 
 1. **Clone or Download:**
    ```bash
@@ -154,14 +179,22 @@ A modern, interactive website that simulates a desktop operating system for netw
 ## Keyboard Shortcuts
 
 ### Window Management
-- **Alt+Tab** — Switch between windows
-- **Alt+F4** — Close active window
-- **Alt+Space** — Maximize/restore window
-- **Escape** — Close active window
+- **Alt+N** — Show Network Topology
+- **Alt+T** — Show Terminal
+- **Alt+C** — Show Codex
+- **Alt+W** — Show Widgets
+- **Escape / Alt+F4** — Close active window
 
 ### Terminal
-- **Ctrl+Tab** — Switch between tabs
-- **Up/Down Arrow** — Navigate command history
+- **Ctrl+L** — Clear terminal
+- **Ctrl+U** — Clear input line
+- **Ctrl+R** — Reload terminal
+
+### Network Visualization
+- **Ctrl+F** — Fit network to view
+- **Ctrl+Plus** — Zoom in
+- **Ctrl+Minus** — Zoom out
+- **Ctrl+0** — Reset zoom
 
 ## Browser Support
 - Chrome 80+
@@ -176,8 +209,11 @@ A modern, interactive website that simulates a desktop operating system for netw
 - Window management: [interact.js](https://interactjs.io/)
 
 ## License
-MIT License - See LICENSE file for details
 
----
+This project is licensed under the MIT License.
 
-**For demo and learning purposes only. Not a real OS.** 
+## Disclaimer
+
+This is a demo project and not a real operating system. It is intended for educational and demonstration purposes only.
+
+
