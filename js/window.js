@@ -14,7 +14,7 @@ export class WindowManager {
         this.setupEventListeners();
     }
 
-    createWindow({ id, title, content, width = UI_CONFIG.window.defaultWidth, height = UI_CONFIG.window.defaultHeight, icon = 'fa-window-maximize' }) {
+    createWindow({ id, title, content, width = UI_CONFIG.window.defaultWidth, height = UI_CONFIG.window.defaultHeight, icon }) {
         // Ensure window dimensions are within bounds
         width = Math.min(Math.max(width, UI_CONFIG.window.minWidth), UI_CONFIG.window.maxWidth);
         height = Math.min(Math.max(height, UI_CONFIG.window.minHeight), UI_CONFIG.window.maxHeight);
@@ -35,8 +35,8 @@ export class WindowManager {
         windowElement.innerHTML = `
             <div class="window-header">
                 <div class="window-title">
-                    <i class="fas ${icon}"></i>
-                    <span>${title}</span>
+                    <span class="icon">${icon || ''}</span>
+                    <span class="label">${title}</span>
                 </div>
                 <div class="window-controls">
                     <button class="window-control minimize" title="Minimize">-</button>

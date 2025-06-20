@@ -84,7 +84,7 @@ export class KeyboardManager {
     closeActiveWindow() {
         const activeWindow = document.querySelector('.window:not([style*="display: none"])');
         if (activeWindow) {
-            const closeBtn = activeWindow.querySelector('.close-btn');
+            const closeBtn = activeWindow.querySelector('.window-control.close');
             if (closeBtn) {
                 closeBtn.click();
             }

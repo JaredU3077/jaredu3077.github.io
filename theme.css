@@ -72,7 +72,7 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'Segoe UI', Consolas, 'Courier New', monospace;
-    color: var(--text-primary);
+    color: var(--text-color);
 }
 
 /* Body and background */
@@ -138,7 +138,8 @@ body {
 /* Window Styles */
 .window {
     position: absolute;
-    background: var(--background-dark);
+    background: var(--window-bg);
+    color: var(--text-color);
     border-radius: var(--border-radius-md);
     box-shadow: var(--shadow-lg);
     transition: transform var(--transition-fast), box-shadow var(--transition-fast);
@@ -148,16 +149,19 @@ body {
     backdrop-filter: blur(10px);
     border: 1px solid var(--border-color);
     pointer-events: auto;
+    z-index: var(--z-index-window);
 }
 
 .window.focused {
     box-shadow: var(--shadow-lg);
     transform: translateY(-2px);
-    border: 1px solid var(--border-hover);
+    border: 1.5px solid var(--primary-color);
+    z-index: calc(var(--z-index-window) + 5);
 }
 
 .window-header {
-    background: linear-gradient(to bottom, var(--background-light), var(--background-dark));
+    background: linear-gradient(to bottom, var(--window-bg), var(--background-dark));
+    color: var(--text-color);
     padding: var(--spacing-sm) var(--spacing-md);
     display: flex;
     align-items: center;
@@ -165,6 +169,8 @@ body {
     cursor: move;
     user-select: none;
     border-bottom: 1px solid var(--border-color);
+    overflow: hidden;
+    z-index: calc(var(--z-index-window) + 1);
 }
 
 .window-title {
@@ -174,6 +180,7 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
+    z-index: calc(var(--z-index-window) + 2);
 }
 
 .window-title i {
@@ -181,16 +188,44 @@ body {
     opacity: 0.8;
 }
 
+.window-title .icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 6px;
+    flex: 0 0 auto;
+}
+
+.window-title .icon svg {
+    width: 100%;
+    height: 100%;
+    stroke: var(--primary-color);
+}
+
+.window-title .label {
+    font-size: 14px;
+    color: var(--text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
 .window-controls {
     display: flex;
     gap: 8px;
+    z-index: calc(var(--z-index-window) + 2);
 }
 
 .window-control {
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    border: none;
+    border: 1px solid rgba(0,0,0,0.1);
     cursor: pointer;
     transition: all 0.2s ease;
     padding: 0;
@@ -287,7 +322,7 @@ body {
 .window-resize {
     position: absolute;
     background: transparent;
-    z-index: 1000;
+    z-index: calc(var(--z-index-window) + 3);
 }
 
 .window-resize.n {
@@ -356,10 +391,12 @@ body {
 
 /* Window Content */
 .window-content {
-    padding: 16px;
-    height: calc(100% - 37px);
-    overflow: auto;
-    background: var(--window-content-bg, #1C2526);
+    background: var(--window-bg);
+    color: var(--text-color);
+    padding: var(--spacing-md);
+    height: calc(100% - var(--window-header-height));
+    overflow-y: auto;
+    z-index: var(--z-index-window);
 }
 
 /* Scrollbar Styling */
@@ -486,17 +523,18 @@ body {
     border: 2px dashed rgba(255, 255, 255, 0.3);
     border-radius: 8px;
     pointer-events: none;
-    z-index: 1000;
+    z-index: calc(var(--z-index-window) + 30);
 }
 
 /* Window Snap Zones */
-.snap-zone {
+.snap-zone,
+.snap-zone.active {
     position: absolute;
     background: rgba(70, 130, 180, 0.1);
     border: 2px solid rgba(70, 130, 180, 0.2);
     border-radius: 4px;
     pointer-events: none;
-    z-index: 999;
+    z-index: calc(var(--z-index-window) + 40);
     transition: all 0.3s ease;
     opacity: 0;
 }
@@ -511,13 +549,11 @@ body {
 /* Window Context Menu */
 .window-context-menu {
     position: absolute;
-    background: var(--window-bg, #1C2526);
-    border-radius: 4px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    padding: 4px 0;
-    min-width: 150px;
-    z-index: 1000;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--window-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+    z-index: calc(var(--z-index-window) + 10);
 }
 
 .window-context-menu-item {
@@ -544,14 +580,13 @@ body {
     position: absolute;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
-    backdrop-filter: blur(5px);
+    z-index: calc(var(--z-index-window) + 20);
 }
 
 .window-loading-spinner {
@@ -593,7 +628,9 @@ body {
 }
 
 .window-header span {
-    font-size: 16px;
+    color: inherit;
+    margin: 0;
+    padding: 0;
 }
 
 .minimize-btn,
@@ -1584,4 +1621,12 @@ mark {
     color: var(--text-color);
     opacity: 0.7;
     margin-left: var(--spacing-md);
+}
+
+.window.minimizing,
+.window.restoring,
+.window.maximizing,
+.window.unmaximizing,
+.window.closing {
+    z-index: calc(var(--z-index-window) + 50);
 }
