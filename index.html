@@ -75,16 +75,16 @@
         startBtn.setAttribute('tabindex', '0');
         startBtn.setAttribute('role', 'button');
         startBtn.addEventListener('click', () => {
-            startMenu.style.display = startMenu.style.display === 'flex' ? 'none' : 'flex';
+            startMenu.classList.toggle('show');
         });
         startBtn.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
-                startMenu.style.display = startMenu.style.display === 'flex' ? 'none' : 'flex';
+                startMenu.classList.toggle('show');
             }
         });
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.start-btn') && !e.target.closest('.start-menu')) {
-                startMenu.style.display = 'none';
+                startMenu.classList.remove('show');
             }
         });
 
@@ -158,12 +158,12 @@
             const button = e.target.closest('[data-tool]');
             if (button && button.classList.contains('start-menu-item')) {
                 handleAppClick(button.dataset.tool);
-                startMenu.style.display = 'none';
+                startMenu.classList.remove('show');
             }
             // Help button
             if (e.target.closest('#helpBtn')) {
                 helpManager.showHelp();
-                startMenu.style.display = 'none';
+                startMenu.classList.remove('show');
             }
         });
 
@@ -171,11 +171,11 @@
         document.addEventListener('keydown', (e) => {
             if ((e.key === 'Enter' || e.key === ' ') && document.activeElement && document.activeElement.hasAttribute('data-tool') && document.activeElement.classList.contains('start-menu-item')) {
                 handleAppClick(document.activeElement.dataset.tool);
-                startMenu.style.display = 'none';
+                startMenu.classList.remove('show');
             }
             if ((e.key === 'Enter' || e.key === ' ') && document.activeElement && document.activeElement.id === 'helpBtn') {
                 helpManager.showHelp();
-                startMenu.style.display = 'none';
+                startMenu.classList.remove('show');
             }
         });
 

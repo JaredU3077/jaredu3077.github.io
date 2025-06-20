@@ -87,20 +87,17 @@ To generate the documentation, you need to have Node.js and JSDoc installed.
 ### Core Components
 - **Window Manager (`window.js`):** 
   - Handles window creation, management, and state
-  - Implements window dragging and resizing
+  - Implements window dragging and resizing using `interact.js`
   - Manages window focus and z-index
   - Provides window context menu
   - Handles keyboard shortcuts for window management
 
 - **Network Visualization (`network.js`):** 
-  - Manages network topology and metrics
-  - Implements state persistence
-  - Provides error handling
-  - Manages tooltips and interactions
-  - Handles configuration updates
+  - Manages network topology and metrics using `vis.js`
+  - Implements state persistence, error handling, tooltips, and configuration updates
 
 - **Terminal (`terminal.js`):** 
-  - Implements terminal emulation
+  - Implements terminal emulation, including command parsing
   - Processes commands
   - Manages command history
   - Handles input/output
@@ -115,10 +112,8 @@ To generate the documentation, you need to have Node.js and JSDoc installed.
   - Handles configuration updates
   - Provides default values
 
-- **Command Parser (`parser.js`):** 
-  - Processes terminal commands
-  - Handles system actions
-  - Manages command validation
+- **Content Parser (`parser.js`):**
+  - Parses text content from files like `resume.txt` and `codex.txt` into HTML
 
 - **Keyboard Manager (`keyboard.js`):** 
   - Handles keyboard shortcuts
@@ -176,44 +171,13 @@ To generate the documentation, you need to have Node.js and JSDoc installed.
    - For full functionality, use a modern browser (Chrome, Firefox, Edge, Safari)
    - Recommended screen resolution: 1920x1080 or higher
 
-## Keyboard Shortcuts
-
-### Window Management
-- **Alt+N** — Show Network Topology
-- **Alt+T** — Show Terminal
-- **Alt+C** — Show Codex
-- **Alt+W** — Show Widgets
-- **Escape / Alt+F4** — Close active window
-
-### Terminal
-- **Ctrl+L** — Clear terminal
-- **Ctrl+U** — Clear input line
-- **Ctrl+R** — Reload terminal
-
-### Network Visualization
-- **Ctrl+F** — Fit network to view
-- **Ctrl+Plus** — Zoom in
-- **Ctrl+Minus** — Zoom out
-- **Ctrl+0** — Reset zoom
-
-## Browser Support
-- Chrome 80+
-- Firefox 75+
-- Safari 13+
-- Edge 80+
-
 ## Credits
 - UI/UX: Inspired by macOS, Windows, and Linux desktop environments
 - Network visualization: [vis.js](https://visjs.org/)
 - Icons: [Font Awesome](https://fontawesome.com/)
-- Window management: [interact.js](https://interactjs.io/)
 
 ## License
 
 This project is licensed under the MIT License.
-
-## Disclaimer
-
-This is a demo project and not a real operating system. It is intended for educational and demonstration purposes only.
 
 

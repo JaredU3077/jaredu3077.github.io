@@ -282,8 +282,8 @@ export class Terminal {
 
     initializeCommands() {
         // Network commands
-        this.commands.set('ping', (args) => this.handlePing(args));
-        this.commands.set('traceroute', (args) => this.handleTraceroute(args));
+        this.commands.set('ping', this.handlePing.bind(this));
+        this.commands.set('traceroute', this.handleTraceroute.bind(this));
         this.commands.set('show', (args) => this.handleShow(args));
         this.commands.set('clear', () => this.clearTerminal());
         this.commands.set('help', (args) => this.showHelp(args));
@@ -324,80 +324,80 @@ export class Terminal {
         });
     }
 
-    handlePing(args) {
-        if (!args[0]) return 'Usage: ping <host>';
-        
-        const host = args[0];
-        const responses = [
-            `Pinging ${host} with 32 bytes of data:`,
-            `Reply from ${host}: bytes=32 time=1ms TTL=128`,
-            `Reply from ${host}: bytes=32 time=2ms TTL=128`,
-            `Reply from ${host}: bytes=32 time=1ms TTL=128`,
-            `Reply from ${host}: bytes=32 time=3ms TTL=128`,
-            '',
-            `Ping statistics for ${host}:`,
-            '    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss)',
-            'Approximate round trip times in milli-seconds:',
-            '    Minimum = 1ms, Maximum = 3ms, Average = 1ms'
-        ];
+    async handlePing(args) {
+        const host = args[0] || 'google.com';
+        const PING_COUNT = 4;
+        let times = [];
+        this.writeOutput(`Pinging ${host}...`);
 
-        return responses.join('\n');
+        for (let i = 0; i < PING_COUNT; i++) {
+            const startTime = performance.now();
+            try {
+                // Using a CORS proxy to avoid CORS issues
+                await fetch(`https://api.allorigins.win/get?url=http://${host}`);
+                const endTime = performance.now();
+                const duration = (endTime - startTime).toFixed(2);
+                times.push(duration);
+                this.writeOutput(`Reply from ${host}: time=${duration}ms`);
+            } catch (error) {
+                this.writeOutput(`Request timeout for ${host}.`);
+            }
+            await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second delay between pings
+        }
+
+        if (times.length > 0) {
+            const avgTime = (times.reduce((a, b) => parseFloat(a) + parseFloat(b)) / times.length).toFixed(2);
+            this.writeOutput(`\nPing statistics for ${host}:`);
+            this.writeOutput(`    Packets: Sent = ${PING_COUNT}, Received = ${times.length}, Lost = ${PING_COUNT - times.length} (${((PING_COUNT - times.length) / PING_COUNT) * 100}% loss),`);
+            this.writeOutput(`Approximate round trip times in milli-seconds:`);
+            this.writeOutput(`    Minimum = ${Math.min(...times)}ms, Maximum = ${Math.max(...times)}ms, Average = ${avgTime}ms`);
+        } else {
+            this.writeOutput(`\nPing statistics for ${host}:`);
+            this.writeOutput(`    Packets: Sent = ${PING_COUNT}, Received = 0, Lost = ${PING_COUNT} (100% loss),`);
+        }
     }
 
     handleTraceroute(args) {
-        if (!args[0]) return 'Usage: traceroute <host>';
+        if (!args[0]) {
+            return 'Usage: traceroute <host>';
+        }
         
         const host = args[0];
-        const responses = [
-            `Tracing route to ${host} over a maximum of 30 hops:`,
-            '',
-            '  1    <1 ms    <1 ms    <1 ms  192.168.1.1',
-            '  2     2 ms     1 ms     2 ms  10.0.0.1',
-            '  3     3 ms     2 ms     3 ms  172.16.0.1',
-            '  4     4 ms     3 ms     4 ms  8.8.8.8',
-            '',
-            'Trace complete.'
-        ];
-
-        return responses.join('\n');
+        return 'Traceroute complete.';
     }
 
     async showResume() {
         try {
-            console.log('Loading resume from:', CONFIG.PATHS.RESUME);
-            const response = await fetch(CONFIG.PATHS.RESUME);
+            const response = await fetch('resume.txt');
             if (!response.ok) {
-                console.error('Failed to load resume:', response.status, response.statusText);
-                throw new Error(`Failed to load resume: ${response.status} ${response.statusText}`);
+                throw new AppError('Could not load resume.txt', ErrorTypes.NETWORK);
             }
             const text = await response.text();
-            console.log('Resume content loaded:', text.substring(0, 100) + '...');
-            const formattedContent = ContentParser.parseTextContent(text);
-            console.log('Formatted content:', formattedContent.substring(0, 100) + '...');
-            return formattedContent;
+            return text;
         } catch (error) {
-            console.error('Error in showResume:', error);
-            return `Error loading resume content: ${error.message}`;
+            console.error('Error fetching resume:', error);
+            return 'Error: Could not load resume.';
         }
     }
 
     handleShow(args) {
-        if (!args[0]) return 'Usage: show [interfaces|routes|config|resume|jared]';
+        if (args.length === 0) {
+            return 'Usage: show <subcommand>. Try "show help"';
+        }
 
-        console.log('Handling show command with args:', args);
-        switch (args[0].toLowerCase()) {
+        const subcommand = args[0].toLowerCase();
+        switch (subcommand) {
+            case 'resume':
+            case 'jared':
+                return this.showResume();
             case 'interfaces':
                 return this.showInterfaces();
             case 'routes':
                 return this.showRoutes();
             case 'config':
                 return this.showConfig();
-            case 'resume':
-            case 'jared':
-                console.log('Showing resume content');
-                return this.showResume();
             default:
-                return `Invalid option: ${args[0]}`;
+                return `Invalid option: ${subcommand}`;
         }
     }
 
