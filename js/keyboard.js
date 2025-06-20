@@ -87,6 +87,8 @@ export class KeyboardManager {
             const closeBtn = activeWindow.querySelector('.window-control.close');
             if (closeBtn) {
                 closeBtn.click();
+            } else {
+                activeWindow.style.display = 'none';
             }
         }
     }

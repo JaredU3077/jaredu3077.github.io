@@ -1630,3 +1630,38 @@ mark {
 .window.closing {
     z-index: calc(var(--z-index-window) + 50);
 }
+
+/* Focus states for accessibility */
+button:focus-visible, .desktop-icon:focus-visible, .start-menu-item:focus-visible, .taskbar-icon:focus-visible, .window-control:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+    z-index: 9999;
+}
+
+/* Standardize icon sizes */
+.desktop-icon .icon, .start-menu-item .icon, .taskbar-icon .icon {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.desktop-icon .icon svg, .start-menu-item .icon svg, .taskbar-icon .icon svg {
+    width: 100%;
+    height: 100%;
+    stroke: var(--primary-color);
+}
+
+/* Remove legacy .icon, .icon span, etc. rules if present */
+
+/* Ensure all window controls have visible hover/focus states */
+.window-control:focus-visible, .window-control:hover {
+    box-shadow: 0 0 0 2px var(--primary-color);
+    outline: none;
+}
+
+/* Ensure .window-title, .window-header, .window-content, .window-controls use consistent spacing and color */
+.window-title, .window-header, .window-content, .window-controls {
+    color: var(--text-color);
+}

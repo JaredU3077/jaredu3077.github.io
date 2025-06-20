@@ -316,11 +316,7 @@ export const UI_CONFIG = {
             id: 'network-monitor',
             title: 'Network Monitor',
             description: 'Monitor network topology and traffic',
-            icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 12h18M3 6h18M3 18h18"/>
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>
-            </svg>`,
+            icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 12h18M3 6h18M3 18h18"/><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg>`,
             windows: [{
                 id: 'topologyWindow',
                 title: 'Network Topology',
@@ -333,10 +329,7 @@ export const UI_CONFIG = {
             id: 'device-manager',
             title: 'Device Manager',
             description: 'Manage network devices',
-            icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="2" y="4" width="20" height="16" rx="2"/>
-                <path d="M8 8h8M8 12h8M8 16h4"/>
-            </svg>`,
+            icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/></svg>`,
             windows: [{
                 id: 'devicesWindow',
                 title: 'Device Manager',
@@ -349,10 +342,7 @@ export const UI_CONFIG = {
             id: 'terminal',
             title: 'Terminal',
             description: 'Command line interface',
-            icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="2" y="4" width="20" height="16" rx="2"/>
-                <path d="M8 8h8M8 12h8M8 16h4"/>
-            </svg>`,
+            icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/></svg>`,
             windows: [{
                 id: 'terminalWindow',
                 title: 'Terminal',
@@ -360,7 +350,7 @@ export const UI_CONFIG = {
                     <div id="terminalOutput"></div>
                     <div id="terminalInput">
                         <span class="prompt">$</span>
-                        <input type="text" autofocus>
+                        <input type="text" autofocus aria-label="Terminal input">
                     </div>
                 `,
                 width: 600,
@@ -371,16 +361,13 @@ export const UI_CONFIG = {
             id: 'codex',
             title: 'Codex',
             description: 'Search and browse documentation',
-            icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                <path d="M10 10l4 4"/>
-            </svg>`,
+            icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/><path d="M10 10l4 4"/></svg>`,
             windows: [{
                 id: 'codexWindow',
                 title: 'Codex',
                 content: `
                     <div class="search-container">
-                        <input type="text" id="searchInput" placeholder="Search documentation...">
+                        <input type="text" id="searchInput" placeholder="Search documentation..." aria-label="Search documentation">
                         <div id="searchResults"></div>
                     </div>
                 `,
@@ -453,19 +440,17 @@ export function createAppButton(app, type) {
     button.className = type === 'desktop' ? 'desktop-icon' : type === 'start-menu' ? 'start-menu-item' : 'taskbar-icon';
     button.dataset.tool = app.id;
     button.title = app.description;
+    button.setAttribute('aria-label', app.title);
+    button.setAttribute('tabindex', '0');
 
     if (type === 'desktop') {
         button.innerHTML = `
-            <div class="icon">
-                ${app.icon}
-            </div>
+            <div class="icon">${app.icon}</div>
             <span class="label">${app.title}</span>
         `;
     } else {
         button.innerHTML = `
-            <div class="icon">
-                ${app.icon}
-            </div>
+            <div class="icon">${app.icon}</div>
             ${type === 'start-menu' ? `<span class="label">${app.title}</span>` : ''}
         `;
     }

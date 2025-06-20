@@ -12,6 +12,8 @@ export class Terminal {
         if (!inputElement || !outputElement) {
             throw new AppError('Input and output elements are required', ErrorTypes.VALIDATION);
         }
+        inputElement.setAttribute('aria-label', 'Terminal input');
+        outputElement.setAttribute('aria-label', 'Terminal output');
 
         this.inputElement = inputElement;
         this.outputElement = outputElement;

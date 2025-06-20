@@ -26,6 +26,8 @@ export class WindowManager {
         const windowElement = document.createElement('div');
         windowElement.className = 'window';
         windowElement.id = id;
+        windowElement.setAttribute('role', 'dialog');
+        windowElement.setAttribute('aria-label', title);
         windowElement.style.width = `${width}px`;
         windowElement.style.height = `${height}px`;
         windowElement.style.left = `${left}px`;
@@ -33,18 +35,18 @@ export class WindowManager {
         windowElement.style.zIndex = this.getNextZIndex();
 
         windowElement.innerHTML = `
-            <div class="window-header">
+            <div class="window-header" role="banner" aria-label="${title} window header">
                 <div class="window-title">
                     <span class="icon">${icon || ''}</span>
                     <span class="label">${title}</span>
                 </div>
                 <div class="window-controls">
-                    <button class="window-control minimize" title="Minimize">-</button>
-                    <button class="window-control maximize" title="Maximize">□</button>
-                    <button class="window-control close" title="Close">×</button>
+                    <button class="window-control minimize" title="Minimize" aria-label="Minimize window">-</button>
+                    <button class="window-control maximize" title="Maximize" aria-label="Maximize window">□</button>
+                    <button class="window-control close" title="Close" aria-label="Close window">×</button>
                 </div>
             </div>
-            <div class="window-content">
+            <div class="window-content" tabindex="0">
                 ${content}
             </div>
             <div class="window-resize n"></div>

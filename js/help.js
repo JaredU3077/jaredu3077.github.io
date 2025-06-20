@@ -176,8 +176,9 @@ export class HelpManager {
     showHelp(section = 'terminal') {
         const helpWindow = document.getElementById('helpWindow');
         const helpContent = document.getElementById('helpContent');
-        
         if (helpWindow && helpContent) {
+            helpContent.setAttribute('aria-live', 'polite');
+            helpContent.setAttribute('tabindex', '0');
             helpContent.innerHTML = this.generateHelpHTML(section);
             helpWindow.style.display = 'block';
         }

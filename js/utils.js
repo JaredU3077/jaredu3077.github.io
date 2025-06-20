@@ -71,6 +71,8 @@ export const ErrorTypes = {
 export function createLoadingIndicator(message = 'Loading...') {
     const indicator = document.createElement('div');
     indicator.className = 'loading-indicator';
+    indicator.setAttribute('role', 'status');
+    indicator.setAttribute('aria-live', 'polite');
     indicator.innerHTML = `
         <div class="spinner"></div>
         <div class="message">${message}</div>

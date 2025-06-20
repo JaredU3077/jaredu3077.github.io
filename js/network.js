@@ -13,6 +13,7 @@ export class NetworkVisualization {
         if (!this.container) {
             throw new AppError(`Container element with id "${containerId}" not found`, ErrorTypes.UI);
         }
+        this.container.setAttribute('aria-label', 'Network topology visualization');
         
         this.network = null;
         this.updateInterval = null;

@@ -47,6 +47,8 @@ export class SearchManager {
         // Initialize search input
         const searchInput = document.getElementById('codexSearch');
         const searchResults = document.getElementById('searchResults');
+        if (searchInput) searchInput.setAttribute('aria-label', 'Search Codex');
+        if (searchResults) searchResults.setAttribute('aria-live', 'polite');
 
         // Add debounced search
         let debounceTimer;
