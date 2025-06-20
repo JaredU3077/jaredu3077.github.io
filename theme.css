@@ -96,28 +96,28 @@ body {
     border-radius: var(--border-radius);
     box-shadow: 0 12px 48px 0 #101624, var(--neu-shadow);
     padding: 24px 0 16px 0;
-    display: none;
+    display: flex;
     flex-direction: column;
     gap: 10px;
     z-index: 3000;
     border: 2px solid #26334d;
-    animation: slideUp 0.3s ease-out;
     /* Neumorphic edge */
     box-shadow: 0 8px 32px 0 #101624, 0 2px 8px 0 #232c3d inset;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out, visibility 0.3s;
 }
 
 .start-menu.show {
-    display: flex;
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
 }
 
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(24px) scale(0.98); }
     to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-@keyframes slideUp {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
 }
 
 .start-menu-item {
