@@ -92,16 +92,25 @@
         // Track open windows by ID
         const openWindows = {};
         function handleAppClick(appId) {
+            console.log(`handleAppClick called for appId: ${appId}`);
             const app = UI_CONFIG.applications[appId];
-            if (!app) return;
+            if (!app) {
+                console.error(`No application config found for appId: ${appId}`);
+                return;
+            }
+            console.log(`App config found:`, app);
+
             app.windows.forEach(windowConfig => {
+                console.log(`Processing window config:`, windowConfig);
                 // If window already open, focus it and do not re-initialize
                 let winElem = document.getElementById(windowConfig.id);
                 if (winElem) {
+                    console.log(`Window already open, focusing: ${windowConfig.id}`);
                     windowManager.focusWindow(windowManager.windows.get(windowConfig.id));
                     return;
                 }
                 // Create window and initialize app logic
+                console.log(`Creating new window for: ${windowConfig.id}`);
                 winElem = windowManager.createWindow({
                     id: windowConfig.id,
                     title: windowConfig.title,
@@ -110,27 +119,36 @@
                     height: windowConfig.height,
                     icon: app.icon
                 });
+                console.log('Window element created:', winElem);
                 openWindows[windowConfig.id] = winElem;
-                switch (appId) {
-                    case 'terminal':
-                        terminal = new Terminal(
-                            winElem.querySelector('#terminalInput input'),
-                            winElem.querySelector('#terminalOutput')
-                        );
-                        break;
-                    case 'network-monitor':
-                        if (windowConfig.id === 'topologyWindow') {
-                            network = new NetworkVisualization('networkTopology');
-                        }
-                        break;
-                    case 'codex':
-                        if (windowConfig.id === 'codexWindow') {
-                            searchManager.initializeSearch();
-                        }
-                        break;
-                    case 'device-manager':
-                        // Future: initialize device manager logic here
-                        break;
+                try {
+                    switch (appId) {
+                        case 'terminal':
+                            console.log('Initializing terminal...');
+                            terminal = new Terminal(
+                                winElem.querySelector('#terminalInput input'),
+                                winElem.querySelector('#terminalOutput')
+                            );
+                            console.log('Terminal initialized:', terminal);
+                            break;
+                        case 'network-monitor':
+                            if (windowConfig.id === 'topologyWindow') {
+                                network = new NetworkVisualization('networkTopology');
+                            }
+                            break;
+                        case 'codex':
+                            if (windowConfig.id === 'codexWindow') {
+                                searchManager.initializeSearch();
+                            }
+                            break;
+                        case 'device-manager':
+                            // Future: initialize device manager logic here
+                            break;
+                    }
+                } catch (error) {
+                    alert(`Error initializing application ${appId}: ${error.message}`);
+                    console.error(`Error initializing application ${appId}:`, error);
+                    winElem.remove();
                 }
             });
         }

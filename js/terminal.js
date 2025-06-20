@@ -36,7 +36,7 @@ export class Terminal {
 
     setupEventListeners() {
         // Use passive event listeners for better performance
-        this.inputElement.addEventListener('keydown', this.handleKeyDown.bind(this), { passive: true });
+        this.inputElement.addEventListener('keydown', this.handleKeyDown.bind(this));
         this.inputElement.addEventListener('input', this.handleInput.bind(this), { passive: true });
         
         // Handle window resize for terminal resizing
