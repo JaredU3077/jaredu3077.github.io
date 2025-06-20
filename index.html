@@ -89,11 +89,20 @@
         });
 
         // Handle app icon and menu clicks (only in start menu now)
+        // Track open windows by ID
+        const openWindows = {};
         function handleAppClick(appId) {
             const app = UI_CONFIG.applications[appId];
             if (!app) return;
             app.windows.forEach(windowConfig => {
-                const win = windowManager.createWindow({
+                // If window already open, focus it and do not re-initialize
+                let winElem = document.getElementById(windowConfig.id);
+                if (winElem) {
+                    windowManager.focusWindow(windowManager.windows.get(windowConfig.id));
+                    return;
+                }
+                // Create window and initialize app logic
+                winElem = windowManager.createWindow({
                     id: windowConfig.id,
                     title: windowConfig.title,
                     content: windowConfig.content,
@@ -101,11 +110,12 @@
                     height: windowConfig.height,
                     icon: app.icon
                 });
+                openWindows[windowConfig.id] = winElem;
                 switch (appId) {
                     case 'terminal':
                         terminal = new Terminal(
-                            win.querySelector('#terminalInput input'),
-                            win.querySelector('#terminalOutput')
+                            winElem.querySelector('#terminalInput input'),
+                            winElem.querySelector('#terminalOutput')
                         );
                         break;
                     case 'network-monitor':
