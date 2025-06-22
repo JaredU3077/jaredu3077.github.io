@@ -40,6 +40,11 @@ export class Terminal {
         this.setupEventListeners();
         this.loadHistory();
         
+        // Focus the input element after a brief delay to override autofocus blocking
+        setTimeout(() => {
+            this.inputElement.focus();
+        }, 100);
+        
         // Track performance metrics
         this.performanceMetrics = new Map();
     }
