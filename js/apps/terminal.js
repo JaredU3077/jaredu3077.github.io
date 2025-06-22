@@ -105,10 +105,9 @@ export class Terminal {
      * @memberof Terminal
      */
     handleResize() {
-        // Adjust terminal output height based on window size
-        const windowHeight = window.innerHeight;
-        const maxHeight = Math.min(windowHeight * 0.8, 600);
-        this.outputElement.style.maxHeight = `${maxHeight}px`;
+        // With flex layout, terminal automatically adjusts to container size
+        // Force scroll position recalculation if needed
+        this.scrollToBottom();
     }
 
     /**

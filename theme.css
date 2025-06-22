@@ -330,16 +330,26 @@ button:focus-visible, .start-menu-item:focus-visible, .window-control:focus-visi
     color: var(--text-color);
 }
 
+/* Terminal Window-specific styles */
+#terminalWindow .window-content {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
 /* Terminal Styles */
 #terminalOutput {
     background: #1a1a1a;
     color: #00ff00;
     font-family: 'Courier New', monospace;
     padding: 10px;
-    height: calc(100% - 40px);
+    flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     font-size: 14px;
     line-height: 1.4;
+    min-height: 0; /* Important for flex child to shrink */
 }
 
 #terminalInput {
@@ -350,6 +360,9 @@ button:focus-visible, .start-menu-item:focus-visible, .window-control:focus-visi
     font-family: 'Courier New', monospace;
     padding: 5px 10px;
     border-top: 1px solid #333;
+    flex-shrink: 0; /* Prevent input from shrinking */
+    height: 40px; /* Fixed height for input area */
+    box-sizing: border-box;
 }
 
 #terminalInput .prompt {
