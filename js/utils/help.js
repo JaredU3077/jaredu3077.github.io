@@ -154,17 +154,16 @@ export class HelpManager {
 
     /**
      * Shows the help window with content for a specific topic.
-     * This method relies on the main script to have created the help window.
      * @param {string} [topic='terminal'] - The help topic to display.
+     * @param {WindowManager} windowManager - The window manager instance to use.
      * @memberof HelpManager
      */
-    showHelp(topic = 'terminal') {
-        // This is a simplified approach. A more robust solution would be to
-        // have the HelpManager create the window itself via the WindowManager.
-        const windowManager = window.windowManager; // Accessing global windowManager
-        if (windowManager) {
+    showHelp(topic = 'terminal', windowManager = null) {
+        // Use passed windowManager or try to get it from global scope
+        const wm = windowManager || window.windowManager;
+        if (wm) {
             const helpContent = this.generateHelpHTML(topic);
-            const helpWindow = windowManager.createWindow({
+            const helpWindow = wm.createWindow({
                 id: 'helpWindow',
                 title: 'Help',
                 content: `<div id="helpContent" class="help-content-container">${helpContent}</div>`,

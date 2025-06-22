@@ -30,18 +30,18 @@ export class SearchManager {
      * @memberof SearchManager
      */
     initializeSearch() {
-        // Add search input to Codex window
-        const codexHeader = document.querySelector('#codexWindow .window-header');
-        if (!codexHeader) return; // Defensive: only run if window exists
-        // Prevent duplicate search bar
-        if (codexHeader.querySelector('.search-container')) return;
-        const searchContainer = document.createElement('div');
-        searchContainer.className = 'search-container';
-        searchContainer.innerHTML = `
-            <input type="text" id="codexSearch" placeholder="Search Codex..." class="search-input">
-            <div id="searchResults" class="search-results"></div>
+        // Find the codex window content area
+        const codexContent = document.querySelector('#codexWindow .window-content');
+        if (!codexContent) return; // Defensive: only run if window exists
+        
+        // Add search input and content area
+        codexContent.innerHTML = `
+            <div class="search-container">
+                <input type="text" id="codexSearch" placeholder="Search Codex..." class="search-input">
+                <div id="searchResults" class="search-results"></div>
+                <div id="codexContent" style="margin-top: 20px; display: none;"></div>
+            </div>
         `;
-        codexHeader.appendChild(searchContainer);
 
         // Initialize search input
         const searchInput = document.getElementById('codexSearch');
@@ -51,17 +51,20 @@ export class SearchManager {
 
         // Add debounced search
         let debounceTimer;
-        searchInput.addEventListener('input', (e) => {
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => {
-                this.performSearch(e.target.value);
-            }, 300);
-        });
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    this.performSearch(e.target.value);
+                }, 300);
+            });
+        }
 
         // Close search results when clicking outside
         document.addEventListener('click', (e) => {
-            if (!searchContainer.contains(e.target)) {
-                searchResults.style.display = 'none';
+            const searchContainer = document.querySelector('#codexWindow .search-container');
+            if (searchContainer && !searchContainer.contains(e.target)) {
+                if (searchResults) searchResults.style.display = 'none';
             }
         });
 

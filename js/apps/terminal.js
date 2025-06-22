@@ -4,7 +4,7 @@
  */
 
 import { ContentParser } from '../utils/parser.js';
-import { AppError, ErrorTypes, performanceMonitor, eventEmitter } from '../utils.js';
+import { AppError, ErrorTypes, performanceMonitor, eventEmitter } from '../utils/utils.js';
 import { CONFIG } from '../config.js';
 
 /**

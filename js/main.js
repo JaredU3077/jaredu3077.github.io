@@ -10,11 +10,13 @@ import { NetworkVisualization } from './apps/network.js';
 import { KeyboardManager } from './core/keyboard.js';
 import { HelpManager } from './utils/help.js';
 import { SearchManager } from './utils/search.js';
-import { CONFIG as UI_CONFIG, createAppButton } from './config.js';
+import { CONFIG, createAppButton } from './config.js';
 
 // --- MODULE INITIALIZATION ---
 /** @type {WindowManager} */
 const windowManager = new WindowManager();
+// Expose windowManager globally for other modules to use
+window.windowManager = windowManager;
 /** @type {HelpManager} */
 const helpManager = new HelpManager();
 /** @type {SearchManager} */
@@ -38,7 +40,7 @@ function initializeUI() {
     desktopIcons.innerHTML = '';
 
     // Create start menu items and desktop icons for all apps
-    Object.values(UI_CONFIG.applications).forEach(app => {
+    Object.values(CONFIG.applications).forEach(app => {
         // Create Start Menu buttons
         startMenu.insertAdjacentHTML('beforeend', createAppButton(app, 'start-menu'));
         
@@ -89,7 +91,7 @@ document.addEventListener('click', (e) => {
  */
 function handleAppClick(appId) {
     console.log(`handleAppClick called for appId: ${appId}`);
-    const app = UI_CONFIG.applications[appId];
+    const app = CONFIG.applications[appId];
     if (!app) {
         console.error(`No application config found for appId: ${appId}`);
         return;
@@ -177,7 +179,7 @@ function handleGlobalClick(e) {
     }
 
     if (e.target.closest('#helpBtn')) {
-        helpManager.showHelp();
+        helpManager.showHelp('terminal', windowManager);
         document.getElementById('startMenu').classList.remove('show');
     }
 }
@@ -194,7 +196,7 @@ function handleGlobalKeydown(e) {
         }
     }
     if ((e.key === 'Enter' || e.key === ' ') && document.activeElement && document.activeElement.id === 'helpBtn') {
-        helpManager.showHelp();
+        helpManager.showHelp('terminal', windowManager);
         document.getElementById('startMenu').classList.remove('show');
     }
 }

@@ -1,4 +1,4 @@
-import { CONFIG as UI_CONFIG } from '../config.js';
+import { CONFIG } from '../config.js';
 import { debounce, throttle } from '../utils/utils.js';
 
 /**
@@ -17,9 +17,9 @@ export class WindowManager {
         /** @type {?object} */
         this.activeWindow = null;
         /** @type {number} */
-        this.zIndexCounter = UI_CONFIG.window.zIndex;
+        this.zIndexCounter = CONFIG.window.zIndex;
         /** @type {number} */
-        this.snapThreshold = UI_CONFIG.window.snapThreshold;
+        this.snapThreshold = CONFIG.window.snapThreshold;
         /** @type {Map<string, object>} */
         this.snapZones = new Map();
         /** @type {?HTMLElement} */
@@ -37,16 +37,16 @@ export class WindowManager {
      * @param {string} options.id - The unique ID for the window.
      * @param {string} options.title - The title of the window.
      * @param {string} options.content - The HTML content of the window.
-     * @param {number} [options.width=UI_CONFIG.window.defaultWidth] - The width of the window.
-     * @param {number} [options.height=UI_CONFIG.window.defaultHeight] - The height of the window.
+     * @param {number} [options.width=CONFIG.window.defaultWidth] - The width of the window.
+     * @param {number} [options.height=CONFIG.window.defaultHeight] - The height of the window.
      * @param {string} [options.icon] - The icon for the window header.
      * @returns {HTMLElement} The created window element.
      * @memberof WindowManager
      */
-    createWindow({ id, title, content, width = UI_CONFIG.window.defaultWidth, height = UI_CONFIG.window.defaultHeight, icon }) {
+    createWindow({ id, title, content, width = CONFIG.window.defaultWidth, height = CONFIG.window.defaultHeight, icon }) {
         // Ensure window dimensions are within bounds
-        width = Math.min(Math.max(width, UI_CONFIG.window.minWidth), UI_CONFIG.window.maxWidth);
-        height = Math.min(Math.max(height, UI_CONFIG.window.minHeight), UI_CONFIG.window.maxHeight);
+        width = Math.min(Math.max(width, CONFIG.window.minWidth), CONFIG.window.maxWidth);
+        height = Math.min(Math.max(height, CONFIG.window.minHeight), CONFIG.window.maxHeight);
 
         // Center the window on screen
         const left = (window.innerWidth - width) / 2;
@@ -90,7 +90,7 @@ export class WindowManager {
 
         document.getElementById('desktop').appendChild(windowElement);
 
-        const window = {
+        const windowObj = {
             element: windowElement,
             id,
             title,
@@ -104,10 +104,10 @@ export class WindowManager {
             originalPosition: { left, top, width, height }
         };
 
-        this.windows.set(id, window);
-        this.windowStack.push(window);
-        this.setupWindowEvents(window);
-        this.focusWindow(window);
+        this.windows.set(id, windowObj);
+        this.windowStack.push(windowObj);
+        this.setupWindowEvents(windowObj);
+        this.focusWindow(windowObj);
 
         return windowElement;
     }
@@ -154,8 +154,8 @@ export class WindowManager {
                             endOnly: true
                         }),
                         interact.modifiers.restrictSize({
-                            min: { width: UI_CONFIG.window.minWidth, height: UI_CONFIG.window.minHeight },
-                            max: { width: UI_CONFIG.window.maxWidth, height: UI_CONFIG.window.maxHeight }
+                            min: { width: CONFIG.window.minWidth, height: CONFIG.window.minHeight },
+                            max: { width: CONFIG.window.maxWidth, height: CONFIG.window.maxHeight }
                         })
                     ]
                 });
@@ -527,8 +527,8 @@ export class WindowManager {
      */
     updateWindowSize(window, width, height) {
         // Ensure window stays within bounds
-        width = Math.min(Math.max(width, UI_CONFIG.window.minWidth), UI_CONFIG.window.maxWidth);
-        height = Math.min(Math.max(height, UI_CONFIG.window.minHeight), UI_CONFIG.window.maxHeight);
+        width = Math.min(Math.max(width, CONFIG.window.minWidth), CONFIG.window.maxWidth);
+        height = Math.min(Math.max(height, CONFIG.window.minHeight), CONFIG.window.maxHeight);
         
         window.element.style.width = `${width}px`;
         window.element.style.height = `${height}px`;

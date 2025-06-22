@@ -3,7 +3,7 @@
  * @author Jared U.
  */
 
-import { AppError, ErrorTypes, sanitizeHTML, showLoading, hideLoading } from './utils.js';
+import { AppError, ErrorTypes, sanitizeHTML, showLoading, hideLoading } from '../utils/utils.js';
 
 /**
  * Provides static methods for parsing text files into HTML.
