@@ -203,7 +203,7 @@ export class Terminal {
             if (handler) {
                 try {
                     const result = handler(args);
-                    await this.handleCommandResult(result);
+                    await this.handleCommandResult(result, command);
                 } catch (error) {
                     this.handleCommandError(error);
                 }
@@ -240,26 +240,37 @@ export class Terminal {
     /**
      * Handles the result of a command execution, displaying it in the output.
      * @param {string | Promise<string>} result - The result of the command.
+     * @param {string} command - The original command executed.
      * @private
      * @memberof Terminal
      */
-    async handleCommandResult(result) {
+    async handleCommandResult(result, command = '') {
         const resultElement = document.createElement('div');
         resultElement.className = 'terminal-result';
         
+        let output;
         if (result instanceof Promise) {
             try {
-                const output = await result;
+                output = await result;
                 this.formatOutput(output, resultElement);
             } catch (error) {
                 this.handleCommandError(error);
+                return;
             }
         } else {
+            output = result;
             this.formatOutput(result, resultElement);
         }
         
         this.outputElement.appendChild(resultElement);
-        this.scrollToBottom();
+        
+        // For document-like content (resume), scroll to top to start reading
+        // For other commands, scroll to bottom (traditional terminal behavior)
+        if (this.isDocumentContent(command, output)) {
+            this.scrollToTop();
+        } else {
+            this.scrollToBottom();
+        }
     }
 
     /**
@@ -369,6 +380,32 @@ export class Terminal {
 
     scrollToBottom() {
         this.outputElement.scrollTop = this.outputElement.scrollHeight;
+    }
+
+    scrollToTop() {
+        this.outputElement.scrollTop = 0;
+    }
+
+    /**
+     * Determines if content should be treated as a document (scroll to top)
+     * @param {string} command - The command that was executed
+     * @param {string} output - The output content
+     * @returns {boolean} True if this is document content
+     * @private
+     * @memberof Terminal
+     */
+    isDocumentContent(command, output) {
+        // Check if it's a show resume/jared command
+        if (command.includes('show resume') || command.includes('show jared')) {
+            return true;
+        }
+        
+        // Check if output contains resume-like content (has terminal styling classes)
+        if (typeof output === 'string' && output.includes('terminal-heading')) {
+            return true;
+        }
+        
+        return false;
     }
 
     /**
