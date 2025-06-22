@@ -73,6 +73,157 @@ export const CONFIG = {
     PATHS: {
         RESUME: 'resume.txt',
         CODEX: 'codex.txt'
+    },
+
+    // Application configurations
+    applications: {
+        'welcome': {
+            id: 'welcome',
+            name: 'Welcome',
+            icon: '👋',
+            windows: [{
+                id: 'welcomeWindow',
+                title: 'Welcome!',
+                width: 400,
+                height: 250,
+                content: `
+                    <div class="welcome-content" style="padding: 15px; text-align: center;">
+                        <h2>Welcome to My Interactive Portfolio</h2>
+                        <p>This is a simulated OS environment built with JavaScript.</p>
+                        <p>Feel free to open applications from the Start Menu, move windows around, and explore.</p>
+                        <p>You can start by checking out my resume by typing 'cat resume.txt' into the terminal!</p>
+                    </div>
+                `
+            }]
+        },
+        'terminal': {
+            id: 'terminal',
+            name: 'Terminal',
+            description: 'Command line interface',
+            icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/></svg>`,
+            windows: [{
+                id: 'terminalWindow',
+                title: 'Terminal',
+                content: `
+                    <div id="terminalOutput"></div>
+                    <div id="terminalInput">
+                        <span class="prompt">$</span>
+                        <input type="text" autofocus aria-label="Terminal input">
+                    </div>
+                `,
+                width: 600,
+                height: 400
+            }]
+        },
+        'network-monitor': {
+            id: 'network-monitor',
+            name: 'Network Monitor',
+            description: 'Visualize the network topology',
+            icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20h.01"/><path d="M8.5 16.5A2.5 2.5 0 016 14H3c-1.1 0-2-.9-2-2v- инфраструктура-0c0-1.1.9-2 2-2h3a2.5 2.5 0 012.5-2.5M15.5 16.5A2.5 2.5 0 0018 14h3c1.1 0 2-.9 2-2v-0c0-1.1-.9-2-2-2h-3a2.5 2.5 0 00-2.5-2.5"/><path d="M7 12h10"/></svg>`,
+            windows: [{
+                id: 'topologyWindow',
+                title: 'Network Topology',
+                content: `<div id="networkTopology" style="height: 100%;"></div>`,
+                width: 800,
+                height: 600
+            }]
+        }
+    },
+
+    // Network visualization settings
+    NETWORK: {
+        nodes: [
+            { id: 1, label: 'Router', group: 'routers' },
+            { id: 2, label: 'Switch', group: 'switches' },
+            { id: 3, label: 'Server 1', group: 'servers' },
+            { id: 4, label: 'Server 2', group: 'servers' },
+            { id: 5, label: 'PC-1', group: 'pcs' },
+            { id: 6, label: 'PC-2', group: 'pcs' },
+            { id: 7, label: 'PC-3', group: 'pcs' },
+            { id: 8, label: 'Firewall', group: 'firewalls' }
+        ],
+        edges: [
+            { from: 8, to: 1 }, // Firewall -> Router
+            { from: 1, to: 2 }, // Router -> Switch
+            { from: 2, to: 3 }, // Switch -> Server 1
+            { from: 2, to: 4 }, // Switch -> Server 2
+            { from: 2, to: 5 }, // Switch -> PC-1
+            { from: 2, to: 6 }, // Switch -> PC-2
+            { from: 2, to: 7 }  // Switch -> PC-3
+        ],
+        options: {
+            nodes: {
+                shape: 'dot',
+                size: 16,
+                font: {
+                    size: 14,
+                    color: '#ffffff'
+                },
+                borderWidth: 2
+            },
+            edges: {
+                width: 2,
+                color: {
+                    color: '#848484',
+                    highlight: '#a8a8a8'
+                }
+            },
+            physics: {
+                enabled: true,
+                barnesHut: {
+                    gravitationalConstant: -10000,
+                    centralGravity: 0.1,
+                    springLength: 150
+                }
+            },
+            interaction: {
+                hover: true,
+                dragNodes: true
+            },
+            groups: {
+                routers: { color: { background: '#ff6900', border: '#ff8a38' }, shape: 'diamond' },
+                switches: { color: { background: '#7c53ff', border: '#9b7dff' }, shape: 'square' },
+                servers: { color: { background: '#00d084', border: '#33da9c' }, shape: 'box' },
+                pcs: { color: { background: '#00b8d9', border: '#33c9e3' } },
+                firewalls: { color: { background: '#ff4d4d', border: '#ff7070' }, shape: 'triangle' }
+            }
+        }
+    },
+
+    // Environment-specific settings
+    ENV: {
+        development: {
+            DEBUG: true,
+            LOG_LEVEL: 'debug',
+            NETWORK: {
+                UPDATE_INTERVAL: 1000,
+                MOCK_DATA: true
+            }
+        },
+        staging: {
+            DEBUG: true,
+            LOG_LEVEL: 'info',
+            NETWORK: {
+                UPDATE_INTERVAL: 2000,
+                MOCK_DATA: true
+            }
+        },
+        testing: {
+            DEBUG: true,
+            LOG_LEVEL: 'debug',
+            NETWORK: {
+                UPDATE_INTERVAL: 1000,
+                MOCK_DATA: true
+            }
+        },
+        production: {
+            DEBUG: false,
+            LOG_LEVEL: 'error',
+            NETWORK: {
+                UPDATE_INTERVAL: 5000,
+                MOCK_DATA: false
+            }
+        }
     }
 };
 

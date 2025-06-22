@@ -1,13 +1,23 @@
 /**
- * Terminal Module
- * Handles terminal functionality with performance optimizations and enhanced error handling
+ * @file Handles terminal functionality, command parsing, and execution.
+ * @author Jared U.
  */
 
-import { ContentParser } from './parser.js';
-import { AppError, ErrorTypes, performanceMonitor, eventEmitter } from './utils.js';
-import { CONFIG } from './config.js';
+import { ContentParser } from '../utils/parser.js';
+import { AppError, ErrorTypes, performanceMonitor, eventEmitter } from '../utils.js';
+import { CONFIG } from '../config.js';
 
+/**
+ * Represents the terminal interface, handling user input, command execution, and output.
+ * @class Terminal
+ */
 export class Terminal {
+    /**
+     * Creates an instance of Terminal.
+     * @param {HTMLInputElement} inputElement - The input element for user commands.
+     * @param {HTMLElement} outputElement - The element to display terminal output.
+     * @memberof Terminal
+     */
     constructor(inputElement, outputElement) {
         if (!inputElement || !outputElement) {
             throw new AppError('Input and output elements are required', ErrorTypes.VALIDATION);
@@ -34,6 +44,11 @@ export class Terminal {
         this.performanceMetrics = new Map();
     }
 
+    /**
+     * Sets up event listeners for the terminal input.
+     * @private
+     * @memberof Terminal
+     */
     setupEventListeners() {
         // Use passive event listeners for better performance
         this.inputElement.addEventListener('keydown', this.handleKeyDown.bind(this));
@@ -43,6 +58,13 @@ export class Terminal {
         window.addEventListener('resize', this.handleResize.bind(this), { passive: true });
     }
 
+    /**
+     * Handles keydown events in the terminal input.
+     * Manages command execution, history navigation, and tab completion.
+     * @param {KeyboardEvent} e - The keyboard event.
+     * @private
+     * @memberof Terminal
+     */
     handleKeyDown(e) {
         performanceMonitor.startMeasure('terminalKeyDown');
         
@@ -68,10 +90,20 @@ export class Terminal {
         }
     }
 
+    /**
+     * Updates the current input value when the user types.
+     * @private
+     * @memberof Terminal
+     */
     handleInput() {
         this.currentInput = this.inputElement.value;
     }
 
+    /**
+     * Adjusts the terminal's output height on window resize.
+     * @private
+     * @memberof Terminal
+     */
     handleResize() {
         // Adjust terminal output height based on window size
         const windowHeight = window.innerHeight;
@@ -79,6 +111,12 @@ export class Terminal {
         this.outputElement.style.maxHeight = `${maxHeight}px`;
     }
 
+    /**
+     * Navigates through the command history.
+     * @param {'up' | 'down'} direction - The direction to navigate.
+     * @private
+     * @memberof Terminal
+     */
     navigateHistory(direction) {
         if (this.history.length === 0) return;
 
@@ -105,6 +143,11 @@ export class Terminal {
         }
     }
 
+    /**
+     * Handles tab completion for commands.
+     * @private
+     * @memberof Terminal
+     */
     handleTabCompletion() {
         performanceMonitor.startMeasure('tabCompletion');
         
@@ -125,6 +168,11 @@ export class Terminal {
         }
     }
 
+    /**
+     * Executes the command currently in the input field.
+     * @returns {Promise<void>}
+     * @memberof Terminal
+     */
     async executeCommand() {
         if (this.isProcessing) {
             this.commandQueue.push(this.inputElement.value);
@@ -171,6 +219,12 @@ export class Terminal {
         }
     }
 
+    /**
+     * Handles the result of a command execution, displaying it in the output.
+     * @param {string | Promise<string>} result - The result of the command.
+     * @private
+     * @memberof Terminal
+     */
     async handleCommandResult(result) {
         const resultElement = document.createElement('div');
         resultElement.className = 'terminal-result';
@@ -190,6 +244,12 @@ export class Terminal {
         this.scrollToBottom();
     }
 
+    /**
+     * Handles errors that occur during command execution.
+     * @param {Error} error - The error object.
+     * @private
+     * @memberof Terminal
+     */
     handleCommandError(error) {
         const errorElement = document.createElement('div');
         errorElement.className = 'terminal-error';
@@ -201,6 +261,13 @@ export class Terminal {
         eventEmitter.emit('terminalError', { error });
     }
 
+    /**
+     * Formats and styles the output before displaying it.
+     * @param {string | Array | object} output - The content to format.
+     * @param {HTMLElement} element - The element to display the output in.
+     * @private
+     * @memberof Terminal
+     */
     formatOutput(output, element) {
         if (typeof output === 'string') {
             if (/<\w+/.test(output)) {
@@ -217,6 +284,12 @@ export class Terminal {
         }
     }
 
+    /**
+     * Adds a command to the history.
+     * @param {string} command - The command to add.
+     * @private
+     * @memberof Terminal
+     */
     addToHistory(command) {
         this.history.push(command);
         if (this.history.length > this.maxHistorySize) {
@@ -226,6 +299,11 @@ export class Terminal {
         this.saveHistory();
     }
 
+    /**
+     * Loads command history from local storage.
+     * @private
+     * @memberof Terminal
+     */
     loadHistory() {
         try {
             const savedHistory = localStorage.getItem('terminalHistory');
@@ -237,6 +315,11 @@ export class Terminal {
         }
     }
 
+    /**
+     * Saves the command history to local storage.
+     * @private
+     * @memberof Terminal
+     */
     saveHistory() {
         try {
             localStorage.setItem('terminalHistory', JSON.stringify(this.history));
@@ -245,6 +328,11 @@ export class Terminal {
         }
     }
 
+    /**
+     * Writes content directly to the terminal output.
+     * @param {string} content - The HTML content to write.
+     * @memberof Terminal
+     */
     writeOutput(content) {
         const div = document.createElement('div');
         div.innerHTML = content;
@@ -265,9 +353,14 @@ export class Terminal {
         this.outputElement.scrollTop = this.outputElement.scrollHeight;
     }
 
+    /**
+     * Clears the terminal output.
+     * @returns {string} An empty string to signify success.
+     * @memberof Terminal
+     */
     clear() {
         this.outputElement.innerHTML = '';
-        this.writeOutput('<div class="terminal-heading">Terminal cleared</div>');
+        return '';
     }
 
     clearInput() {
@@ -276,206 +369,100 @@ export class Terminal {
     }
 
     reload() {
-        this.clear();
-        this.writeOutput('<div class="terminal-heading">Terminal reloaded</div>');
+        // Future: implement terminal state restoration
     }
 
+    /**
+     * Initializes the available terminal commands.
+     * @private
+     * @memberof Terminal
+     */
     initializeCommands() {
-        // Network commands
+        this.commands.set('help', this.showHelp.bind(this));
         this.commands.set('ping', this.handlePing.bind(this));
-        this.commands.set('traceroute', this.handleTraceroute.bind(this));
-        this.commands.set('show', (args) => this.handleShow(args));
-        this.commands.set('clear', () => this.clearTerminal());
-        this.commands.set('help', (args) => this.showHelp(args));
-        this.commands.set('date', () => new Date().toLocaleString());
-        this.commands.set('echo', (args) => args.join(' '));
-
-        this.commands.set('network status', () => {
-            const bandwidth = document.getElementById('bandwidth')?.textContent || 'N/A';
-            const alerts = document.getElementById('alerts')?.textContent || 'N/A';
-            return `Bandwidth: ${bandwidth}\nAlerts: ${alerts}`;
-        });
-
-        this.commands.set('window list', () => {
-            const windows = Array.from(document.querySelectorAll('.window'))
-                .map(w => `${w.id}: ${w.style.display === 'none' ? 'closed' : 'open'}`)
-                .join('\n');
-            return windows || 'No windows found';
-        });
-
-        this.commands.set('window focus', (args) => {
-            const windowId = args[0];
-            if (!windowId) return 'Error: Window ID required';
-            const window = document.getElementById(windowId);
-            if (!window) return `Error: Window '${windowId}' not found`;
-            window.style.zIndex = '100';
-            return `Focused window: ${windowId}`;
-        });
-
-        this.commands.set('network zoom', (args) => {
-            const action = args[0];
-            if (!action) return 'Error: Action required (in/out/reset)';
-            switch (action) {
-                case 'in': window.network?.zoomIn(); return 'Zoomed in';
-                case 'out': window.network?.zoomOut(); return 'Zoomed out';
-                case 'reset': window.network?.resetZoom(); return 'Zoom reset';
-                default: return 'Error: Invalid action (use in/out/reset)';
-            }
-        });
+        this.commands.set('show', this.handleShow.bind(this));
+        this.commands.set('clear', this.clear.bind(this));
+        // Future commands: traceroute, etc.
     }
 
+    /**
+     * Handles the 'ping' command.
+     * @param {string[]} args - The arguments for the command.
+     * @returns {Promise<string>} The result of the ping.
+     * @private
+     * @memberof Terminal
+     */
     async handlePing(args) {
-        const host = args[0] || 'google.com';
-        const PING_COUNT = 4;
-        let times = [];
+        const host = args[0] || 'localhost';
+        let pings = 0;
         this.writeOutput(`Pinging ${host}...`);
 
-        for (let i = 0; i < PING_COUNT; i++) {
-            const startTime = performance.now();
-            try {
-                // Using a CORS proxy to avoid CORS issues
-                await fetch(`https://api.allorigins.win/get?url=http://${host}`);
-                const endTime = performance.now();
-                const duration = (endTime - startTime).toFixed(2);
-                times.push(duration);
-                this.writeOutput(`Reply from ${host}: time=${duration}ms`);
-            } catch (error) {
-                this.writeOutput(`Request timeout for ${host}.`);
-            }
-            await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second delay between pings
-        }
-
-        if (times.length > 0) {
-            const avgTime = (times.reduce((a, b) => parseFloat(a) + parseFloat(b)) / times.length).toFixed(2);
-            this.writeOutput(`\nPing statistics for ${host}:`);
-            this.writeOutput(`    Packets: Sent = ${PING_COUNT}, Received = ${times.length}, Lost = ${PING_COUNT - times.length} (${((PING_COUNT - times.length) / PING_COUNT) * 100}% loss),`);
-            this.writeOutput(`Approximate round trip times in milli-seconds:`);
-            this.writeOutput(`    Minimum = ${Math.min(...times)}ms, Maximum = ${Math.max(...times)}ms, Average = ${avgTime}ms`);
-        } else {
-            this.writeOutput(`\nPing statistics for ${host}:`);
-            this.writeOutput(`    Packets: Sent = ${PING_COUNT}, Received = 0, Lost = ${PING_COUNT} (100% loss),`);
-        }
+        return new Promise(resolve => {
+            const interval = setInterval(() => {
+                if (pings >= 4) {
+                    clearInterval(interval);
+                    resolve(`Ping complete.`);
+                    return;
+                }
+                const time = Math.round(Math.random() * 100);
+                this.writeOutput(`Reply from ${host}: time=${time}ms`);
+                pings++;
+            }, 1000);
+        });
     }
 
-    handleTraceroute(args) {
-        if (!args[0]) {
-            return 'Usage: traceroute <host>';
-        }
-        
-        const host = args[0];
-        return 'Traceroute complete.';
-    }
-
+    /**
+     * Fetches and displays the resume.
+     * @returns {Promise<string>} The resume content or an error message.
+     * @private
+     * @memberof Terminal
+     */
     async showResume() {
         try {
             const response = await fetch('resume.txt');
             if (!response.ok) {
-                throw new AppError('Could not load resume.txt', ErrorTypes.NETWORK);
+                return `Error: Could not load resume.txt. Status: ${response.status}`;
             }
-            const text = await response.text();
-            return text;
+            const data = await response.text();
+            // Using <pre> to preserve formatting
+            return `<pre>${data}</pre>`;
         } catch (error) {
             console.error('Error fetching resume:', error);
-            return 'Error: Could not load resume.';
+            return 'Error: Could not fetch resume.txt.';
         }
     }
 
+    /**
+     * Handles the 'show' command and its sub-commands.
+     * @param {string[]} args - The arguments for the command.
+     * @returns {string | Promise<string>} The result of the command.
+     * @private
+     * @memberof Terminal
+     */
     handleShow(args) {
-        if (args.length === 0) {
-            return 'Usage: show <subcommand>. Try "show help"';
+        const target = args[0];
+        if (target === 'resume') {
+            return this.showResume();
         }
-
-        const subcommand = args[0].toLowerCase();
-        switch (subcommand) {
-            case 'resume':
-            case 'jared':
-                return this.showResume();
-            case 'interfaces':
-                return this.showInterfaces();
-            case 'routes':
-                return this.showRoutes();
-            case 'config':
-                return this.showConfig();
-            default:
-                return `Invalid option: ${subcommand}`;
+        if (target === 'jared') {
+            return `
+                <div>
+                    <h3>Jared U.</h3>
+                    <p>Network Engineer & Aspiring Developer</p>
+                    <p>I build and maintain networks, and in my free time, I create cool projects like this one.</p>
+                </div>
+            `;
         }
+        return `Error: Unknown 'show' command target: ${target}. Try 'show resume' or 'show jared'.`;
     }
 
-    showInterfaces() {
-        return [
-            'Interface Status:',
-            'GigabitEthernet0/0 is up, line protocol is up',
-            '  Hardware is GigabitEthernet, address is 00:1a:2b:3c:4d:5e',
-            '  Internet address is 192.168.1.1/24',
-            '  MTU 1500 bytes, BW 1000000 Kbit/sec, DLY 10 usec',
-            '',
-            'GigabitEthernet0/1 is up, line protocol is up',
-            '  Hardware is GigabitEthernet, address is 00:1a:2b:3c:4d:5f',
-            '  Internet address is 10.0.0.1/24',
-            '  MTU 1500 bytes, BW 1000000 Kbit/sec, DLY 10 usec'
-        ].join('\n');
-    }
-
-    showRoutes() {
-        return [
-            'Routing Table:',
-            'Codes: C - connected, S - static, R - RIP, M - mobile, B - BGP',
-            '       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area',
-            '',
-            'Gateway of last resort is 192.168.1.254 to network 0.0.0.0',
-            '',
-            'C    192.168.1.0/24 is directly connected, GigabitEthernet0/0',
-            'C    10.0.0.0/24 is directly connected, GigabitEthernet0/1',
-            'S*   0.0.0.0/0 [1/0] via 192.168.1.254'
-        ].join('\n');
-    }
-
-    showConfig() {
-        return [
-            'Current configuration:',
-            '!',
-            'version 15.0',
-            'service timestamps debug datetime msec',
-            'service timestamps log datetime msec',
-            '!',
-            'hostname Router',
-            '!',
-            'interface GigabitEthernet0/0',
-            ' ip address 192.168.1.1 255.255.255.0',
-            ' no shutdown',
-            '!',
-            'interface GigabitEthernet0/1',
-            ' ip address 10.0.0.1 255.255.255.0',
-            ' no shutdown',
-            '!',
-            'ip route 0.0.0.0 0.0.0.0 192.168.1.254',
-            '!',
-            'end'
-        ].join('\n');
-    }
-
-    clearTerminal() {
-        this.outputElement.innerHTML = '';
-        return '';
-    }
-
-    showHelp(args) {
-        if (args[0]) {
-            const cmd = this.commands.get(args[0].toLowerCase());
-            if (cmd) {
-                return [
-                    `Command: ${args[0]}`,
-                    `Description: ${cmd.description}`,
-                    `Usage: ${cmd.usage}`
-                ].join('\n');
-            }
-            return `Command not found: ${args[0]}`;
-        }
-
-        const helpText = ['Available commands:'];
-        for (const [cmd, info] of this.commands) {
-            helpText.push(`${cmd.padEnd(15)} ${info.description}`);
-        }
-        return helpText.join('\n');
+    /**
+     * Displays a list of available commands.
+     * @returns {string} The help text.
+     * @memberof Terminal
+     */
+    showHelp() {
+        const commandList = Array.from(this.commands.keys()).join(', ');
+        return `Available commands: ${commandList}`;
     }
 }

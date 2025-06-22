@@ -1,22 +1,19 @@
 /**
- * @module Search
- * @description Handles search functionality for the Codex content
+ * @file Manages search functionality for text-based content.
+ * @author Jared U.
  */
 
 import { ContentParser } from './parser.js';
-import { CONFIG } from './config.js';
+import { CONFIG } from '../config.js';
 
 /**
+ * Manages indexing and searching of content within the application.
  * @class SearchManager
- * @classdesc Manages the search functionality for the Codex window
- * @property {Map} searchIndex - Index of searchable content
- * @property {Array} searchResults - Current search results
- * @property {string} currentQuery - Current search query
  */
 export class SearchManager {
     /**
-     * Creates a new SearchManager instance
-     * @constructor
+     * Creates an instance of SearchManager.
+     * @memberof SearchManager
      */
     constructor() {
         /** @private */
@@ -28,7 +25,9 @@ export class SearchManager {
     }
 
     /**
-     * Call this after the Codex window is created and in the DOM.
+     * Initializes the search functionality for a given window.
+     * This should be called after the target window is created and in the DOM.
+     * @memberof SearchManager
      */
     initializeSearch() {
         // Add search input to Codex window
@@ -71,9 +70,10 @@ export class SearchManager {
     }
 
     /**
-     * Loads and indexes the Codex content
+     * Loads content from the codex.txt file and indexes it for searching.
      * @private
-     * @description Loads the content from codex.txt and creates a searchable index
+     * @async
+     * @memberof SearchManager
      */
     async loadAndIndexContent() {
         try {
@@ -89,9 +89,10 @@ export class SearchManager {
     }
 
     /**
-     * Indexes content for searching
-     * @param {string} content - The HTML content to index
-     * @description Parses the content and creates a searchable index of words
+     * Creates a searchable index from a string of HTML content.
+     * @param {string} content - The HTML content to index.
+     * @private
+     * @memberof SearchManager
      */
     indexContent(content) {
         const parser = new DOMParser();
@@ -122,10 +123,11 @@ export class SearchManager {
     }
 
     /**
-     * Gets the DOM path for an element
+     * Generates a CSS selector path to a given HTML element.
+     * @param {HTMLElement} element - The element to get the path for.
+     * @returns {string} The CSS selector path.
      * @private
-     * @param {HTMLElement} element - The element to get the path for
-     * @returns {string} The CSS selector path to the element
+     * @memberof SearchManager
      */
     getElementPath(element) {
         const path = [];
@@ -146,9 +148,9 @@ export class SearchManager {
     }
 
     /**
-     * Performs the search operation
-     * @param {string} query - The search query
-     * @description Searches the indexed content and displays results
+     * Performs a search against the indexed content.
+     * @param {string} query - The search query.
+     * @memberof SearchManager
      */
     performSearch(query) {
         this.currentQuery = query.toLowerCase();
@@ -186,9 +188,9 @@ export class SearchManager {
     }
 
     /**
-     * Displays the search results
+     * Displays the search results in the UI.
      * @private
-     * @description Renders the search results in the UI
+     * @memberof SearchManager
      */
     displayResults() {
         const searchResults = document.getElementById('searchResults');
@@ -222,10 +224,11 @@ export class SearchManager {
     }
 
     /**
-     * Gets the context for a search result
+     * Gets a snippet of context for a search result.
+     * @param {object} result - The search result object.
+     * @returns {string} The formatted context with highlighted matches.
      * @private
-     * @param {Object} result - The search result object
-     * @returns {string} The formatted context with highlighted matches
+     * @memberof SearchManager
      */
     getResultContext(result) {
         const maxLength = 100;
@@ -240,10 +243,11 @@ export class SearchManager {
     }
 
     /**
-     * Highlights matching text in the results
+     * Highlights the matching query text within a string.
+     * @param {string} text - The text to highlight.
+     * @returns {string} The text with `<mark>` tags around the matches.
      * @private
-     * @param {string} text - The text to highlight matches in
-     * @returns {string} The text with highlighted matches
+     * @memberof SearchManager
      */
     highlightMatch(text) {
         const regex = new RegExp(`(${this.currentQuery})`, 'gi');
@@ -251,10 +255,10 @@ export class SearchManager {
     }
 
     /**
-     * Scrolls to a search result
+     * Scrolls the content view to the selected search result.
+     * @param {string} path - The CSS selector path to the result element.
      * @private
-     * @param {string} path - The CSS selector path to the result
-     * @description Smoothly scrolls to the result and highlights it
+     * @memberof Search.
      */
     scrollToResult(path) {
         const element = document.querySelector(path);

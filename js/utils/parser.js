@@ -1,16 +1,24 @@
 /**
- * Content Parser Module
- * Handles parsing and formatting of text content for both codex.txt and resume.txt
+ * @file Parses text content into a structured HTML format.
+ * @author Jared U.
  */
 
 import { AppError, ErrorTypes, sanitizeHTML, showLoading, hideLoading } from './utils.js';
 
+/**
+ * Provides static methods for parsing text files into HTML.
+ * Specifically designed to format resume.txt and codex.txt content.
+ * @class ContentParser
+ */
 export class ContentParser {
     /**
-     * Parse and format text content into HTML
-     * @param {string} text - The text content to parse
-     * @returns {string} Formatted HTML content
-     * @throws {AppError} If text is invalid or parsing fails
+     * Parses a block of text, converting it into styled HTML.
+     * It identifies headings, sections, and various content lines based on indentation and patterns.
+     * @param {string} text - The raw text content to parse.
+     * @returns {string} The formatted HTML content as a string.
+     * @throws {AppError} If the input text is invalid.
+     * @static
+     * @memberof ContentParser
      */
     static parseTextContent(text) {
         if (!text || typeof text !== 'string') {
@@ -87,11 +95,13 @@ export class ContentParser {
     }
 
     /**
-     * Load and parse content from a file
-     * @param {string} filePath - Path to the file to load
-     * @param {HTMLElement} container - Container to show loading indicator in
-     * @returns {Promise<string>} Promise resolving to formatted HTML content
-     * @throws {AppError} If file loading or parsing fails
+     * Asynchronously loads content from a file path and parses it into HTML.
+     * @param {string} filePath - The path to the file to load.
+     * @param {HTMLElement} [container] - An optional container to show a loading indicator within.
+     * @returns {Promise<string>} A promise that resolves to the formatted HTML content.
+     * @throws {AppError} If the file fails to load or the content parsing fails.
+     * @static
+     * @memberof ContentParser
      */
     static async loadAndParseContent(filePath, container) {
         let loadingIndicator = null;

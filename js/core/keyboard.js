@@ -1,11 +1,22 @@
 /**
- * Keyboard Shortcuts Module
- * Handles keyboard shortcuts for common operations
+ * @file Manages global keyboard shortcuts for the application.
+ * @author Jared U.
  */
 
-import { CONFIG } from './config.js';
+import { CONFIG } from '../config.js';
 
+/**
+ * Handles the registration and execution of global keyboard shortcuts.
+ * @class KeyboardManager
+ */
 export class KeyboardManager {
+    /**
+     * Creates an instance of KeyboardManager.
+     * @param {WindowManager} windowManager - An instance of the WindowManager.
+     * @param {Terminal} terminal - An instance of the Terminal.
+     * @param {NetworkVisualization} network - An instance of the NetworkVisualization.
+     * @memberof KeyboardManager
+     */
     constructor(windowManager, terminal, network) {
         this.windowManager = windowManager;
         this.terminal = terminal;
@@ -16,21 +27,20 @@ export class KeyboardManager {
     }
 
     /**
-     * Initialize keyboard shortcuts
+     * Initializes the default keyboard shortcuts.
+     * @private
+     * @memberof KeyboardManager
      */
     initializeShortcuts() {
         // Window management shortcuts
-        this.shortcuts.set('Alt+N', () => this.windowManager.showWindow('topologyWindow'));
-        this.shortcuts.set('Alt+T', () => this.windowManager.showWindow('terminalWindow'));
-        this.shortcuts.set('Alt+C', () => this.windowManager.showWindow('codexWindow'));
-        this.shortcuts.set('Alt+W', () => this.windowManager.showWindow('widgetsWindow'));
+        this.shortcuts.set('Alt+T', () => this.windowManager.createWindow(CONFIG.applications.terminal.windows[0]));
+        this.shortcuts.set('Alt+N', () => this.windowManager.createWindow(CONFIG.applications['network-monitor'].windows[0]));
         this.shortcuts.set('Escape', () => this.closeActiveWindow());
-        this.shortcuts.set('Alt+F4', () => this.closeActiveWindow());
 
-        // Terminal shortcuts
-        this.shortcuts.set('Ctrl+L', () => this.terminal.clear());
-        this.shortcuts.set('Ctrl+U', () => this.terminal.clearInput());
-        this.shortcuts.set('Ctrl+R', () => this.terminal.reload());
+        // Terminal shortcuts (Note: a focused terminal will handle its own shortcuts)
+        this.shortcuts.set('Ctrl+L', () => {
+            if (this.terminal) this.terminal.clear();
+        });
 
         // Network shortcuts
         this.shortcuts.set('Ctrl+F', () => this.network.fit());
@@ -40,7 +50,9 @@ export class KeyboardManager {
     }
 
     /**
-     * Initialize keyboard event listeners
+     * Sets up the global keydown event listener.
+     * @private
+     * @memberof KeyboardManager
      */
     initializeEventListeners() {
         document.addEventListener('keydown', (e) => {
@@ -60,9 +72,11 @@ export class KeyboardManager {
     }
 
     /**
-     * Get key combination string from event
-     * @param {KeyboardEvent} e - Keyboard event
-     * @returns {string} Key combination string
+     * Generates a consistent string representation of a key combination from a keyboard event.
+     * @param {KeyboardEvent} e - The keyboard event.
+     * @returns {string} The key combination string (e.g., "Ctrl+Shift+C").
+     * @private
+     * @memberof KeyboardManager
      */
     getKeyCombo(e) {
         const modifiers = [];
@@ -79,7 +93,9 @@ export class KeyboardManager {
     }
 
     /**
-     * Close the active window
+     * Closes the currently active window.
+     * @private
+     * @memberof KeyboardManager
      */
     closeActiveWindow() {
         const activeWindow = document.querySelector('.window:not([style*="display: none"])');
@@ -94,17 +110,19 @@ export class KeyboardManager {
     }
 
     /**
-     * Add a new keyboard shortcut
-     * @param {string} keyCombo - Key combination string
-     * @param {Function} callback - Function to execute
+     * Adds a new keyboard shortcut.
+     * @param {string} keyCombo - The key combination string (e.g., "Ctrl+S").
+     * @param {Function} callback - The function to execute when the shortcut is pressed.
+     * @memberof KeyboardManager
      */
     addShortcut(keyCombo, callback) {
         this.shortcuts.set(keyCombo, callback);
     }
 
     /**
-     * Remove a keyboard shortcut
-     * @param {string} keyCombo - Key combination string
+     * Removes a keyboard shortcut.
+     * @param {string} keyCombo - The key combination string to remove.
+     * @memberof KeyboardManager
      */
     removeShortcut(keyCombo) {
         this.shortcuts.delete(keyCombo);

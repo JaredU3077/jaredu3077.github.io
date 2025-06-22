@@ -13,6 +13,12 @@
     <script src="https://unpkg.com/interactjs@1.10.27/dist/interact.min.js"></script>
 </head>
 <body>
+    <div id="desktop">
+        <div id="desktop-icons">
+            <!-- Desktop icons will be generated here -->
+        </div>
+        <!-- App windows will be appended here -->
+    </div>
     <!-- Start menu and taskbar only, no desktop icons -->
     <div class="taskbar">
         <button class="start-btn" id="startBtn">
@@ -28,159 +34,6 @@
     </div>
 
     <!-- Scripts -->
-    <script type="module">
-        import { ContentParser } from './js/parser.js';
-        import { Terminal } from './js/terminal.js';
-        import { WindowManager } from './js/window.js';
-        import { NetworkVisualization } from './js/network.js';
-        import { KeyboardManager } from './js/keyboard.js';
-        import { HelpManager } from './js/help.js';
-        import { SearchManager } from './js/search.js';
-        import { CONFIG as UI_CONFIG, createAppButton } from './js/config.js';
-
-        // Initialize modules
-        const windowManager = new WindowManager();
-        const helpManager = new HelpManager();
-        const searchManager = new SearchManager();
-        let network = null;
-        let terminal = null;
-
-        // Initialize UI elements
-        function initializeUI() {
-            const startMenu = document.getElementById('startMenu');
-            startMenu.innerHTML = '';
-
-            // Create start menu items for all apps
-            Object.values(UI_CONFIG.applications).forEach(app => {
-                startMenu.insertAdjacentHTML('beforeend', createAppButton(app, 'start-menu'));
-            });
-
-            // Add help button to start menu
-            startMenu.insertAdjacentHTML('beforeend', `
-                <button class="start-menu-item" title="Help" aria-label="Help" tabindex="0" id="helpBtn">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <path d="M12 16v-4M12 8h.01"/>
-                    </svg>
-                    <span class="label">Help</span>
-                </button>
-            `);
-        }
-
-        // Start menu open/close logic
-        const startBtn = document.getElementById('startBtn');
-        const startMenu = document.getElementById('startMenu');
-        startBtn.setAttribute('aria-haspopup', 'true');
-        startBtn.setAttribute('aria-controls', 'startMenu');
-        startBtn.setAttribute('tabindex', '0');
-        startBtn.setAttribute('role', 'button');
-        startBtn.addEventListener('click', () => {
-            startMenu.classList.toggle('show');
-        });
-        startBtn.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                startMenu.classList.toggle('show');
-            }
-        });
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.start-btn') && !e.target.closest('.start-menu')) {
-                startMenu.classList.remove('show');
-            }
-        });
-
-        // Handle app icon and menu clicks (only in start menu now)
-        // Track open windows by ID
-        const openWindows = {};
-        function handleAppClick(appId) {
-            console.log(`handleAppClick called for appId: ${appId}`);
-            const app = UI_CONFIG.applications[appId];
-            if (!app) {
-                console.error(`No application config found for appId: ${appId}`);
-                return;
-            }
-            console.log(`App config found:`, app);
-
-            app.windows.forEach(windowConfig => {
-                console.log(`Processing window config:`, windowConfig);
-                // If window already open, focus it and do not re-initialize
-                let winElem = document.getElementById(windowConfig.id);
-                if (winElem) {
-                    console.log(`Window already open, focusing: ${windowConfig.id}`);
-                    windowManager.focusWindow(windowManager.windows.get(windowConfig.id));
-                    return;
-                }
-                // Create window and initialize app logic
-                console.log(`Creating new window for: ${windowConfig.id}`);
-                winElem = windowManager.createWindow({
-                    id: windowConfig.id,
-                    title: windowConfig.title,
-                    content: windowConfig.content,
-                    width: windowConfig.width,
-                    height: windowConfig.height,
-                    icon: app.icon
-                });
-                console.log('Window element created:', winElem);
-                openWindows[windowConfig.id] = winElem;
-                try {
-                    switch (appId) {
-                        case 'terminal':
-                            console.log('Initializing terminal...');
-                            terminal = new Terminal(
-                                winElem.querySelector('#terminalInput input'),
-                                winElem.querySelector('#terminalOutput')
-                            );
-                            console.log('Terminal initialized:', terminal);
-                            break;
-                        case 'network-monitor':
-                            if (windowConfig.id === 'topologyWindow') {
-                                network = new NetworkVisualization('networkTopology');
-                            }
-                            break;
-                        case 'codex':
-                            if (windowConfig.id === 'codexWindow') {
-                                searchManager.initializeSearch();
-                            }
-                            break;
-                        case 'device-manager':
-                            // Future: initialize device manager logic here
-                            break;
-                    }
-                } catch (error) {
-                    alert(`Error initializing application ${appId}: ${error.message}`);
-                    console.error(`Error initializing application ${appId}:`, error);
-                    winElem.remove();
-                }
-            });
-        }
-
-        // Add click handlers for all app buttons (start menu only)
-        document.addEventListener('click', (e) => {
-            const button = e.target.closest('[data-tool]');
-            if (button && button.classList.contains('start-menu-item')) {
-                handleAppClick(button.dataset.tool);
-                startMenu.classList.remove('show');
-            }
-            // Help button
-            if (e.target.closest('#helpBtn')) {
-                helpManager.showHelp();
-                startMenu.classList.remove('show');
-            }
-        });
-
-        // Keyboard accessibility for app buttons
-        document.addEventListener('keydown', (e) => {
-            if ((e.key === 'Enter' || e.key === ' ') && document.activeElement && document.activeElement.hasAttribute('data-tool') && document.activeElement.classList.contains('start-menu-item')) {
-                handleAppClick(document.activeElement.dataset.tool);
-                startMenu.classList.remove('show');
-            }
-            if ((e.key === 'Enter' || e.key === ' ') && document.activeElement && document.activeElement.id === 'helpBtn') {
-                helpManager.showHelp();
-                startMenu.classList.remove('show');
-            }
-        });
-
-        // Initialize UI
-        initializeUI();
-    </script>
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>

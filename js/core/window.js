@@ -1,19 +1,48 @@
 import { CONFIG as UI_CONFIG } from './config.js';
 import { debounce, throttle } from './utils.js';
 
+/**
+ * Manages windows in the OS-like interface.
+ * Handles creation, movement, resizing, and focus of windows.
+ * @class WindowManager
+ */
 export class WindowManager {
+    /**
+     * Creates an instance of WindowManager.
+     * @memberof WindowManager
+     */
     constructor() {
+        /** @type {Map<string, object>} */
         this.windows = new Map();
+        /** @type {?object} */
         this.activeWindow = null;
+        /** @type {number} */
         this.zIndexCounter = UI_CONFIG.window.zIndex;
+        /** @type {number} */
         this.snapThreshold = UI_CONFIG.window.snapThreshold;
+        /** @type {Map<string, object>} */
         this.snapZones = new Map();
+        /** @type {?HTMLElement} */
         this.contextMenu = null;
+        /** @type {Array<object>} */
         this.windowStack = [];
+        /** @type {Set<Function>} */
         this.stateChangeCallbacks = new Set();
         this.setupEventListeners();
     }
 
+    /**
+     * Creates a new window and adds it to the desktop.
+     * @param {object} options - The options for the new window.
+     * @param {string} options.id - The unique ID for the window.
+     * @param {string} options.title - The title of the window.
+     * @param {string} options.content - The HTML content of the window.
+     * @param {number} [options.width=UI_CONFIG.window.defaultWidth] - The width of the window.
+     * @param {number} [options.height=UI_CONFIG.window.defaultHeight] - The height of the window.
+     * @param {string} [options.icon] - The icon for the window header.
+     * @returns {HTMLElement} The created window element.
+     * @memberof WindowManager
+     */
     createWindow({ id, title, content, width = UI_CONFIG.window.defaultWidth, height = UI_CONFIG.window.defaultHeight, icon }) {
         // Ensure window dimensions are within bounds
         width = Math.min(Math.max(width, UI_CONFIG.window.minWidth), UI_CONFIG.window.maxWidth);
@@ -59,7 +88,7 @@ export class WindowManager {
             <div class="window-resize sw"></div>
         `;
 
-        document.body.appendChild(windowElement);
+        document.getElementById('desktop').appendChild(windowElement);
 
         const window = {
             element: windowElement,
@@ -83,6 +112,12 @@ export class WindowManager {
         return windowElement;
     }
 
+    /**
+     * Sets up event listeners for a window (drag, resize, controls).
+     * @param {object} window - The window object to set up events for.
+     * @private
+     * @memberof WindowManager
+     */
     setupWindowEvents(window) {
         const header = window.element.querySelector('.window-header');
         const controls = window.element.querySelector('.window-controls');
@@ -139,6 +174,12 @@ export class WindowManager {
         });
     }
 
+    /**
+     * Handles the drag movement of a window.
+     * @param {object} event - The interact.js drag event.
+     * @private
+     * @memberof WindowManager
+     */
     handleDragMove(event) {
         const window = this.windows.get(event.target.closest('.window').id);
         if (!window) return;
@@ -149,6 +190,12 @@ export class WindowManager {
         window.element.style.transform = `translate(${x}px, ${y}px)`;
     }
 
+    /**
+     * Handles the end of a window drag event.
+     * @param {object} event - The interact.js drag event.
+     * @private
+     * @memberof WindowManager
+     */
     handleDragEnd(event) {
         const window = this.windows.get(event.target.closest('.window').id);
         if (!window) return;
@@ -163,6 +210,12 @@ export class WindowManager {
         this.checkSnapZones(window);
     }
 
+    /**
+     * Handles the resize event of a window.
+     * @param {object} event - The interact.js resize event.
+     * @private
+     * @memberof WindowManager
+     */
     handleResizeMove(event) {
         const window = this.windows.get(event.target.id);
         if (!window) return;
@@ -177,6 +230,12 @@ export class WindowManager {
         });
     }
 
+    /**
+     * Checks if a window is in a snap zone and snaps it if it is.
+     * @param {object} window - The window to check.
+     * @private
+     * @memberof WindowManager
+     */
     checkSnapZones(window) {
         const rect = window.element.getBoundingClientRect();
         const snapZones = this.getSnapZones();
@@ -189,6 +248,12 @@ export class WindowManager {
         }
     }
 
+    /**
+     * Gets the defined screen snap zones.
+     * @returns {Map<string, object>} A map of snap zones.
+     * @private
+     * @memberof WindowManager
+     */
     getSnapZones() {
         const zones = new Map();
         const screenWidth = window.innerWidth;
@@ -229,6 +294,14 @@ export class WindowManager {
         return zones;
     }
 
+    /**
+     * Checks if a rectangle is within a snap zone.
+     * @param {DOMRect} rect - The rectangle to check.
+     * @param {object} zone - The snap zone to check against.
+     * @returns {boolean} True if the rectangle is in the snap zone.
+     * @private
+     * @memberof WindowManager
+     */
     isInSnapZone(rect, zone) {
         return (
             Math.abs(rect.left - zone.left) < this.snapThreshold &&
@@ -236,6 +309,13 @@ export class WindowManager {
         );
     }
 
+    /**
+     * Snaps a window to a specific zone.
+     * @param {object} window - The window to snap.
+     * @param {string} zone - The name of the zone to snap to.
+     * @private
+     * @memberof WindowManager
+     */
     snapWindowToZone(window, zone) {
         const screenWidth = window.innerWidth;
         const screenHeight = window.innerHeight;
@@ -268,6 +348,11 @@ export class WindowManager {
         }
     }
 
+    /**
+     * Minimizes a window.
+     * @param {object} window - The window to minimize.
+     * @memberof WindowManager
+     */
     minimizeWindow(window) {
         if (window.isMinimized) {
             this.restoreWindow(window);
@@ -282,6 +367,11 @@ export class WindowManager {
         }
     }
 
+    /**
+     * Restores a window from a minimized or maximized state.
+     * @param {object} window - The window to restore.
+     * @memberof WindowManager
+     */
     restoreWindow(window) {
         window.isMinimized = false;
         window.element.style.display = '';
@@ -292,6 +382,11 @@ export class WindowManager {
         }, 300);
     }
 
+    /**
+     * Toggles the maximized state of a window.
+     * @param {object} window - The window to toggle.
+     * @memberof WindowManager
+     */
     toggleMaximize(window) {
         if (window.isMaximized) {
             this.unmaximizeWindow(window);
@@ -300,6 +395,12 @@ export class WindowManager {
         }
     }
 
+    /**
+     * Maximizes a window to fill the screen.
+     * @param {object} window - The window to maximize.
+     * @private
+     * @memberof WindowManager
+     */
     maximizeWindow(window) {
         window.isMaximized = true;
         window.originalPosition = {
@@ -319,6 +420,12 @@ export class WindowManager {
         }, 300);
     }
 
+    /**
+     * Restores a window from the maximized state.
+     * @param {object} window - The window to unmaximize.
+     * @private
+     * @memberof WindowManager
+     */
     unmaximizeWindow(window) {
         window.isMaximized = false;
         window.element.classList.add('unmaximizing');
@@ -331,6 +438,11 @@ export class WindowManager {
         }, 300);
     }
 
+    /**
+     * Closes and removes a window.
+     * @param {object} window - The window to close.
+     * @memberof WindowManager
+     */
     closeWindow(window) {
         window.element.classList.add('closing');
         setTimeout(() => {
@@ -341,6 +453,11 @@ export class WindowManager {
         }, 200);
     }
 
+    /**
+     * Brings a window to the front and sets it as the active window.
+     * @param {object} window - The window to focus.
+     * @memberof WindowManager
+     */
     focusWindow(window) {
         if (this.activeWindow) {
             this.activeWindow.element.classList.remove('focused');
@@ -352,10 +469,21 @@ export class WindowManager {
         this.notifyStateChange();
     }
 
+    /**
+     * Gets the next z-index for a new window.
+     * @returns {number} The next z-index.
+     * @private
+     * @memberof WindowManager
+     */
     getNextZIndex() {
         return this.zIndexCounter++;
     }
 
+    /**
+     * Sets up global event listeners for the window manager.
+     * @private
+     * @memberof WindowManager
+     */
     setupEventListeners() {
         // Add window resize observer
         const resizeObserver = new ResizeObserver(entries => {
@@ -386,6 +514,13 @@ export class WindowManager {
         });
     }
 
+    /**
+     * Updates the size of a window.
+     * @param {object} window - The window to update.
+     * @param {number} width - The new width.
+     * @param {number} height - The new height.
+     * @memberof WindowManager
+     */
     updateWindowSize(window, width, height) {
         // Ensure window stays within bounds
         width = Math.min(Math.max(width, UI_CONFIG.window.minWidth), UI_CONFIG.window.maxWidth);
@@ -395,6 +530,12 @@ export class WindowManager {
         window.element.style.height = `${height}px`;
     }
 
+    /**
+     * Updates the position of a window.
+     * @param {object} window - The window to update.
+     * @private
+     * @memberof WindowManager
+     */
     updateWindowPosition(window) {
         // Ensure window stays within viewport
         const rect = window.element.getBoundingClientRect();
@@ -408,10 +549,20 @@ export class WindowManager {
         window.element.style.top = `${top}px`;
     }
 
+    /**
+     * Notifies all registered callbacks that the window state has changed.
+     * @private
+     * @memberof WindowManager
+     */
     notifyStateChange() {
         this.stateChangeCallbacks.forEach(callback => callback());
     }
 
+    /**
+     * Registers a callback to be called when the window state changes.
+     * @param {Function} callback - The callback function.
+     * @memberof WindowManager
+     */
     onStateChange(callback) {
         this.stateChangeCallbacks.add(callback);
         return () => this.stateChangeCallbacks.delete(callback);
