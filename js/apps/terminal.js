@@ -433,13 +433,8 @@ export class Terminal {
      */
     async showResume() {
         try {
-            const response = await fetch('resume.txt');
-            if (!response.ok) {
-                return `Error: Could not load resume.txt. Status: ${response.status}`;
-            }
-            const data = await response.text();
-            // Using <pre> to preserve formatting
-            return `<pre>${data}</pre>`;
+            const content = await ContentParser.loadAndParseContent('resume.txt');
+            return content;
         } catch (error) {
             console.error('Error fetching resume:', error);
             return 'Error: Could not fetch resume.txt.';
@@ -455,17 +450,8 @@ export class Terminal {
      */
     handleShow(args) {
         const target = args[0];
-        if (target === 'resume') {
+        if (target === 'resume' || target === 'jared') {
             return this.showResume();
-        }
-        if (target === 'jared') {
-            return `
-                <div>
-                    <h3>Jared U.</h3>
-                    <p>Network Engineer & Aspiring Developer</p>
-                    <p>I build and maintain networks, and in my free time, I create cool projects like this one.</p>
-                </div>
-            `;
         }
         return `Error: Unknown 'show' command target: ${target}. Try 'show resume' or 'show jared'.`;
     }
