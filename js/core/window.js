@@ -185,13 +185,21 @@ export class WindowManager {
      * @memberof WindowManager
      */
     handleDragMove(event) {
-        const window = this.windows.get(event.target.closest('.window').id);
+        const windowElement = event.target.closest('.window');
+        if (!windowElement) return;
+        
+        const window = this.windows.get(windowElement.id);
         if (!window) return;
 
         const x = (parseFloat(window.element.style.left) || 0) + event.dx;
         const y = (parseFloat(window.element.style.top) || 0) + event.dy;
 
-        window.element.style.transform = `translate(${x}px, ${y}px)`;
+        window.element.style.left = `${x}px`;
+        window.element.style.top = `${y}px`;
+        
+        // Update the window object with new position
+        window.left = x;
+        window.top = y;
     }
 
     /**
@@ -201,16 +209,13 @@ export class WindowManager {
      * @memberof WindowManager
      */
     handleDragEnd(event) {
-        const window = this.windows.get(event.target.closest('.window').id);
+        const windowElement = event.target.closest('.window');
+        if (!windowElement) return;
+        
+        const window = this.windows.get(windowElement.id);
         if (!window) return;
 
-        const x = (parseFloat(window.element.style.left) || 0) + event.dx;
-        const y = (parseFloat(window.element.style.top) || 0) + event.dy;
-
-        window.element.style.transform = '';
-        window.element.style.left = `${x}px`;
-        window.element.style.top = `${y}px`;
-
+        // Position has already been updated in handleDragMove
         this.checkSnapZones(window);
     }
 
@@ -224,14 +229,21 @@ export class WindowManager {
         const window = this.windows.get(event.target.id);
         if (!window) return;
 
-        const x = (parseFloat(window.element.style.left) || 0);
-        const y = (parseFloat(window.element.style.top) || 0);
+        const x = (parseFloat(window.element.style.left) || 0) + event.deltaRect.left;
+        const y = (parseFloat(window.element.style.top) || 0) + event.deltaRect.top;
 
         Object.assign(window.element.style, {
             width: `${event.rect.width}px`,
             height: `${event.rect.height}px`,
-            transform: `translate(${x + event.deltaRect.left}px, ${y + event.deltaRect.top}px)`
+            left: `${x}px`,
+            top: `${y}px`
         });
+        
+        // Update the window object
+        window.width = event.rect.width;
+        window.height = event.rect.height;
+        window.left = x;
+        window.top = y;
     }
 
     /**

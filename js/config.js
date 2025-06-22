@@ -377,19 +377,23 @@ export function createAppButton(app, type) {
     const button = document.createElement('button');
     button.className = type === 'desktop' ? 'desktop-icon' : type === 'start-menu' ? 'start-menu-item' : 'taskbar-icon';
     button.dataset.tool = app.id;
-    button.title = app.description;
-    button.setAttribute('aria-label', app.title);
+    button.title = app.description || app.name;
+    button.setAttribute('aria-label', app.name);
     button.setAttribute('tabindex', '0');
 
     if (type === 'desktop') {
         button.innerHTML = `
             <div class="icon">${app.icon}</div>
-            <span class="label">${app.title}</span>
+            <span class="label">${app.name}</span>
+        `;
+    } else if (type === 'start-menu') {
+        button.innerHTML = `
+            ${app.icon}
+            <span class="label">${app.name}</span>
         `;
     } else {
         button.innerHTML = `
             <div class="icon">${app.icon}</div>
-            ${type === 'start-menu' ? `<span class="label">${app.title}</span>` : ''}
         `;
     }
 

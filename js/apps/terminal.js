@@ -220,6 +220,20 @@ export class Terminal {
     }
 
     /**
+     * Displays the command prompt and command in the terminal output.
+     * @param {string} command - The command to display.
+     * @private
+     * @memberof Terminal
+     */
+    displayCommand(command) {
+        const commandElement = document.createElement('div');
+        commandElement.className = 'terminal-command';
+        commandElement.innerHTML = `<span class="prompt">$</span> ${command}`;
+        this.outputElement.appendChild(commandElement);
+        this.clearInput();
+    }
+
+    /**
      * Handles the result of a command execution, displaying it in the output.
      * @param {string | Promise<string>} result - The result of the command.
      * @private
