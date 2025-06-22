@@ -23,6 +23,8 @@ const searchManager = new SearchManager();
 let network = null;
 /** @type {?Terminal} */
 let terminal = null;
+/** @type {Object<string, HTMLElement>} */
+let openWindows = {};
 
 // --- UI INITIALIZATION ---
 
@@ -138,11 +140,25 @@ function handleAppClick(appId) {
                 case 'device-manager':
                     // Future: initialize device manager logic here
                     break;
+                case 'welcome':
+                    // Welcome window needs no special initialization
+                    break;
             }
         } catch (error) {
-            alert(`Error initializing application ${appId}: ${error.message}`);
             console.error(`Error initializing application ${appId}:`, error);
-            winElem.remove();
+            // Show user-friendly error instead of alert
+            const errorContent = `
+                <div class="error-content" style="padding: 20px; text-align: center; color: #ff6b6b;">
+                    <h3>⚠️ Application Error</h3>
+                    <p>Failed to initialize ${app.name}</p>
+                    <p style="font-size: 0.9em; opacity: 0.8;">${error.message}</p>
+                    <button onclick="this.closest('.window').querySelector('.close').click()" 
+                            style="margin-top: 10px; padding: 5px 15px; background: #ff6b6b; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Close
+                    </button>
+                </div>
+            `;
+            winElem.querySelector('.window-content').innerHTML = errorContent;
         }
     });
 }
@@ -189,4 +205,12 @@ document.addEventListener('keydown', handleGlobalKeydown);
 // --- INITIALIZATION ---
 
 // Initialize UI on load
-initializeUI(); 
+initializeUI();
+
+// Launch welcome window on first load
+document.addEventListener('DOMContentLoaded', () => {
+    // Small delay to ensure UI is fully initialized
+    setTimeout(() => {
+        handleAppClick('welcome');
+    }, 500);
+}); 

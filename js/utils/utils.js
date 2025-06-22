@@ -74,7 +74,8 @@ export const ErrorTypes = {
     VALIDATION: 'VALIDATION_ERROR',
     STATE: 'STATE_ERROR',
     UI: 'UI_ERROR',
-    SYSTEM: 'SYSTEM_ERROR'
+    SYSTEM: 'SYSTEM_ERROR',
+    FILE_LOAD: 'FILE_LOAD_ERROR'
 };
 
 /**

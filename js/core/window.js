@@ -1,5 +1,5 @@
-import { CONFIG as UI_CONFIG } from './config.js';
-import { debounce, throttle } from './utils.js';
+import { CONFIG as UI_CONFIG } from '../config.js';
+import { debounce, throttle } from '../utils/utils.js';
 
 /**
  * Manages windows in the OS-like interface.
@@ -123,41 +123,45 @@ export class WindowManager {
         const controls = window.element.querySelector('.window-controls');
         const resizeHandles = window.element.querySelectorAll('.window-resize');
 
-        // Make window draggable
-        interact(header)
-            .draggable({
-                inertia: true,
-                modifiers: [
-                    interact.modifiers.restrictRect({
-                        restriction: 'parent',
-                        endOnly: true
-                    })
-                ],
-                autoScroll: true,
-                listeners: {
-                    move: this.handleDragMove.bind(this),
-                    end: this.handleDragEnd.bind(this)
-                }
-            });
+        // Make window draggable - check if interact.js is available
+        if (typeof interact !== 'undefined') {
+            interact(header)
+                .draggable({
+                    inertia: true,
+                    modifiers: [
+                        interact.modifiers.restrictRect({
+                            restriction: 'parent',
+                            endOnly: true
+                        })
+                    ],
+                    autoScroll: true,
+                    listeners: {
+                        move: this.handleDragMove.bind(this),
+                        end: this.handleDragEnd.bind(this)
+                    }
+                });
 
-        // Make window resizable
-        interact(window.element)
-            .resizable({
-                edges: { left: true, right: true, bottom: true, top: true },
-                listeners: {
-                    move: this.handleResizeMove.bind(this)
-                },
-                modifiers: [
-                    interact.modifiers.restrictEdges({
-                        outer: 'parent',
-                        endOnly: true
-                    }),
-                    interact.modifiers.restrictSize({
-                        min: { width: UI_CONFIG.window.minWidth, height: UI_CONFIG.window.minHeight },
-                        max: { width: UI_CONFIG.window.maxWidth, height: UI_CONFIG.window.maxHeight }
-                    })
-                ]
-            });
+            // Make window resizable
+            interact(window.element)
+                .resizable({
+                    edges: { left: true, right: true, bottom: true, top: true },
+                    listeners: {
+                        move: this.handleResizeMove.bind(this)
+                    },
+                    modifiers: [
+                        interact.modifiers.restrictEdges({
+                            outer: 'parent',
+                            endOnly: true
+                        }),
+                        interact.modifiers.restrictSize({
+                            min: { width: UI_CONFIG.window.minWidth, height: UI_CONFIG.window.minHeight },
+                            max: { width: UI_CONFIG.window.maxWidth, height: UI_CONFIG.window.maxHeight }
+                        })
+                    ]
+                });
+        } else {
+            console.warn('interact.js not loaded - window dragging/resizing will not work');
+        }
 
         // Window control buttons
         controls.querySelector('.minimize').addEventListener('click', () => this.minimizeWindow(window));
