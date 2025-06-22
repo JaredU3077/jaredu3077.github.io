@@ -338,8 +338,8 @@ button:focus-visible, .start-menu-item:focus-visible, .window-control:focus-visi
     height: 100%;
 }
 
-/* Terminal Styles */
-#terminalOutput {
+/* Terminal container layout */
+#terminalWindow #terminalOutput {
     background: #1a1a1a;
     color: #00ff00;
     font-family: 'Courier New', monospace;
@@ -349,7 +349,32 @@ button:focus-visible, .start-menu-item:focus-visible, .window-control:focus-visi
     overflow-x: hidden;
     font-size: 14px;
     line-height: 1.4;
-    min-height: 0; /* Important for flex child to shrink */
+    min-height: 0;
+}
+
+#terminalWindow #terminalInput {
+    display: flex;
+    align-items: center;
+    background: #1a1a1a;
+    color: #00ff00;
+    font-family: 'Courier New', monospace;
+    padding: 5px 10px;
+    border-top: 1px solid #333;
+    flex-shrink: 0;
+    height: 40px;
+    box-sizing: border-box;
+}
+
+/* Terminal Styles (fallback for other contexts) */
+#terminalOutput {
+    background: #1a1a1a;
+    color: #00ff00;
+    font-family: 'Courier New', monospace;
+    padding: 10px;
+    height: calc(100% - 40px);
+    overflow-y: auto;
+    font-size: 14px;
+    line-height: 1.4;
 }
 
 #terminalInput {
@@ -360,9 +385,6 @@ button:focus-visible, .start-menu-item:focus-visible, .window-control:focus-visi
     font-family: 'Courier New', monospace;
     padding: 5px 10px;
     border-top: 1px solid #333;
-    flex-shrink: 0; /* Prevent input from shrinking */
-    height: 40px; /* Fixed height for input area */
-    box-sizing: border-box;
 }
 
 #terminalInput .prompt {
