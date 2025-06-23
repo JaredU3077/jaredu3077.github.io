@@ -265,11 +265,13 @@ export class Terminal {
         this.outputElement.appendChild(resultElement);
         
         // For document-like content (resume), scroll to top to start reading
-        // For other commands, scroll to bottom (traditional terminal behavior)
+        // For other commands, auto-scroll to bottom is handled by WindowManager
         if (this.isDocumentContent(command, output)) {
-            this.scrollToTop();
-        } else {
-            this.scrollToBottom();
+            // Get the window from the window manager and scroll to top
+            const terminalWindow = window.windowManager.windows.get('terminalWindow');
+            if (terminalWindow) {
+                window.windowManager.scrollToTop(terminalWindow);
+            }
         }
     }
 
@@ -284,7 +286,7 @@ export class Terminal {
         errorElement.className = 'terminal-error';
         errorElement.textContent = `Error: ${error.message}`;
         this.outputElement.appendChild(errorElement);
-        this.scrollToBottom();
+        // Auto-scroll is now handled by the WindowManager
         
         // Emit error event
         eventEmitter.emit('terminalError', { error });
@@ -366,7 +368,7 @@ export class Terminal {
         const div = document.createElement('div');
         div.innerHTML = content;
         this.outputElement.appendChild(div);
-        this.scrollToBottom();
+        // Auto-scroll is now handled by the WindowManager
         
         // Trim output if it gets too long
         this.trimOutput();

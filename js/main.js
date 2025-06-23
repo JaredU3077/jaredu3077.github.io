@@ -115,7 +115,8 @@ function handleAppClick(appId) {
             content: windowConfig.content,
             width: windowConfig.width,
             height: windowConfig.height,
-            icon: app.icon
+            icon: app.icon,
+            autoScroll: ['terminal', 'codex', 'device-manager'].includes(appId) // Enable auto-scroll for apps that benefit from it
         });
         console.log('Window element created:', winElem);
         openWindows[windowConfig.id] = winElem;

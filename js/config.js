@@ -116,7 +116,7 @@ export const CONFIG = {
                 id: 'terminalWindow',
                 title: 'Terminal',
                 content: `
-                    <div id="terminalOutput"></div>
+                    <div id="terminalOutput" data-scroll-container></div>
                     <div id="terminalInput">
                         <span class="prompt">$</span>
                         <input type="text" autofocus aria-label="Terminal input">
@@ -147,7 +147,7 @@ export const CONFIG = {
             windows: [{
                 id: 'devicesWindow',
                 title: 'Device Manager',
-                content: '<div id="deviceList"></div>',
+                content: '<div id="deviceList" data-scroll-container></div>',
                 width: 600,
                 height: 400
             }]
@@ -163,7 +163,7 @@ export const CONFIG = {
                 content: `
                     <div class="search-container">
                         <input type="text" id="searchInput" placeholder="Search documentation..." aria-label="Search documentation">
-                        <div id="searchResults"></div>
+                        <div id="searchResults" data-scroll-container></div>
                     </div>
                 `,
                 width: 800,

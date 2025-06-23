@@ -40,10 +40,11 @@ export class WindowManager {
      * @param {number} [options.width=CONFIG.window.defaultWidth] - The width of the window.
      * @param {number} [options.height=CONFIG.window.defaultHeight] - The height of the window.
      * @param {string} [options.icon] - The icon for the window header.
+     * @param {boolean} [options.autoScroll=false] - Whether to enable auto-scroll to bottom on content updates.
      * @returns {HTMLElement} The created window element.
      * @memberof WindowManager
      */
-    createWindow({ id, title, content, width = CONFIG.window.defaultWidth, height = CONFIG.window.defaultHeight, icon }) {
+    createWindow({ id, title, content, width = CONFIG.window.defaultWidth, height = CONFIG.window.defaultHeight, icon, autoScroll = false }) {
         // Ensure window dimensions are within bounds
         width = Math.min(Math.max(width, CONFIG.window.minWidth), CONFIG.window.maxWidth);
         height = Math.min(Math.max(height, CONFIG.window.minHeight), CONFIG.window.maxHeight);
@@ -101,13 +102,19 @@ export class WindowManager {
             top,
             isMaximized: false,
             isMinimized: false,
-            originalPosition: { left, top, width, height }
+            originalPosition: { left, top, width, height },
+            autoScroll: autoScroll
         };
 
         this.windows.set(id, windowObj);
         this.windowStack.push(windowObj);
         this.setupWindowEvents(windowObj);
         this.focusWindow(windowObj);
+
+        // Set up auto-scroll functionality if enabled
+        if (autoScroll) {
+            this.setupAutoScroll(windowObj);
+        }
 
         return windowElement;
     }
@@ -460,6 +467,11 @@ export class WindowManager {
      * @memberof WindowManager
      */
     closeWindow(window) {
+        // Clean up scroll observer if it exists
+        if (window.scrollObserver) {
+            window.scrollObserver.disconnect();
+        }
+        
         window.element.classList.add('closing');
         setTimeout(() => {
             window.element.remove();
@@ -582,5 +594,109 @@ export class WindowManager {
     onStateChange(callback) {
         this.stateChangeCallbacks.add(callback);
         return () => this.stateChangeCallbacks.delete(callback);
+    }
+
+    /**
+     * Sets up auto-scroll functionality for a window.
+     * @param {object} window - The window object to set up auto-scroll for.
+     * @private
+     * @memberof WindowManager
+     */
+    setupAutoScroll(window) {
+        const windowContent = window.element.querySelector('.window-content');
+        
+        // Create a mutation observer to watch for content changes
+        const observer = new MutationObserver(() => {
+            this.scrollToBottom(window);
+        });
+
+        // Observe changes to the window content
+        observer.observe(windowContent, {
+            childList: true,
+            subtree: true,
+            characterData: true
+        });
+
+        // Store the observer so we can disconnect it when the window is closed
+        window.scrollObserver = observer;
+    }
+
+    /**
+     * Scrolls a window's content to the bottom.
+     * @param {object} window - The window object to scroll.
+     * @memberof WindowManager
+     */
+    scrollToBottom(window) {
+        const windowContent = window.element.querySelector('.window-content');
+        if (windowContent) {
+            // Check if there's a specific scroll container (like terminal output)
+            const scrollContainer = windowContent.querySelector('[data-scroll-container]') || windowContent;
+            scrollContainer.scrollTop = scrollContainer.scrollHeight;
+        }
+    }
+
+    /**
+     * Scrolls a window's content to the top.
+     * @param {object} window - The window object to scroll.
+     * @memberof WindowManager
+     */
+    scrollToTop(window) {
+        const windowContent = window.element.querySelector('.window-content');
+        if (windowContent) {
+            // Check if there's a specific scroll container (like terminal output)
+            const scrollContainer = windowContent.querySelector('[data-scroll-container]') || windowContent;
+            scrollContainer.scrollTop = 0;
+        }
+    }
+
+    /**
+     * Determines if content should scroll to top (for document-like content).
+     * @param {object} window - The window object.
+     * @param {string} content - The content being added.
+     * @returns {boolean} True if should scroll to top.
+     * @memberof WindowManager
+     */
+    shouldScrollToTop(window, content) {
+        // Check if it's document-like content (contains headings, structured text)
+        if (typeof content === 'string' && (
+            content.includes('terminal-heading') ||
+            content.includes('<h1>') ||
+            content.includes('<h2>') ||
+            content.includes('<h3>') ||
+            content.includes('resume') ||
+            content.includes('document')
+        )) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Enables auto-scroll for an existing window.
+     * @param {string} windowId - The ID of the window to enable auto-scroll for.
+     * @memberof WindowManager
+     */
+    enableAutoScroll(windowId) {
+        const window = this.windows.get(windowId);
+        if (window && !window.autoScroll) {
+            window.autoScroll = true;
+            this.setupAutoScroll(window);
+        }
+    }
+
+    /**
+     * Disables auto-scroll for an existing window.
+     * @param {string} windowId - The ID of the window to disable auto-scroll for.
+     * @memberof WindowManager
+     */
+    disableAutoScroll(windowId) {
+        const window = this.windows.get(windowId);
+        if (window && window.autoScroll) {
+            window.autoScroll = false;
+            if (window.scrollObserver) {
+                window.scrollObserver.disconnect();
+                delete window.scrollObserver;
+            }
+        }
     }
 }

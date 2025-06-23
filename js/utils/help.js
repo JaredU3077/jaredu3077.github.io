@@ -166,10 +166,11 @@ export class HelpManager {
             const helpWindow = wm.createWindow({
                 id: 'helpWindow',
                 title: 'Help',
-                content: `<div id="helpContent" class="help-content-container">${helpContent}</div>`,
+                content: `<div id="helpContent" class="help-content-container" data-scroll-container>${helpContent}</div>`,
                 width: 500,
                 height: 400,
-                icon: '❓'
+                icon: '❓',
+                autoScroll: true
             });
         } else {
             console.error('WindowManager not found. Cannot display help.');
