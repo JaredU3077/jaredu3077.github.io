@@ -606,8 +606,29 @@ export class WindowManager {
         const windowContent = window.element.querySelector('.window-content');
         
         // Create a mutation observer to watch for content changes
-        const observer = new MutationObserver(() => {
-            this.scrollToBottom(window);
+        const observer = new MutationObserver((mutations) => {
+            // Check if we should scroll to top instead of bottom
+            let shouldScrollToTop = false;
+            
+            mutations.forEach(mutation => {
+                if (mutation.type === 'childList') {
+                    mutation.addedNodes.forEach(node => {
+                        if (node.nodeType === Node.ELEMENT_NODE) {
+                            const content = node.textContent || node.innerHTML || '';
+                            if (this.shouldScrollToTop(window, content)) {
+                                shouldScrollToTop = true;
+                            }
+                        }
+                    });
+                }
+            });
+            
+            if (shouldScrollToTop) {
+                // Use setTimeout to ensure this happens after the content is fully rendered
+                setTimeout(() => this.scrollToTop(window), 10);
+            } else {
+                this.scrollToBottom(window);
+            }
         });
 
         // Observe changes to the window content

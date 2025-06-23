@@ -264,15 +264,8 @@ export class Terminal {
         
         this.outputElement.appendChild(resultElement);
         
-        // For document-like content (resume), scroll to top to start reading
-        // For other commands, auto-scroll to bottom is handled by WindowManager
-        if (this.isDocumentContent(command, output)) {
-            // Get the window from the window manager and scroll to top
-            const terminalWindow = window.windowManager.windows.get('terminalWindow');
-            if (terminalWindow) {
-                window.windowManager.scrollToTop(terminalWindow);
-            }
-        }
+        // Scrolling behavior is now automatically handled by WindowManager
+        // It will detect document content and scroll to top, or scroll to bottom for regular commands
     }
 
     /**
