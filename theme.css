@@ -181,6 +181,8 @@ body {
     z-index: 1000;
     /* Neumorphic edge */
     box-shadow: 0 8px 32px 0 #101624, 0 2px 8px 0 #232c3d inset;
+    display: flex;
+    flex-direction: column;
 }
 .window.focused {
     box-shadow: 0 0 0 4px var(--primary-color), 0 12px 48px 0 #4a90e2, var(--neu-shadow);
@@ -197,6 +199,7 @@ body {
     border-bottom: 2px solid #26334d;
     user-select: none;
     box-shadow: 0 2px 8px 0 #101624 inset;
+    flex-shrink: 0; /* Prevent header from shrinking */
 }
 .window-title {
     display: flex;
@@ -360,7 +363,8 @@ button:focus-visible, .start-menu-item:focus-visible, .window-control:focus-visi
     padding: 0;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    flex: 1;
+    min-height: 0; /* Allow content to shrink */
 }
 
 /* Terminal container layout */
