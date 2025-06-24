@@ -153,7 +153,8 @@ export class WindowManager {
                 .resizable({
                     edges: { left: true, right: true, bottom: true, top: true },
                     listeners: {
-                        move: this.handleResizeMove.bind(this)
+                        move: this.handleResizeMove.bind(this),
+                        end: this.handleResizeEnd.bind(this)
                     },
                     modifiers: [
                         interact.modifiers.restrictEdges({
@@ -222,8 +223,28 @@ export class WindowManager {
         const window = this.windows.get(windowElement.id);
         if (!window) return;
 
-        // Position has already been updated in handleDragMove
+        // Only check snap zones for drag operations (not resize)
         this.checkSnapZones(window);
+    }
+
+    /**
+     * Handles the end of a window resize event.
+     * @param {object} event - The interact.js resize event.
+     * @private
+     * @memberof WindowManager
+     */
+    handleResizeEnd(event) {
+        const window = this.windows.get(event.target.id);
+        if (!window) return;
+
+        // Update the window object with final dimensions
+        window.width = event.rect.width;
+        window.height = event.rect.height;
+        window.left = (parseFloat(window.element.style.left) || 0);
+        window.top = (parseFloat(window.element.style.top) || 0);
+        
+        // Do NOT check snap zones after resize operations
+        // This prevents the window from snapping when user is just resizing
     }
 
     /**
