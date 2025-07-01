@@ -48,11 +48,13 @@ body {
     align-items: center;
     padding: 0 32px;
     z-index: 2000;
-    border-top-left-radius: var(--border-radius);
-    border-top-right-radius: var(--border-radius);
-    border-top: 1.5px solid #222b3a;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    border-top: 2px solid #222b3a;
+    border-left: 2px solid #222b3a;
+    border-right: 2px solid #222b3a;
     overflow: hidden;
-    /* Neumorphic edge */
+    /* Neumorphic edge with square styling */
     box-shadow: 0 8px 32px 0 #101624, 0 -4px 16px 0 #232c3d inset;
 }
 
@@ -63,8 +65,8 @@ body {
     background: linear-gradient(135deg, #232c3d 60%, #2e3a54 100%);
     color: var(--primary-color);
     border: none;
-    border-radius: 16px;
-    padding: 12px 32px;
+    border-radius: 8px;
+    padding: 14px 28px;
     font-size: 1.1rem;
     font-weight: 700;
     box-shadow: var(--neu-inset), 0 2px 8px 0 #101624;
@@ -73,6 +75,7 @@ body {
     outline: none;
     position: relative;
     z-index: 2;
+    border: 2px solid #26334d;
 }
 .start-btn:hover, .start-btn:focus {
     background: linear-gradient(135deg, #357ab8 60%, #4a90e2 100%);
@@ -100,15 +103,15 @@ body {
     left: 32px;
     width: var(--start-menu-width);
     background: linear-gradient(135deg, #232c3d 60%, #2e3a54 100%);
-    border-radius: var(--border-radius);
+    border-radius: 12px;
     box-shadow: 0 12px 48px 0 #101624, var(--neu-shadow);
-    padding: 24px 0 16px 0;
+    padding: 20px 0 12px 0;
     display: none;
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;
     z-index: 3000;
     border: 2px solid #26334d;
-    /* Neumorphic edge */
+    /* Neumorphic edge with square styling */
     box-shadow: 0 8px 32px 0 #101624, 0 2px 8px 0 #232c3d inset;
     opacity: 0;
     visibility: hidden;
@@ -131,17 +134,18 @@ body {
 .start-menu-item {
     display: flex;
     align-items: center;
-    width: 100%;
+    width: calc(100% - 16px);
     height: var(--start-menu-item-height);
-    padding: 0 32px;
+    margin: 0 8px;
+    padding: 0 20px;
     background: linear-gradient(135deg, #232c3d 60%, #2e3a54 100%);
-    border: none;
-    border-radius: 14px;
+    border: 2px solid #26334d;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background var(--transition), color var(--transition), box-shadow var(--transition);
+    transition: background var(--transition), color var(--transition), box-shadow var(--transition), border-color var(--transition);
     font-size: 1.08rem;
     color: var(--text-color);
-    gap: 20px;
+    gap: 16px;
     outline: none;
     box-shadow: var(--neu-inset);
     position: relative;
@@ -170,6 +174,7 @@ body {
 .start-menu-item:hover, .start-menu-item:focus {
     background: linear-gradient(135deg, #357ab8 60%, #4a90e2 100%);
     color: #fff;
+    border-color: var(--primary-color);
     box-shadow: 0 4px 24px 0 #4a90e2, var(--neu-inset);
 }
 .start-menu-item:hover .icon svg, .start-menu-item:focus .icon svg {
@@ -298,30 +303,31 @@ body {
 /* Remove desktop and taskbar app icon styles for minimalism */
 /* .desktop, .desktop-icon, .taskbar-icon, .taskbar-tools { display: none !important; } */
 
-/* Fixed desktop icon styling */
+/* Fixed desktop icon styling - Square button design */
 .desktop-icon {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 80px;
-    height: 80px;
+    width: 84px;
+    height: 84px;
     margin: 10px;
-    padding: 10px;
-    border-radius: 12px;
+    padding: 12px;
+    border-radius: 8px;
     background: linear-gradient(135deg, #232c3d 60%, #2e3a54 100%);
     box-shadow: var(--neu-shadow);
     cursor: pointer;
-    transition: all var(--transition);
+    transition: all var(--transition), border-color var(--transition);
     color: var(--text-color);
     text-decoration: none;
-    border: 1px solid var(--border-color);
+    border: 2px solid var(--border-color);
 }
 
 .desktop-icon:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(74, 144, 226, 0.3), var(--neu-shadow);
     background: linear-gradient(135deg, var(--primary-color) 60%, var(--primary-hover) 100%);
+    border-color: var(--primary-color);
     color: white;
 }
 
@@ -959,7 +965,8 @@ body {
 .data-packet:nth-child(5) { animation: dataFlow 16s linear infinite 8s; top: 70%; }
 .data-packet:nth-child(6) { animation: dataFlow 13s linear infinite 10s; top: 85%; }
 
-/* Pulsing Network Nodes */
+/* Network Nodes Removed - Green pulsing dots disabled */
+/* Keeping keyframes for potential future use */
 @keyframes networkPulse {
     0%, 100% { 
         transform: scale(1) translateZ(0); 
@@ -971,21 +978,10 @@ body {
     }
 }
 
+/* Network nodes disabled - no longer rendering green pulsing dots */
 .network-node {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    background: var(--accent-green);
-    border-radius: 50%;
-    animation: networkPulse 4s ease-in-out infinite;
-    will-change: transform, opacity;
-    transform: translateZ(0);
+    display: none;
 }
-
-.network-node:nth-child(1) { top: 15%; left: 10%; animation-delay: 0s; }
-.network-node:nth-child(2) { top: 35%; right: 15%; animation-delay: 1s; }
-.network-node:nth-child(3) { bottom: 25%; left: 20%; animation-delay: 2s; }
-.network-node:nth-child(4) { bottom: 15%; right: 25%; animation-delay: 3s; }
 
 /* Enhanced Window Animations */
 .window {
