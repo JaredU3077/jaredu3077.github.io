@@ -19,7 +19,7 @@ export class WindowManager {
         /** @type {number} */
         this.zIndexCounter = CONFIG.window.zIndex;
         /** @type {number} */
-        this.snapThreshold = CONFIG.window.snapThreshold;
+        this.snapThreshold = CONFIG.window.snapThreshold || 20; // Reduce snap sensitivity
         /** @type {Map<string, object>} */
         this.snapZones = new Map();
         /** @type {?HTMLElement} */
@@ -134,7 +134,7 @@ export class WindowManager {
         if (typeof interact !== 'undefined') {
             interact(header)
                 .draggable({
-                    inertia: true,
+                    inertia: false, // Disable inertia to prevent unwanted movement
                     modifiers: [
                         interact.modifiers.restrictRect({
                             restriction: 'parent',
@@ -162,8 +162,8 @@ export class WindowManager {
                             endOnly: true
                         }),
                         interact.modifiers.restrictSize({
-                            min: { width: CONFIG.window.minWidth, height: CONFIG.window.minHeight },
-                            max: { width: CONFIG.window.maxWidth, height: CONFIG.window.maxHeight }
+                            min: { width: CONFIG.window.minWidth || 300, height: CONFIG.window.minHeight || 200 },
+                            max: { width: CONFIG.window.maxWidth || window.innerWidth * 0.9, height: CONFIG.window.maxHeight || window.innerHeight * 0.9 }
                         })
                     ]
                 });
@@ -234,14 +234,22 @@ export class WindowManager {
      * @memberof WindowManager
      */
     handleResizeEnd(event) {
-        const window = this.windows.get(event.target.id);
-        if (!window) return;
+        const windowObj = this.windows.get(event.target.id);
+        if (!windowObj) return;
 
-        // Update the window object with final dimensions
-        window.width = event.rect.width;
-        window.height = event.rect.height;
-        window.left = (parseFloat(window.element.style.left) || 0);
-        window.top = (parseFloat(window.element.style.top) || 0);
+        // Update the window object with final dimensions and position
+        windowObj.width = event.rect.width;
+        windowObj.height = event.rect.height;
+        windowObj.left = parseFloat(windowObj.element.style.left) || 0;
+        windowObj.top = parseFloat(windowObj.element.style.top) || 0;
+        
+        // Store the original position for future operations
+        windowObj.originalPosition = {
+            left: windowObj.left,
+            top: windowObj.top,
+            width: windowObj.width,
+            height: windowObj.height
+        };
         
         // Do NOT check snap zones after resize operations
         // This prevents the window from snapping when user is just resizing
@@ -254,39 +262,49 @@ export class WindowManager {
      * @memberof WindowManager
      */
     handleResizeMove(event) {
-        const window = this.windows.get(event.target.id);
-        if (!window) return;
+        const windowObj = this.windows.get(event.target.id);
+        if (!windowObj) return;
 
-        const x = (parseFloat(window.element.style.left) || 0) + event.deltaRect.left;
-        const y = (parseFloat(window.element.style.top) || 0) + event.deltaRect.top;
+        // Calculate new position based on resize deltas
+        const x = (parseFloat(windowObj.element.style.left) || 0) + event.deltaRect.left;
+        const y = (parseFloat(windowObj.element.style.top) || 0) + event.deltaRect.top;
 
-        Object.assign(window.element.style, {
+        // Apply the new dimensions and position
+        Object.assign(windowObj.element.style, {
             width: `${event.rect.width}px`,
             height: `${event.rect.height}px`,
             left: `${x}px`,
             top: `${y}px`
         });
         
-        // Update the window object
-        window.width = event.rect.width;
-        window.height = event.rect.height;
-        window.left = x;
-        window.top = y;
+        // Update the window object properties
+        windowObj.width = event.rect.width;
+        windowObj.height = event.rect.height;
+        windowObj.left = x;
+        windowObj.top = y;
+        
+        // Mark that this window is no longer in a snapped state
+        windowObj.isMaximized = false;
     }
 
     /**
      * Checks if a window is in a snap zone and snaps it if it is.
-     * @param {object} window - The window to check.
+     * @param {object} windowObj - The window to check.
      * @private
      * @memberof WindowManager
      */
-    checkSnapZones(window) {
-        const rect = window.element.getBoundingClientRect();
+    checkSnapZones(windowObj) {
+        // Don't snap if window is maximized
+        if (windowObj.isMaximized) {
+            return;
+        }
+
+        const rect = windowObj.element.getBoundingClientRect();
         const snapZones = this.getSnapZones();
 
         for (const [zone, bounds] of snapZones) {
             if (this.isInSnapZone(rect, bounds)) {
-                this.snapWindowToZone(window, zone);
+                this.snapWindowToZone(windowObj, zone);
                 return;
             }
         }
@@ -347,49 +365,83 @@ export class WindowManager {
      * @memberof WindowManager
      */
     isInSnapZone(rect, zone) {
-        return (
-            Math.abs(rect.left - zone.left) < this.snapThreshold &&
-            Math.abs(rect.top - zone.top) < this.snapThreshold
-        );
+        // Check if the window's center point is near the zone boundaries
+        const windowCenterX = rect.left + rect.width / 2;
+        const windowCenterY = rect.top + rect.height / 2;
+        
+        // More specific zone detection
+        if (zone.left === 0 && zone.width === window.innerWidth / 2) {
+            // Left zone - check if dragged to left edge
+            return rect.left < this.snapThreshold;
+        } else if (zone.left === window.innerWidth / 2 && zone.width === window.innerWidth / 2) {
+            // Right zone - check if dragged to right edge
+            return rect.right > window.innerWidth - this.snapThreshold;
+        } else if (zone.top === 0 && zone.height === window.innerHeight / 2) {
+            // Top zone - check if dragged to top edge
+            return rect.top < this.snapThreshold;
+        } else if (zone.top === window.innerHeight / 2) {
+            // Bottom zone - check if dragged to bottom edge
+            return rect.bottom > window.innerHeight - this.snapThreshold - 54; // Account for taskbar
+        }
+        
+        return false;
     }
 
     /**
      * Snaps a window to a specific zone.
-     * @param {object} window - The window to snap.
+     * @param {object} windowObj - The window to snap.
      * @param {string} zone - The name of the zone to snap to.
      * @private
      * @memberof WindowManager
      */
-    snapWindowToZone(window, zone) {
+    snapWindowToZone(windowObj, zone) {
         const screenWidth = window.innerWidth;
         const screenHeight = window.innerHeight;
+        const taskbarHeight = 54; // Height of taskbar
+
+        let newLeft, newTop, newWidth, newHeight;
 
         switch (zone) {
             case 'left':
-                window.element.style.left = '0';
-                window.element.style.top = '0';
-                window.element.style.width = `${screenWidth / 2}px`;
-                window.element.style.height = `${screenHeight}px`;
+                newLeft = 0;
+                newTop = 0;
+                newWidth = screenWidth / 2;
+                newHeight = screenHeight - taskbarHeight;
                 break;
             case 'right':
-                window.element.style.left = `${screenWidth / 2}px`;
-                window.element.style.top = '0';
-                window.element.style.width = `${screenWidth / 2}px`;
-                window.element.style.height = `${screenHeight}px`;
+                newLeft = screenWidth / 2;
+                newTop = 0;
+                newWidth = screenWidth / 2;
+                newHeight = screenHeight - taskbarHeight;
                 break;
             case 'top':
-                window.element.style.left = '0';
-                window.element.style.top = '0';
-                window.element.style.width = `${screenWidth}px`;
-                window.element.style.height = `${screenHeight / 2}px`;
+                newLeft = 0;
+                newTop = 0;
+                newWidth = screenWidth;
+                newHeight = (screenHeight - taskbarHeight) / 2;
                 break;
             case 'bottom':
-                window.element.style.left = '0';
-                window.element.style.top = `${screenHeight / 2}px`;
-                window.element.style.width = `${screenWidth}px`;
-                window.element.style.height = `${screenHeight / 2}px`;
+                newLeft = 0;
+                newTop = (screenHeight - taskbarHeight) / 2;
+                newWidth = screenWidth;
+                newHeight = (screenHeight - taskbarHeight) / 2;
                 break;
+            default:
+                return; // Unknown zone, don't snap
         }
+
+        // Apply the new dimensions and position
+        windowObj.element.style.left = `${newLeft}px`;
+        windowObj.element.style.top = `${newTop}px`;
+        windowObj.element.style.width = `${newWidth}px`;
+        windowObj.element.style.height = `${newHeight}px`;
+
+        // Update the window object properties to stay in sync
+        windowObj.left = newLeft;
+        windowObj.top = newTop;
+        windowObj.width = newWidth;
+        windowObj.height = newHeight;
+        windowObj.isMaximized = false; // Snapped windows are not maximized
     }
 
     /**
