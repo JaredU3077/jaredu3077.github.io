@@ -206,13 +206,8 @@ export class WindowManager {
                             },
                             move: this.handleResizeMove.bind(this),
                             end: this.handleResizeEnd.bind(this)
-                        },
-                        modifiers: [
-                            interact.modifiers.restrictSize({
-                                min: { width: CONFIG.window?.minWidth || 300, height: CONFIG.window?.minHeight || 200 },
-                                max: { width: window.innerWidth * 0.9, height: (window.innerHeight - 54) * 0.9 }
-                            })
-                        ]
+                        }
+                        // Removed restrictSize modifier to prevent conflicts
                     });
 
                 // Store interact instances for potential cleanup/reset
@@ -327,21 +322,34 @@ export class WindowManager {
         windowObj._hasBeenResized = true; // Mark that this window has been manually resized
         windowObj.element.classList.remove('resizing');
 
-        // Update the window object with final dimensions and position
-        const finalWidth = event.rect.width;
-        const finalHeight = event.rect.height;
-        const finalLeft = (parseFloat(windowObj.element.style.left) || 0) + (event.deltaRect.left || 0);
-        const finalTop = (parseFloat(windowObj.element.style.top) || 0) + (event.deltaRect.top || 0);
+        // Get the actual current dimensions and position from the DOM
+        // This is more reliable than trying to calculate deltas
+        const rect = windowObj.element.getBoundingClientRect();
+        const computedStyle = window.getComputedStyle(windowObj.element);
+        
+        const finalWidth = parseInt(computedStyle.width);
+        const finalHeight = parseInt(computedStyle.height);
+        const finalLeft = parseInt(computedStyle.left) || rect.left;
+        const finalTop = parseInt(computedStyle.top) || rect.top;
 
-        // Apply final position and size - this ensures consistency
-        windowObj.element.style.width = `${finalWidth}px`;
-        windowObj.element.style.height = `${finalHeight}px`;
-        windowObj.element.style.left = `${finalLeft}px`;
-        windowObj.element.style.top = `${finalTop}px`;
+        // Apply size constraints manually since we removed the restrictSize modifier
+        const minWidth = CONFIG.window?.minWidth || 300;
+        const minHeight = CONFIG.window?.minHeight || 200;
+        const maxWidth = window.innerWidth * 0.9;
+        const maxHeight = (window.innerHeight - 54) * 0.9;
+        
+        const constrainedWidth = Math.max(minWidth, Math.min(finalWidth, maxWidth));
+        const constrainedHeight = Math.max(minHeight, Math.min(finalHeight, maxHeight));
 
-        // Update window object properties
-        windowObj.width = finalWidth;
-        windowObj.height = finalHeight;
+        // Only update if constraints were violated
+        if (constrainedWidth !== finalWidth || constrainedHeight !== finalHeight) {
+            windowObj.element.style.width = `${constrainedWidth}px`;
+            windowObj.element.style.height = `${constrainedHeight}px`;
+        }
+
+        // Update window object properties with final values
+        windowObj.width = constrainedWidth;
+        windowObj.height = constrainedHeight;
         windowObj.left = finalLeft;
         windowObj.top = finalTop;
         
@@ -353,8 +361,8 @@ export class WindowManager {
         windowObj.originalPosition = {
             left: finalLeft,
             top: finalTop,
-            width: finalWidth,
-            height: finalHeight
+            width: constrainedWidth,
+            height: constrainedHeight
         };
         
         // Re-enable snapping but mark this window as having been manually resized
@@ -366,8 +374,8 @@ export class WindowManager {
         
         console.log('✅ Resize completed successfully - Window dimensions:', { 
             id: windowObj.id,
-            width: finalWidth, 
-            height: finalHeight, 
+            width: constrainedWidth, 
+            height: constrainedHeight, 
             left: finalLeft, 
             top: finalTop 
         });
@@ -388,33 +396,11 @@ export class WindowManager {
 
         // Ensure snapping is completely disabled during resize
         this.isSnappingEnabled = false;
-
-        // Get current position from element style to ensure accuracy
-        const currentLeft = parseFloat(windowObj.element.style.left) || 0;
-        const currentTop = parseFloat(windowObj.element.style.top) || 0;
-
-        // Calculate new position based on resize deltas
-        const newLeft = currentLeft + (event.deltaRect.left || 0);
-        const newTop = currentTop + (event.deltaRect.top || 0);
-
-        // Constrain to viewport bounds
-        const maxLeft = Math.max(0, window.innerWidth - event.rect.width);
-        const maxTop = Math.max(0, window.innerHeight - event.rect.height - 54);
         
-        const constrainedLeft = Math.max(0, Math.min(newLeft, maxLeft));
-        const constrainedTop = Math.max(0, Math.min(newTop, maxTop));
-
-        // Apply the new dimensions and position immediately
-        windowObj.element.style.width = `${event.rect.width}px`;
-        windowObj.element.style.height = `${event.rect.height}px`;
-        windowObj.element.style.left = `${constrainedLeft}px`;
-        windowObj.element.style.top = `${constrainedTop}px`;
-        
-        // Update the window object properties to match
+        // Let interact.js handle the positioning automatically
+        // We'll just update our window object state to match
         windowObj.width = event.rect.width;
         windowObj.height = event.rect.height;
-        windowObj.left = constrainedLeft;
-        windowObj.top = constrainedTop;
         
         // Mark that this window is no longer in a snapped/maximized state
         windowObj.isMaximized = false;
