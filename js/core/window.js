@@ -85,7 +85,7 @@ export class WindowManager {
                     <button class="window-control close" title="Close" aria-label="Close window">×</button>
                 </div>
             </div>
-            <div class="window-content" tabindex="0">
+            <div class="window-content" tabindex="0" data-scroll-container>
                 ${content}
             </div>
             <div class="window-resize n" title="Resize window"></div>

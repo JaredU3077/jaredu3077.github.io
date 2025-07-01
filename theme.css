@@ -305,6 +305,28 @@ body {
     background: var(--primary-hover);
 }
 
+/* Ensure scrollbars are not affected by resize handles */
+[data-scroll-container]::-webkit-scrollbar,
+[data-scroll-container]::-webkit-scrollbar-thumb,
+[data-scroll-container]::-webkit-scrollbar-track {
+    position: relative;
+    z-index: 20; /* Higher than resize handles */
+}
+
+/* Prevent resize handles from interfering with scrollable content */
+.window-content [data-scroll-container] {
+    position: relative;
+    z-index: 15; /* Higher than resize handles but lower than scrollbar */
+}
+
+/* Additional protection for terminal output and other scrollable elements */
+#terminalOutput,
+.terminal-output,
+.window-content.data-scroll-container {
+    position: relative;
+    z-index: 15; /* Higher than resize handles but lower than scrollbar */
+}
+
 /* Remove desktop and taskbar app icon styles for minimalism */
 /* .desktop, .desktop-icon, .taskbar-icon, .taskbar-tools { display: none !important; } */
 
@@ -1618,8 +1640,8 @@ img, video {
 
 .window-resize.ne {
     top: -5px;
-    right: -5px;
-    width: 15px;
+    right: -10px; /* Move further right to avoid scrollbar */
+    width: 10px; /* Make narrower to reduce overlap */
     height: 15px;
     cursor: ne-resize;
 }
@@ -1634,8 +1656,8 @@ img, video {
 
 .window-resize.se {
     bottom: -5px;
-    right: -5px;
-    width: 15px;
+    right: -10px; /* Move further right to avoid scrollbar */
+    width: 10px; /* Make narrower to reduce overlap */
     height: 15px;
     cursor: se-resize;
 }
@@ -1644,7 +1666,7 @@ img, video {
 .window-resize.n {
     top: -5px;
     left: 15px;
-    right: 15px;
+    right: 20px; /* Avoid scrollbar area on right */
     height: 10px;
     cursor: n-resize;
 }
@@ -1652,7 +1674,7 @@ img, video {
 .window-resize.s {
     bottom: -5px;
     left: 15px;
-    right: 15px;
+    right: 20px; /* Avoid scrollbar area on right */
     height: 10px;
     cursor: s-resize;
 }
@@ -1660,8 +1682,8 @@ img, video {
 .window-resize.e {
     top: 15px;
     bottom: 15px;
-    right: -5px;
-    width: 10px;
+    right: -10px; /* Move further right to avoid scrollbar */
+    width: 5px; /* Make narrower to reduce overlap */
     cursor: e-resize;
 }
 
