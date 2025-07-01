@@ -624,23 +624,47 @@ export class WindowManager {
     }
 
     /**
-     * Closes and removes a window.
-     * @param {object} window - The window to close.
+     * Closes a window and removes it from the desktop.
+     * @param {object} window - The window object to close.
      * @memberof WindowManager
      */
     closeWindow(window) {
-        // Clean up scroll observer if it exists
-        if (window.scrollObserver) {
-            window.scrollObserver.disconnect();
+        if (!window || !window.element) return;
+
+        // Play window closing sound
+        if (window.bootSystemInstance) {
+            window.bootSystemInstance.playWindowCloseSound();
+        }
+
+        // Remove from DOM
+        window.element.remove();
+        
+        // Remove from windows map
+        this.windows.delete(window.id);
+        
+        // Remove from window stack
+        this.windowStack = this.windowStack.filter(w => w.id !== window.id);
+        
+        // Clean up interact instances
+        if (this.interactInstances.has(window.id)) {
+            const instances = this.interactInstances.get(window.id);
+            try {
+                if (instances.drag) instances.drag.unset();
+                if (instances.resize) instances.resize.unset();
+            } catch (error) {
+                console.warn('Failed to cleanup interact instances:', error);
+            }
+            this.interactInstances.delete(window.id);
         }
         
-        window.element.classList.add('closing');
-        setTimeout(() => {
-            window.element.remove();
-            this.windows.delete(window.id);
-            this.windowStack = this.windowStack.filter(w => w.id !== window.id);
-            this.notifyStateChange();
-        }, 200);
+        // Focus the next window in stack if available
+        if (this.windowStack.length > 0) {
+            this.focusWindow(this.windowStack[this.windowStack.length - 1]);
+        } else {
+            this.activeWindow = null;
+        }
+        
+        this.notifyStateChange();
     }
 
     /**

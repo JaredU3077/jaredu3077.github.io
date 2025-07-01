@@ -1,5 +1,5 @@
 /**
- * @file Boot System Module - Handles system boot sequence, login, and audio
+ * @file Boot System Module - Handles system boot sequence, login, audio, and particle effects
  * @author Jared U.
  */
 
@@ -18,12 +18,18 @@ export class BootSystem {
         ];
         this.messageIndex = 0;
         this.audioContext = null;
+        this.audioNodes = {};
+        this.particles = [];
+        this.particleCount = 150; // Increased particle count
+        this.mouseX = 0;
+        this.mouseY = 0;
         this.init();
     }
 
     async init() {
         this.setupAudioSystem();
         this.setupEventListeners();
+        this.setupParticleSystem();
         await this.startBootSequence();
     }
 
@@ -47,6 +53,9 @@ export class BootSystem {
                             }
                         }, { once: true });
                     }
+
+                    // Pre-create audio nodes for better performance
+                    this.setupAudioNodes();
                 } else {
                     console.warn('AudioContext not supported in this browser');
                     this.audioEnabled = false;
@@ -56,6 +65,25 @@ export class BootSystem {
                 this.audioEnabled = false;
                 this.audioContext = null;
             }
+        }
+    }
+
+    setupAudioNodes() {
+        if (!this.audioContext) return;
+
+        try {
+            // Create master gain node
+            this.audioNodes.masterGain = this.audioContext.createGain();
+            this.audioNodes.masterGain.gain.setValueAtTime(0.3, this.audioContext.currentTime);
+            this.audioNodes.masterGain.connect(this.audioContext.destination);
+
+            // Create filter for different sound types
+            this.audioNodes.filter = this.audioContext.createBiquadFilter();
+            this.audioNodes.filter.type = 'lowpass';
+            this.audioNodes.filter.frequency.setValueAtTime(2000, this.audioContext.currentTime);
+            this.audioNodes.filter.connect(this.audioNodes.masterGain);
+        } catch (error) {
+            console.warn('Failed to setup audio nodes:', error);
         }
     }
 
@@ -85,6 +113,256 @@ export class BootSystem {
                 this.skipBoot();
             }
         }, { once: true });
+
+        // Mouse tracking for particle interaction
+        document.addEventListener('mousemove', (e) => {
+            this.mouseX = e.clientX;
+            this.mouseY = e.clientY;
+            this.updateParticleInteraction();
+        });
+
+        // Keyboard controls for background effects
+        document.addEventListener('keydown', (e) => {
+            // Only handle keyboard controls if no input is focused
+            if (document.activeElement.tagName !== 'INPUT' && 
+                document.activeElement.tagName !== 'TEXTAREA' &&
+                !e.ctrlKey && !e.altKey && !e.metaKey) {
+                
+                switch(e.key.toLowerCase()) {
+                    case 'space':
+                        e.preventDefault();
+                        this.toggleParticleAnimation();
+                        break;
+                    case 'r':
+                        this.rotateBackground();
+                        break;
+                    case '+':
+                    case '=':
+                        this.increaseParticles();
+                        break;
+                    case '-':
+                        this.decreaseParticles();
+                        break;
+                    case 'c':
+                        this.changeParticleColors();
+                        break;
+                }
+            }
+        });
+
+        // Typing sound effects
+        this.setupTypingSounds();
+    }
+
+    setupTypingSounds() {
+        // Add typing sounds to all text inputs
+        document.addEventListener('keydown', (e) => {
+            // Only play typing sounds for actual character input
+            if (e.target.tagName === 'INPUT' && e.target.type === 'text' && 
+                !e.ctrlKey && !e.altKey && !e.metaKey && 
+                e.key.length === 1) {
+                this.playTypingSound();
+            }
+        });
+
+        // Special sounds for special keys
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' && e.target.type === 'text') {
+                switch(e.key) {
+                    case 'Enter':
+                        this.playEnterSound();
+                        break;
+                    case 'Backspace':
+                        this.playBackspaceSound();
+                        break;
+                    case ' ':
+                        this.playSpaceSound();
+                        break;
+                }
+            }
+        });
+    }
+
+    setupParticleSystem() {
+        // Create particle container
+        const particleContainer = document.createElement('div');
+        particleContainer.className = 'particle-container';
+        particleContainer.id = 'particleContainer';
+        document.body.appendChild(particleContainer);
+
+        // Create spinning background elements
+        const spinner1 = document.createElement('div');
+        spinner1.className = 'background-spinner';
+        spinner1.style.width = '300px';
+        spinner1.style.height = '300px';
+        spinner1.style.margin = '-150px 0 0 -150px';
+        document.body.appendChild(spinner1);
+
+        const spinner2 = document.createElement('div');
+        spinner2.className = 'background-spinner';
+        spinner2.style.width = '500px';
+        spinner2.style.height = '500px';
+        spinner2.style.margin = '-250px 0 0 -250px';
+        spinner2.style.animationDuration = '50s';
+        spinner2.style.animationDirection = 'reverse';
+        spinner2.style.opacity = '0.3';
+        document.body.appendChild(spinner2);
+
+        // Create matrix background
+        const matrixBg = document.createElement('div');
+        matrixBg.className = 'matrix-background';
+        document.body.appendChild(matrixBg);
+
+        // Generate initial particles
+        this.generateParticles();
+        
+        // Start particle animation loop
+        this.animateParticles();
+    }
+
+    generateParticles() {
+        const container = document.getElementById('particleContainer');
+        if (!container) return;
+
+        for (let i = 0; i < this.particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'blue-particle particle-interactive';
+            
+            // Random size variation
+            const size = Math.random();
+            if (size < 0.3) {
+                particle.classList.add('small');
+            } else if (size > 0.7) {
+                particle.classList.add('large');
+            }
+
+            // Random positioning
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 15 + 's';
+            particle.style.animationDuration = (10 + Math.random() * 20) + 's';
+            
+            // Add some horizontal movement variation
+            const drift = (Math.random() - 0.5) * 200;
+            particle.style.setProperty('--drift', drift + 'px');
+
+            container.appendChild(particle);
+            this.particles.push({
+                element: particle,
+                originalX: parseFloat(particle.style.left),
+                originalY: 100,
+                velocityX: (Math.random() - 0.5) * 2,
+                velocityY: -Math.random() * 2 - 1
+            });
+        }
+    }
+
+    updateParticleInteraction() {
+        // Create attraction/repulsion effect based on mouse position
+        const mouseForce = 50;
+        const mouseRadius = 150;
+
+        this.particles.forEach(particle => {
+            const rect = particle.element.getBoundingClientRect();
+            const particleX = rect.left + rect.width / 2;
+            const particleY = rect.top + rect.height / 2;
+            
+            const dx = this.mouseX - particleX;
+            const dy = this.mouseY - particleY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < mouseRadius) {
+                const force = (mouseRadius - distance) / mouseRadius;
+                const angle = Math.atan2(dy, dx);
+                
+                // Gentle repulsion effect
+                const repelX = -Math.cos(angle) * force * mouseForce;
+                const repelY = -Math.sin(angle) * force * mouseForce;
+                
+                particle.element.style.transform = `translate(${repelX}px, ${repelY}px) scale(${1 + force * 0.5})`;
+                particle.element.style.opacity = Math.min(1, 0.6 + force * 0.4);
+            } else {
+                particle.element.style.transform = '';
+                particle.element.style.opacity = '';
+            }
+        });
+    }
+
+    animateParticles() {
+        // Continuous particle regeneration
+        setInterval(() => {
+            if (this.particles.length < this.particleCount) {
+                this.generateParticles();
+            }
+        }, 2000);
+    }
+
+    // Enhanced sound effects
+    playTypingSound() {
+        if (!this.audioEnabled || !this.audioContext) return;
+
+        const frequency = 400 + Math.random() * 200; // Vary the typing sound
+        const duration = 0.08;
+        this.createTone(frequency, duration, 'square', 0.03);
+    }
+
+    playEnterSound() {
+        if (!this.audioEnabled || !this.audioContext) return;
+        
+        // Play a satisfying "enter" sound
+        this.createTone(600, 0.15, 'sine', 0.05);
+        setTimeout(() => this.createTone(800, 0.1, 'sine', 0.03), 50);
+    }
+
+    playBackspaceSound() {
+        if (!this.audioEnabled || !this.audioContext) return;
+        
+        // Play a "deletion" sound
+        this.createTone(300, 0.1, 'sawtooth', 0.04);
+    }
+
+    playSpaceSound() {
+        if (!this.audioEnabled || !this.audioContext) return;
+        
+        // Subtle space bar sound
+        this.createTone(350, 0.06, 'triangle', 0.02);
+    }
+
+    playUIClickSound() {
+        if (!this.audioEnabled || !this.audioContext) return;
+        
+        // UI interaction sound
+        this.createTone(800, 0.1, 'sine', 0.04);
+        setTimeout(() => this.createTone(1000, 0.05, 'sine', 0.02), 30);
+    }
+
+    playWindowOpenSound() {
+        if (!this.audioEnabled || !this.audioContext) return;
+        
+        // Window opening sound
+        for (let i = 0; i < 3; i++) {
+            setTimeout(() => {
+                this.createTone(400 + i * 200, 0.15, 'sine', 0.03);
+            }, i * 50);
+        }
+    }
+
+    playWindowCloseSound() {
+        if (!this.audioEnabled || !this.audioContext) return;
+        
+        // Window closing sound
+        for (let i = 0; i < 3; i++) {
+            setTimeout(() => {
+                this.createTone(800 - i * 200, 0.1, 'sine', 0.03);
+            }, i * 40);
+        }
+    }
+
+    // Expose sound methods globally for other components
+    static getInstance() {
+        if (!window.bootSystemInstance) {
+            window.bootSystemInstance = new BootSystem();
+        }
+        return window.bootSystemInstance;
     }
 
     async startBootSequence() {
@@ -331,6 +609,109 @@ export class BootSystem {
 
     delay(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // Background control methods
+    toggleParticleAnimation() {
+        const particles = document.querySelectorAll('.blue-particle');
+        const spinners = document.querySelectorAll('.background-spinner');
+        
+        particles.forEach(particle => {
+            if (particle.style.animationPlayState === 'paused') {
+                particle.style.animationPlayState = 'running';
+            } else {
+                particle.style.animationPlayState = 'paused';
+            }
+        });
+        
+        spinners.forEach(spinner => {
+            if (spinner.style.animationPlayState === 'paused') {
+                spinner.style.animationPlayState = 'running';
+            } else {
+                spinner.style.animationPlayState = 'paused';
+            }
+        });
+        
+        // Play UI feedback sound
+        if (this.audioEnabled) {
+            this.playUIClickSound();
+        }
+    }
+
+    rotateBackground() {
+        const spinners = document.querySelectorAll('.background-spinner');
+        spinners.forEach((spinner, index) => {
+            const currentRotation = parseInt(spinner.dataset.rotation || '0');
+            const newRotation = currentRotation + 90;
+            spinner.dataset.rotation = newRotation.toString();
+            spinner.style.transform = `rotate(${newRotation}deg)`;
+        });
+        
+        // Add a temporary visual effect
+        document.body.style.transform = 'rotate(2deg)';
+        setTimeout(() => {
+            document.body.style.transform = '';
+        }, 200);
+        
+        if (this.audioEnabled) {
+            this.createTone(600, 0.2, 'sine', 0.05);
+        }
+    }
+
+    increaseParticles() {
+        if (this.particleCount < 300) {
+            this.particleCount += 25;
+            this.generateParticles();
+            
+            if (this.audioEnabled) {
+                this.createTone(800, 0.1, 'sine', 0.04);
+            }
+        }
+    }
+
+    decreaseParticles() {
+        if (this.particleCount > 50) {
+            this.particleCount -= 25;
+            
+            // Remove some particles
+            const particlesToRemove = this.particles.slice(-25);
+            particlesToRemove.forEach(particle => {
+                if (particle.element && particle.element.parentNode) {
+                    particle.element.remove();
+                }
+            });
+            this.particles = this.particles.slice(0, -25);
+            
+            if (this.audioEnabled) {
+                this.createTone(400, 0.1, 'sine', 0.04);
+            }
+        }
+    }
+
+    changeParticleColors() {
+        const colors = [
+            '#4a90e2', // Original blue
+            '#00d084', // Green
+            '#7c53ff', // Purple
+            '#ff6900', // Orange
+            '#ff4757', // Red
+            '#2ed573', // Light green
+            '#5352ed'  // Indigo
+        ];
+        
+        const currentColor = this.currentParticleColor || 0;
+        const newColor = (currentColor + 1) % colors.length;
+        this.currentParticleColor = newColor;
+        
+        const particles = document.querySelectorAll('.blue-particle');
+        particles.forEach(particle => {
+            particle.style.background = `radial-gradient(circle, ${colors[newColor]} 0%, ${colors[newColor]}aa 50%, transparent 100%)`;
+            particle.style.boxShadow = `0 0 8px ${colors[newColor]}, 0 0 16px ${colors[newColor]}44`;
+        });
+        
+        if (this.audioEnabled) {
+            this.createTone(1000, 0.15, 'triangle', 0.06);
+        }
     }
 }
 

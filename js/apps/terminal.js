@@ -458,6 +458,11 @@ export class Terminal {
         this.commands.set('whoami', () => 'jared - Senior Network Engineer');
         this.commands.set('date', () => new Date().toString());
         this.commands.set('uptime', () => 'System uptime: 15+ years in networking');
+        
+        // Background control commands
+        this.commands.set('bg', this.handleBackground.bind(this));
+        this.commands.set('particles', this.handleParticles.bind(this));
+        this.commands.set('fx', this.handleEffects.bind(this));
     }
 
     /**
@@ -686,11 +691,117 @@ Internet Address      Physical Address      Type
     }
 
     handleRoute() {
-        return `Kernel IP routing table:
-Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
-0.0.0.0         192.168.1.1     0.0.0.0         UG    100    0        0 eth0
-192.168.1.0     0.0.0.0         255.255.255.0   U     100    0        0 eth0
-169.254.0.0     0.0.0.0         255.255.0.0     U     1000   0        0 eth0`;
+        return CONFIG.COMMANDS.ROUTE;
+    }
+
+    // Background control commands
+    handleBackground(args) {
+        const bootSystem = window.bootSystemInstance;
+        if (!bootSystem) {
+            return 'Error: Background system not available';
+        }
+
+        const action = args[0];
+        switch(action) {
+            case 'pause':
+                bootSystem.toggleParticleAnimation();
+                return 'Background animation paused/resumed';
+            case 'rotate':
+                bootSystem.rotateBackground();
+                return 'Background rotated 90 degrees';
+            case 'help':
+                return `Background Control Commands:
+bg pause    - Toggle animation pause/play
+bg rotate   - Rotate background elements
+bg help     - Show this help
+
+Use 'particles' and 'fx' commands for more controls`;
+            default:
+                return 'Usage: bg [pause|rotate|help]';
+        }
+    }
+
+    handleParticles(args) {
+        const bootSystem = window.bootSystemInstance;
+        if (!bootSystem) {
+            return 'Error: Particle system not available';
+        }
+
+        const action = args[0];
+        const value = args[1];
+        
+        switch(action) {
+            case 'add':
+                const count = parseInt(value) || 25;
+                for (let i = 0; i < count / 25; i++) {
+                    bootSystem.increaseParticles();
+                }
+                return `Added ~${count} particles to background`;
+            case 'remove':
+                const removeCount = parseInt(value) || 25;
+                for (let i = 0; i < removeCount / 25; i++) {
+                    bootSystem.decreaseParticles();
+                }
+                return `Removed ~${removeCount} particles from background`;
+            case 'color':
+                bootSystem.changeParticleColors();
+                return 'Particle colors changed';
+            case 'count':
+                return `Current particle count: ${bootSystem.particleCount}`;
+            case 'help':
+                return `Particle Control Commands:
+particles add [count]     - Add particles (default: 25)
+particles remove [count]  - Remove particles (default: 25)
+particles color          - Change particle colors
+particles count          - Show current particle count
+particles help           - Show this help`;
+            default:
+                return 'Usage: particles [add|remove|color|count|help] [value]';
+        }
+    }
+
+    handleEffects(args) {
+        const action = args[0];
+        
+        switch(action) {
+            case 'status':
+                return `Effects Status:
+Audio: ${window.bootSystemInstance?.audioEnabled ? 'ON' : 'OFF'}
+Particles: ${document.querySelectorAll('.blue-particle').length} active
+Animation: ${document.querySelector('.blue-particle')?.style.animationPlayState !== 'paused' ? 'RUNNING' : 'PAUSED'}
+
+Keyboard Shortcuts:
+SPACE - Toggle animations
+R - Rotate background
++/- - Add/remove particles
+C - Change colors`;
+            case 'toggle':
+                if (window.bootSystemInstance) {
+                    window.bootSystemInstance.toggleParticleAnimation();
+                    return 'Effects animation toggled';
+                }
+                return 'Error: Effects system not available';
+            case 'reset':
+                // Reset to default state
+                if (window.bootSystemInstance) {
+                    window.bootSystemInstance.particleCount = 150;
+                    window.bootSystemInstance.currentParticleColor = 0;
+                    document.querySelectorAll('.blue-particle').forEach(p => p.remove());
+                    window.bootSystemInstance.generateParticles();
+                    return 'Effects reset to default state';
+                }
+                return 'Error: Effects system not available';
+            case 'help':
+                return `Effects Control Commands:
+fx status    - Show current effects status
+fx toggle    - Toggle all animations
+fx reset     - Reset to default state
+fx help      - Show this help
+
+Tip: Use keyboard shortcuts for quick control!`;
+            default:
+                return 'Usage: fx [status|toggle|reset|help]';
+        }
     }
 
     /**

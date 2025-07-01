@@ -26,7 +26,16 @@ export const CONFIG = {
 • tracert [host] - Trace route to destination
 • nslookup [domain] - DNS lookup
 • clear - Clear terminal screen
-• help - Show this help message`,
+• help - Show this help message
+
+Background Effects:
+• bg [pause|rotate|help] - Control background animation
+• particles [add|remove|color|count|help] - Manage particles
+• fx [status|toggle|reset|help] - Effects control
+
+Keyboard Shortcuts:
+• SPACE - Toggle animations  • R - Rotate background
+• +/- - Add/remove particles  • C - Change colors`,
         PING: 'Pinging 8.8.8.8... Reply from 8.8.8.8: 32ms',
         IFCONFIG: `eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
         inet 192.168.1.100  netmask 255.255.255.0  broadcast 192.168.1.255
@@ -39,7 +48,12 @@ Proto  Local Address          Foreign Address        State
 TCP    192.168.1.100:22       192.168.1.1:54321     ESTABLISHED
 TCP    192.168.1.100:80       0.0.0.0:0              LISTENING
 TCP    192.168.1.100:443      0.0.0.0:0              LISTENING
-UDP    192.168.1.100:53       *:*                    LISTENING`
+UDP    192.168.1.100:53       *:*                    LISTENING`,
+        ROUTE: `Kernel IP routing table:
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.1.1     0.0.0.0         UG    100    0        0 eth0
+192.168.1.0     0.0.0.0         255.255.255.0   U     100    0        0 eth0
+169.254.0.0     0.0.0.0         255.255.0.0     U     1000   0        0 eth0`
     },
 
     // File paths
@@ -130,10 +144,23 @@ UDP    192.168.1.100:53       *:*                    LISTENING`
                             <h3>🚀 Quick Start:</h3>
                             <ul style="list-style-type: none; padding: 0;">
                                 <li>📊 <strong>Network Monitor:</strong> View network topology</li>
-                                <li>💻 <strong>Terminal:</strong> Run commands like 'show resume' or 'ping 8.8.8.8'</li>
+                                <li>💻 <strong>Terminal:</strong> Run commands like 'show resume' or 'ping 8.8.8.8' or 'fx status'</li>
                                 <li>📚 <strong>Codex:</strong> Search network documentation</li>
                                 <li>🔧 <strong>Device Manager:</strong> Network device overview</li>
                             </ul>
+
+                            <h3>✨ Interactive Background:</h3>
+                            <div style="font-size: 0.85em; margin-left: 10px;">
+                                <p><strong>Keyboard Controls:</strong><br>
+                                • SPACE - Toggle animations<br>
+                                • R - Rotate background<br>
+                                • +/- - Add/remove particles<br>
+                                • C - Change colors</p>
+                                <p><strong>Terminal Commands:</strong><br>
+                                • 'bg pause' - Pause/resume effects<br>
+                                • 'particles add 50' - Add particles<br>
+                                • 'fx status' - Show effects info</p>
+                            </div>
                         </div>
                         <p style="margin-top: 15px; font-size: 0.9em; opacity: 0.8;">
                             15+ years experience • CCNA Certified • Python & Ansible Expert

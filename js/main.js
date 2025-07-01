@@ -103,6 +103,12 @@ function toggleStartMenu(e) {
  */
 function handleAppClick(appId) {
     console.log(`handleAppClick called for appId: ${appId}`);
+    
+    // Play UI sound effect
+    if (window.bootSystemInstance) {
+        window.bootSystemInstance.playUIClickSound();
+    }
+    
     const app = CONFIG.applications[appId];
     if (!app) {
         console.error(`No application config found for appId: ${appId}`);
@@ -119,6 +125,12 @@ function handleAppClick(appId) {
             windowManager.focusWindow(windowManager.windows.get(windowConfig.id));
             return;
         }
+        
+        // Play window opening sound
+        if (window.bootSystemInstance) {
+            window.bootSystemInstance.playWindowOpenSound();
+        }
+        
         // Create window and initialize app logic
         console.log(`Creating new window for: ${windowConfig.id}`);
         winElem = windowManager.createWindow({
