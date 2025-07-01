@@ -10,6 +10,10 @@ import { NetworkVisualization } from './apps/network.js';
 import { KeyboardManager } from './core/keyboard.js';
 import { HelpManager } from './utils/help.js';
 import { SearchManager } from './utils/search.js';
+import { BootSystem } from './core/boot.js';
+import { SkillsApp } from './apps/skills.js';
+import { ProjectsApp } from './apps/projects.js';
+import { SystemStatus } from './apps/system-status.js';
 import { CONFIG, createAppButton } from './config.js';
 
 // --- MODULE INITIALIZATION ---
@@ -25,6 +29,8 @@ const searchManager = new SearchManager();
 let network = null;
 /** @type {?Terminal} */
 let terminal = null;
+/** @type {BootSystem} */
+let bootSystem = null;
 /** @type {Object<string, HTMLElement>} */
 let openWindows = {};
 
@@ -72,16 +78,6 @@ function toggleStartMenu(e) {
         startMenu.classList.toggle('show');
     }
 }
-
-document.getElementById('startBtn').addEventListener('click', toggleStartMenu);
-document.getElementById('startBtn').addEventListener('keydown', toggleStartMenu);
-
-document.addEventListener('click', (e) => {
-    const startMenu = document.getElementById('startMenu');
-    if (!e.target.closest('.start-btn') && !e.target.closest('.start-menu')) {
-        startMenu.classList.remove('show');
-    }
-});
 
 // --- APPLICATION LAUNCHER ---
 
@@ -135,13 +131,34 @@ function handleAppClick(appId) {
                         network = new NetworkVisualization('networkTopology');
                     }
                     break;
+                case 'skills':
+                    if (windowConfig.id === 'skillsWindow') {
+                        new SkillsApp(winElem.querySelector('#skillsContainer'));
+                    }
+                    break;
+                case 'projects':
+                    if (windowConfig.id === 'projectsWindow') {
+                        new ProjectsApp(winElem.querySelector('#projectsContainer'));
+                    }
+                    break;
+                case 'system-status':
+                    if (windowConfig.id === 'statusWindow') {
+                        new SystemStatus(winElem.querySelector('#systemStatus'));
+                    }
+                    break;
+                case 'contact':
+                    // Contact form needs form handling
+                    if (windowConfig.id === 'contactWindow') {
+                        setupContactForm(winElem);
+                    }
+                    break;
                 case 'codex':
                     if (windowConfig.id === 'codexWindow') {
                         searchManager.initializeSearch();
                     }
                     break;
                 case 'device-manager':
-                    // Future: initialize device manager logic here
+                    // Device manager already has static content
                     break;
                 case 'welcome':
                     // Welcome window needs no special initialization
@@ -164,6 +181,58 @@ function handleAppClick(appId) {
             winElem.querySelector('.window-content').innerHTML = errorContent;
         }
     });
+}
+
+// Expose handleAppClick globally for boot system
+window.handleAppClick = handleAppClick;
+
+/**
+ * Sets up the contact form functionality
+ * @param {HTMLElement} winElem - The window element containing the contact form
+ */
+function setupContactForm(winElem) {
+    const form = winElem.querySelector('.transmission-form');
+    if (form) {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            const submitBtn = form.querySelector('.transmit-btn');
+            const originalText = submitBtn.innerHTML;
+            
+            // Show transmission in progress
+            submitBtn.innerHTML = '<span>📡 Transmitting...</span>';
+            submitBtn.disabled = true;
+            
+            // Simulate transmission delay
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // Show success message
+            submitBtn.innerHTML = '<span>✅ Message Transmitted!</span>';
+            
+            setTimeout(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                form.reset();
+                
+                // Show success notification
+                const statusDiv = winElem.querySelector('.transmission-status .status-indicator');
+                if (statusDiv) {
+                    statusDiv.innerHTML = `
+                        <div class="signal-icon" style="width: 12px; height: 12px; background: var(--accent-green); border-radius: 50%; animation: pulse 2s infinite;"></div>
+                        <span>Message delivered successfully</span>
+                    `;
+                    
+                    setTimeout(() => {
+                        statusDiv.innerHTML = `
+                            <div class="signal-icon" style="width: 12px; height: 12px; background: var(--accent-green); border-radius: 50%; animation: pulse 2s infinite;"></div>
+                            <span>Secure channel established</span>
+                        `;
+                    }, 3000);
+                }
+            }, 1500);
+        });
+    }
 }
 
 /**
@@ -202,18 +271,30 @@ function handleGlobalKeydown(e) {
     }
 }
 
-document.addEventListener('click', handleGlobalClick);
-document.addEventListener('keydown', handleGlobalKeydown);
-
 // --- INITIALIZATION ---
 
-// Initialize UI on load
-initializeUI();
-
-// Launch welcome window on first load
 document.addEventListener('DOMContentLoaded', () => {
-    // Small delay to ensure UI is fully initialized
-    setTimeout(() => {
-        handleAppClick('welcome');
-    }, 500);
+    // Initialize UI components
+    initializeUI();
+    
+    // Set up start menu event listeners
+    document.getElementById('startBtn').addEventListener('click', toggleStartMenu);
+    document.getElementById('startBtn').addEventListener('keydown', toggleStartMenu);
+    
+    document.addEventListener('click', (e) => {
+        const startMenu = document.getElementById('startMenu');
+        if (!e.target.closest('.start-btn') && !e.target.closest('.start-menu')) {
+            startMenu.classList.remove('show');
+        }
+    });
+    
+    // Set up global event listeners
+    document.addEventListener('click', handleGlobalClick);
+    document.addEventListener('keydown', handleGlobalKeydown);
+    
+    // Initialize keyboard manager
+    new KeyboardManager();
+    
+    // Initialize boot system (this will handle the welcome window launch)
+    bootSystem = new BootSystem();
 }); 

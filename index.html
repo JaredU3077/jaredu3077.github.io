@@ -79,6 +79,82 @@
     </script>
 </head>
 <body>
+    <!-- Boot Sequence -->
+    <div id="bootSequence" class="boot-sequence">
+        <div class="boot-container">
+            <div class="boot-header">
+                <div class="boot-logo">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M3 12h18M3 6h18M3 18h18"/>
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>
+                    </svg>
+                </div>
+                <h1>Neu-OS v2.1.4</h1>
+                <p>Network Engineering Operating System</p>
+            </div>
+            <div class="boot-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <div class="boot-messages">
+                    <div class="boot-message">Initializing network stack...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="login-logo">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M3 12h18M3 6h18M3 18h18"/>
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>
+                    </svg>
+                </div>
+                <h2>Neu-OS</h2>
+                <p>Senior Network Engineer Workstation</p>
+            </div>
+            <div class="login-form">
+                <div class="user-profile">
+                    <div class="user-avatar">👨‍💻</div>
+                    <div class="user-info">
+                        <h3>Jared U.</h3>
+                        <p>Senior Network Engineer</p>
+                    </div>
+                </div>
+                <button id="guestLoginBtn" class="login-btn">
+                    <span>Enter as Guest</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </button>
+                <p class="login-footer">Click to explore the interactive portfolio</p>
+            </div>
+        </div>
+        <div class="login-background">
+            <div class="network-grid"></div>
+        </div>
+    </div>
+
+    <!-- Audio Controls -->
+    <div id="audioControls" class="audio-controls">
+        <button id="audioToggle" class="audio-toggle" title="Toggle Sound Effects">
+            <svg class="audio-on" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.08"/>
+            </svg>
+            <svg class="audio-off" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                <line x1="23" y1="9" x2="17" y2="15"/>
+                <line x1="17" y1="9" x2="23" y2="15"/>
+            </svg>
+        </button>
+    </div>
+
     <div id="desktop">
         <div id="desktop-icons">
             <!-- Desktop icons will be generated here -->

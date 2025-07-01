@@ -198,63 +198,192 @@ UDP    192.168.1.100:53       *:*                    LISTENING`
                     </div>
                     
                     <div class="device-category" style="margin-bottom: 25px;">
-                        <h4 style="color: #ff6900; margin-bottom: 10px;">🛡️ Security Infrastructure</h4>
+                        <h4 style="color: #ff6900; margin-bottom: 10px;">🔥 Security Infrastructure</h4>
                         <div class="device-item" style="margin: 8px 0; padding: 8px; background: #1e2530; border-radius: 8px;">
-                            <strong>Firewall Cluster</strong> - Palo Alto PA-5250 (HA)<br>
-                            <span style="color: #a0a0a0; font-size: 0.9em;">Management: 192.168.1.20-21 | Status: ✅ Active/Standby | Threats Blocked: 1,247</span>
+                            <strong>Primary Firewall</strong> - Palo Alto PA-5250 (HA Primary)<br>
+                            <span style="color: #a0a0a0; font-size: 0.9em;">Management: 192.168.1.20 | Status: ✅ Online | Throughput: 2.3 Gbps</span>
                         </div>
                         <div class="device-item" style="margin: 8px 0; padding: 8px; background: #1e2530; border-radius: 8px;">
-                            <strong>IPS/IDS</strong> - Fortinet FortiGate 600E<br>
-                            <span style="color: #a0a0a0; font-size: 0.9em;">Management: 192.168.1.22 | Status: ✅ Online | Signatures: Updated</span>
-                        </div>
-                    </div>
-                    
-                    <div class="device-category" style="margin-bottom: 25px;">
-                        <h4 style="color: #7c53ff; margin-bottom: 10px;">📡 Wireless Infrastructure</h4>
-                        <div class="device-item" style="margin: 8px 0; padding: 8px; background: #1e2530; border-radius: 8px;">
-                            <strong>Wireless Controllers</strong> - Arista Cloud Vision (Primary/Secondary)<br>
-                            <span style="color: #a0a0a0; font-size: 0.9em;">Management: 192.168.1.30-31 | Status: ✅ Online | APs: 127/130</span>
-                        </div>
-                        <div class="device-item" style="margin: 8px 0; padding: 8px; background: #1e2530; border-radius: 8px;">
-                            <strong>Access Points</strong> - Arista Wi-Fi 6E (Various Models)<br>
-                            <span style="color: #a0a0a0; font-size: 0.9em;">Coverage: 99.7% | Clients: 1,847 | Avg Signal: -45 dBm</span>
+                            <strong>Secondary Firewall</strong> - Palo Alto PA-5250 (HA Secondary)<br>
+                            <span style="color: #a0a0a0; font-size: 0.9em;">Management: 192.168.1.21 | Status: ✅ Standby | Ready for failover</span>
                         </div>
                     </div>
                     
                     <div class="device-category" style="margin-bottom: 25px;">
-                        <h4 style="color: #00b8d9; margin-bottom: 10px;">🌐 WAN & Connectivity</h4>
+                        <h4 style="color: #7c53ff; margin-bottom: 10px;">☁️ Wireless Infrastructure</h4>
                         <div class="device-item" style="margin: 8px 0; padding: 8px; background: #1e2530; border-radius: 8px;">
-                            <strong>Edge Routers</strong> - Cisco ASR 1000 Series<br>
-                            <span style="color: #a0a0a0; font-size: 0.9em;">Management: 192.168.1.40-41 | Status: ✅ Online | BGP Sessions: 8/8</span>
+                            <strong>Wireless Controller</strong> - Cisco 9800-CL (Virtual)<br>
+                            <span style="color: #a0a0a0; font-size: 0.9em;">Management: 192.168.1.30 | APs: 47 connected | Clients: 312 active</span>
+                        </div>
+                    </div>
+                    
+                    <div class="device-category" style="margin-bottom: 25px;">
+                        <h4 style="color: #00d084; margin-bottom: 10px;">🔗 WAN/Internet</h4>
+                        <div class="device-item" style="margin: 8px 0; padding: 8px; background: #1e2530; border-radius: 8px;">
+                            <strong>Primary ISP</strong> - Fiber 1Gbps (Comcast Business)<br>
+                            <span style="color: #a0a0a0; font-size: 0.9em;">Circuit ID: CMCST-123456 | Status: ✅ Online | Utilization: 23%</span>
                         </div>
                         <div class="device-item" style="margin: 8px 0; padding: 8px; background: #1e2530; border-radius: 8px;">
-                            <strong>SD-WAN Appliances</strong> - Cisco Meraki MX450<br>
-                            <span style="color: #a0a0a0; font-size: 0.9em;">Management: Cloud Managed | Status: ✅ Online | Tunnels: 12/12</span>
+                            <strong>Backup ISP</strong> - Cable 500Mbps (Xfinity Business)<br>
+                            <span style="color: #a0a0a0; font-size: 0.9em;">Circuit ID: XFN-789012 | Status: ✅ Standby | Ready for failover</span>
                         </div>
                     </div>
                     
                     <div class="device-category">
-                        <h4 style="color: #ff4d4d; margin-bottom: 10px;">📊 Monitoring & Management</h4>
+                        <h4 style="color: #ff4d4d; margin-bottom: 10px;">⚡ Power & Environmental</h4>
                         <div class="device-item" style="margin: 8px 0; padding: 8px; background: #1e2530; border-radius: 8px;">
-                            <strong>Network Monitoring</strong> - SolarWinds NPM Cluster<br>
-                            <span style="color: #a0a0a0; font-size: 0.9em;">Management: 192.168.1.50-52 | Status: ✅ Online | Devices Monitored: 847</span>
+                            <strong>UPS Systems</strong> - APC Smart-UPS 3000VA (2 units)<br>
+                            <span style="color: #a0a0a0; font-size: 0.9em;">Load: 45% | Battery: 100% | Runtime: 47 minutes</span>
                         </div>
                         <div class="device-item" style="margin: 8px 0; padding: 8px; background: #1e2530; border-radius: 8px;">
-                            <strong>Log Management</strong> - Splunk Enterprise<br>
-                            <span style="color: #a0a0a0; font-size: 0.9em;">Management: 192.168.1.60 | Status: ✅ Online | Daily Logs: 2.3TB</span>
+                            <strong>Environmental Monitor</strong> - NetBotz Room Monitor 355<br>
+                            <span style="color: #a0a0a0; font-size: 0.9em;">Temp: 72°F | Humidity: 45% | All sensors normal</span>
                         </div>
-                    </div>
-                    
-                    <div style="margin-top: 25px; padding: 15px; background: #0f1419; border-radius: 8px; border-left: 4px solid #4a90e2;">
-                        <strong>Network Health Summary:</strong><br>
-                        <span style="color: #00d084;">● 847 devices monitored</span><br>
-                        <span style="color: #00d084;">● 99.97% network uptime</span><br>
-                        <span style="color: #ffff00;">● 3 minor alerts pending</span><br>
-                        <span style="color: #00d084;">● All critical systems operational</span>
                     </div>
                 </div>`,
                 width: 700,
+                height: 500
+            }],
+        },
+        'skills': {
+            id: 'skills',
+            name: 'Skills Lab',
+            description: 'Interactive technical skill demonstrations',
+            icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>`,
+            windows: [{
+                id: 'skillsWindow',
+                title: 'Skills Laboratory - Interactive Demos',
+                content: `<div id="skillsContainer" data-scroll-container></div>`,
+                width: 900,
                 height: 600
+            }]
+        },
+        'projects': {
+            id: 'projects',
+            name: 'Project Portfolio',
+            description: 'Live project demonstrations and case studies',
+            icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><folder x="2" y="3" width="20" height="14" rx="2" ry="2"/><path d="M8 3v18M16 3v18"/></svg>`,
+            windows: [{
+                id: 'projectsWindow',
+                title: 'Project Portfolio - Live Demos',
+                content: `<div id="projectsContainer" data-scroll-container></div>`,
+                width: 900,
+                height: 650
+            }]
+        },
+        'system-status': {
+            id: 'system-status',
+            name: 'System Status',
+            description: 'Real-time system diagnostics and metrics',
+            icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`,
+            windows: [{
+                id: 'statusWindow',
+                title: 'Neu-OS System Status',
+                content: `<div id="systemStatus" data-scroll-container></div>`,
+                width: 800,
+                height: 500
+            }]
+        },
+        'contact': {
+            id: 'contact',
+            name: 'Communication Module',
+            description: 'Network packet transmitter and messaging system',
+            icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>`,
+            windows: [{
+                id: 'contactWindow',
+                title: 'Network Communication Module',
+                content: `
+                    <div class="contact-module" style="padding: 30px;">
+                        <div class="contact-header" style="text-align: center; margin-bottom: 30px;">
+                            <h2 style="color: var(--primary-color); margin-bottom: 10px;">📡 Network Packet Transmitter</h2>
+                            <p style="opacity: 0.8;">Secure communication channel established</p>
+                        </div>
+                        
+                        <form class="transmission-form" style="max-width: 500px; margin: 0 auto;">
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 8px; color: var(--primary-color); font-weight: 600;">Sender ID:</label>
+                                <input type="text" name="sender" placeholder="Enter your identification" required 
+                                       style="width: 100%; padding: 12px; background: #1a1f2a; border: 2px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-family: 'Fira Code', monospace;">
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 8px; color: var(--primary-color); font-weight: 600;">Message Protocol:</label>
+                                <input type="email" name="email" placeholder="sender@network.domain" required 
+                                       style="width: 100%; padding: 12px; background: #1a1f2a; border: 2px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-family: 'Fira Code', monospace;">
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 8px; color: var(--primary-color); font-weight: 600;">Transmission Subject:</label>
+                                <input type="text" name="subject" placeholder="Message header classification" required 
+                                       style="width: 100%; padding: 12px; background: #1a1f2a; border: 2px solid var(--border-color); border-radius: 8px; color: var(--text-color);">
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 30px;">
+                                <label style="display: block; margin-bottom: 8px; color: var(--primary-color); font-weight: 600;">Transmission Content:</label>
+                                <textarea name="message" rows="6" placeholder="Enter message payload..." required 
+                                          style="width: 100%; padding: 12px; background: #1a1f2a; border: 2px solid var(--border-color); border-radius: 8px; color: var(--text-color); resize: vertical; font-family: inherit;"></textarea>
+                            </div>
+                            
+                            <div class="transmission-status" style="text-align: center; margin-bottom: 20px;">
+                                <div class="status-indicator" style="display: inline-flex; align-items: center; gap: 8px; color: var(--accent-green);">
+                                    <div class="signal-icon" style="width: 12px; height: 12px; background: var(--accent-green); border-radius: 50%; animation: pulse 2s infinite;"></div>
+                                    <span>Secure channel established</span>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="transmit-btn" 
+                                    style="width: 100%; padding: 15px; background: linear-gradient(135deg, var(--primary-color) 60%, var(--primary-hover) 100%); color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.3s ease;">
+                                <span>🚀 Transmit Message</span>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="22" y1="2" x2="11" y2="13"/>
+                                    <polygon points="22,2 15,22 11,13 2,9 22,2"/>
+                                </svg>
+                            </button>
+                        </form>
+                        
+                        <div class="contact-info" style="margin-top: 40px; text-align: center; padding-top: 30px; border-top: 1px solid var(--border-color);">
+                            <h3 style="color: var(--primary-color); margin-bottom: 15px;">Direct Communication Channels</h3>
+                            <div class="contact-methods" style="display: flex; justify-content: center; gap: 30px; flex-wrap: wrap;">
+                                <div class="contact-method">
+                                    <div style="color: var(--accent-green); font-size: 1.5rem; margin-bottom: 5px;">📧</div>
+                                    <div style="font-size: 0.9rem; opacity: 0.8;">Network Email</div>
+                                    <div style="font-family: 'Fira Code', monospace; font-size: 0.9rem;">contact@jaredu.dev</div>
+                                </div>
+                                <div class="contact-method">
+                                    <div style="color: var(--primary-color); font-size: 1.5rem; margin-bottom: 5px;">💼</div>
+                                    <div style="font-size: 0.9rem; opacity: 0.8;">Professional Network</div>
+                                    <div style="font-family: 'Fira Code', monospace; font-size: 0.9rem;">linkedin.com/in/jaredu</div>
+                                </div>
+                                <div class="contact-method">
+                                    <div style="color: var(--accent-purple); font-size: 1.5rem; margin-bottom: 5px;">⚡</div>
+                                    <div style="font-size: 0.9rem; opacity: 0.8;">Code Repository</div>
+                                    <div style="font-family: 'Fira Code', monospace; font-size: 0.9rem;">github.com/jaredu3077</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <style>
+                    @keyframes pulse {
+                        0%, 100% { opacity: 1; transform: scale(1); }
+                        50% { opacity: 0.7; transform: scale(1.1); }
+                    }
+                    
+                    .transmit-btn:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 8px 25px rgba(74, 144, 226, 0.4);
+                    }
+                    
+                    .form-group input:focus,
+                    .form-group textarea:focus {
+                        outline: none;
+                        border-color: var(--primary-color);
+                        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+                    }
+                    </style>
+                `,
+                width: 650,
+                height: 700
             }]
         },
         'codex': {
