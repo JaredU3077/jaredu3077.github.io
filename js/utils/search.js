@@ -146,10 +146,11 @@ export class SearchManager {
         let html = '<div class="codex-document">';
         let currentLayer = null;
         let inList = false;
+        let elementCounter = 0;
 
         // Add document header
         html += `
-            <div class="codex-header" style="margin-bottom: 30px; padding: 20px; background: #1e2530; border-radius: 12px; border-left: 4px solid #4a90e2;">
+            <div class="codex-header" id="codex-element-${elementCounter++}" style="margin-bottom: 30px; padding: 20px; background: #1e2530; border-radius: 12px; border-left: 4px solid #4a90e2;">
                 <h1 style="color: #4a90e2; margin: 0 0 10px 0; font-size: 1.8em;">📚 Financial Instruments Codex</h1>
                 <p style="color: #a0a0a0; margin: 0; font-size: 0.95em;">Comprehensive documentation of financial instruments and control mechanisms</p>
             </div>
@@ -169,8 +170,8 @@ export class SearchManager {
                 const [, number, title] = layerMatch;
                 currentLayer = number;
                 html += `
-                    <div class="layer-section" style="margin: 25px 0;">
-                        <h2 class="layer-header" style="color: #00d084; margin: 0 0 15px 0; padding: 10px 0; border-bottom: 2px solid #00d084; font-size: 1.4em;">
+                    <div class="layer-section" id="codex-element-${elementCounter++}" style="margin: 25px 0;">
+                        <h2 class="layer-header" id="layer-${number}" style="color: #00d084; margin: 0 0 15px 0; padding: 10px 0; border-bottom: 2px solid #00d084; font-size: 1.4em;">
                             Layer ${number}: ${this.escapeHtml(title)}
                         </h2>
                 `;
@@ -183,14 +184,14 @@ export class SearchManager {
                     html += '</ul>';
                     inList = false;
                 }
-                html += `<h3 style="color: #4a90e2; margin: 20px 0 10px 0; font-size: 1.2em;">${this.escapeHtml(line)}</h3>`;
+                html += `<h3 id="codex-element-${elementCounter++}" style="color: #4a90e2; margin: 20px 0 10px 0; font-size: 1.2em;">${this.escapeHtml(line)}</h3>`;
                 return;
             }
 
             // Check for list items (indented with spaces)
             if (line.match(/^\s{4,}/)) {
                 if (!inList) {
-                    html += '<ul style="margin: 10px 0; padding-left: 20px;">';
+                    html += `<ul id="codex-element-${elementCounter++}" style="margin: 10px 0; padding-left: 20px;">`;
                     inList = true;
                 }
                 const cleanLine = line.replace(/^\s+/, '');
@@ -199,9 +200,9 @@ export class SearchManager {
                 if (cleanLine.includes(':')) {
                     const [term, ...descParts] = cleanLine.split(':');
                     const description = descParts.join(':').trim();
-                    html += `<li style="margin: 8px 0; line-height: 1.4;"><strong style="color: #4a90e2;">${this.escapeHtml(term.trim())}:</strong> <span style="color: #eaf1fb;">${this.escapeHtml(description)}</span></li>`;
+                    html += `<li id="codex-element-${elementCounter++}" style="margin: 8px 0; line-height: 1.4;"><strong style="color: #4a90e2;">${this.escapeHtml(term.trim())}:</strong> <span style="color: #eaf1fb;">${this.escapeHtml(description)}</span></li>`;
                 } else {
-                    html += `<li style="margin: 8px 0; line-height: 1.4;">${this.escapeHtml(cleanLine)}</li>`;
+                    html += `<li id="codex-element-${elementCounter++}" style="margin: 8px 0; line-height: 1.4;">${this.escapeHtml(cleanLine)}</li>`;
                 }
                 return;
             }
@@ -211,7 +212,7 @@ export class SearchManager {
                 html += '</ul>';
                 inList = false;
             }
-            html += `<p style="margin: 12px 0; line-height: 1.5; color: #eaf1fb;">${this.escapeHtml(line)}</p>`;
+            html += `<p id="codex-element-${elementCounter++}" style="margin: 12px 0; line-height: 1.5; color: #eaf1fb;">${this.escapeHtml(line)}</p>`;
         });
 
         if (inList) {
@@ -264,6 +265,9 @@ export class SearchManager {
                 weight = parseInt(element.tagName.charAt(1)) <= 2 ? 3 : 2; // h1, h2 get higher weight
             }
             
+            // Get element ID for reliable targeting
+            const elementId = element.id || this.generateElementId(element);
+            
             words.forEach(word => {
                 if (!this.searchIndex.has(word)) {
                     this.searchIndex.set(word, []);
@@ -273,10 +277,33 @@ export class SearchManager {
                     text: element.textContent,
                     weight: weight,
                     parent: element.parentElement?.tagName.toLowerCase() || '',
+                    elementId: elementId,
                     path: this.getElementPath(element)
                 });
             });
         });
+    }
+
+    /**
+     * Generates a unique ID for an element based on its content
+     * @param {HTMLElement} element - The element to generate an ID for
+     * @returns {string} A unique element ID
+     * @private
+     * @memberof SearchManager
+     */
+    generateElementId(element) {
+        const text = element.textContent.trim();
+        const tagName = element.tagName.toLowerCase();
+        
+        // Create a simple hash from the text content
+        let hash = 0;
+        for (let i = 0; i < text.length; i++) {
+            const char = text.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // Convert to 32-bit integer
+        }
+        
+        return `${tagName}-${Math.abs(hash)}`;
     }
 
     /**
@@ -377,7 +404,7 @@ export class SearchManager {
             const context = this.getResultContext(result);
             const elementType = result.element.startsWith('h') ? '📄' : '📝';
             html += `
-                <div class="search-result" data-path="${result.path}" 
+                <div class="search-result" data-element-id="${result.elementId}" data-path="${result.path}"
                      style="padding: 10px 15px; border-bottom: 1px solid #26334d; cursor: pointer; transition: background-color 0.2s;"
                      onmouseover="this.style.backgroundColor='#26334d'" 
                      onmouseout="this.style.backgroundColor='transparent'">
@@ -395,7 +422,10 @@ export class SearchManager {
         // Add click handlers
         searchResults.querySelectorAll('.search-result').forEach(result => {
             result.addEventListener('click', () => {
-                this.scrollToResult(result.dataset.path);
+                const elementId = result.dataset.elementId;
+                const path = result.dataset.path;
+                console.log('Search result clicked:', { elementId, path });
+                this.scrollToResult(elementId, path);
                 searchResults.style.display = 'none';
             });
         });
@@ -448,27 +478,103 @@ export class SearchManager {
 
     /**
      * Scrolls the content view to the selected search result.
-     * @param {string} path - The CSS selector path to the result element.
+     * @param {string} elementId - The element ID to scroll to
+     * @param {string} path - The CSS selector path as fallback
      * @private
      * @memberof SearchManager
      */
-    scrollToResult(path) {
+    scrollToResult(elementId, path) {
         const codexContent = document.getElementById('codexContent');
-        const element = codexContent.querySelector(path.split(' > ').pop());
+        let targetElement = null;
         
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Try multiple approaches to find the element
+        
+        // 1. Try finding by element ID first (most reliable)
+        if (elementId) {
+            targetElement = document.getElementById(elementId);
+            if (!targetElement) {
+                // Try finding within the codex content specifically
+                targetElement = codexContent.querySelector(`#${elementId}`);
+            }
+        }
+        
+        // 2. If ID search failed, try finding by path
+        if (!targetElement && path) {
+            try {
+                targetElement = codexContent.querySelector(path.split(' > ').pop());
+            } catch (e) {
+                console.warn('Path selector failed:', path);
+            }
+        }
+        
+        // 3. If still not found, try a more flexible search
+        if (!targetElement && elementId) {
+            // Try finding by partial ID match
+            targetElement = codexContent.querySelector(`[id*="${elementId.split('-')[0]}"]`);
+        }
+        
+        // 4. Last resort: try finding by text content
+        if (!targetElement) {
+            const searchText = this.currentQuery;
+            const allElements = codexContent.querySelectorAll('h1, h2, h3, h4, p, li');
+            for (const el of allElements) {
+                if (el.textContent.toLowerCase().includes(searchText)) {
+                    targetElement = el;
+                    break;
+                }
+            }
+        }
+        
+        if (targetElement) {
+            console.log('Scrolling to element:', targetElement);
             
-            // Add highlight effect
-            element.style.background = 'rgba(74, 144, 226, 0.2)';
-            element.style.borderRadius = '8px';
-            element.style.padding = '10px';
-            element.style.transition = 'all 0.3s ease';
+            // Ensure the codex content container scrolls, not the window
+            const codexContainer = targetElement.closest('#codexContent');
             
+            // Calculate the position within the scrollable container
+            const containerRect = codexContent.getBoundingClientRect();
+            const elementRect = targetElement.getBoundingClientRect();
+            const relativeTop = elementRect.top - containerRect.top + codexContent.scrollTop;
+            
+            // Scroll to the calculated position (center the element)
+            const scrollToPosition = relativeTop - (codexContent.clientHeight / 2) + (targetElement.offsetHeight / 2);
+            
+            // Use scrollTo if available, otherwise use scrollTop for broader compatibility
+            if (codexContent.scrollTo) {
+                codexContent.scrollTo({
+                    top: Math.max(0, scrollToPosition),
+                    behavior: 'smooth'
+                });
+            } else {
+                // Fallback for older browsers
+                codexContent.scrollTop = Math.max(0, scrollToPosition);
+            }
+            
+            // Add highlight effect with better visibility
+            const originalStyle = {
+                background: targetElement.style.background,
+                borderRadius: targetElement.style.borderRadius,
+                padding: targetElement.style.padding,
+                transition: targetElement.style.transition,
+                outline: targetElement.style.outline
+            };
+            
+            targetElement.style.background = 'rgba(74, 144, 226, 0.3)';
+            targetElement.style.borderRadius = '8px';
+            targetElement.style.padding = '10px';
+            targetElement.style.transition = 'all 0.3s ease';
+            targetElement.style.outline = '2px solid #4a90e2';
+            
+            // Remove highlight after delay
             setTimeout(() => {
-                element.style.background = 'transparent';
-                element.style.padding = '';
-            }, 2000);
+                targetElement.style.background = originalStyle.background;
+                targetElement.style.borderRadius = originalStyle.borderRadius;
+                targetElement.style.padding = originalStyle.padding;
+                targetElement.style.transition = originalStyle.transition;
+                targetElement.style.outline = originalStyle.outline;
+            }, 3000);
+        } else {
+            console.warn('Could not find target element for scroll:', { elementId, path });
         }
     }
 } 

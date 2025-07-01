@@ -289,6 +289,13 @@ class WindowManager {
 - **Font Awesome** (v6.0): Comprehensive icon system
 - **Custom CSS Framework**: Complete neumorphic design system
 
+#### **PWA Status**:
+- **Service Worker**: ❌ Removed (was causing 404 errors)
+- **Manifest**: ❌ Not implemented
+- **Offline Support**: ❌ Not available
+- **Install Capability**: ❌ Not available
+- **Future Consideration**: Could add PWA features for offline portfolio viewing
+
 #### **Browser Compatibility**:
 - Modern browsers with CSS Grid/Flexbox support
 - Hardware acceleration for smooth animations
@@ -379,6 +386,45 @@ class WindowManager {
 - **Optimized**: Window resize handling for better performance
 - **Enhanced**: Memory management in window lifecycle
 - **Improved**: Animation frame handling for smoother effects
+
+### **Technical Cleanup**:
+- **Fixed**: Removed non-existent service worker registration causing 404 errors
+- **Cleaned**: Eliminated sw.js references that were causing console errors
+- **Documented**: PWA status and future implementation considerations
+
+---
+
+## 🚀 **FUTURE CONSIDERATIONS**
+
+### **Progressive Web App (PWA) Implementation**
+If PWA functionality is desired in the future, the following could be implemented:
+
+#### **Service Worker Features**:
+- **Offline Caching**: Cache application shell and content for offline viewing
+- **Background Sync**: Update content when connection is restored
+- **Push Notifications**: Notify users of portfolio updates or new content
+- **Performance Optimization**: Cache strategies for faster loading
+
+#### **Web App Manifest**:
+- **App Installation**: Enable "Add to Home Screen" functionality
+- **Native App Feel**: Custom splash screen and app icon
+- **Display Modes**: Standalone app experience on mobile/desktop
+- **Theme Colors**: Consistent branding across app interface
+
+#### **Implementation Plan**:
+1. Create `manifest.json` with app metadata and icons
+2. Implement `sw.js` with caching strategies:
+   - Cache First: Static assets (CSS, JS, images)
+   - Network First: Dynamic content (resume updates)
+   - Stale While Revalidate: API calls and external resources
+3. Add install prompt UI component
+4. Test across different browsers and devices
+
+#### **Benefits for Portfolio**:
+- **Professional Touch**: Shows knowledge of modern web technologies
+- **Better UX**: Faster loading and offline access for recruiters
+- **Mobile Experience**: Native app-like experience on mobile devices
+- **Reliability**: Works even with poor network conditions
 
 ---
 
