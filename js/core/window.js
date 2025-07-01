@@ -17,7 +17,7 @@ export class WindowManager {
         /** @type {?object} */
         this.activeWindow = null;
         /** @type {number} */
-        this.zIndexCounter = CONFIG.window.zIndex;
+        this.zIndexCounter = CONFIG.window?.zIndex || 1000;
         /** @type {number} */
         this.snapThreshold = 15; // Much more conservative threshold
         /** @type {Map<string, object>} */
@@ -49,9 +49,14 @@ export class WindowManager {
      * @memberof WindowManager
      */
     createWindow({ id, title, content, width = CONFIG.window.defaultWidth, height = CONFIG.window.defaultHeight, icon, autoScroll = false }) {
-        // Ensure window dimensions are within bounds
-        width = Math.min(Math.max(width, CONFIG.window.minWidth), CONFIG.window.maxWidth);
-        height = Math.min(Math.max(height, CONFIG.window.minHeight), CONFIG.window.maxHeight);
+        // Ensure window dimensions are within bounds with proper fallbacks
+        const minWidth = CONFIG.window?.minWidth || 300;
+        const maxWidth = CONFIG.window?.maxWidth || 1200;
+        const minHeight = CONFIG.window?.minHeight || 200;
+        const maxHeight = CONFIG.window?.maxHeight || 800;
+        
+        width = Math.min(Math.max(width, minWidth), maxWidth);
+        height = Math.min(Math.max(height, minHeight), maxHeight);
 
         // Center the window on screen
         const left = (window.innerWidth - width) / 2;
@@ -83,17 +88,21 @@ export class WindowManager {
             <div class="window-content" tabindex="0">
                 ${content}
             </div>
-            <div class="window-resize n"></div>
-            <div class="window-resize e"></div>
-            <div class="window-resize s"></div>
-            <div class="window-resize w"></div>
-            <div class="window-resize ne"></div>
-            <div class="window-resize nw"></div>
-            <div class="window-resize se"></div>
-            <div class="window-resize sw"></div>
+            <div class="window-resize n" title="Resize window"></div>
+            <div class="window-resize e" title="Resize window"></div>
+            <div class="window-resize s" title="Resize window"></div>
+            <div class="window-resize w" title="Resize window"></div>
+            <div class="window-resize ne" title="Resize window"></div>
+            <div class="window-resize nw" title="Resize window"></div>
+            <div class="window-resize se" title="Resize window"></div>
+            <div class="window-resize sw" title="Resize window"></div>
         `;
 
-        document.getElementById('desktop').appendChild(windowElement);
+        const desktop = document.getElementById('desktop');
+        if (!desktop) {
+            throw new Error('Desktop element not found! Cannot create window.');
+        }
+        desktop.appendChild(windowElement);
 
         const windowObj = {
             element: windowElement,
@@ -112,6 +121,16 @@ export class WindowManager {
 
         this.windows.set(id, windowObj);
         this.windowStack.push(windowObj);
+        
+        console.log('🪟 Window created:', { 
+            id, 
+            width, 
+            height, 
+            left, 
+            top,
+            zIndex: windowElement.style.zIndex 
+        });
+        
         this.setupWindowEvents(windowObj);
         this.focusWindow(windowObj);
 
@@ -169,6 +188,7 @@ export class WindowManager {
                 const resizeInstance = interact(window.element)
                     .resizable({
                         edges: { left: true, right: true, bottom: true, top: true },
+                        margin: 10,
                         listeners: {
                             start: (event) => {
                                 // Mark window as being resized to prevent drag conflicts and disable snapping
@@ -178,14 +198,17 @@ export class WindowManager {
                                     windowObj._isDragging = false;
                                     // Disable snapping during resize to prevent interference
                                     this.disableSnapping(2000);
+                                    // Add visual feedback
+                                    windowObj.element.classList.add('resizing');
                                 }
+                                console.log('Resize started on window:', event.target.id);
                             },
                             move: this.handleResizeMove.bind(this),
                             end: this.handleResizeEnd.bind(this)
                         },
                         modifiers: [
                             interact.modifiers.restrictSize({
-                                min: { width: 300, height: 200 },
+                                min: { width: CONFIG.window?.minWidth || 300, height: CONFIG.window?.minHeight || 200 },
                                 max: { width: window.innerWidth * 0.95, height: (window.innerHeight - 54) * 0.95 }
                             })
                         ]
@@ -282,8 +305,9 @@ export class WindowManager {
         const windowObj = this.windows.get(event.target.id);
         if (!windowObj) return;
 
-        // Clear resizing flag
+        // Clear resizing flag and visual feedback
         windowObj._isResizing = false;
+        windowObj.element.classList.remove('resizing');
 
         // Update the window object with final dimensions and position
         const finalWidth = event.rect.width;
@@ -318,7 +342,13 @@ export class WindowManager {
         // Ensure snapping remains disabled briefly after resize
         this.disableSnapping(1000);
         
-        console.log('Resize ended - Window dimensions:', { width: finalWidth, height: finalHeight, left: finalLeft, top: finalTop });
+        console.log('✅ Resize completed successfully - Window dimensions:', { 
+            id: windowObj.id,
+            width: finalWidth, 
+            height: finalHeight, 
+            left: finalLeft, 
+            top: finalTop 
+        });
     }
 
     /**
@@ -712,7 +742,9 @@ export class WindowManager {
      * @memberof WindowManager
      */
     getNextZIndex() {
-        return this.zIndexCounter++;
+        this.zIndexCounter += 10; // Use larger increments to avoid conflicts
+        console.log('🔢 Assigning z-index:', this.zIndexCounter);
+        return this.zIndexCounter;
     }
 
     /**
@@ -759,8 +791,13 @@ export class WindowManager {
      */
     updateWindowSize(window, width, height) {
         // Ensure window stays within bounds
-        width = Math.min(Math.max(width, CONFIG.window.minWidth), CONFIG.window.maxWidth);
-        height = Math.min(Math.max(height, CONFIG.window.minHeight), CONFIG.window.maxHeight);
+        const safeWidth = CONFIG.window?.minWidth || 300;
+        const safeMaxWidth = CONFIG.window?.maxWidth || 1200;
+        const safeHeight = CONFIG.window?.minHeight || 200;
+        const safeMaxHeight = CONFIG.window?.maxHeight || 800;
+        
+        width = Math.min(Math.max(width, safeWidth), safeMaxWidth);
+        height = Math.min(Math.max(height, safeHeight), safeMaxHeight);
         
         window.element.style.width = `${width}px`;
         window.element.style.height = `${height}px`;

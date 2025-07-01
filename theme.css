@@ -1599,3 +1599,93 @@ img, video {
         display: none;
     }
 }
+
+/* Window Resize Handles - CRITICAL MISSING CSS */
+.window-resize {
+    position: absolute;
+    background: transparent;
+    z-index: 10;
+}
+
+/* Corner resize handles */
+.window-resize.nw {
+    top: -5px;
+    left: -5px;
+    width: 15px;
+    height: 15px;
+    cursor: nw-resize;
+}
+
+.window-resize.ne {
+    top: -5px;
+    right: -5px;
+    width: 15px;
+    height: 15px;
+    cursor: ne-resize;
+}
+
+.window-resize.sw {
+    bottom: -5px;
+    left: -5px;
+    width: 15px;
+    height: 15px;
+    cursor: sw-resize;
+}
+
+.window-resize.se {
+    bottom: -5px;
+    right: -5px;
+    width: 15px;
+    height: 15px;
+    cursor: se-resize;
+}
+
+/* Edge resize handles */
+.window-resize.n {
+    top: -5px;
+    left: 15px;
+    right: 15px;
+    height: 10px;
+    cursor: n-resize;
+}
+
+.window-resize.s {
+    bottom: -5px;
+    left: 15px;
+    right: 15px;
+    height: 10px;
+    cursor: s-resize;
+}
+
+.window-resize.e {
+    top: 15px;
+    bottom: 15px;
+    right: -5px;
+    width: 10px;
+    cursor: e-resize;
+}
+
+.window-resize.w {
+    top: 15px;
+    bottom: 15px;
+    left: -5px;
+    width: 10px;
+    cursor: w-resize;
+}
+
+/* Visual feedback on hover */
+.window-resize:hover {
+    background: rgba(74, 144, 226, 0.2);
+    border: 1px solid rgba(74, 144, 226, 0.4);
+}
+
+/* Visual feedback during resize operation */
+.window.resizing {
+    opacity: 0.9;
+    box-shadow: 0 0 0 2px var(--primary-color), 0 12px 48px 0 #4a90e2, var(--neu-shadow);
+}
+
+.window.resizing .window-resize {
+    background: rgba(74, 144, 226, 0.3);
+    border: 1px solid var(--primary-color);
+}

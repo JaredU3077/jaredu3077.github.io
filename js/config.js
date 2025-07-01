@@ -13,6 +13,17 @@ export const CONFIG = {
         MAXIMIZED_MARGIN: '5%'
     },
 
+    // Window configuration (lowercase for compatibility)
+    window: {
+        defaultWidth: 500,
+        defaultHeight: 400,
+        minWidth: 300,
+        minHeight: 200,
+        maxWidth: 1200,
+        maxHeight: 800,
+        zIndex: 1000
+    },
+
     // Terminal commands
     COMMANDS: {
         HELP: `Available commands:
