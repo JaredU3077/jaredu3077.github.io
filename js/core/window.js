@@ -19,7 +19,7 @@ export class WindowManager {
         /** @type {number} */
         this.zIndexCounter = CONFIG.window.zIndex;
         /** @type {number} */
-        this.snapThreshold = CONFIG.window.snapThreshold || 20; // Reduce snap sensitivity
+        this.snapThreshold = 15; // Much more conservative threshold
         /** @type {Map<string, object>} */
         this.snapZones = new Map();
         /** @type {?HTMLElement} */
@@ -28,6 +28,10 @@ export class WindowManager {
         this.windowStack = [];
         /** @type {Set<Function>} */
         this.stateChangeCallbacks = new Set();
+        /** @type {boolean} */
+        this.isSnappingEnabled = true;
+        /** @type {Map<string, object>} */
+        this.interactInstances = new Map();
         this.setupEventListeners();
     }
 
@@ -132,27 +136,36 @@ export class WindowManager {
 
         // Make window draggable - check if interact.js is available
         if (typeof interact !== 'undefined') {
-            interact(header)
+            const dragInstance = interact(header)
                 .draggable({
-                    inertia: false, // Disable inertia to prevent unwanted movement
+                    inertia: false,
                     modifiers: [
                         interact.modifiers.restrictRect({
                             restriction: 'parent',
                             endOnly: true
                         })
                     ],
-                    autoScroll: true,
+                    autoScroll: false, // Disable autoscroll to prevent conflicts
                     listeners: {
+                        start: (event) => {
+                            // Mark window as being dragged to prevent resize conflicts
+                            const windowObj = this.windows.get(event.target.closest('.window').id);
+                            if (windowObj) windowObj._isDragging = true;
+                        },
                         move: this.handleDragMove.bind(this),
                         end: this.handleDragEnd.bind(this)
                     }
                 });
 
-            // Make window resizable
-            interact(window.element)
+            const resizeInstance = interact(window.element)
                 .resizable({
                     edges: { left: true, right: true, bottom: true, top: true },
                     listeners: {
+                        start: (event) => {
+                            // Mark window as being resized to prevent drag conflicts
+                            const windowObj = this.windows.get(event.target.id);
+                            if (windowObj) windowObj._isResizing = true;
+                        },
                         move: this.handleResizeMove.bind(this),
                         end: this.handleResizeEnd.bind(this)
                     },
@@ -167,6 +180,9 @@ export class WindowManager {
                         })
                     ]
                 });
+
+            // Store interact instances for potential cleanup/reset
+            this.interactInstances.set(window.id, { drag: dragInstance, resize: resizeInstance });
         } else {
             console.warn('interact.js not loaded - window dragging/resizing will not work');
         }
@@ -220,11 +236,19 @@ export class WindowManager {
         const windowElement = event.target.closest('.window');
         if (!windowElement) return;
         
-        const window = this.windows.get(windowElement.id);
-        if (!window) return;
+        const windowObj = this.windows.get(windowElement.id);
+        if (!windowObj) return;
 
-        // Only check snap zones for drag operations (not resize)
-        this.checkSnapZones(window);
+        // Clear dragging flag
+        windowObj._isDragging = false;
+
+        // Only check snap zones if snapping is enabled and this was actually a significant drag
+        if (this.isSnappingEnabled && !windowObj._isResizing) {
+            // Use a small delay to ensure DOM is fully updated
+            setTimeout(() => {
+                this.checkSnapZones(windowObj);
+            }, 10);
+        }
     }
 
     /**
@@ -237,11 +261,18 @@ export class WindowManager {
         const windowObj = this.windows.get(event.target.id);
         if (!windowObj) return;
 
+        // Clear resizing flag
+        windowObj._isResizing = false;
+
         // Update the window object with final dimensions and position
         windowObj.width = event.rect.width;
         windowObj.height = event.rect.height;
         windowObj.left = parseFloat(windowObj.element.style.left) || 0;
         windowObj.top = parseFloat(windowObj.element.style.top) || 0;
+        
+        // Reset any snapped state since user manually resized
+        windowObj.isMaximized = false;
+        windowObj._isSnapped = false;
         
         // Store the original position for future operations
         windowObj.originalPosition = {
@@ -251,8 +282,7 @@ export class WindowManager {
             height: windowObj.height
         };
         
-        // Do NOT check snap zones after resize operations
-        // This prevents the window from snapping when user is just resizing
+        // NEVER check snap zones after resize operations
     }
 
     /**
@@ -283,8 +313,9 @@ export class WindowManager {
         windowObj.left = x;
         windowObj.top = y;
         
-        // Mark that this window is no longer in a snapped state
+        // Mark that this window is no longer in a snapped/maximized state
         windowObj.isMaximized = false;
+        windowObj._isSnapped = false;
     }
 
     /**
@@ -294,8 +325,8 @@ export class WindowManager {
      * @memberof WindowManager
      */
     checkSnapZones(windowObj) {
-        // Don't snap if window is maximized
-        if (windowObj.isMaximized) {
+        // Don't snap if window is maximized, currently being resized, or snapping is disabled
+        if (windowObj.isMaximized || windowObj._isResizing || !this.isSnappingEnabled || windowObj._isSnapped) {
             return;
         }
 
@@ -308,6 +339,18 @@ export class WindowManager {
                 return;
             }
         }
+    }
+
+    /**
+     * Disables snapping temporarily
+     * @param {number} duration - How long to disable snapping in milliseconds
+     * @memberof WindowManager
+     */
+    disableSnapping(duration = 1000) {
+        this.isSnappingEnabled = false;
+        setTimeout(() => {
+            this.isSnappingEnabled = true;
+        }, duration);
     }
 
     /**
@@ -365,23 +408,24 @@ export class WindowManager {
      * @memberof WindowManager
      */
     isInSnapZone(rect, zone) {
-        // Check if the window's center point is near the zone boundaries
-        const windowCenterX = rect.left + rect.width / 2;
-        const windowCenterY = rect.top + rect.height / 2;
+        // Much more conservative snap detection - only at extreme edges
+        const threshold = this.snapThreshold;
         
-        // More specific zone detection
+        // Left zone - only when window is very close to left edge
         if (zone.left === 0 && zone.width === window.innerWidth / 2) {
-            // Left zone - check if dragged to left edge
-            return rect.left < this.snapThreshold;
-        } else if (zone.left === window.innerWidth / 2 && zone.width === window.innerWidth / 2) {
-            // Right zone - check if dragged to right edge
-            return rect.right > window.innerWidth - this.snapThreshold;
-        } else if (zone.top === 0 && zone.height === window.innerHeight / 2) {
-            // Top zone - check if dragged to top edge
-            return rect.top < this.snapThreshold;
-        } else if (zone.top === window.innerHeight / 2) {
-            // Bottom zone - check if dragged to bottom edge
-            return rect.bottom > window.innerHeight - this.snapThreshold - 54; // Account for taskbar
+            return rect.left <= threshold;
+        } 
+        // Right zone - only when window is very close to right edge
+        else if (zone.left === window.innerWidth / 2 && zone.width === window.innerWidth / 2) {
+            return rect.right >= window.innerWidth - threshold;
+        } 
+        // Top zone - only when window is very close to top edge
+        else if (zone.top === 0 && zone.height === (window.innerHeight - 54) / 2) {
+            return rect.top <= threshold;
+        } 
+        // Bottom zone - only when window is very close to bottom edge  
+        else if (zone.top === (window.innerHeight - 54) / 2) {
+            return rect.bottom >= window.innerHeight - 54 - threshold;
         }
         
         return false;
@@ -395,9 +439,12 @@ export class WindowManager {
      * @memberof WindowManager
      */
     snapWindowToZone(windowObj, zone) {
+        // Temporarily disable snapping to prevent recursive calls
+        this.isSnappingEnabled = false;
+
         const screenWidth = window.innerWidth;
         const screenHeight = window.innerHeight;
-        const taskbarHeight = 54; // Height of taskbar
+        const taskbarHeight = 54;
 
         let newLeft, newTop, newWidth, newHeight;
 
@@ -405,29 +452,40 @@ export class WindowManager {
             case 'left':
                 newLeft = 0;
                 newTop = 0;
-                newWidth = screenWidth / 2;
+                newWidth = Math.floor(screenWidth / 2);
                 newHeight = screenHeight - taskbarHeight;
                 break;
             case 'right':
-                newLeft = screenWidth / 2;
+                newLeft = Math.floor(screenWidth / 2);
                 newTop = 0;
-                newWidth = screenWidth / 2;
+                newWidth = Math.floor(screenWidth / 2);
                 newHeight = screenHeight - taskbarHeight;
                 break;
             case 'top':
                 newLeft = 0;
                 newTop = 0;
                 newWidth = screenWidth;
-                newHeight = (screenHeight - taskbarHeight) / 2;
+                newHeight = Math.floor((screenHeight - taskbarHeight) / 2);
                 break;
             case 'bottom':
                 newLeft = 0;
-                newTop = (screenHeight - taskbarHeight) / 2;
+                newTop = Math.floor((screenHeight - taskbarHeight) / 2);
                 newWidth = screenWidth;
-                newHeight = (screenHeight - taskbarHeight) / 2;
+                newHeight = Math.floor((screenHeight - taskbarHeight) / 2);
                 break;
             default:
-                return; // Unknown zone, don't snap
+                this.isSnappingEnabled = true;
+                return;
+        }
+
+        // Store original position before snapping
+        if (!windowObj.originalPosition || !windowObj._isSnapped) {
+            windowObj.originalPosition = {
+                left: windowObj.left,
+                top: windowObj.top,
+                width: windowObj.width,
+                height: windowObj.height
+            };
         }
 
         // Apply the new dimensions and position
@@ -436,12 +494,26 @@ export class WindowManager {
         windowObj.element.style.width = `${newWidth}px`;
         windowObj.element.style.height = `${newHeight}px`;
 
-        // Update the window object properties to stay in sync
+        // Update the window object properties
         windowObj.left = newLeft;
         windowObj.top = newTop;
         windowObj.width = newWidth;
         windowObj.height = newHeight;
-        windowObj.isMaximized = false; // Snapped windows are not maximized
+        windowObj.isMaximized = false;
+        windowObj._isSnapped = true;
+
+        // Reset interact.js internal state to prevent conflicts
+        const instances = this.interactInstances.get(windowObj.id);
+        if (instances && typeof interact !== 'undefined') {
+            // Force interact.js to recalculate positions
+            instances.resize.reset();
+            instances.drag.reset();
+        }
+
+        // Re-enable snapping after a delay
+        setTimeout(() => {
+            this.isSnappingEnabled = true;
+        }, 100);
     }
 
     /**
