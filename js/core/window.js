@@ -687,14 +687,34 @@ export class WindowManager {
             height: window.element.style.height
         };
 
+        // Get taskbar height to avoid covering it
+        const taskbar = document.querySelector('.taskbar');
+        const taskbarHeight = taskbar ? taskbar.offsetHeight : 54; // Default taskbar height
+
+        // Use config values for proper maximize dimensions
+        const maxWidth = CONFIG.WINDOW.MAXIMIZED_WIDTH || '90%';
+        const maxHeight = CONFIG.WINDOW.MAXIMIZED_HEIGHT || '80%';
+        const margin = CONFIG.WINDOW.MAXIMIZED_MARGIN || '5%';
+
         window.element.classList.add('maximizing');
-        window.element.style.left = '0';
-        window.element.style.top = '0';
-        window.element.style.width = '100%';
-        window.element.style.height = '100%';
+        window.element.classList.add('maximized');
+        
+        // Center the window with proper margins
+        window.element.style.left = margin;
+        window.element.style.top = margin;
+        window.element.style.width = maxWidth;
+        window.element.style.height = `calc(100vh - ${taskbarHeight}px - 10vh)`; // Use viewport height minus taskbar and margin
+        
         setTimeout(() => {
             window.element.classList.remove('maximizing');
         }, 300);
+        
+        console.log('🔍 Window maximized:', { 
+            id: window.id, 
+            width: maxWidth, 
+            height: `calc(100vh - ${taskbarHeight}px - 10vh)`,
+            taskbarHeight 
+        });
     }
 
     /**
@@ -706,13 +726,21 @@ export class WindowManager {
     unmaximizeWindow(window) {
         window.isMaximized = false;
         window.element.classList.add('unmaximizing');
+        window.element.classList.remove('maximized');
+        
         window.element.style.left = window.originalPosition.left;
         window.element.style.top = window.originalPosition.top;
         window.element.style.width = window.originalPosition.width;
         window.element.style.height = window.originalPosition.height;
+        
         setTimeout(() => {
             window.element.classList.remove('unmaximizing');
         }, 300);
+        
+        console.log('🔍 Window unmaximized:', { 
+            id: window.id, 
+            restored: window.originalPosition 
+        });
     }
 
     /**
