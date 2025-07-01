@@ -116,7 +116,8 @@ export class WindowManager {
             isMaximized: false,
             isMinimized: false,
             originalPosition: { left, top, width, height },
-            autoScroll: autoScroll
+            autoScroll: autoScroll,
+            _hasBeenResized: false // New windows start as not manually resized
         };
 
         this.windows.set(id, windowObj);
@@ -196,12 +197,12 @@ export class WindowManager {
                                 if (windowObj) {
                                     windowObj._isResizing = true;
                                     windowObj._isDragging = false;
-                                    // Disable snapping during resize to prevent interference
-                                    this.disableSnapping(2000);
+                                    // Completely disable snapping system during resize
+                                    this.isSnappingEnabled = false;
                                     // Add visual feedback
                                     windowObj.element.classList.add('resizing');
                                 }
-                                console.log('Resize started on window:', event.target.id);
+                                console.log('🔄 Resize started on window:', event.target.id);
                             },
                             move: this.handleResizeMove.bind(this),
                             end: this.handleResizeEnd.bind(this)
@@ -209,7 +210,7 @@ export class WindowManager {
                         modifiers: [
                             interact.modifiers.restrictSize({
                                 min: { width: CONFIG.window?.minWidth || 300, height: CONFIG.window?.minHeight || 200 },
-                                max: { width: window.innerWidth * 0.95, height: (window.innerHeight - 54) * 0.95 }
+                                max: { width: window.innerWidth * 0.9, height: (window.innerHeight - 54) * 0.9 }
                             })
                         ]
                     });
@@ -286,12 +287,28 @@ export class WindowManager {
         // Clear dragging flag
         windowObj._isDragging = false;
 
-        // Only check snap zones if snapping is enabled and this was actually a significant drag
-        if (this.isSnappingEnabled && !windowObj._isResizing) {
-            // Use a small delay to ensure DOM is fully updated
-            setTimeout(() => {
-                this.checkSnapZones(windowObj);
-            }, 10);
+        // Update window position
+        const left = parseFloat(windowObj.element.style.left) || 0;
+        const top = parseFloat(windowObj.element.style.top) || 0;
+        
+        windowObj.left = left;
+        windowObj.top = top;
+
+        // NEVER snap windows that have been manually resized to prevent resize interference
+        // Only check snap zones for brand new windows that haven't been resized
+        if (this.isSnappingEnabled && !windowObj._isResizing && !windowObj._hasBeenResized) {
+            // Only snap if window was dragged to very extreme edges (much more conservative)
+            const rect = windowObj.element.getBoundingClientRect();
+            const threshold = 3; // Extremely small threshold
+            
+            if (rect.left <= threshold || rect.right >= window.innerWidth - threshold || 
+                rect.top <= threshold || rect.bottom >= window.innerHeight - 54 - threshold) {
+                
+                // Use a small delay to ensure DOM is fully updated
+                setTimeout(() => {
+                    this.checkSnapZones(windowObj);
+                }, 10);
+            }
         }
     }
 
@@ -307,6 +324,7 @@ export class WindowManager {
 
         // Clear resizing flag and visual feedback
         windowObj._isResizing = false;
+        windowObj._hasBeenResized = true; // Mark that this window has been manually resized
         windowObj.element.classList.remove('resizing');
 
         // Update the window object with final dimensions and position
@@ -339,8 +357,12 @@ export class WindowManager {
             height: finalHeight
         };
         
-        // Ensure snapping remains disabled briefly after resize
-        this.disableSnapping(1000);
+        // Re-enable snapping but mark this window as having been manually resized
+        // This prevents future automatic snapping for this specific window
+        setTimeout(() => {
+            this.isSnappingEnabled = true;
+            console.log('🔄 Snapping re-enabled globally, but window marked as manually resized');
+        }, 1000);
         
         console.log('✅ Resize completed successfully - Window dimensions:', { 
             id: windowObj.id,
@@ -359,7 +381,13 @@ export class WindowManager {
      */
     handleResizeMove(event) {
         const windowObj = this.windows.get(event.target.id);
-        if (!windowObj) return;
+        if (!windowObj) {
+            console.warn('⚠️ Window object not found during resize move:', event.target.id);
+            return;
+        }
+
+        // Ensure snapping is completely disabled during resize
+        this.isSnappingEnabled = false;
 
         // Get current position from element style to ensure accuracy
         const currentLeft = parseFloat(windowObj.element.style.left) || 0;
@@ -369,17 +397,24 @@ export class WindowManager {
         const newLeft = currentLeft + (event.deltaRect.left || 0);
         const newTop = currentTop + (event.deltaRect.top || 0);
 
+        // Constrain to viewport bounds
+        const maxLeft = Math.max(0, window.innerWidth - event.rect.width);
+        const maxTop = Math.max(0, window.innerHeight - event.rect.height - 54);
+        
+        const constrainedLeft = Math.max(0, Math.min(newLeft, maxLeft));
+        const constrainedTop = Math.max(0, Math.min(newTop, maxTop));
+
         // Apply the new dimensions and position immediately
         windowObj.element.style.width = `${event.rect.width}px`;
         windowObj.element.style.height = `${event.rect.height}px`;
-        windowObj.element.style.left = `${newLeft}px`;
-        windowObj.element.style.top = `${newTop}px`;
+        windowObj.element.style.left = `${constrainedLeft}px`;
+        windowObj.element.style.top = `${constrainedTop}px`;
         
         // Update the window object properties to match
         windowObj.width = event.rect.width;
         windowObj.height = event.rect.height;
-        windowObj.left = newLeft;
-        windowObj.top = newTop;
+        windowObj.left = constrainedLeft;
+        windowObj.top = constrainedTop;
         
         // Mark that this window is no longer in a snapped/maximized state
         windowObj.isMaximized = false;
@@ -393,8 +428,16 @@ export class WindowManager {
      * @memberof WindowManager
      */
     checkSnapZones(windowObj) {
-        // Don't snap if window is maximized, currently being resized, or snapping is disabled
-        if (windowObj.isMaximized || windowObj._isResizing || !this.isSnappingEnabled || windowObj._isSnapped) {
+        // Don't snap if window is maximized, currently being resized, has been manually resized, or snapping is disabled
+        if (windowObj.isMaximized || windowObj._isResizing || windowObj._hasBeenResized || 
+            !this.isSnappingEnabled || windowObj._isSnapped) {
+            console.log('🚫 Snap check skipped:', {
+                isMaximized: windowObj.isMaximized,
+                isResizing: windowObj._isResizing,
+                hasBeenResized: windowObj._hasBeenResized,
+                snappingEnabled: this.isSnappingEnabled,
+                isSnapped: windowObj._isSnapped
+            });
             return;
         }
 
@@ -403,6 +446,7 @@ export class WindowManager {
 
         for (const [zone, bounds] of snapZones) {
             if (this.isInSnapZone(rect, bounds)) {
+                console.log('📌 Snapping window to:', zone);
                 this.snapWindowToZone(windowObj, zone);
                 return;
             }
@@ -571,13 +615,8 @@ export class WindowManager {
         windowObj.isMaximized = false;
         windowObj._isSnapped = true;
 
-        // Reset interact.js internal state to prevent conflicts
-        const instances = this.interactInstances.get(windowObj.id);
-        if (instances && typeof interact !== 'undefined') {
-            // Force interact.js to recalculate positions
-            instances.resize.reset();
-            instances.drag.reset();
-        }
+        // DO NOT reset interact.js instances - this breaks resize functionality!
+        // Instead, just update the element properties and let interact.js handle the rest
 
         // Re-enable snapping after a delay
         setTimeout(() => {
