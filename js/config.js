@@ -441,6 +441,38 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
                 width: 800,
                 height: 600
             }]
+        },
+        'conway-game-of-life': {
+            id: 'conway-game-of-life',
+            name: 'Conway\'s Game of Life',
+            description: 'Interactive cellular automaton simulation',
+            icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="13"/></svg>`,
+            windows: [{
+                id: 'gameOfLifeWindow',
+                title: 'Conway\'s Game of Life',
+                content: `
+                    <div id="gameOfLifeContainer" style="display: flex; flex-direction: column; height: 100%; padding: 10px;">
+                        <div id="gameControls" style="display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; align-items: center;">
+                            <button id="startStopBtn" class="game-btn" style="padding: 8px 16px; background: #4a90e2; color: white; border: none; border-radius: 4px; cursor: pointer;">Start</button>
+                            <button id="resetBtn" class="game-btn" style="padding: 8px 16px; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer;">Reset</button>
+                            <button id="randomBtn" class="game-btn" style="padding: 8px 16px; background: #00d084; color: white; border: none; border-radius: 4px; cursor: pointer;">Random</button>
+                            <label style="color: #eaf1fb; font-size: 14px; margin-left: 10px;">
+                                Speed: <input id="speedSlider" type="range" min="50" max="1000" value="200" style="margin-left: 5px;">
+                            </label>
+                            <span id="generationCounter" style="color: #eaf1fb; font-size: 14px; margin-left: 10px;">Generation: 0</span>
+                        </div>
+                        <div id="gameCanvas" style="flex: 1; border: 2px solid #26334d; border-radius: 8px; background: #1a1a1a; position: relative; overflow: hidden;">
+                            <canvas id="lifeCanvas" style="display: block; width: 100%; height: 100%; cursor: crosshair;"></canvas>
+                        </div>
+                        <div id="gameInfo" style="margin-top: 10px; font-size: 12px; color: #a0a0a0;">
+                            <p>Click cells to toggle them alive/dead. Use patterns like gliders, blinkers, or create your own!</p>
+                            <p><strong>Rules:</strong> Live cells with 2-3 neighbors survive. Dead cells with exactly 3 neighbors become alive.</p>
+                        </div>
+                    </div>
+                `,
+                width: 800,
+                height: 600
+            }]
         }
     },
 

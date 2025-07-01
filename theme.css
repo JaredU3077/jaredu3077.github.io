@@ -1762,3 +1762,98 @@ img, video {
     height: auto;
     min-height: 0;
 }
+
+/* Conway's Game of Life Styles */
+.game-btn {
+    padding: 8px 16px;
+    border: 2px solid #26334d;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #232c3d 60%, #2e3a54 100%);
+    color: var(--text-color);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    box-shadow: var(--neu-inset), 0 2px 4px 0 #101624;
+    outline: none;
+}
+
+.game-btn:hover {
+    background: linear-gradient(135deg, #357ab8 60%, #4a90e2 100%);
+    color: #fff;
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 12px 0 #4a90e2, var(--neu-inset);
+    transform: translateY(-1px);
+}
+
+.game-btn:active {
+    transform: translateY(0);
+    box-shadow: var(--neu-inset);
+}
+
+#speedSlider {
+    width: 120px;
+    height: 4px;
+    border-radius: 2px;
+    background: #26334d;
+    outline: none;
+    appearance: none;
+    cursor: pointer;
+}
+
+#speedSlider::-webkit-slider-thumb {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+#speedSlider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+#gameOfLifeContainer {
+    background: linear-gradient(135deg, #232c3d 60%, #2e3a54 100%);
+    border-radius: 8px;
+}
+
+#gameCanvas {
+    box-shadow: 0 4px 12px 0 #101624 inset;
+}
+
+#gameControls {
+    background: linear-gradient(135deg, #1e2530 60%, #26334d 100%);
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #26334d;
+}
+
+#generationCounter {
+    background: linear-gradient(135deg, #232c3d 60%, #2e3a54 100%);
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: 1px solid #26334d;
+    font-family: 'Courier New', monospace;
+}
+
+#gameInfo {
+    background: linear-gradient(135deg, #1e2530 60%, #26334d 100%);
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #26334d;
+}
+
+#gameInfo p {
+    margin: 4px 0;
+    font-size: 12px;
+    line-height: 1.4;
+}

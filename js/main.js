@@ -14,6 +14,7 @@ import { BootSystem } from './core/boot.js';
 import { SkillsApp } from './apps/skills.js';
 import { ProjectsApp } from './apps/projects.js';
 import { SystemStatus } from './apps/system-status.js';
+import { initializeConwayGameOfLife, destroyConwayGameOfLife } from './apps/conway-game-of-life.js';
 import { CONFIG, createAppButton } from './config.js';
 
 // --- MODULE INITIALIZATION ---
@@ -228,6 +229,20 @@ function handleAppClick(appId) {
                     break;
                 case 'welcome':
                     // Welcome window needs no special initialization
+                    break;
+                case 'conway-game-of-life':
+                    if (windowConfig.id === 'gameOfLifeWindow') {
+                        initializeConwayGameOfLife();
+                        
+                        // Add cleanup when window is closed
+                        const closeBtn = winElem.querySelector('.window-control.close');
+                        if (closeBtn) {
+                            closeBtn.addEventListener('click', () => {
+                                destroyConwayGameOfLife();
+                                delete openWindows[windowConfig.id];
+                            });
+                        }
+                    }
                     break;
             }
         } catch (error) {
