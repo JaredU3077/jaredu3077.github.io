@@ -190,25 +190,12 @@ export class BootSystem {
         particleContainer.id = 'particleContainer';
         document.body.appendChild(particleContainer);
 
-        // Create spinning background elements
-        const spinner1 = document.createElement('div');
-        spinner1.className = 'background-spinner';
-        spinner1.style.width = '300px';
-        spinner1.style.height = '300px';
-        spinner1.style.margin = '-150px 0 0 -150px';
-        document.body.appendChild(spinner1);
+        // Create single subtle spinning background element
+        const spinner = document.createElement('div');
+        spinner.className = 'background-spinner';
+        document.body.appendChild(spinner);
 
-        const spinner2 = document.createElement('div');
-        spinner2.className = 'background-spinner';
-        spinner2.style.width = '500px';
-        spinner2.style.height = '500px';
-        spinner2.style.margin = '-250px 0 0 -250px';
-        spinner2.style.animationDuration = '50s';
-        spinner2.style.animationDirection = 'reverse';
-        spinner2.style.opacity = '0.3';
-        document.body.appendChild(spinner2);
-
-        // Create matrix background
+        // Create simplified matrix background
         const matrixBg = document.createElement('div');
         matrixBg.className = 'matrix-background';
         document.body.appendChild(matrixBg);

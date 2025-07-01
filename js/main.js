@@ -161,17 +161,55 @@ function handleAppClick(appId) {
                     break;
                 case 'skills':
                     if (windowConfig.id === 'skillsWindow') {
-                        new SkillsApp(winElem.querySelector('#skillsContainer'));
+                        try {
+                            new SkillsApp(winElem.querySelector('#skillsContainer'));
+                        } catch (error) {
+                            console.warn('SkillsApp not available, showing placeholder');
+                            winElem.querySelector('#skillsContainer').innerHTML = `
+                                <div style="padding: 20px; text-align: center;">
+                                    <h3>🛠️ Skills Module</h3>
+                                    <p>Interactive skills demonstration will be available soon.</p>
+                                    <p>For now, please use the terminal command 'show skills' to view my technical capabilities.</p>
+                                </div>
+                            `;
+                        }
                     }
                     break;
                 case 'projects':
                     if (windowConfig.id === 'projectsWindow') {
-                        new ProjectsApp(winElem.querySelector('#projectsContainer'));
+                        try {
+                            new ProjectsApp(winElem.querySelector('#projectsContainer'));
+                        } catch (error) {
+                            console.warn('ProjectsApp not available, showing placeholder');
+                            winElem.querySelector('#projectsContainer').innerHTML = `
+                                <div style="padding: 20px; text-align: center;">
+                                    <h3>📋 Projects Portfolio</h3>
+                                    <p>Interactive project showcase will be available soon.</p>
+                                    <p>For now, please use the terminal command 'show experience' to view my work history.</p>
+                                </div>
+                            `;
+                        }
                     }
                     break;
                 case 'system-status':
                     if (windowConfig.id === 'statusWindow') {
-                        new SystemStatus(winElem.querySelector('#systemStatus'));
+                        try {
+                            new SystemStatus(winElem.querySelector('#systemStatus'));
+                        } catch (error) {
+                            console.warn('SystemStatus not available, showing placeholder');
+                            winElem.querySelector('#systemStatus').innerHTML = `
+                                <div style="padding: 20px;">
+                                    <h3>📊 System Status</h3>
+                                    <div style="margin: 15px 0;">
+                                        <div style="margin: 10px 0;"><strong>System:</strong> Neu-OS v1.0</div>
+                                        <div style="margin: 10px 0;"><strong>Status:</strong> ✅ Online</div>
+                                        <div style="margin: 10px 0;"><strong>Network:</strong> 🌐 Connected</div>
+                                        <div style="margin: 10px 0;"><strong>Security:</strong> 🔒 Secured</div>
+                                        <div style="margin: 10px 0;"><strong>Performance:</strong> ⚡ Optimal</div>
+                                    </div>
+                                </div>
+                            `;
+                        }
                     }
                     break;
                 case 'contact':
@@ -294,17 +332,31 @@ function handleGlobalKeydown(e) {
 document.addEventListener('DOMContentLoaded', () => {
     try {
         // Initialize core systems
-        const keyboardManager = new KeyboardManager();
         bootSystem = new BootSystem();
         
         // Initialize UI after DOM is ready
         initializeUI();
         
+        // Initialize keyboard manager after other systems are ready
+        setTimeout(() => {
+            try {
+                const keyboardManager = new KeyboardManager(windowManager, terminal, network);
+                window.keyboardManager = keyboardManager;
+            } catch (error) {
+                console.warn('KeyboardManager initialization failed:', error);
+            }
+        }, 1000);
+        
         // Set up global event listeners with null checks
         const startBtn = document.getElementById('startBtn');
         if (startBtn) {
             startBtn.addEventListener('click', toggleStartMenu);
-            startBtn.addEventListener('keydown', toggleStartMenu);
+            startBtn.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleStartMenu(e);
+                }
+            });
         } else {
             console.error('Start button not found');
         }
