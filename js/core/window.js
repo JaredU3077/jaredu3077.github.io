@@ -134,63 +134,80 @@ export class WindowManager {
         const controls = window.element.querySelector('.window-controls');
         const resizeHandles = window.element.querySelectorAll('.window-resize');
 
+        if (!header || !controls) {
+            console.error('Window header or controls not found');
+            return;
+        }
+
         // Make window draggable - check if interact.js is available
         if (typeof interact !== 'undefined') {
-            const dragInstance = interact(header)
-                .draggable({
-                    inertia: false,
-                    modifiers: [
-                        interact.modifiers.restrictRect({
-                            restriction: 'parent',
-                            endOnly: true
-                        })
-                    ],
-                    autoScroll: false, // Disable autoscroll to prevent conflicts
-                    listeners: {
-                        start: (event) => {
-                            // Mark window as being dragged to prevent resize conflicts
-                            const windowObj = this.windows.get(event.target.closest('.window').id);
-                            if (windowObj) windowObj._isDragging = true;
-                        },
-                        move: this.handleDragMove.bind(this),
-                        end: this.handleDragEnd.bind(this)
-                    }
-                });
+            try {
+                const dragInstance = interact(header)
+                    .draggable({
+                        inertia: false,
+                        modifiers: [
+                            interact.modifiers.restrictRect({
+                                restriction: 'parent',
+                                endOnly: true
+                            })
+                        ],
+                        autoScroll: false, // Disable autoscroll to prevent conflicts
+                        listeners: {
+                            start: (event) => {
+                                // Mark window as being dragged to prevent resize conflicts
+                                const windowObj = this.windows.get(event.target.closest('.window').id);
+                                if (windowObj) windowObj._isDragging = true;
+                            },
+                            move: this.handleDragMove.bind(this),
+                            end: this.handleDragEnd.bind(this)
+                        }
+                    });
 
-            const resizeInstance = interact(window.element)
-                .resizable({
-                    edges: { left: true, right: true, bottom: true, top: true },
-                    listeners: {
-                        start: (event) => {
-                            // Mark window as being resized to prevent drag conflicts
-                            const windowObj = this.windows.get(event.target.id);
-                            if (windowObj) windowObj._isResizing = true;
+                const resizeInstance = interact(window.element)
+                    .resizable({
+                        edges: { left: true, right: true, bottom: true, top: true },
+                        listeners: {
+                            start: (event) => {
+                                // Mark window as being resized to prevent drag conflicts
+                                const windowObj = this.windows.get(event.target.id);
+                                if (windowObj) windowObj._isResizing = true;
+                            },
+                            move: this.handleResizeMove.bind(this),
+                            end: this.handleResizeEnd.bind(this)
                         },
-                        move: this.handleResizeMove.bind(this),
-                        end: this.handleResizeEnd.bind(this)
-                    },
-                    modifiers: [
-                        interact.modifiers.restrictEdges({
-                            outer: 'parent',
-                            endOnly: true
-                        }),
-                        interact.modifiers.restrictSize({
-                            min: { width: CONFIG.window.minWidth || 300, height: CONFIG.window.minHeight || 200 },
-                            max: { width: CONFIG.window.maxWidth || window.innerWidth * 0.9, height: CONFIG.window.maxHeight || window.innerHeight * 0.9 }
-                        })
-                    ]
-                });
+                        modifiers: [
+                            interact.modifiers.restrictEdges({
+                                outer: 'parent',
+                                endOnly: true
+                            }),
+                            interact.modifiers.restrictSize({
+                                min: { width: CONFIG.window.minWidth || 300, height: CONFIG.window.minHeight || 200 },
+                                max: { width: CONFIG.window.maxWidth || window.innerWidth * 0.9, height: CONFIG.window.maxHeight || window.innerHeight * 0.9 }
+                            })
+                        ]
+                    });
 
-            // Store interact instances for potential cleanup/reset
-            this.interactInstances.set(window.id, { drag: dragInstance, resize: resizeInstance });
+                // Store interact instances for potential cleanup/reset
+                this.interactInstances.set(window.id, { drag: dragInstance, resize: resizeInstance });
+            } catch (error) {
+                console.error('Failed to setup window interactions:', error);
+            }
         } else {
             console.warn('interact.js not loaded - window dragging/resizing will not work');
         }
 
-        // Window control buttons
-        controls.querySelector('.minimize').addEventListener('click', () => this.minimizeWindow(window));
-        controls.querySelector('.maximize').addEventListener('click', () => this.toggleMaximize(window));
-        controls.querySelector('.close').addEventListener('click', () => this.closeWindow(window));
+        // Window control buttons with error handling
+        try {
+            const minimizeBtn = controls.querySelector('.minimize');
+            const maximizeBtn = controls.querySelector('.maximize');
+            const closeBtn = controls.querySelector('.close');
+
+            if (minimizeBtn) minimizeBtn.addEventListener('click', () => this.minimizeWindow(window));
+            if (maximizeBtn) maximizeBtn.addEventListener('click', () => this.toggleMaximize(window));
+            if (closeBtn) closeBtn.addEventListener('click', () => this.closeWindow(window));
+        } catch (error) {
+            console.error('Failed to setup window controls:', error);
+        }
 
         // Focus window on click
         window.element.addEventListener('mousedown', () => this.focusWindow(window));

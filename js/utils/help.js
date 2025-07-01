@@ -1,179 +1,163 @@
 /**
- * @file Manages the help system and displays documentation to the user.
+ * @file Help System Module - Provides contextual help and documentation
  * @author Jared U.
  */
 
-import { CONFIG } from '../config.js';
-
-/**
- * Manages the display of help content in a dedicated window.
- * @class HelpManager
- */
 export class HelpManager {
-    /**
-     * Creates an instance of HelpManager.
-     * @memberof HelpManager
-     */
     constructor() {
-        /** @type {Map<string, object>} */
-        this.helpContent = new Map();
-        this.initializeHelpContent();
-    }
-
-    /**
-     * Initializes the help content, defining topics and their details.
-     * @private
-     * @memberof HelpManager
-     */
-    initializeHelpContent() {
-        // Terminal Commands
-        this.helpContent.set('terminal', {
-            title: 'Terminal Commands',
-            sections: [{
-                title: 'Available Commands',
-                commands: [
-                    { name: 'help', description: 'Displays this help message.' },
-                    { name: 'clear', description: 'Clears the terminal screen.' },
-                    { name: 'ping [host]', description: 'Pings a host (defaults to localhost).' },
-                    { name: 'show resume', description: 'Displays the resume.txt file.' },
-                    { name: 'show jared', description: 'Displays a short bio.' },
+        this.helpContent = {
+            general: {
+                title: 'Neu-OS Help System',
+                sections: [
+                    {
+                        title: 'Navigation',
+                        content: [
+                            'Click the Start button to access applications',
+                            'Double-click desktop icons to launch apps',
+                            'Use Alt+Tab to switch between windows',
+                            'Right-click windows for context menu'
+                        ]
+                    },
+                    {
+                        title: 'Applications',
+                        content: [
+                            'Terminal: Run network commands and view resume',
+                            'Network Monitor: View interactive network topology',
+                            'Skills: Explore technical capabilities',
+                            'Projects: View portfolio and case studies',
+                            'Device Manager: Browse network infrastructure'
+                        ]
+                    },
+                    {
+                        title: 'Keyboard Shortcuts',
+                        content: [
+                            'Ctrl+L: Clear terminal screen',
+                            'Escape: Close start menu or dialogs',
+                            'Tab: Auto-complete terminal commands',
+                            'Arrow keys: Navigate command history'
+                        ]
+                    }
                 ]
-            }]
-        });
-
-        // Keyboard Shortcuts
-        this.helpContent.set('shortcuts', {
-            title: 'Keyboard Shortcuts',
-            sections: [{
-                title: 'General',
-                shortcuts: [
-                    { key: 'Click Icons', description: 'Open applications from the desktop or Start Menu.' },
-                    { key: 'Drag Header', description: 'Move windows around the screen.' },
-                    { key: 'Drag Edges', description: 'Resize windows.' },
+            },
+            terminal: {
+                title: 'Terminal Commands',
+                sections: [
+                    {
+                        title: 'Network Commands',
+                        content: [
+                            'ping [host] - Test network connectivity',
+                            'ifconfig - Show network interface configuration',
+                            'netstat - Display network connections',
+                            'tracert [host] - Trace route to destination',
+                            'nslookup [domain] - DNS lookup'
+                        ]
+                    },
+                    {
+                        title: 'Information Commands',
+                        content: [
+                            'show resume - Display professional resume',
+                            'show experience - Show detailed work history',
+                            'show skills - List technical skills',
+                            'show certifications - Display certifications'
+                        ]
+                    },
+                    {
+                        title: 'System Commands',
+                        content: [
+                            'help - Show available commands',
+                            'clear - Clear terminal screen',
+                            'exit - Close terminal window'
+                        ]
+                    }
                 ]
-            }, {
-                title: 'Terminal',
-                shortcuts: [
-                    { key: 'Enter', description: 'Execute a command.' },
-                    { key: 'Arrow Up / Down', description: 'Navigate through command history.' },
-                    { key: 'Ctrl+L or clear', description: 'Clear the terminal screen.' },
-                ]
-            }]
-        });
-
-        // Window Controls
-        this.helpContent.set('windows', {
-            title: 'Window Controls',
-            sections: [
-                {
-                    title: 'Window Operations',
-                    controls: [
-                        { name: 'Minimize', description: 'Click the minimize button or press Alt+Down' },
-                        { name: 'Maximize', description: 'Click the maximize button or press Alt+Up' },
-                        { name: 'Close', description: 'Click the close button or press Escape' },
-                        { name: 'Move', description: 'Drag the window header' },
-                        { name: 'Resize', description: 'Drag window edges or corners' }
-                    ]
-                },
-                {
-                    title: 'Window Snapping',
-                    controls: [
-                        { name: 'Edge Snapping', description: 'Drag window near screen edges' },
-                        { name: 'Center Snapping', description: 'Drag window to screen center' },
-                        { name: 'Window Snapping', description: 'Drag window near other windows' }
-                    ]
-                }
-            ]
-        });
+            }
+        };
     }
 
     /**
-     * Gets help content for a specific topic.
-     * @param {string} topic - The help topic to retrieve.
-     * @returns {?object} The help content for the topic, or null if not found.
-     * @memberof HelpManager
+     * Shows the help window with general or contextual help
+     * @param {string} [context='general'] - The help context to show
      */
-    getHelpContent(topic) {
-        return this.helpContent.get(topic) || null;
-    }
-
-    /**
-     * Generates HTML for the help content.
-     * @param {string} topic - The help topic to generate HTML for.
-     * @returns {string} The generated HTML.
-     * @private
-     * @memberof HelpManager
-     */
-    generateHelpHTML(topic) {
-        const content = this.getHelpContent(topic);
-        if (!content) return '<p>Help topic not found.</p>';
-
-        let html = `<h2>${content.title}</h2>`;
-
-        content.sections.forEach(section => {
-            html += `<div class="help-section"><h3>${section.title}</h3>`;
-
-            if (section.commands) {
-                html += '<div class="help-commands">';
-                section.commands.forEach(cmd => {
-                    html += `<div class="help-command">
-                        <span class="command-name">${cmd.name}</span>
-                        <span class="command-desc">${cmd.description}</span>
-                    </div>`;
-                });
-                html += '</div>';
-            }
-
-            if (section.shortcuts) {
-                html += '<div class="help-shortcuts">';
-                section.shortcuts.forEach(shortcut => {
-                    html += `<div class="help-shortcut">
-                        <span class="shortcut-key">${shortcut.key}</span>
-                        <span class="shortcut-desc">${shortcut.description}</span>
-                    </div>`;
-                });
-                html += '</div>';
-            }
-
-            if (section.controls) {
-                html += '<div class="help-controls">';
-                section.controls.forEach(control => {
-                    html += `<div class="help-control">
-                        <span class="control-name">${control.name}</span>
-                        <span class="control-desc">${control.description}</span>
-                    </div>`;
-                });
-                html += '</div>';
-            }
-
-            html += '</div>';
-        });
-
-        return html;
-    }
-
-    /**
-     * Shows the help window with content for a specific topic.
-     * @param {string} [topic='terminal'] - The help topic to display.
-     * @param {WindowManager} windowManager - The window manager instance to use.
-     * @memberof HelpManager
-     */
-    showHelp(topic = 'terminal', windowManager = null) {
-        // Use passed windowManager or try to get it from global scope
-        const wm = windowManager || window.windowManager;
-        if (wm) {
-            const helpContent = this.generateHelpHTML(topic);
-            const helpWindow = wm.createWindow({
-                id: 'helpWindow',
-                title: 'Help',
-                content: `<div id="helpContent" class="help-content-container" data-scroll-container>${helpContent}</div>`,
-                width: 500,
-                height: 400,
-                icon: '❓',
-                autoScroll: true
-            });
-        } else {
-            console.error('WindowManager not found. Cannot display help.');
+    show(context = 'general') {
+        // Get the window manager from global scope
+        const windowManager = window.windowManager;
+        if (!windowManager) {
+            console.error('Window manager not available');
+            return;
         }
+
+        // Check if help window is already open
+        const existingWindow = document.getElementById('helpWindow');
+        if (existingWindow) {
+            const windowObj = windowManager.windows.get('helpWindow');
+            if (windowObj) {
+                windowManager.focusWindow(windowObj);
+                return;
+            }
+        }
+
+        const helpData = this.helpContent[context] || this.helpContent.general;
+        const helpContent = this.generateHelpContent(helpData);
+
+        try {
+            windowManager.createWindow({
+                id: 'helpWindow',
+                title: '❓ Help - Neu-OS',
+                content: helpContent,
+                width: 600,
+                height: 500,
+                icon: '❓'
+            });
+        } catch (error) {
+            console.error('Failed to create help window:', error);
+        }
+    }
+
+    /**
+     * Generates HTML content for the help window
+     * @param {object} helpData - The help data object
+     * @returns {string} HTML content
+     */
+    generateHelpContent(helpData) {
+        let content = `
+            <div class="help-content-container" style="padding: 20px; height: 100%; overflow-y: auto;">
+                <h2 style="color: #4a90e2; margin-bottom: 20px;">${helpData.title}</h2>
+        `;
+
+        helpData.sections.forEach(section => {
+            content += `
+                <div class="help-section" style="margin-bottom: 25px;">
+                    <h3 style="color: #00d084; margin-bottom: 10px;">${section.title}</h3>
+                    <ul style="list-style-type: none; padding: 0;">
+            `;
+            
+            section.content.forEach(item => {
+                content += `<li style="margin: 8px 0; padding: 8px; background: rgba(74, 144, 226, 0.1); border-radius: 4px; border-left: 3px solid #4a90e2;">• ${item}</li>`;
+            });
+            
+            content += `
+                    </ul>
+                </div>
+            `;
+        });
+
+        content += `
+                <div style="margin-top: 30px; padding: 15px; background: rgba(0, 208, 132, 0.1); border-radius: 8px; border: 1px solid rgba(0, 208, 132, 0.3); text-align: center;">
+                    <p style="margin: 0; color: #00d084; font-weight: 600;">💡 Pro Tip</p>
+                    <p style="margin: 5px 0 0 0; font-size: 0.9em;">Try running 'show resume' in the terminal to see my professional background!</p>
+                </div>
+            </div>
+        `;
+
+        return content;
+    }
+
+    /**
+     * Shows contextual help for a specific application
+     * @param {string} appId - The application ID
+     */
+    showContextualHelp(appId) {
+        const context = appId === 'terminal' ? 'terminal' : 'general';
+        this.show(context);
     }
 } 

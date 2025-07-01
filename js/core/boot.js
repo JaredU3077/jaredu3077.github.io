@@ -28,13 +28,33 @@ export class BootSystem {
     }
 
     setupAudioSystem() {
-        // Create audio context for sound effects
-        if (this.audioEnabled && typeof AudioContext !== 'undefined') {
+        // Create audio context for sound effects with better error handling
+        if (this.audioEnabled) {
             try {
-                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            } catch (e) {
-                console.warn('Audio context not supported');
+                // Check for AudioContext support
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioContextClass) {
+                    this.audioContext = new AudioContextClass();
+                    
+                    // Handle suspended audio context (required by modern browsers)
+                    if (this.audioContext.state === 'suspended') {
+                        // Audio context will be resumed on first user interaction
+                        document.addEventListener('click', () => {
+                            if (this.audioContext && this.audioContext.state === 'suspended') {
+                                this.audioContext.resume().catch(err => {
+                                    console.warn('Failed to resume audio context:', err);
+                                });
+                            }
+                        }, { once: true });
+                    }
+                } else {
+                    console.warn('AudioContext not supported in this browser');
+                    this.audioEnabled = false;
+                }
+            } catch (error) {
+                console.warn('Failed to initialize audio context:', error);
                 this.audioEnabled = false;
+                this.audioContext = null;
             }
         }
     }

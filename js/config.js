@@ -408,13 +408,12 @@ UDP    192.168.1.100:53       *:*                    LISTENING`
 
     // Window configuration
     window: {
+        defaultWidth: 500,
+        defaultHeight: 400,
         minWidth: 300,
-        maxWidth: window.innerWidth * 0.9,
         minHeight: 200,
-        maxHeight: window.innerHeight * 0.9,
-        defaultWidth: 800,
-        defaultHeight: 600,
-        snapThreshold: 50,
+        maxWidth: 1200,
+        maxHeight: 800,
         zIndex: 1000
     },
 
@@ -605,31 +604,22 @@ export function createIcon(config, size = '16') {
  * @returns {string} Button markup
  */
 export function createAppButton(app, type) {
-    const config = CONFIG[type === 'desktop' ? 'desktop' : type === 'start-menu' ? 'startMenu' : 'taskbar'];
-    const iconSize = config.iconSize;
+    const isDesktop = type === 'desktop';
+    const baseClass = isDesktop ? 'desktop-icon' : 'start-menu-item';
     
-    const button = document.createElement('button');
-    button.className = type === 'desktop' ? 'desktop-icon' : type === 'start-menu' ? 'start-menu-item' : 'taskbar-icon';
-    button.dataset.tool = app.id;
-    button.title = app.description || app.name;
-    button.setAttribute('aria-label', app.name);
-    button.setAttribute('tabindex', '0');
-
-    if (type === 'desktop') {
-        button.innerHTML = `
-            <div class="icon">${app.icon}</div>
-            <span class="label">${app.name}</span>
-        `;
-    } else if (type === 'start-menu') {
-        button.innerHTML = `
-            ${app.icon}
-            <span class="label">${app.name}</span>
+    if (isDesktop) {
+        return `
+            <div class="${baseClass}" data-app="${app.id}" title="${app.name}" aria-label="${app.name}">
+                <div class="icon">${app.icon}</div>
+                <div class="label">${app.name}</div>
+            </div>
         `;
     } else {
-        button.innerHTML = `
-            <div class="icon">${app.icon}</div>
+        return `
+            <button class="${baseClass}" data-app="${app.id}" title="${app.name}" aria-label="${app.name}" tabindex="0">
+                <div class="icon">${app.icon}</div>
+                <span class="label">${app.name}</span>
+            </button>
         `;
     }
-
-    return button.outerHTML;
 }

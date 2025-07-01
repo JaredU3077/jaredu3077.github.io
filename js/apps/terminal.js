@@ -188,7 +188,10 @@ export class Terminal {
 
         try {
             const command = this.inputElement.value.trim();
-            if (!command) return;
+            if (!command) {
+                this.isProcessing = false;
+                return;
+            }
 
             // Add command to history
             this.addToHistory(command);
@@ -196,13 +199,20 @@ export class Terminal {
             // Display command in output
             this.displayCommand(command);
 
-            // Execute command
-            const [cmd, ...args] = command.split(' ');
-            const handler = this.commands.get(cmd);
+            // Execute command with input validation
+            const [cmd, ...args] = command.split(' ').filter(arg => arg.length > 0);
             
-            if (handler) {
+            if (!cmd) {
+                this.isProcessing = false;
+                return;
+            }
+
+            // Sanitize command input
+            const sanitizedCmd = cmd.toLowerCase().replace(/[^a-z0-9-]/g, '');
+            
+            if (this.commands.has(sanitizedCmd)) {
                 try {
-                    const result = handler(args);
+                    const result = await this.commands.get(sanitizedCmd)(args);
                     await this.handleCommandResult(result, command);
                 } catch (error) {
                     this.handleCommandError(error);
@@ -210,6 +220,9 @@ export class Terminal {
             } else {
                 this.handleCommandError(new AppError(`Command not found: ${cmd}`, ErrorTypes.VALIDATION));
             }
+
+        } catch (error) {
+            this.handleCommandError(error);
         } finally {
             this.isProcessing = false;
             performanceMonitor.endMeasure('commandExecution');
@@ -218,7 +231,7 @@ export class Terminal {
             if (this.commandQueue.length > 0) {
                 const nextCommand = this.commandQueue.shift();
                 this.inputElement.value = nextCommand;
-                this.executeCommand();
+                setTimeout(() => this.executeCommand(), 100);
             }
         }
     }
@@ -474,19 +487,82 @@ export class Terminal {
     }
 
     /**
-     * Fetches and displays the resume.
-     * @returns {Promise<string>} The resume content or an error message.
-     * @private
+     * Loads and displays the resume content.
+     * @returns {Promise<string>} The resume content or a fallback message.
      * @memberof Terminal
      */
     async showResume() {
         try {
-            const content = await ContentParser.loadAndParseContent('resume.txt');
-            return content;
+            const response = await fetch(CONFIG.PATHS.RESUME);
+            if (!response.ok) {
+                console.warn('Resume file not found, showing fallback content');
+                return this.getFallbackResume();
+            }
+            return await response.text();
         } catch (error) {
             console.error('Error fetching resume:', error);
-            return 'Error: Could not fetch resume.txt.';
+            return this.getFallbackResume();
         }
+    }
+
+    /**
+     * Returns fallback resume content when the file is not available
+     * @returns {string} Fallback resume content
+     */
+    getFallbackResume() {
+        return `
+JARED U. - SENIOR NETWORK ENGINEER
+========================================
+
+📧 Contact: Available on request
+🌐 Portfolio: https://jaredu3077.github.io
+💼 LinkedIn: https://linkedin.com/in/jaredu
+
+PROFESSIONAL SUMMARY
+====================
+Senior Network Engineer with 15+ years of experience in enterprise network 
+infrastructure, security, and automation. Proven track record in designing, 
+implementing, and maintaining large-scale network environments.
+
+CORE COMPETENCIES
+=================
+• Network Architecture & Design    • Python & Ansible Automation
+• Cisco & Arista Technologies      • Network Security (PCI/HIPAA)
+• BGP, OSPF, VLAN Management      • Cloud Networking (AWS/Azure)
+• SolarWinds & Network Monitoring  • Disaster Recovery Planning
+• Project Management & Leadership  • Documentation & Process Improvement
+
+KEY ACHIEVEMENTS
+================
+• Led $2.3M network modernization project with 300% performance improvement
+• Designed and implemented next-gen security infrastructure (99.8% threat detection)
+• Built automation platform reducing manual tasks by 80%
+• Achieved 99.99% network uptime across multiple facilities
+
+RECENT EXPERIENCE
+=================
+Current: Senior Network Engineer - Denali Advanced Integration
+• Architecting hybrid cloud connectivity for space-to-ground communications
+• Multi-cloud network design (AWS/Azure) with <50ms latency requirements
+
+Previous: Senior Network Engineer - Sound Transit (2022-2023)
+• Developed comprehensive network automation platform
+• Implemented GitLab CI/CD pipeline for network change management
+
+Previous: Senior Network Engineer - ArenaNet (2019-2022)
+• Complete network infrastructure modernization using Arista leaf-spine
+• Zero-downtime migration of 500+ network endpoints
+
+CERTIFICATIONS & EDUCATION
+===========================
+• Cisco Certified Network Associate (CCNA)
+• CompTIA Security+
+• Ongoing: Python & Ansible Automation Training
+
+Type 'show experience' for detailed work history
+Type 'show skills' for technical capabilities
+Type 'show certifications' for complete certification list
+        `.trim();
     }
 
     /**

@@ -14,14 +14,14 @@
     <meta property="og:url" content="https://jaredu3077.github.io/">
     <meta property="og:title" content="Jared U. - Senior Network Engineer | Interactive Portfolio">
     <meta property="og:description" content="Senior Network Engineer with 15+ years experience. Interactive portfolio showcasing network infrastructure, security, and automation expertise.">
-    <meta property="og:image" content="https://jaredu3077.github.io/preview.png">
+    <meta property="og:image" content="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'><rect width='400' height='400' fill='%23181f2a'/><circle cx='200' cy='200' r='60' fill='none' stroke='%234a90e2' stroke-width='4'/><path d='M200 140v60M200 260v60M140 200h60M260 200h60' stroke='%234a90e2' stroke-width='4'/><text x='200' y='340' text-anchor='middle' fill='%23eaf1fb' font-family='Arial' font-size='24'>Neu-OS</text></svg>">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://jaredu3077.github.io/">
     <meta property="twitter:title" content="Jared U. - Senior Network Engineer | Interactive Portfolio">
     <meta property="twitter:description" content="Senior Network Engineer with 15+ years experience. Interactive portfolio showcasing network infrastructure, security, and automation expertise.">
-    <meta property="twitter:image" content="https://jaredu3077.github.io/preview.png">
+    <meta property="twitter:image" content="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'><rect width='400' height='400' fill='%23181f2a'/><circle cx='200' cy='200' r='60' fill='none' stroke='%234a90e2' stroke-width='4'/><path d='M200 140v60M200 260v60M140 200h60M260 200h60' stroke='%234a90e2' stroke-width='4'/><text x='200' y='340' text-anchor='middle' fill='%23eaf1fb' font-family='Arial' font-size='24'>Neu-OS</text></svg>">
     
     <!-- Security Headers -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data:; font-src 'self' https://cdnjs.cloudflare.com; connect-src 'self';">
@@ -79,48 +79,51 @@
     </script>
 </head>
 <body>
+    <!-- Skip link for accessibility -->
+    <a href="#desktop" class="skip-link">Skip to main content</a>
+    
     <!-- Boot Sequence -->
-    <div id="bootSequence" class="boot-sequence">
+    <div id="bootSequence" class="boot-sequence" role="dialog" aria-labelledby="boot-title" aria-describedby="boot-desc">
         <div class="boot-container">
             <div class="boot-header">
                 <div class="boot-logo">
-                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                         <path d="M3 12h18M3 6h18M3 18h18"/>
                         <circle cx="12" cy="12" r="3"/>
                         <path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>
                     </svg>
                 </div>
-                <h1>Neu-OS v2.1.4</h1>
-                <p>Network Engineering Operating System</p>
+                <h1 id="boot-title">Neu-OS v2.1.4</h1>
+                <p id="boot-desc">Network Engineering Operating System</p>
             </div>
             <div class="boot-progress">
-                <div class="progress-bar">
+                <div class="progress-bar" role="progressbar" aria-label="Boot progress">
                     <div class="progress-fill"></div>
                 </div>
                 <div class="boot-messages">
-                    <div class="boot-message">Initializing network stack...</div>
+                    <div class="boot-message" aria-live="polite" aria-atomic="true">Initializing network stack...</div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Login Screen -->
-    <div id="loginScreen" class="login-screen">
+    <div id="loginScreen" class="login-screen" role="dialog" aria-labelledby="login-title">
         <div class="login-container">
             <div class="login-header">
                 <div class="login-logo">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                         <path d="M3 12h18M3 6h18M3 18h18"/>
                         <circle cx="12" cy="12" r="3"/>
                         <path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>
                     </svg>
                 </div>
-                <h2>Neu-OS</h2>
+                <h2 id="login-title">Neu-OS</h2>
                 <p>Senior Network Engineer Workstation</p>
             </div>
             <div class="login-form">
                 <div class="user-profile">
-                    <div class="user-avatar">👨‍💻</div>
+                    <div class="user-avatar" aria-hidden="true">👨‍💻</div>
                     <div class="user-info">
                         <h3>Jared U.</h3>
                         <p>Senior Network Engineer</p>
@@ -128,14 +131,14 @@
                 </div>
                 <button id="guestLoginBtn" class="login-btn">
                     <span>Enter as Guest</span>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <path d="M5 12h14M12 5l7 7-7 7"/>
                     </svg>
                 </button>
                 <p class="login-footer">Click to explore the interactive portfolio</p>
             </div>
         </div>
-        <div class="login-background">
+        <div class="login-background" aria-hidden="true">
             <div class="network-grid"></div>
         </div>
     </div>
@@ -155,27 +158,44 @@
         </button>
     </div>
 
-    <div id="desktop">
-        <div id="desktop-icons">
+    <div id="desktop" role="main" aria-label="Neu-OS Desktop">
+        <div id="desktop-icons" role="group" aria-label="Desktop Applications">
             <!-- Desktop icons will be generated here -->
         </div>
         <!-- App windows will be appended here -->
     </div>
+    
     <!-- Start menu and taskbar -->
-    <div class="taskbar">
-        <button class="start-btn" id="startBtn" aria-label="Open Start Menu">
+    <nav class="taskbar" role="navigation" aria-label="System Navigation">
+        <button class="start-btn" id="startBtn" aria-label="Open Start Menu" aria-expanded="false" aria-haspopup="true">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <path d="M3 12h18M3 6h18M3 18h18"/>
             </svg>
             <span>Start</span>
         </button>
-        <div class="start-menu" id="startMenu" role="menu">
+        <div class="start-menu" id="startMenu" role="menu" aria-label="Applications Menu">
             <!-- Start menu items will be dynamically generated -->
         </div>
-        <div class="branding">@JaredU_ - Senior Network Engineer</div>
-    </div>
+        <div class="branding" aria-label="System Information">@JaredU_ - Senior Network Engineer</div>
+    </nav>
+
+    <!-- Live region for screen reader announcements -->
+    <div id="announcements" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
     <!-- Scripts -->
     <script type="module" src="js/main.js"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                    console.log('ServiceWorker registration successful');
+                }, function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    </script>
 </body>
 </html>

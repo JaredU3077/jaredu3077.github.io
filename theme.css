@@ -189,6 +189,8 @@ body {
     box-shadow: 0 8px 32px 0 #101624, 0 2px 8px 0 #232c3d inset;
     display: flex;
     flex-direction: column;
+    will-change: transform, box-shadow;
+    transform: translateZ(0);
 }
 .window.focused {
     box-shadow: 0 0 0 4px var(--primary-color), 0 12px 48px 0 #4a90e2, var(--neu-shadow);
@@ -340,31 +342,58 @@ button:focus-visible, .start-menu-item:focus-visible, .window-control:focus-visi
 
 @media (max-width: 480px) {
     .start-menu-item {
-        height: 48px;
-        font-size: 0.95rem;
         padding: 0 20px;
+        font-size: 1rem;
     }
+    
     .start-menu-item .icon {
-        width: 24px;
-        height: 24px;
+        width: 28px;
+        height: 28px;
     }
+    
     .window-header {
-        padding: 10px 12px;
+        padding: 8px 12px;
     }
+    
     .window-title .label {
-        font-size: 0.85rem;
+        font-size: 0.9rem;
     }
+    
     .window-control {
-        width: 24px;
-        height: 24px;
-        font-size: 14px;
+        width: 32px;
+        height: 32px;
     }
+    
     .branding {
         display: none;
     }
+    
     .start-btn {
         padding: 8px 16px;
-        font-size: 0.95rem;
+        font-size: 0.9rem;
+    }
+    
+    /* Improve touch targets */
+    .desktop-icon {
+        min-width: 44px;
+        min-height: 44px;
+        padding: 8px;
+    }
+    
+    .start-menu-item {
+        min-height: 44px;
+    }
+    
+    .window-control {
+        min-width: 44px;
+        min-height: 44px;
+    }
+    
+    /* Reduce animations on mobile for better performance */
+    .data-packet,
+    .network-node,
+    .scan-lines {
+        display: none;
     }
 }
 
@@ -1004,15 +1033,25 @@ button:focus-visible, .start-menu-item:focus-visible, .window-control:focus-visi
     height: 4px;
     background: var(--primary-color);
     border-radius: 50%;
-    box-shadow: 0 0 6px var(--primary-color);
+    opacity: 0.6;
+    will-change: transform, opacity;
+    pointer-events: none;
+    /* Use transform3d to enable hardware acceleration */
+    transform: translateZ(0);
 }
 
 /* Animated Data Flow Lines */
 @keyframes dataFlow {
-    0% { transform: translateX(-100px) translateY(0px); opacity: 0; }
-    10% { opacity: 1; }
-    90% { opacity: 1; }
-    100% { transform: translateX(calc(100vw + 100px)) translateY(50px); opacity: 0; }
+    0% { 
+        transform: translateX(-100px) translateZ(0); 
+        opacity: 0; 
+    }
+    10% { opacity: 0.8; }
+    90% { opacity: 0.8; }
+    100% { 
+        transform: translateX(calc(100vw + 100px)) translateZ(0); 
+        opacity: 0; 
+    }
 }
 
 .data-packet:nth-child(1) { animation: dataFlow 12s linear infinite; top: 10%; }
@@ -1025,24 +1064,24 @@ button:focus-visible, .start-menu-item:focus-visible, .window-control:focus-visi
 /* Pulsing Network Nodes */
 @keyframes networkPulse {
     0%, 100% { 
-        box-shadow: 0 0 5px var(--primary-color), 0 0 10px var(--primary-color), 0 0 15px var(--primary-color);
-        transform: scale(1);
+        transform: scale(1) translateZ(0); 
+        opacity: 0.4; 
     }
     50% { 
-        box-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color), 0 0 30px var(--primary-color);
-        transform: scale(1.05);
+        transform: scale(1.5) translateZ(0); 
+        opacity: 0.8; 
     }
 }
 
 .network-node {
-    position: fixed;
+    position: absolute;
     width: 8px;
     height: 8px;
     background: var(--accent-green);
     border-radius: 50%;
-    z-index: 1;
     animation: networkPulse 4s ease-in-out infinite;
-    pointer-events: none;
+    will-change: transform, opacity;
+    transform: translateZ(0);
 }
 
 .network-node:nth-child(1) { top: 15%; left: 10%; animation-delay: 0s; }
@@ -1056,13 +1095,13 @@ button:focus-visible, .start-menu-item:focus-visible, .window-control:focus-visi
 }
 
 @keyframes windowSlideIn {
-    0% {
+    from {
         opacity: 0;
-        transform: scale(0.8) translateY(-50px);
+        transform: translateY(20px) scale(0.95) translateZ(0);
     }
-    100% {
+    to {
         opacity: 1;
-        transform: scale(1) translateY(0);
+        transform: translateY(0) scale(1) translateZ(0);
     }
 }
 
@@ -1175,8 +1214,15 @@ button:focus-visible, .start-menu-item:focus-visible, .window-control:focus-visi
 
 /* Holographic Scan Lines */
 .scan-lines {
-    position: relative;
-    overflow: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.03;
+    will-change: transform;
 }
 
 .scan-lines::after {
@@ -1184,22 +1230,16 @@ button:focus-visible, .start-menu-item:focus-visible, .window-control:focus-visi
     position: absolute;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
-    background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(74, 144, 226, 0.03) 2px,
-        rgba(74, 144, 226, 0.03) 4px
-    );
-    pointer-events: none;
-    animation: scanMove 2s linear infinite;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+    animation: scanMove 3s linear infinite;
+    will-change: transform;
 }
 
 @keyframes scanMove {
-    0% { transform: translateY(-4px); }
-    100% { transform: translateY(4px); }
+    0% { transform: translateY(-2px) translateZ(0); }
+    100% { transform: translateY(100vh) translateZ(0); }
 }
 
 /* Network Topology Visualization */
@@ -1250,7 +1290,8 @@ button:focus-visible,
     .connection-line,
     .scan-lines::after,
     .taskbar::before {
-        animation: none;
+        animation: none !important;
+        transition: none !important;
     }
     
     .desktop::before {
@@ -1277,4 +1318,102 @@ button:focus-visible,
 
 ::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(180deg, var(--primary-hover), var(--primary-color));
+}
+
+/* Focus management improvements */
+.window:focus-within {
+    box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+/* Skip link for screen readers */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: var(--primary-color);
+    color: white;
+    padding: 8px;
+    text-decoration: none;
+    border-radius: 4px;
+    z-index: 10000;
+}
+
+.skip-link:focus {
+    top: 6px;
+}
+
+/* Performance optimizations */
+* {
+    box-sizing: border-box;
+}
+
+/* Improve scrolling performance */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Optimize images and media */
+img, video {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Reduce paint and layout thrashing */
+.window-content {
+    contain: layout style;
+}
+
+.terminal-output {
+    contain: layout;
+}
+
+/* Optimize focus states */
+:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* Improve contrast for accessibility */
+::selection {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* Print styles */
+@media print {
+    .taskbar,
+    .start-menu,
+    .boot-sequence,
+    .login-screen,
+    .audio-controls,
+    .data-packet,
+    .network-node,
+    .scan-lines {
+        display: none !important;
+    }
+    
+    .window {
+        position: static !important;
+        box-shadow: none !important;
+        border: 1px solid #000 !important;
+        page-break-inside: avoid;
+    }
+    
+    body {
+        background: white !important;
+        color: black !important;
+    }
+}
+
+/* Screen reader only content */
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
 }

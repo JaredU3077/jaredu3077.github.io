@@ -42,6 +42,18 @@ let openWindows = {};
 function initializeUI() {
     const startMenu = document.getElementById('startMenu');
     const desktopIcons = document.getElementById('desktop-icons');
+    
+    // Add null checks to prevent errors
+    if (!startMenu) {
+        console.error('Start menu element not found');
+        return;
+    }
+    
+    if (!desktopIcons) {
+        console.error('Desktop icons container not found');
+        return;
+    }
+    
     startMenu.innerHTML = '';
     desktopIcons.innerHTML = '';
 
@@ -57,7 +69,7 @@ function initializeUI() {
     // Add help button to start menu
     startMenu.insertAdjacentHTML('beforeend', `
         <button class="start-menu-item" title="Help" aria-label="Help" tabindex="0" id="helpBtn">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <circle cx="12" cy="12" r="10"/>
                 <path d="M12 16v-4M12 8h.01"/>
             </svg>
@@ -75,7 +87,11 @@ function initializeUI() {
 function toggleStartMenu(e) {
     if (e.type === 'click' || (e.type === 'keydown' && (e.key === 'Enter' || e.key === ' '))) {
         const startMenu = document.getElementById('startMenu');
-        startMenu.classList.toggle('show');
+        if (startMenu) {
+            startMenu.classList.toggle('show');
+        } else {
+            console.error('Start menu element not found');
+        }
     }
 }
 
@@ -236,65 +252,102 @@ function setupContactForm(winElem) {
 }
 
 /**
- * Handles global click events to launch applications or the help menu.
- * @param {MouseEvent} e - The click event.
+ * Handles global click events, particularly for closing the start menu.
+ * @param {Event} e - The click event.
  */
 function handleGlobalClick(e) {
-    const button = e.target.closest('[data-tool]');
-    if (button) {
-        handleAppClick(button.dataset.tool);
-        if (button.classList.contains('start-menu-item')) {
-            document.getElementById('startMenu').classList.remove('show');
-        }
-    }
-
-    if (e.target.closest('#helpBtn')) {
-        helpManager.showHelp('terminal', windowManager);
-        document.getElementById('startMenu').classList.remove('show');
+    const startMenu = document.getElementById('startMenu');
+    if (!startMenu) return;
+    
+    // Close start menu if clicked outside
+    if (!e.target.closest('.start-btn') && !e.target.closest('.start-menu')) {
+        startMenu.classList.remove('show');
     }
 }
 
 /**
- * Handles global keydown events for accessibility.
- * @param {KeyboardEvent} e - The keydown event.
+ * Handles global keyboard events for shortcuts and navigation.
+ * @param {Event} e - The keydown event.
  */
 function handleGlobalKeydown(e) {
-    if ((e.key === 'Enter' || e.key === ' ') && document.activeElement && document.activeElement.hasAttribute('data-tool')) {
-        handleAppClick(document.activeElement.dataset.tool);
-        if (document.activeElement.classList.contains('start-menu-item')) {
-            document.getElementById('startMenu').classList.remove('show');
-        }
-    }
-    if ((e.key === 'Enter' || e.key === ' ') && document.activeElement && document.activeElement.id === 'helpBtn') {
-        helpManager.showHelp('terminal', windowManager);
-        document.getElementById('startMenu').classList.remove('show');
+    const startMenu = document.getElementById('startMenu');
+    
+    // Close start menu on Escape
+    if (e.key === 'Escape' && startMenu && startMenu.classList.contains('show')) {
+        startMenu.classList.remove('show');
     }
 }
 
 // --- INITIALIZATION ---
-
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize UI components
-    initializeUI();
-    
-    // Set up start menu event listeners
-    document.getElementById('startBtn').addEventListener('click', toggleStartMenu);
-    document.getElementById('startBtn').addEventListener('keydown', toggleStartMenu);
-    
-    document.addEventListener('click', (e) => {
-        const startMenu = document.getElementById('startMenu');
-        if (!e.target.closest('.start-btn') && !e.target.closest('.start-menu')) {
-            startMenu.classList.remove('show');
+    try {
+        // Initialize core systems
+        const keyboardManager = new KeyboardManager();
+        bootSystem = new BootSystem();
+        
+        // Initialize UI after DOM is ready
+        initializeUI();
+        
+        // Set up global event listeners with null checks
+        const startBtn = document.getElementById('startBtn');
+        if (startBtn) {
+            startBtn.addEventListener('click', toggleStartMenu);
+            startBtn.addEventListener('keydown', toggleStartMenu);
+        } else {
+            console.error('Start button not found');
         }
-    });
-    
-    // Set up global event listeners
-    document.addEventListener('click', handleGlobalClick);
-    document.addEventListener('keydown', handleGlobalKeydown);
-    
-    // Initialize keyboard manager
-    new KeyboardManager();
-    
-    // Initialize boot system (this will handle the welcome window launch)
-    bootSystem = new BootSystem();
+
+        const startMenu = document.getElementById('startMenu');
+        if (startMenu) {
+            // Event delegation for start menu items
+            startMenu.addEventListener('click', (e) => {
+                const menuItem = e.target.closest('.start-menu-item');
+                if (menuItem) {
+                    const appId = menuItem.dataset.app;
+                    if (appId) {
+                        handleAppClick(appId);
+                        startMenu.classList.remove('show');
+                    } else if (menuItem.id === 'helpBtn') {
+                        helpManager.show();
+                        startMenu.classList.remove('show');
+                    }
+                }
+            });
+        }
+
+        // Event delegation for desktop icons
+        const desktopIcons = document.getElementById('desktop-icons');
+        if (desktopIcons) {
+            desktopIcons.addEventListener('click', (e) => {
+                const desktopIcon = e.target.closest('.desktop-icon');
+                if (desktopIcon) {
+                    const appId = desktopIcon.dataset.app;
+                    if (appId) {
+                        handleAppClick(appId);
+                    }
+                }
+            });
+        }
+
+        // Global event listeners
+        document.addEventListener('click', handleGlobalClick);
+        document.addEventListener('keydown', handleGlobalKeydown);
+        
+    } catch (error) {
+        console.error('Failed to initialize application:', error);
+        
+        // Show fallback error message
+        document.body.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: center; height: 100vh; background: #181f2a; color: #eaf1fb; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px;">
+                <div>
+                    <h1 style="color: #ff6b6b; margin-bottom: 20px;">⚠️ Neu-OS Initialization Error</h1>
+                    <p style="margin-bottom: 15px;">The operating system failed to start properly.</p>
+                    <p style="font-size: 0.9em; opacity: 0.8;">Please refresh the page or check the browser console for more details.</p>
+                    <button onclick="location.reload()" style="margin-top: 20px; padding: 10px 20px; background: #4a90e2; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px;">
+                        Restart System
+                    </button>
+                </div>
+            </div>
+        `;
+    }
 }); 
