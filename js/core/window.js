@@ -156,7 +156,10 @@ export class WindowManager {
                             start: (event) => {
                                 // Mark window as being dragged to prevent resize conflicts
                                 const windowObj = this.windows.get(event.target.closest('.window').id);
-                                if (windowObj) windowObj._isDragging = true;
+                                if (windowObj) {
+                                    windowObj._isDragging = true;
+                                    windowObj._isResizing = false;
+                                }
                             },
                             move: this.handleDragMove.bind(this),
                             end: this.handleDragEnd.bind(this)
@@ -168,21 +171,22 @@ export class WindowManager {
                         edges: { left: true, right: true, bottom: true, top: true },
                         listeners: {
                             start: (event) => {
-                                // Mark window as being resized to prevent drag conflicts
+                                // Mark window as being resized to prevent drag conflicts and disable snapping
                                 const windowObj = this.windows.get(event.target.id);
-                                if (windowObj) windowObj._isResizing = true;
+                                if (windowObj) {
+                                    windowObj._isResizing = true;
+                                    windowObj._isDragging = false;
+                                    // Disable snapping during resize to prevent interference
+                                    this.disableSnapping(2000);
+                                }
                             },
                             move: this.handleResizeMove.bind(this),
                             end: this.handleResizeEnd.bind(this)
                         },
                         modifiers: [
-                            interact.modifiers.restrictEdges({
-                                outer: 'parent',
-                                endOnly: true
-                            }),
                             interact.modifiers.restrictSize({
-                                min: { width: CONFIG.window.minWidth || 300, height: CONFIG.window.minHeight || 200 },
-                                max: { width: CONFIG.window.maxWidth || window.innerWidth * 0.9, height: CONFIG.window.maxHeight || window.innerHeight * 0.9 }
+                                min: { width: 300, height: 200 },
+                                max: { width: window.innerWidth * 0.95, height: (window.innerHeight - 54) * 0.95 }
                             })
                         ]
                     });
@@ -282,24 +286,39 @@ export class WindowManager {
         windowObj._isResizing = false;
 
         // Update the window object with final dimensions and position
-        windowObj.width = event.rect.width;
-        windowObj.height = event.rect.height;
-        windowObj.left = parseFloat(windowObj.element.style.left) || 0;
-        windowObj.top = parseFloat(windowObj.element.style.top) || 0;
+        const finalWidth = event.rect.width;
+        const finalHeight = event.rect.height;
+        const finalLeft = (parseFloat(windowObj.element.style.left) || 0) + (event.deltaRect.left || 0);
+        const finalTop = (parseFloat(windowObj.element.style.top) || 0) + (event.deltaRect.top || 0);
+
+        // Apply final position and size - this ensures consistency
+        windowObj.element.style.width = `${finalWidth}px`;
+        windowObj.element.style.height = `${finalHeight}px`;
+        windowObj.element.style.left = `${finalLeft}px`;
+        windowObj.element.style.top = `${finalTop}px`;
+
+        // Update window object properties
+        windowObj.width = finalWidth;
+        windowObj.height = finalHeight;
+        windowObj.left = finalLeft;
+        windowObj.top = finalTop;
         
         // Reset any snapped state since user manually resized
         windowObj.isMaximized = false;
         windowObj._isSnapped = false;
         
-        // Store the original position for future operations
+        // Store the new position as the original position for future operations
         windowObj.originalPosition = {
-            left: windowObj.left,
-            top: windowObj.top,
-            width: windowObj.width,
-            height: windowObj.height
+            left: finalLeft,
+            top: finalTop,
+            width: finalWidth,
+            height: finalHeight
         };
         
-        // NEVER check snap zones after resize operations
+        // Ensure snapping remains disabled briefly after resize
+        this.disableSnapping(1000);
+        
+        console.log('Resize ended - Window dimensions:', { width: finalWidth, height: finalHeight, left: finalLeft, top: finalTop });
     }
 
     /**
@@ -312,23 +331,25 @@ export class WindowManager {
         const windowObj = this.windows.get(event.target.id);
         if (!windowObj) return;
 
-        // Calculate new position based on resize deltas
-        const x = (parseFloat(windowObj.element.style.left) || 0) + event.deltaRect.left;
-        const y = (parseFloat(windowObj.element.style.top) || 0) + event.deltaRect.top;
+        // Get current position from element style to ensure accuracy
+        const currentLeft = parseFloat(windowObj.element.style.left) || 0;
+        const currentTop = parseFloat(windowObj.element.style.top) || 0;
 
-        // Apply the new dimensions and position
-        Object.assign(windowObj.element.style, {
-            width: `${event.rect.width}px`,
-            height: `${event.rect.height}px`,
-            left: `${x}px`,
-            top: `${y}px`
-        });
+        // Calculate new position based on resize deltas
+        const newLeft = currentLeft + (event.deltaRect.left || 0);
+        const newTop = currentTop + (event.deltaRect.top || 0);
+
+        // Apply the new dimensions and position immediately
+        windowObj.element.style.width = `${event.rect.width}px`;
+        windowObj.element.style.height = `${event.rect.height}px`;
+        windowObj.element.style.left = `${newLeft}px`;
+        windowObj.element.style.top = `${newTop}px`;
         
-        // Update the window object properties
+        // Update the window object properties to match
         windowObj.width = event.rect.width;
         windowObj.height = event.rect.height;
-        windowObj.left = x;
-        windowObj.top = y;
+        windowObj.left = newLeft;
+        windowObj.top = newTop;
         
         // Mark that this window is no longer in a snapped/maximized state
         windowObj.isMaximized = false;
@@ -365,7 +386,8 @@ export class WindowManager {
      */
     disableSnapping(duration = 1000) {
         this.isSnappingEnabled = false;
-        setTimeout(() => {
+        clearTimeout(this._snapTimeout);
+        this._snapTimeout = setTimeout(() => {
             this.isSnappingEnabled = true;
         }, duration);
     }
