@@ -558,7 +558,6 @@ export class WindowManager {
 
         const screenWidth = window.innerWidth;
         const screenHeight = window.innerHeight;
-        const taskbarHeight = 54;
 
         let newLeft, newTop, newWidth, newHeight;
 
@@ -567,25 +566,25 @@ export class WindowManager {
                 newLeft = 0;
                 newTop = 0;
                 newWidth = Math.floor(screenWidth / 2);
-                newHeight = screenHeight - taskbarHeight;
+                newHeight = screenHeight;
                 break;
             case 'right':
                 newLeft = Math.floor(screenWidth / 2);
                 newTop = 0;
                 newWidth = Math.floor(screenWidth / 2);
-                newHeight = screenHeight - taskbarHeight;
+                newHeight = screenHeight;
                 break;
             case 'top':
                 newLeft = 0;
                 newTop = 0;
                 newWidth = screenWidth;
-                newHeight = Math.floor((screenHeight - taskbarHeight) / 2);
+                newHeight = Math.floor(screenHeight / 2);
                 break;
             case 'bottom':
                 newLeft = 0;
-                newTop = Math.floor((screenHeight - taskbarHeight) / 2);
+                newTop = Math.floor(screenHeight / 2);
                 newWidth = screenWidth;
-                newHeight = Math.floor((screenHeight - taskbarHeight) / 2);
+                newHeight = Math.floor(screenHeight / 2);
                 break;
             default:
                 this.isSnappingEnabled = true;
@@ -687,13 +686,9 @@ export class WindowManager {
             height: window.element.style.height
         };
 
-        // Get taskbar height to avoid covering it
-        const taskbar = document.querySelector('.taskbar');
-        const taskbarHeight = taskbar ? taskbar.offsetHeight : 54; // Default taskbar height
-
         // Use config values for proper maximize dimensions
         const maxWidth = CONFIG.WINDOW.MAXIMIZED_WIDTH || '90%';
-        const maxHeight = CONFIG.WINDOW.MAXIMIZED_HEIGHT || '80%';
+        const maxHeight = CONFIG.WINDOW.MAXIMIZED_HEIGHT || '90%';
         const margin = CONFIG.WINDOW.MAXIMIZED_MARGIN || '5%';
 
         window.element.classList.add('maximizing');
@@ -703,7 +698,7 @@ export class WindowManager {
         window.element.style.left = margin;
         window.element.style.top = margin;
         window.element.style.width = maxWidth;
-        window.element.style.height = `calc(100vh - ${taskbarHeight}px - 10vh)`; // Use viewport height minus taskbar and margin
+        window.element.style.height = maxHeight;
         
         setTimeout(() => {
             window.element.classList.remove('maximizing');
@@ -712,8 +707,7 @@ export class WindowManager {
         console.log('🔍 Window maximized:', { 
             id: window.id, 
             width: maxWidth, 
-            height: `calc(100vh - ${taskbarHeight}px - 10vh)`,
-            taskbarHeight 
+            height: maxHeight
         });
     }
 

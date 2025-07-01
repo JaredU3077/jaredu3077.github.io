@@ -450,18 +450,11 @@ export class BootSystem {
     initializeDesktop() {
         // Show desktop with fade-in animation
         const desktop = document.getElementById('desktop');
-        const taskbar = document.querySelector('.taskbar');
         
         if (desktop) {
             desktop.style.opacity = '0';
             desktop.style.transform = 'scale(0.95)';
             desktop.style.transition = 'opacity 1s ease-out, transform 1s ease-out';
-        }
-        
-        if (taskbar) {
-            taskbar.style.opacity = '0';
-            taskbar.style.transform = 'translateY(100%)';
-            taskbar.style.transition = 'opacity 1s ease-out, transform 1s ease-out';
         }
 
         // Add network animation elements
@@ -472,10 +465,6 @@ export class BootSystem {
             if (desktop) {
                 desktop.style.opacity = '1';
                 desktop.style.transform = 'scale(1)';
-            }
-            if (taskbar) {
-                taskbar.style.opacity = '1';
-                taskbar.style.transform = 'translateY(0)';
             }
         }, 100);
 

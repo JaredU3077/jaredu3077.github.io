@@ -487,20 +487,6 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
         zIndex: 1000
     },
 
-    // Start menu configuration
-    startMenu: {
-        width: 300,
-        itemHeight: 40,
-        iconSize: 24
-    },
-
-    // Taskbar configuration
-    taskbar: {
-        height: 40,
-        iconSize: 20,
-        spacing: 4
-    },
-
     // Desktop configuration
     desktop: {
         iconSize: 64,
@@ -668,28 +654,16 @@ export function createIcon(config, size = '16') {
 }
 
 /**
- * Helper function to create application button
+ * Helper function to create desktop application icon
  * @param {Object} app - Application configuration
- * @param {string} type - Type of button (desktop, taskbar, or start-menu)
- * @returns {string} Button markup
+ * @param {string} type - Type of button (desktop)
+ * @returns {string} Desktop icon markup
  */
 export function createAppButton(app, type) {
-    const isDesktop = type === 'desktop';
-    const baseClass = isDesktop ? 'desktop-icon' : 'start-menu-item';
-    
-    if (isDesktop) {
-        return `
-            <div class="${baseClass}" data-app="${app.id}" title="${app.name}" aria-label="${app.name}">
-                <div class="icon">${app.icon}</div>
-                <div class="label">${app.name}</div>
-            </div>
-        `;
-    } else {
-        return `
-            <button class="${baseClass}" data-app="${app.id}" title="${app.name}" aria-label="${app.name}" tabindex="0">
-                <div class="icon">${app.icon}</div>
-                <span class="label">${app.name}</span>
-            </button>
-        `;
-    }
+    return `
+        <div class="desktop-icon" data-app="${app.id}" title="${app.name}" aria-label="${app.name}">
+            <div class="icon">${app.icon}</div>
+            <div class="label">${app.name}</div>
+        </div>
+    `;
 }

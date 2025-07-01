@@ -38,63 +38,29 @@ let openWindows = {};
 // --- UI INITIALIZATION ---
 
 /**
- * Initializes the user interface, creating desktop icons and start menu items.
+ * Initializes the user interface, creating desktop icons.
  */
 function initializeUI() {
-    const startMenu = document.getElementById('startMenu');
     const desktopIcons = document.getElementById('desktop-icons');
     
-    // Add null checks to prevent errors
-    if (!startMenu) {
-        console.error('Start menu element not found');
-        return;
-    }
-    
+    // Add null check to prevent errors
     if (!desktopIcons) {
         console.error('Desktop icons container not found');
         return;
     }
     
-    startMenu.innerHTML = '';
     desktopIcons.innerHTML = '';
 
-    // Create start menu items and desktop icons for all apps
+    // Create desktop icons for all apps
     Object.values(CONFIG.applications).forEach(app => {
-        // Create Start Menu buttons
-        startMenu.insertAdjacentHTML('beforeend', createAppButton(app, 'start-menu'));
-        
         // Create Desktop Icons
         desktopIcons.insertAdjacentHTML('beforeend', createAppButton(app, 'desktop'));
     });
-
-    // Add help button to start menu
-    startMenu.insertAdjacentHTML('beforeend', `
-        <button class="start-menu-item" title="Help" aria-label="Help" tabindex="0" id="helpBtn">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M12 16v-4M12 8h.01"/>
-            </svg>
-            <span class="label">Help</span>
-        </button>
-    `);
 }
 
 // --- EVENT LISTENERS ---
 
-/**
- * Toggles the visibility of the start menu.
- * @param {Event} e - The click or keydown event.
- */
-function toggleStartMenu(e) {
-    if (e.type === 'click' || (e.type === 'keydown' && (e.key === 'Enter' || e.key === ' '))) {
-        const startMenu = document.getElementById('startMenu');
-        if (startMenu) {
-            startMenu.classList.toggle('show');
-        } else {
-            console.error('Start menu element not found');
-        }
-    }
-}
+
 
 // --- APPLICATION LAUNCHER ---
 
@@ -317,17 +283,11 @@ function setupContactForm(winElem) {
 }
 
 /**
- * Handles global click events, particularly for closing the start menu.
+ * Handles global click events.
  * @param {Event} e - The click event.
  */
 function handleGlobalClick(e) {
-    const startMenu = document.getElementById('startMenu');
-    if (!startMenu) return;
-    
-    // Close start menu if clicked outside
-    if (!e.target.closest('.start-btn') && !e.target.closest('.start-menu')) {
-        startMenu.classList.remove('show');
-    }
+    // Reserved for future global click handling
 }
 
 /**
@@ -335,12 +295,7 @@ function handleGlobalClick(e) {
  * @param {Event} e - The keydown event.
  */
 function handleGlobalKeydown(e) {
-    const startMenu = document.getElementById('startMenu');
-    
-    // Close start menu on Escape
-    if (e.key === 'Escape' && startMenu && startMenu.classList.contains('show')) {
-        startMenu.classList.remove('show');
-    }
+    // Reserved for future global keyboard shortcuts
 }
 
 // --- INITIALIZATION ---
@@ -363,36 +318,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1000);
         
         // Set up global event listeners with null checks
-        const startBtn = document.getElementById('startBtn');
-        if (startBtn) {
-            startBtn.addEventListener('click', toggleStartMenu);
-            startBtn.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    toggleStartMenu(e);
-                }
-            });
-        } else {
-            console.error('Start button not found');
-        }
-
-        const startMenu = document.getElementById('startMenu');
-        if (startMenu) {
-            // Event delegation for start menu items
-            startMenu.addEventListener('click', (e) => {
-                const menuItem = e.target.closest('.start-menu-item');
-                if (menuItem) {
-                    const appId = menuItem.dataset.app;
-                    if (appId) {
-                        handleAppClick(appId);
-                        startMenu.classList.remove('show');
-                    } else if (menuItem.id === 'helpBtn') {
-                        helpManager.show();
-                        startMenu.classList.remove('show');
-                    }
-                }
-            });
-        }
 
         // Event delegation for desktop icons
         const desktopIcons = document.getElementById('desktop-icons');

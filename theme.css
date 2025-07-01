@@ -5,7 +5,6 @@
     --background-dark: #181f2a;
     --background-light: #232c3d;
     --window-bg: #232c3d;
-    --taskbar-bg: #181f2a;
     --text-color: #eaf1fb;
     --border-color: #26334d;
     --shadow: 0 8px 32px 0 rgba(30, 60, 120, 0.30), 0 2px 8px 0 rgba(30, 60, 120, 0.12);
@@ -14,10 +13,6 @@
     --neu-highlight: 0 1.5px 4px 0 #3a4a6a, 0 -1.5px 4px 0 #2a3750;
     --border-radius: 22px;
     --transition: 0.22s cubic-bezier(.4,2,.6,1);
-    --taskbar-height: 54px;
-    --start-menu-width: 340px;
-    --start-menu-item-height: 54px;
-    --start-menu-icon-size: 32px;
     --accent-green: #00d084;
     --accent-orange: #ff6900;
     --accent-purple: #7c53ff;
@@ -32,154 +27,13 @@ body {
     transition: background 0.3s;
     margin: 0;
     padding: 0;
-    padding-bottom: var(--taskbar-height); /* Make room for taskbar at bottom */
 }
 
-/* Taskbar */
-.taskbar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: var(--taskbar-height);
-    background: var(--taskbar-bg);
-    box-shadow: var(--neu-shadow), 0 1.5px 8px 0 #101624;
-    display: flex;
-    align-items: center;
-    padding: 0 32px;
-    z-index: 2000;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-    border-top: 2px solid #222b3a;
-    border-left: 2px solid #222b3a;
-    border-right: 2px solid #222b3a;
-    overflow: hidden;
-    /* Neumorphic edge with square styling */
-    box-shadow: 0 8px 32px 0 #101624, 0 -4px 16px 0 #232c3d inset;
-}
 
-.start-btn {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    background: linear-gradient(135deg, #232c3d 60%, #2e3a54 100%);
-    color: var(--primary-color);
-    border: none;
-    border-radius: 8px;
-    padding: 14px 28px;
-    font-size: 1.1rem;
-    font-weight: 700;
-    box-shadow: var(--neu-inset), 0 2px 8px 0 #101624;
-    cursor: pointer;
-    transition: background var(--transition), color var(--transition), box-shadow var(--transition);
-    outline: none;
-    position: relative;
-    z-index: 2;
-    border: 2px solid #26334d;
-}
-.start-btn:hover, .start-btn:focus {
-    background: linear-gradient(135deg, #357ab8 60%, #4a90e2 100%);
-    color: #fff;
-    box-shadow: 0 4px 24px 0 #4a90e2, var(--neu-inset);
-}
-.start-btn svg {
-    stroke: currentColor;
-    filter: drop-shadow(0 1px 2px #101624);
-}
 
-.branding {
-    margin-left: auto;
-    padding: 0 10px;
-    font-size: 14px;
-    color: var(--text-color);
-    font-weight: 600;
-    text-shadow: 0 1px 2px #101624;
-}
 
-/* Start Menu */
-.start-menu {
-    position: absolute;
-    bottom: var(--taskbar-height);
-    left: 32px;
-    width: var(--start-menu-width);
-    background: linear-gradient(135deg, #232c3d 60%, #2e3a54 100%);
-    border-radius: 12px;
-    box-shadow: 0 12px 48px 0 #101624, var(--neu-shadow);
-    padding: 20px 0 12px 0;
-    display: none;
-    flex-direction: column;
-    gap: 6px;
-    z-index: 3000;
-    border: 2px solid #26334d;
-    /* Neumorphic edge with square styling */
-    box-shadow: 0 8px 32px 0 #101624, 0 2px 8px 0 #232c3d inset;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(20px);
-    transition: opacity 0.3s ease-out, transform 0.3s ease-out, visibility 0.3s;
-}
 
-.start-menu.show {
-    display: flex;
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(24px) scale(0.98); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.start-menu-item {
-    display: flex;
-    align-items: center;
-    width: calc(100% - 16px);
-    height: var(--start-menu-item-height);
-    margin: 0 8px;
-    padding: 0 20px;
-    background: linear-gradient(135deg, #232c3d 60%, #2e3a54 100%);
-    border: 2px solid #26334d;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background var(--transition), color var(--transition), box-shadow var(--transition), border-color var(--transition);
-    font-size: 1.08rem;
-    color: var(--text-color);
-    gap: 16px;
-    outline: none;
-    box-shadow: var(--neu-inset);
-    position: relative;
-}
-.start-menu-item .icon {
-    width: var(--start-menu-icon-size);
-    height: var(--start-menu-icon-size);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    filter: drop-shadow(0 1px 2px #101624);
-}
-.start-menu-item .icon svg {
-    width: 100%;
-    height: 100%;
-    stroke: var(--primary-color);
-    filter: drop-shadow(0 1px 2px #101624);
-}
-.start-menu-item .label {
-    font-size: 1.08rem;
-    color: var(--text-color);
-    font-weight: 600;
-    letter-spacing: 0.01em;
-    text-shadow: 0 1px 2px #101624;
-}
-.start-menu-item:hover, .start-menu-item:focus {
-    background: linear-gradient(135deg, #357ab8 60%, #4a90e2 100%);
-    color: #fff;
-    border-color: var(--primary-color);
-    box-shadow: 0 4px 24px 0 #4a90e2, var(--neu-inset);
-}
-.start-menu-item:hover .icon svg, .start-menu-item:focus .icon svg {
-    stroke: #fff;
-}
 
 /* Window Styles - Square Button Theme */
 .window {
@@ -327,8 +181,8 @@ body {
     z-index: 15; /* Higher than resize handles but lower than scrollbar */
 }
 
-/* Remove desktop and taskbar app icon styles for minimalism */
-/* .desktop, .desktop-icon, .taskbar-icon, .taskbar-tools { display: none !important; } */
+/* Remove desktop app icon styles for minimalism if needed */
+/* .desktop, .desktop-icon { display: none !important; } */
 
 /* Fixed desktop icon styling - Square button design */
 .desktop-icon {
@@ -940,9 +794,7 @@ body {
 
 /* Hide desktop during boot/login */
 .boot-active #desktop,
-.boot-active .taskbar,
-.login-active #desktop,
-.login-active .taskbar {
+.login-active #desktop {
     display: none;
 }
 
@@ -1026,18 +878,6 @@ body {
     }
 }
 
-/* Enhanced Taskbar Effects */
-.taskbar::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
-    animation: scanLine 3s linear infinite;
-}
-
 @keyframes scanLine {
     0% { left: -100%; }
     100% { left: 100%; }
@@ -1065,9 +905,7 @@ body {
 }
 
 /* Interactive Glow Effects */
-.start-btn:hover,
-.window-control:hover,
-.start-menu-item:hover {
+.window-control:hover {
     box-shadow: 0 0 15px rgba(74, 144, 226, 0.4), inset 0 0 15px rgba(74, 144, 226, 0.2);
 }
 
@@ -1178,7 +1016,6 @@ body {
 
 /* Enhanced Focus States */
 button:focus-visible, 
-.start-menu-item:focus-visible, 
 .window-control:focus-visible {
     outline: 2.5px solid var(--primary-color);
     outline-offset: 2px;
@@ -1203,8 +1040,7 @@ button:focus-visible,
     .data-packet,
     .network-node,
     .connection-line,
-    .scan-lines::after,
-    .taskbar::before {
+    .scan-lines::after {
         animation: none !important;
         transition: none !important;
     }
@@ -1296,8 +1132,6 @@ img, video {
 
 /* Print styles */
 @media print {
-    .taskbar,
-    .start-menu,
     .boot-sequence,
     .login-screen,
     .audio-controls,
@@ -1506,13 +1340,6 @@ img, video {
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .start-menu {
-        left: 0;
-        width: 100vw;
-        border-radius: 0;
-        max-height: 70vh;
-        overflow-y: auto;
-    }
     .window {
         min-width: 95vw;
         min-height: 50vh;
@@ -1522,13 +1349,6 @@ img, video {
     .window-content {
         padding: 12px;
         font-size: 14px;
-    }
-    .taskbar {
-        padding: 0 8px;
-    }
-    .branding {
-        font-size: 12px;
-        display: none;
     }
     .welcome-content h2 {
         font-size: 1.1em;
@@ -1564,16 +1384,6 @@ img, video {
 }
 
 @media (max-width: 480px) {
-    .start-menu-item {
-        padding: 0 20px;
-        font-size: 1rem;
-    }
-    
-    .start-menu-item .icon {
-        width: 28px;
-        height: 28px;
-    }
-    
     .window-header {
         padding: 8px 12px;
     }
@@ -1587,15 +1397,6 @@ img, video {
         height: 32px;
     }
     
-    .branding {
-        display: none;
-    }
-    
-    .start-btn {
-        padding: 8px 16px;
-        font-size: 0.9rem;
-    }
-    
     /* Improve touch targets */
     .desktop-icon {
         min-width: 44px;
@@ -1603,10 +1404,6 @@ img, video {
         padding: 8px;
         width: 50px;
         height: 50px;
-    }
-    
-    .start-menu-item {
-        min-height: 44px;
     }
     
     .window-control {
