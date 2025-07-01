@@ -15,8 +15,31 @@ export const CONFIG = {
 
     // Terminal commands
     COMMANDS: {
-        HELP: 'Available commands: ping, clear, help, show resume, show jared',
-        PING: 'Pinging 8.8.8.8... Reply from 8.8.8.8: 32ms'
+        HELP: `Available commands:
+• ping [host] - Test network connectivity
+• show resume - Display professional resume  
+• show experience - Show detailed work history
+• show skills - List technical skills
+• show certifications - Display certifications
+• ifconfig - Show network interface configuration
+• netstat - Display network connections
+• tracert [host] - Trace route to destination
+• nslookup [domain] - DNS lookup
+• clear - Clear terminal screen
+• help - Show this help message`,
+        PING: 'Pinging 8.8.8.8... Reply from 8.8.8.8: 32ms',
+        IFCONFIG: `eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.1.100  netmask 255.255.255.0  broadcast 192.168.1.255
+        inet6 fe80::a00:27ff:fe4e:66a1  prefixlen 64  scopeid 0x20<link>
+        ether 08:00:27:4e:66:a1  txqueuelen 1000  (Ethernet)
+        RX packets 1234567  bytes 987654321 (941.1 MiB)
+        TX packets 987654   bytes 123456789 (117.7 MiB)`,
+        NETSTAT: `Active Connections
+Proto  Local Address          Foreign Address        State
+TCP    192.168.1.100:22       192.168.1.1:54321     ESTABLISHED
+TCP    192.168.1.100:80       0.0.0.0:0              LISTENING
+TCP    192.168.1.100:443      0.0.0.0:0              LISTENING
+UDP    192.168.1.100:53       *:*                    LISTENING`
     },
 
     // File paths
@@ -94,15 +117,27 @@ export const CONFIG = {
             icon: '👋',
             windows: [{
                 id: 'welcomeWindow',
-                title: 'Welcome!',
-                width: 400,
-                height: 250,
+                title: 'Welcome - Senior Network Engineer Portfolio',
+                width: 500,
+                height: 320,
                 content: `
-                    <div class="welcome-content" style="padding: 15px; text-align: center;">
-                        <h2>Welcome to My Interactive Portfolio</h2>
-                        <p>This is a simulated OS environment built with JavaScript.</p>
-                        <p>Feel free to open applications from the Start Menu, move windows around, and explore.</p>
-                        <p>You can start by checking out my resume by typing 'cat resume.txt' into the terminal!</p>
+                    <div class="welcome-content" style="padding: 20px; text-align: center;">
+                        <h2>🖥️ Senior Network Engineer Portfolio</h2>
+                        <p><strong>Jared U. (@JaredU_)</strong></p>
+                        <p>Welcome to my interactive portfolio featuring a simulated network engineer workstation.</p>
+                        <hr style="margin: 15px 0; border: 1px solid #26334d;">
+                        <div style="text-align: left; margin-top: 15px;">
+                            <h3>🚀 Quick Start:</h3>
+                            <ul style="list-style-type: none; padding: 0;">
+                                <li>📊 <strong>Network Monitor:</strong> View network topology</li>
+                                <li>💻 <strong>Terminal:</strong> Run commands like 'show resume' or 'ping 8.8.8.8'</li>
+                                <li>📚 <strong>Codex:</strong> Search network documentation</li>
+                                <li>🔧 <strong>Device Manager:</strong> Network device overview</li>
+                            </ul>
+                        </div>
+                        <p style="margin-top: 15px; font-size: 0.9em; opacity: 0.8;">
+                            15+ years experience • CCNA Certified • Python & Ansible Expert
+                        </p>
                     </div>
                 `
             }]
@@ -146,10 +181,80 @@ export const CONFIG = {
             icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/></svg>`,
             windows: [{
                 id: 'devicesWindow',
-                title: 'Device Manager',
-                content: '<div id="deviceList" data-scroll-container></div>',
-                width: 600,
-                height: 400
+                title: 'Network Device Manager',
+                content: `<div id="deviceList" data-scroll-container style="padding: 20px;">
+                    <h3 style="color: #4a90e2; margin-bottom: 20px;">🖥️ Network Infrastructure Overview</h3>
+                    
+                    <div class="device-category" style="margin-bottom: 25px;">
+                        <h4 style="color: #00d084; margin-bottom: 10px;">🔧 Core Infrastructure</h4>
+                        <div class="device-item" style="margin: 8px 0; padding: 8px; background: #1e2530; border-radius: 8px;">
+                            <strong>Core Switch Stack</strong> - Arista 7280R (Active/Standby)<br>
+                            <span style="color: #a0a0a0; font-size: 0.9em;">Management: 192.168.1.10 | Status: ✅ Online | Uptime: 247 days</span>
+                        </div>
+                        <div class="device-item" style="margin: 8px 0; padding: 8px; background: #1e2530; border-radius: 8px;">
+                            <strong>Distribution Switches</strong> - Cisco Catalyst 9300 Series<br>
+                            <span style="color: #a0a0a0; font-size: 0.9em;">Management: 192.168.1.11-16 | Status: ✅ Online | Load: 34%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="device-category" style="margin-bottom: 25px;">
+                        <h4 style="color: #ff6900; margin-bottom: 10px;">🛡️ Security Infrastructure</h4>
+                        <div class="device-item" style="margin: 8px 0; padding: 8px; background: #1e2530; border-radius: 8px;">
+                            <strong>Firewall Cluster</strong> - Palo Alto PA-5250 (HA)<br>
+                            <span style="color: #a0a0a0; font-size: 0.9em;">Management: 192.168.1.20-21 | Status: ✅ Active/Standby | Threats Blocked: 1,247</span>
+                        </div>
+                        <div class="device-item" style="margin: 8px 0; padding: 8px; background: #1e2530; border-radius: 8px;">
+                            <strong>IPS/IDS</strong> - Fortinet FortiGate 600E<br>
+                            <span style="color: #a0a0a0; font-size: 0.9em;">Management: 192.168.1.22 | Status: ✅ Online | Signatures: Updated</span>
+                        </div>
+                    </div>
+                    
+                    <div class="device-category" style="margin-bottom: 25px;">
+                        <h4 style="color: #7c53ff; margin-bottom: 10px;">📡 Wireless Infrastructure</h4>
+                        <div class="device-item" style="margin: 8px 0; padding: 8px; background: #1e2530; border-radius: 8px;">
+                            <strong>Wireless Controllers</strong> - Arista Cloud Vision (Primary/Secondary)<br>
+                            <span style="color: #a0a0a0; font-size: 0.9em;">Management: 192.168.1.30-31 | Status: ✅ Online | APs: 127/130</span>
+                        </div>
+                        <div class="device-item" style="margin: 8px 0; padding: 8px; background: #1e2530; border-radius: 8px;">
+                            <strong>Access Points</strong> - Arista Wi-Fi 6E (Various Models)<br>
+                            <span style="color: #a0a0a0; font-size: 0.9em;">Coverage: 99.7% | Clients: 1,847 | Avg Signal: -45 dBm</span>
+                        </div>
+                    </div>
+                    
+                    <div class="device-category" style="margin-bottom: 25px;">
+                        <h4 style="color: #00b8d9; margin-bottom: 10px;">🌐 WAN & Connectivity</h4>
+                        <div class="device-item" style="margin: 8px 0; padding: 8px; background: #1e2530; border-radius: 8px;">
+                            <strong>Edge Routers</strong> - Cisco ASR 1000 Series<br>
+                            <span style="color: #a0a0a0; font-size: 0.9em;">Management: 192.168.1.40-41 | Status: ✅ Online | BGP Sessions: 8/8</span>
+                        </div>
+                        <div class="device-item" style="margin: 8px 0; padding: 8px; background: #1e2530; border-radius: 8px;">
+                            <strong>SD-WAN Appliances</strong> - Cisco Meraki MX450<br>
+                            <span style="color: #a0a0a0; font-size: 0.9em;">Management: Cloud Managed | Status: ✅ Online | Tunnels: 12/12</span>
+                        </div>
+                    </div>
+                    
+                    <div class="device-category">
+                        <h4 style="color: #ff4d4d; margin-bottom: 10px;">📊 Monitoring & Management</h4>
+                        <div class="device-item" style="margin: 8px 0; padding: 8px; background: #1e2530; border-radius: 8px;">
+                            <strong>Network Monitoring</strong> - SolarWinds NPM Cluster<br>
+                            <span style="color: #a0a0a0; font-size: 0.9em;">Management: 192.168.1.50-52 | Status: ✅ Online | Devices Monitored: 847</span>
+                        </div>
+                        <div class="device-item" style="margin: 8px 0; padding: 8px; background: #1e2530; border-radius: 8px;">
+                            <strong>Log Management</strong> - Splunk Enterprise<br>
+                            <span style="color: #a0a0a0; font-size: 0.9em;">Management: 192.168.1.60 | Status: ✅ Online | Daily Logs: 2.3TB</span>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 25px; padding: 15px; background: #0f1419; border-radius: 8px; border-left: 4px solid #4a90e2;">
+                        <strong>Network Health Summary:</strong><br>
+                        <span style="color: #00d084;">● 847 devices monitored</span><br>
+                        <span style="color: #00d084;">● 99.97% network uptime</span><br>
+                        <span style="color: #ffff00;">● 3 minor alerts pending</span><br>
+                        <span style="color: #00d084;">● All critical systems operational</span>
+                    </div>
+                </div>`,
+                width: 700,
+                height: 600
             }]
         },
         'codex': {

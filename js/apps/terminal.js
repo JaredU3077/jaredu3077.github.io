@@ -432,7 +432,19 @@ export class Terminal {
         this.commands.set('ping', this.handlePing.bind(this));
         this.commands.set('show', this.handleShow.bind(this));
         this.commands.set('clear', this.clear.bind(this));
-        // Future commands: traceroute, etc.
+        this.commands.set('ifconfig', () => CONFIG.COMMANDS.IFCONFIG);
+        this.commands.set('netstat', () => CONFIG.COMMANDS.NETSTAT);
+        this.commands.set('tracert', this.handleTracert.bind(this));
+        this.commands.set('traceroute', this.handleTracert.bind(this));
+        this.commands.set('nslookup', this.handleNslookup.bind(this));
+        this.commands.set('dig', this.handleNslookup.bind(this));
+        this.commands.set('arp', () => this.handleArp());
+        this.commands.set('route', () => this.handleRoute());
+        this.commands.set('ls', () => 'resume.txt  codex.txt  network-configs/  scripts/');
+        this.commands.set('pwd', () => '/home/jared');
+        this.commands.set('whoami', () => 'jared - Senior Network Engineer');
+        this.commands.set('date', () => new Date().toString());
+        this.commands.set('uptime', () => 'System uptime: 15+ years in networking');
     }
 
     /**
@@ -488,8 +500,121 @@ export class Terminal {
         const target = args[0];
         if (target === 'resume' || target === 'jared') {
             return this.showResume();
+        } else if (target === 'experience') {
+            return this.showExperience();
+        } else if (target === 'skills') {
+            return this.showSkills();
+        } else if (target === 'certifications') {
+            return this.showCertifications();
         }
-        return `Error: Unknown 'show' command target: ${target}. Try 'show resume' or 'show jared'.`;
+        return `Error: Unknown 'show' command target: ${target}. Try 'show resume', 'show experience', 'show skills', or 'show certifications'.`;
+    }
+
+    showExperience() {
+        return `<div class="terminal-section">
+<div class="terminal-subheading">Professional Experience Summary</div>
+<div class="terminal-detail">
+🏢 <strong>Current:</strong> Senior Network Engineer @ Denali Advanced Integrations<br>
+&nbsp;&nbsp;&nbsp;• Space-to-ground communications infrastructure<br>
+&nbsp;&nbsp;&nbsp;• Mission-critical network deployments<br>
+&nbsp;&nbsp;&nbsp;• Network segmentation for scientific environments<br><br>
+
+🏢 <strong>Previous:</strong> Senior Technology Consultant @ Riverstrong<br>
+&nbsp;&nbsp;&nbsp;• Cisco Meraki and Fortinet deployments<br>
+&nbsp;&nbsp;&nbsp;• SMB infrastructure modernization<br><br>
+
+🏢 <strong>Previous:</strong> Senior Network Engineer @ Sound Transit<br>
+&nbsp;&nbsp;&nbsp;• SolarWinds infrastructure modernization<br>
+&nbsp;&nbsp;&nbsp;• PCI compliance and security auditing<br>
+&nbsp;&nbsp;&nbsp;• Statewide retail POS system refresh<br><br>
+
+🏢 <strong>Previous:</strong> Senior Network Engineer @ ArenaNet<br>
+&nbsp;&nbsp;&nbsp;• Arista leaf-spine architecture implementation<br>
+&nbsp;&nbsp;&nbsp;• Palo Alto NGFW deployment<br>
+&nbsp;&nbsp;&nbsp;• Team mentorship and technical leadership<br><br>
+
+Use 'show resume' for complete details.
+</div>
+</div>`;
+    }
+
+    showSkills() {
+        return `<div class="terminal-section">
+<div class="terminal-subheading">Technical Skills</div>
+<div class="terminal-detail">
+🌐 <strong>Networking:</strong> Cisco, Arista, Juniper, Brocade, Meraki<br>
+🔐 <strong>Security:</strong> Palo Alto, Fortinet, VPN, NGFW, Network Segmentation<br>
+☁️ <strong>Cloud:</strong> AWS, Azure, VMware, Hyper-V<br>
+📊 <strong>Monitoring:</strong> SolarWinds, Splunk, Grafana, Wireshark, NetFlow<br>
+🤖 <strong>Automation:</strong> Python, Ansible, bash, PowerShell, IaC<br>
+📋 <strong>Management:</strong> Project Management, Vendor Relations, Change Management<br>
+🔧 <strong>Protocols:</strong> IPv4/IPv6, BGP, OSPF, EIGRP, MPLS, VLANs<br>
+📡 <strong>Wireless:</strong> Enterprise Wi-Fi, Arista Cloud Vision, RF Planning
+</div>
+</div>`;
+    }
+
+    showCertifications() {
+        return `<div class="terminal-section">
+<div class="terminal-subheading">Professional Certifications</div>
+<div class="terminal-detail">
+✅ <strong>Cisco CCNA</strong> (Active)<br>
+&nbsp;&nbsp;&nbsp;Certificate ID: e789b6372c2b4632ac9d485919e3e863<br><br>
+
+✅ <strong>CompTIA Security+</strong> (Active)<br>
+&nbsp;&nbsp;&nbsp;Information Security Fundamentals<br><br>
+
+✅ <strong>CompTIA A+</strong> (Active)<br>
+&nbsp;&nbsp;&nbsp;Hardware and Software Troubleshooting<br><br>
+
+📚 <strong>Currently Studying:</strong><br>
+&nbsp;&nbsp;&nbsp;• NEBIUS AI LLM 12 week course<br>
+&nbsp;&nbsp;&nbsp;• Nvidia Cumulus Linux AI Networking<br>
+&nbsp;&nbsp;&nbsp;• Advanced Python for Network Automation
+</div>
+</div>`;
+    }
+
+    handleTracert(args) {
+        const target = args && args.length > 0 ? args[0] : '8.8.8.8';
+        return `Tracing route to ${target}:
+
+1    <1 ms    <1 ms    <1 ms  192.168.1.1
+2    15 ms    12 ms    14 ms  10.0.0.1
+3    25 ms    23 ms    26 ms  isp-gateway.net [203.0.113.1]
+4    35 ms    33 ms    37 ms  backbone-1.net [198.51.100.1]
+5    45 ms    43 ms    47 ms  ${target}
+
+Trace complete.`;
+    }
+
+    handleNslookup(args) {
+        const domain = args && args.length > 0 ? args[0] : 'example.com';
+        return `Server:  192.168.1.1
+Address: 192.168.1.1#53
+
+Non-authoritative answer:
+Name:    ${domain}
+Address: 93.184.216.34
+Address: 2606:2800:220:1:248:1893:25c8:1946`;
+    }
+
+    handleArp() {
+        return `ARP Table:
+
+Internet Address      Physical Address      Type
+192.168.1.1          00-50-56-c0-00-01     dynamic
+192.168.1.10         00-0c-29-a1-b2-c3     dynamic  
+192.168.1.20         00-1b-21-d4-e5-f6     dynamic
+192.168.1.100        08-00-27-4e-66-a1     dynamic`;
+    }
+
+    handleRoute() {
+        return `Kernel IP routing table:
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.1.1     0.0.0.0         UG    100    0        0 eth0
+192.168.1.0     0.0.0.0         255.255.255.0   U     100    0        0 eth0
+169.254.0.0     0.0.0.0         255.255.0.0     U     1000   0        0 eth0`;
     }
 
     /**
@@ -498,7 +623,6 @@ export class Terminal {
      * @memberof Terminal
      */
     showHelp() {
-        const commandList = Array.from(this.commands.keys()).join(', ');
-        return `Available commands: ${commandList}`;
+        return CONFIG.COMMANDS.HELP;
     }
 }

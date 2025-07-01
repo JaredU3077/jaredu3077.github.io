@@ -81,6 +81,8 @@ body {
     padding: 0 10px;
     font-size: 14px;
     color: var(--text-color);
+    font-weight: 600;
+    text-shadow: 0 1px 2px #101624;
 }
 
 /* Start Menu */
@@ -293,21 +295,72 @@ button:focus-visible, .start-menu-item:focus-visible, .window-control:focus-visi
     box-shadow: 0 0 0 4px #4a90e2;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
     .start-menu {
         left: 0;
         width: 100vw;
         border-radius: 0;
+        max-height: 70vh;
+        overflow-y: auto;
     }
     .window {
-        min-width: 94vw;
-        min-height: 44vh;
+        min-width: 95vw;
+        min-height: 50vh;
+        max-width: 100vw;
+        max-height: calc(100vh - 60px);
     }
     .window-content {
-        padding: 16px;
+        padding: 12px;
+        font-size: 14px;
     }
     .taskbar {
         padding: 0 8px;
+    }
+    .branding {
+        font-size: 12px;
+        display: none;
+    }
+    .welcome-content h2 {
+        font-size: 1.1em;
+    }
+    .welcome-content ul {
+        font-size: 0.9em;
+    }
+    #terminalOutput {
+        font-size: 12px;
+    }
+    .terminal-detail {
+        font-size: 0.9em;
+    }
+}
+
+@media (max-width: 480px) {
+    .start-menu-item {
+        height: 48px;
+        font-size: 0.95rem;
+        padding: 0 20px;
+    }
+    .start-menu-item .icon {
+        width: 24px;
+        height: 24px;
+    }
+    .window-header {
+        padding: 10px 12px;
+    }
+    .window-title .label {
+        font-size: 0.85rem;
+    }
+    .window-control {
+        width: 24px;
+        height: 24px;
+        font-size: 14px;
+    }
+    .branding {
+        display: none;
+    }
+    .start-btn {
+        padding: 8px 16px;
+        font-size: 0.95rem;
     }
 }
 
