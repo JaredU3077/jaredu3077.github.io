@@ -446,6 +446,7 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
             id: 'conway-game-of-life',
             name: 'Conway\'s Game of Life',
             description: 'Interactive cellular automaton simulation',
+            type: 'game', // Mark as game for special handling
             icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="13"/></svg>`,
             windows: [{
                 id: 'gameOfLifeWindow',
@@ -457,7 +458,7 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
                             <button id="resetBtn" class="game-btn" style="padding: 8px 16px; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer;">Reset</button>
                             <button id="randomBtn" class="game-btn" style="padding: 8px 16px; background: #00d084; color: white; border: none; border-radius: 4px; cursor: pointer;">Random</button>
                             <label style="color: #eaf1fb; font-size: 14px; margin-left: 10px;">
-                                Speed: <input id="speedSlider" type="range" min="50" max="1000" value="200" style="margin-left: 5px;">
+                                Speed: <input id="speedSlider" type="range" min="50" max="1000" value="900" style="margin-left: 5px;">
                             </label>
                             <span id="generationCounter" style="color: #eaf1fb; font-size: 14px; margin-left: 10px;">Generation: 0</span>
                         </div>

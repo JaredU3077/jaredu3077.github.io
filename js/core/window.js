@@ -48,7 +48,7 @@ export class WindowManager {
      * @returns {HTMLElement} The created window element.
      * @memberof WindowManager
      */
-    createWindow({ id, title, content, width = CONFIG.window.defaultWidth, height = CONFIG.window.defaultHeight, icon, autoScroll = false }) {
+    createWindow({ id, title, content, width = CONFIG.window.defaultWidth, height = CONFIG.window.defaultHeight, icon, autoScroll = false, type = 'app' }) {
         // Ensure window dimensions are within bounds with proper fallbacks
         const minWidth = CONFIG.window?.minWidth || 300;
         const maxWidth = CONFIG.window?.maxWidth || 1200;
@@ -63,7 +63,7 @@ export class WindowManager {
         const top = (window.innerHeight - height) / 2;
 
         const windowElement = document.createElement('div');
-        windowElement.className = 'window';
+        windowElement.className = type === 'game' ? 'window game-window' : 'window';
         windowElement.id = id;
         windowElement.setAttribute('role', 'dialog');
         windowElement.setAttribute('aria-label', title);
@@ -117,6 +117,7 @@ export class WindowManager {
             isMinimized: false,
             originalPosition: { left, top, width, height },
             autoScroll: autoScroll,
+            type: type, // Store window type (e.g., 'game' vs 'app')
             _hasBeenResized: false // New windows start as not manually resized
         };
 

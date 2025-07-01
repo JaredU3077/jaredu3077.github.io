@@ -200,11 +200,31 @@ export class BootSystem {
         matrixBg.className = 'matrix-background';
         document.body.appendChild(matrixBg);
 
+        // Initialize mouse tracking
+        this.mouseX = 0;
+        this.mouseY = 0;
+        this.setupMouseTracking();
+
         // Generate initial particles
         this.generateParticles();
         
         // Start particle animation loop
         this.animateParticles();
+        
+        // Start continuous particle generation from bottom
+        this.startContinuousGeneration();
+    }
+
+    setupMouseTracking() {
+        document.addEventListener('mousemove', (e) => {
+            this.mouseX = e.clientX;
+            this.mouseY = e.clientY;
+            this.updateParticleInteraction();
+        });
+
+        document.addEventListener('click', (e) => {
+            this.createMouseClickEffect(e.clientX, e.clientY);
+        });
     }
 
     generateParticles() {
@@ -212,43 +232,66 @@ export class BootSystem {
         if (!container) return;
 
         for (let i = 0; i < this.particleCount; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'blue-particle particle-interactive';
-            
-            // Random size variation
-            const size = Math.random();
-            if (size < 0.3) {
-                particle.classList.add('small');
-            } else if (size > 0.7) {
-                particle.classList.add('large');
-            }
-
-            // Random positioning
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.animationDelay = Math.random() * 15 + 's';
-            particle.style.animationDuration = (10 + Math.random() * 20) + 's';
-            
-            // Add some horizontal movement variation
-            const drift = (Math.random() - 0.5) * 200;
-            particle.style.setProperty('--drift', drift + 'px');
-
-            container.appendChild(particle);
-            this.particles.push({
-                element: particle,
-                originalX: parseFloat(particle.style.left),
-                originalY: 100,
-                velocityX: (Math.random() - 0.5) * 2,
-                velocityY: -Math.random() * 2 - 1
-            });
+            this.createSingleParticle(container);
         }
     }
 
+    createSingleParticle(container) {
+        const particle = document.createElement('div');
+        particle.className = 'blue-particle particle-interactive';
+        
+        // Random size variation
+        const size = Math.random();
+        if (size < 0.3) {
+            particle.classList.add('small');
+        } else if (size > 0.7) {
+            particle.classList.add('large');
+        }
+
+        // Start particles from bottom with random horizontal position
+        const startX = Math.random() * 100;
+        particle.style.left = startX + '%';
+        particle.style.animationDelay = Math.random() * 5 + 's';
+        particle.style.animationDuration = (12 + Math.random() * 16) + 's';
+        
+        // Add horizontal drift variation
+        const drift = (Math.random() - 0.5) * 150;
+        particle.style.setProperty('--drift', drift + 'px');
+
+        // Add click interaction
+        particle.addEventListener('click', (e) => {
+            this.onParticleClick(e, particle);
+        });
+
+        container.appendChild(particle);
+        
+        // Remove particle after animation completes
+        setTimeout(() => {
+            if (particle.parentNode) {
+                particle.parentNode.removeChild(particle);
+            }
+        }, parseFloat(particle.style.animationDuration) * 1000 + 1000);
+
+        this.particles.push({
+            element: particle,
+            originalX: startX,
+            originalY: 100,
+            velocityX: (Math.random() - 0.5) * 1.5,
+            velocityY: -Math.random() * 1.5 - 0.5,
+            attracted: false
+        });
+    }
+
     updateParticleInteraction() {
-        // Create attraction/repulsion effect based on mouse position
-        const mouseForce = 50;
-        const mouseRadius = 150;
+        if (!this.mouseX || !this.mouseY) return;
+
+        const attractRadius = 120;
+        const repelRadius = 60;
+        const maxForce = 80;
 
         this.particles.forEach(particle => {
+            if (!particle.element.parentNode) return;
+            
             const rect = particle.element.getBoundingClientRect();
             const particleX = rect.left + rect.width / 2;
             const particleY = rect.top + rect.height / 2;
@@ -257,30 +300,165 @@ export class BootSystem {
             const dy = this.mouseY - particleY;
             const distance = Math.sqrt(dx * dx + dy * dy);
             
-            if (distance < mouseRadius) {
-                const force = (mouseRadius - distance) / mouseRadius;
+            // Remove existing mouse interaction classes
+            particle.element.classList.remove('mouse-attracted', 'mouse-repelled');
+            
+            if (distance < repelRadius) {
+                // Repulsion effect (very close to mouse)
+                const force = (repelRadius - distance) / repelRadius;
                 const angle = Math.atan2(dy, dx);
                 
-                // Gentle repulsion effect
-                const repelX = -Math.cos(angle) * force * mouseForce;
-                const repelY = -Math.sin(angle) * force * mouseForce;
+                const repelX = -Math.cos(angle) * force * maxForce;
+                const repelY = -Math.sin(angle) * force * maxForce;
                 
-                particle.element.style.transform = `translate(${repelX}px, ${repelY}px) scale(${1 + force * 0.5})`;
-                particle.element.style.opacity = Math.min(1, 0.6 + force * 0.4);
+                particle.element.style.transform = `translate(${repelX}px, ${repelY}px)`;
+                particle.element.classList.add('mouse-repelled');
+                particle.attracted = false;
+                
+            } else if (distance < attractRadius) {
+                // Attraction effect (medium distance)
+                const force = (attractRadius - distance) / attractRadius;
+                const angle = Math.atan2(dy, dx);
+                
+                const attractX = Math.cos(angle) * force * (maxForce * 0.3);
+                const attractY = Math.cos(angle) * force * (maxForce * 0.3);
+                
+                particle.element.style.transform = `translate(${attractX}px, ${attractY}px)`;
+                particle.element.classList.add('mouse-attracted');
+                particle.attracted = true;
+                
             } else {
+                // Reset to normal state
                 particle.element.style.transform = '';
-                particle.element.style.opacity = '';
+                particle.attracted = false;
             }
         });
     }
 
-    animateParticles() {
-        // Continuous particle regeneration
-        setInterval(() => {
-            if (this.particles.length < this.particleCount) {
-                this.generateParticles();
+    onParticleClick(event, particle) {
+        event.stopPropagation();
+        
+        // Create explosion effect
+        const rect = particle.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        
+        // Remove the clicked particle
+        particle.remove();
+        
+        // Create mini particles explosion
+        for (let i = 0; i < 8; i++) {
+            const miniParticle = document.createElement('div');
+            miniParticle.className = 'blue-particle small';
+            miniParticle.style.position = 'fixed';
+            miniParticle.style.left = centerX + 'px';
+            miniParticle.style.top = centerY + 'px';
+            miniParticle.style.pointerEvents = 'none';
+            miniParticle.style.zIndex = '1000';
+            
+            const angle = (i / 8) * Math.PI * 2;
+            const velocity = 100 + Math.random() * 50;
+            const vx = Math.cos(angle) * velocity;
+            const vy = Math.sin(angle) * velocity;
+            
+            document.body.appendChild(miniParticle);
+            
+            // Animate explosion
+            miniParticle.animate([
+                { transform: `translate(0px, 0px) scale(1)`, opacity: 1 },
+                { transform: `translate(${vx}px, ${vy}px) scale(0)`, opacity: 0 }
+            ], {
+                duration: 600,
+                easing: 'ease-out'
+            }).addEventListener('finish', () => {
+                miniParticle.remove();
+            });
+        }
+        
+        // Play sound effect if audio enabled
+        if (this.audioEnabled) {
+            this.createTone(800, 0.1, 'sine', 0.05);
+        }
+    }
+
+    createMouseClickEffect(x, y) {
+        // Create ripple effect at mouse click
+        const ripple = document.createElement('div');
+        ripple.style.position = 'fixed';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        ripple.style.width = '4px';
+        ripple.style.height = '4px';
+        ripple.style.background = 'radial-gradient(circle, #4a90e2 0%, transparent 70%)';
+        ripple.style.borderRadius = '50%';
+        ripple.style.pointerEvents = 'none';
+        ripple.style.zIndex = '1000';
+        ripple.style.transform = 'translate(-50%, -50%)';
+        
+        document.body.appendChild(ripple);
+        
+        // Animate ripple
+        ripple.animate([
+            { transform: 'translate(-50%, -50%) scale(1)', opacity: 0.8 },
+            { transform: 'translate(-50%, -50%) scale(20)', opacity: 0 }
+        ], {
+            duration: 400,
+            easing: 'ease-out'
+        }).addEventListener('finish', () => {
+            ripple.remove();
+        });
+    }
+
+    toggleParticleAnimation() {
+        const particles = document.querySelectorAll('.blue-particle');
+        const spinners = document.querySelectorAll('.background-spinner');
+        
+        particles.forEach(particle => {
+            if (particle.style.animationPlayState === 'paused') {
+                particle.style.animationPlayState = 'running';
+            } else {
+                particle.style.animationPlayState = 'paused';
             }
-        }, 2000);
+        });
+        
+        spinners.forEach(spinner => {
+            if (spinner.style.animationPlayState === 'paused') {
+                spinner.style.animationPlayState = 'running';
+            } else {
+                spinner.style.animationPlayState = 'paused';
+            }
+        });
+        
+        // Play UI feedback sound
+        if (this.audioEnabled) {
+            this.playUIClickSound();
+        }
+    }
+
+    startContinuousGeneration() {
+        // Generate new particles continuously from the bottom
+        setInterval(() => {
+            const container = document.getElementById('particleContainer');
+            if (container && this.particles.length < this.particleCount * 1.5) {
+                this.createSingleParticle(container);
+            }
+        }, 800); // Create new particle every 800ms
+
+        // Clean up old particles
+        setInterval(() => {
+            this.particles = this.particles.filter(particle => {
+                return particle.element.parentNode !== null;
+            });
+        }, 5000);
+    }
+
+    animateParticles() {
+        // Start the mouse interaction loop
+        const updateLoop = () => {
+            this.updateParticleInteraction();
+            requestAnimationFrame(updateLoop);
+        };
+        requestAnimationFrame(updateLoop);
     }
 
     // Enhanced sound effects
