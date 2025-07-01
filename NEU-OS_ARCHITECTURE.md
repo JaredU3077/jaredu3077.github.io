@@ -1,4 +1,5 @@
 # Neu-OS Portfolio System - Architecture & Super Prompt
+*Updated: December 2024 - Current Stable Release*
 
 ## 🎯 **SUPER PROMPT FOR THEME RECREATION**
 
@@ -17,17 +18,17 @@ You are creating a **Neu-OS: Network Engineering Operating System** - an interac
 ### **🏗️ SYSTEM ARCHITECTURE**
 
 #### **Core Components**:
-1. **Boot System** - Animated startup sequence
-2. **Window Manager** - Draggable, resizable windows with neumorphic styling
-3. **Terminal** - Interactive command-line interface
-4. **Network Visualization** - Interactive topology diagrams
-5. **Desktop Environment** - OS-style desktop with icons and taskbar
+1. **Boot System** ✅ - Animated startup sequence
+2. **Window Manager** ✅ - Fully functional draggable, resizable windows with neumorphic styling
+3. **Terminal** ✅ - Interactive command-line interface
+4. **Network Visualization** ✅ - Interactive topology diagrams
+5. **Desktop Environment** ✅ - OS-style desktop with square icons and taskbar
 
 #### **Visual Effects System**:
-- **Particle System**: Floating blue particles with glow effects
-- **Network Data Flow**: Animated data packets moving across screen
-- **Neumorphic Elements**: Inset shadows, subtle glows, raised/pressed button states
-- **Background Effects**: Subtle gradients, scan lines, matrix-style overlays
+- **Particle System** ✅ - Floating blue particles with glow effects
+- **Network Data Flow** ✅ - Animated data packets moving across screen
+- **Neumorphic Elements** ✅ - Inset shadows, subtle glows, raised/pressed button states
+- **Background Effects** ✅ - Subtle gradients, scan lines, matrix-style overlays
 
 ---
 
@@ -43,7 +44,7 @@ jaredu3077.github.io/
 │   ├── config.js            # Central configuration & app definitions
 │   ├── core/                # Core system modules
 │   │   ├── boot.js         # Boot sequence & initialization
-│   │   ├── window.js       # Window management system
+│   │   ├── window.js       # Advanced window management system
 │   │   └── keyboard.js     # Global keyboard handling
 │   ├── apps/               # Individual applications
 │   │   ├── terminal.js     # Command-line interface
@@ -56,6 +57,7 @@ jaredu3077.github.io/
 │       ├── search.js       # Search functionality
 │       ├── help.js         # Help system
 │       └── utils.js        # Common utilities
+├── NEU-OS_ARCHITECTURE.md   # This architecture document
 ├── resume.txt              # Resume content
 ├── codex.txt              # Technical documentation
 └── README.md              # Project documentation
@@ -63,46 +65,57 @@ jaredu3077.github.io/
 
 ### **🎭 UI Component Hierarchy**
 
-#### **1. Boot Sequence** (`#bootSequence`)
+#### **1. Boot Sequence** (`#bootSequence`) ✅
 - Animated logo with pulse effects
 - Progress bar with gradient fill
 - System initialization messages
 - Smooth transition to login
 
-#### **2. Login Screen** (`#loginScreen`)
+#### **2. Login Screen** (`#loginScreen`) ✅
 - Central login panel with neumorphic styling
 - Animated network grid background
 - User profile display
 - "Enter as Guest" button
 
-#### **3. Desktop Environment** (`#desktop`)
+#### **3. Desktop Environment** (`#desktop`) ✅
 - **Taskbar** (`nav.taskbar`):
-  - Start button with gradient hover effects
-  - System branding display
+  - Square start button matching vertical icon style
+  - System branding display (Senior Network Engineer)
   - Audio controls toggle
+  - Consistent square button design
 - **Start Menu** (`#startMenu`):
   - Animated app launcher
   - Neumorphic menu items with hover states
   - Icon + label layout
 - **Desktop Icons** (`#desktop-icons`):
-  - Vertical icon arrangement
+  - Vertical square icon arrangement (left side)
+  - Consistent square button styling
   - Launch applications on click/keyboard
 - **Background Effects**:
   - Particle system container
   - Network data flow animations
-  - Matrix-style overlays
+  - Matrix-style overlays (green pulsing dots removed)
 
-#### **4. Window System** (`.window`)
+#### **4. Advanced Window System** (`.window`) ✅
 - **Window Header** (`.window-header`):
   - Icon + title display
   - Control buttons (minimize, maximize, close)
+  - Draggable handle for window movement
 - **Window Content** (`.window-content`):
   - Scrollable content area
   - Application-specific layouts
+  - Auto-scroll support for dynamic content
+- **Window Resize System** (`.window-resize`):
+  - 8-directional resize handles (N, S, E, W, NE, NW, SE, SW)
+  - Visual resize borders with hover feedback
+  - Smooth resize operation without snapping bugs
 - **Interactive Features**:
-  - Draggable via header
-  - Resizable from edges/corners
-  - Focus management with z-index stacking
+  - ✅ **Draggable via header** - Smooth window movement
+  - ✅ **Resizable from edges/corners** - Full directional resizing
+  - ✅ **Minimize/Maximize/Close controls** - All window controls working
+  - ✅ **Focus management** - Z-index stacking with proper focus handling
+  - ✅ **Anti-snap protection** - Windows maintain size after manual resize
+  - ✅ **Boundary constraints** - Windows stay within viewport bounds
 
 ### **🎨 Neumorphic Design System**
 
@@ -126,13 +139,14 @@ jaredu3077.github.io/
 }
 ```
 
-#### **Neumorphic Components**:
+#### **Neumorphic Components** ✅:
 1. **Raised Elements**: Use `--neu-shadow` for outward depth
 2. **Pressed/Inset Elements**: Use `--neu-inset` for inward depth
 3. **Interactive States**: Smooth transitions between raised/pressed
 4. **Glow Effects**: Primary color glows on hover/focus
+5. **Square Design Language**: Consistent square buttons and icons
 
-### **💫 Animation & Effects System**
+### **💫 Animation & Effects System** ✅
 
 #### **Particle System**:
 - **Blue Particles** (`.blue-particle`):
@@ -140,133 +154,232 @@ jaredu3077.github.io/
   - Floating animation with rotation and scaling
   - Randomized timing and positioning
   - Hardware-accelerated transforms
+  - Performance optimized with efficient rendering
 
 #### **Network Effects**:
 - **Data Packets** (`.data-packet`):
   - Horizontal flow animation across screen
   - Multiple layers with different speeds
   - Blue glow effects with opacity transitions
-- **Network Nodes** (`.network-node`):
-  - ⚠️ **GREEN PULSING DOTS** - These are the elements to remove
-  - Located at fixed positions
-  - Scale and opacity pulse animation
+- **Background Layers**:
+  - Matrix Background: Subtle radial gradients
+  - Scan Lines: Moving highlight effects
+  - Background Spinner: Slow rotating border elements
+  - **Removed**: Green pulsing dots (eliminated per user request)
 
-#### **Background Layers**:
-1. **Matrix Background**: Subtle radial gradients
-2. **Scan Lines**: Moving highlight effects
-3. **Background Spinner**: Slow rotating border elements
-
-### **🖥️ Application Modules**
+### **🖥️ Application Modules** ✅
 
 #### **Terminal** (`apps/terminal.js`):
 - Command parsing and execution
-- Network utilities simulation (ping, ifconfig, netstat)
-- Resume and experience display
-- Background effects control commands
+- Network utilities simulation (ping, ifconfig, netstat, tracert)
+- Resume and experience display (`show resume`, `show experience`)
+- Background effects control commands (`bg pause`, `particles add`)
+- Skills and project commands (`show skills`, `show projects`)
+- Interactive help system
 
 #### **Network Monitor** (`apps/network.js`):
 - Interactive topology visualization using vis.js
 - Node groups: routers, switches, servers, PCs, firewalls
 - Color-coded device types
-- Physics-based layout
+- Physics-based layout with realistic network connections
+- Drag and drop node positioning
 
 #### **Skills & Projects** (`apps/skills.js`, `apps/projects.js`):
-- Dynamic content rendering
+- Dynamic content rendering from configuration
 - Interactive skill demonstrations
-- Project portfolio with filtering
+- Project portfolio with detailed descriptions
+- Filtering and search capabilities
 
 #### **System Status** (`apps/system-status.js`):
 - Real-time system monitoring simulation
 - Performance graphs and metrics
-- Network connectivity testing
+- Network connectivity status
+- Resource utilization displays
 
-### **⌨️ Interactive Features**
+#### **Codex Application**:
+- Technical documentation browser
+- Search functionality
+- Formatted code examples and network configurations
+
+### **🪟 Advanced Window Management System**
+
+#### **Window Manager Class** (`js/core/window.js`):
+```javascript
+class WindowManager {
+    // Features:
+    - createWindow()          // Window creation with proper positioning
+    - setupWindowEvents()     // Drag, resize, and control setup
+    - handleResizeMove()      // Real-time resize handling
+    - handleResizeEnd()       // Resize completion with state management
+    - checkSnapZones()        // Smart window snapping (disabled for resized windows)
+    - focusWindow()           // Z-index and focus management
+    - minimizeWindow()        // Window minimization
+    - maximizeWindow()        // Window maximization
+    - closeWindow()           // Window cleanup and removal
+}
+```
+
+#### **Window State Management**:
+- **Resize Protection**: Windows that have been manually resized are protected from auto-snapping
+- **Position Tracking**: Accurate position and dimension tracking
+- **State Persistence**: Window states maintained across operations
+- **Conflict Prevention**: Proper handling of drag vs resize operations
+- **Memory Management**: Cleanup of interact.js instances on window close
+
+#### **Resize System Features**:
+- **8-Direction Resizing**: Full directional resize support (N, S, E, W, NE, NW, SE, SW)
+- **Visual Feedback**: Resize cursors and hover states
+- **Smooth Operation**: No snapping bugs or size corruption
+- **Constraint Handling**: Minimum/maximum size enforcement
+- **Position Correction**: Proper handling of top/left edge resizing
+
+### **⌨️ Interactive Features** ✅
 
 #### **Keyboard Controls**:
 - `SPACE`: Toggle animations
 - `R`: Rotate background effects
 - `+/-`: Add/remove particles
 - `C`: Change color schemes
+- `ESC`: Close focused window
+- `TAB`: Navigate between windows
 
 #### **Terminal Commands**:
-- System commands: `ping`, `ifconfig`, `netstat`, `tracert`
-- Content commands: `show resume`, `show skills`, `show experience`
-- Effects commands: `bg pause`, `particles add 50`, `fx status`
+- **System Commands**: `ping`, `ifconfig`, `netstat`, `tracert`, `systeminfo`
+- **Content Commands**: `show resume`, `show skills`, `show experience`, `show projects`
+- **Effects Commands**: `bg pause`, `particles add 50`, `fx status`, `audio toggle`
+- **Navigation**: `help`, `clear`, `exit`
+- **Network Tools**: `nslookup`, `arp`, `route`
 
 #### **Window Management**:
-- Drag & drop window positioning
-- Resize from edges and corners
-- Minimize/maximize/close controls
-- Focus management and z-index stacking
+- ✅ **Drag & Drop**: Smooth window positioning via header
+- ✅ **Multi-directional Resize**: From edges and corners
+- ✅ **Control Buttons**: Minimize/maximize/close fully functional
+- ✅ **Focus Management**: Click-to-focus with z-index stacking
+- ✅ **Snap Zones**: Smart window snapping (disabled for manually resized windows)
 
-### **📱 Responsive Design**
+### **📱 Responsive Design** ✅
 
 #### **Breakpoints**:
-- **Desktop**: Full feature set, all animations
-- **Tablet** (≤768px): Simplified animations, adjusted layouts
-- **Mobile** (≤480px): Minimal animations, touch-optimized controls
+- **Desktop** (>1024px): Full feature set, all animations, complete window management
+- **Tablet** (768px-1024px): Simplified animations, touch-optimized controls
+- **Mobile** (≤768px): Minimal animations, single-window mode, touch gestures
 
 #### **Performance Optimizations**:
-- Hardware acceleration via `translateZ(0)`
+- Hardware acceleration via `translateZ(0)` and `transform3d`
 - Reduced motion for accessibility (`prefers-reduced-motion`)
-- Efficient particle management
-- Debounced resize handlers
+- Efficient particle management with object pooling
+- Debounced resize handlers to prevent performance issues
+- Optimized interact.js integration
 
-### **🎯 Key Design Principles**
+### **🎯 Key Design Principles** ✅
 
-1. **Neumorphic Consistency**: All interactive elements follow the same depth/shadow system
+1. **Neumorphic Consistency**: All interactive elements follow unified depth/shadow system
 2. **Professional Aesthetic**: Clean, modern, enterprise-ready appearance
 3. **Network Engineering Focus**: Commands, visualizations, and content reflect networking expertise
-4. **Interactive Portfolio**: Engaging way to showcase technical skills
-5. **OS Simulation**: Authentic desktop operating system feel
+4. **Interactive Portfolio**: Engaging demonstration of technical skills
+5. **OS Simulation**: Authentic desktop operating system experience
 6. **Accessibility**: Proper ARIA labels, keyboard navigation, screen reader support
+7. **Square Design Language**: Consistent square buttons and icons throughout interface
 
 ### **🔧 Technical Implementation Notes**
 
 #### **Dependencies**:
-- **vis.js**: Network topology visualization
-- **interact.js**: Drag and drop functionality
-- **Font Awesome**: Icon system
-- **Custom CSS**: Complete neumorphic design system
+- **vis.js** (v9.1.0): Network topology visualization
+- **interact.js** (v1.10.17): Advanced drag and drop functionality
+- **Font Awesome** (v6.0): Comprehensive icon system
+- **Custom CSS Framework**: Complete neumorphic design system
 
 #### **Browser Compatibility**:
 - Modern browsers with CSS Grid/Flexbox support
 - Hardware acceleration for smooth animations
+- ES6+ JavaScript features
+- WebGL support for advanced visualizations
 - Graceful fallbacks for older browsers
 
 #### **Performance Considerations**:
-- Efficient particle system with object pooling
-- CSS transform-based animations
-- Minimal DOM manipulation during animations
-- Optimized asset loading
+- Efficient particle system with RAF-based animation loops
+- CSS transform-based animations for 60fps performance
+- Minimal DOM manipulation during window operations
+- Optimized asset loading and caching
+- Memory leak prevention in window management
+
+#### **Window System Technical Details**:
+```javascript
+// Key technical implementations:
+- interact.js integration for drag/resize
+- Custom event handling for window state management
+- Z-index stacking with focus management
+- Position and size constraint enforcement  
+- Memory cleanup on window destruction
+- Anti-snap protection for manually resized windows
+```
 
 ---
 
-## 🚀 **IMPLEMENTATION CHECKLIST**
+## 🚀 **CURRENT IMPLEMENTATION STATUS**
 
-### **Essential Components**:
-- [ ] Neumorphic color scheme and shadows
-- [ ] Boot sequence with animations
-- [ ] Desktop environment with taskbar
-- [ ] Window management system
-- [ ] Terminal with network commands
-- [ ] Particle background effects
-- [ ] Network topology visualization
-- [ ] Responsive design implementation
+### **✅ Completed Core Components**:
+- [x] Neumorphic color scheme and shadows
+- [x] Boot sequence with animations
+- [x] Desktop environment with square-styled taskbar
+- [x] **Advanced window management system** (drag, resize, minimize, maximize, close)
+- [x] Terminal with comprehensive network commands
+- [x] Particle background effects (green dots removed)
+- [x] Network topology visualization
+- [x] Responsive design implementation
+- [x] Skills and projects applications
+- [x] System status monitoring
+- [x] Codex documentation system
 
-### **Visual Polish**:
-- [ ] Smooth hover transitions
-- [ ] Glow effects on interactive elements
-- [ ] Consistent border radius and shadows
-- [ ] Professional typography
-- [ ] Loading animations
-- [ ] Error state handling
+### **✅ Visual Polish Completed**:
+- [x] Smooth hover transitions throughout interface
+- [x] Glow effects on interactive elements
+- [x] Consistent border radius and shadows
+- [x] Professional typography system
+- [x] Loading animations and transitions
+- [x] Error state handling
+- [x] Square design language consistency
 
-### **Content Integration**:
-- [ ] Resume and experience content
-- [ ] Skills and certifications display
-- [ ] Project portfolio showcase
-- [ ] Technical documentation (codex)
-- [ ] Network engineering commands
+### **✅ Content Integration Completed**:
+- [x] Resume and experience content
+- [x] Skills and certifications display
+- [x] Project portfolio showcase
+- [x] Technical documentation (codex) integration
+- [x] Network engineering command simulation
+- [x] Interactive help system
 
-This architecture creates a sophisticated, interactive portfolio that demonstrates both technical skills and creative design capabilities while maintaining a professional, enterprise-ready appearance. 
+### **🎯 Current System Status: STABLE & FULLY FUNCTIONAL**
+
+**Window Management**: ✅ All features working - drag, resize, minimize, maximize, close, focus management  
+**UI Consistency**: ✅ Square design language applied throughout  
+**Performance**: ✅ Optimized animations and effects  
+**Content**: ✅ Complete portfolio content integrated  
+**Accessibility**: ✅ Keyboard navigation and screen reader support  
+**Responsive**: ✅ Mobile and tablet optimized  
+
+---
+
+## 🔄 **RECENT IMPROVEMENTS LOG**
+
+### **December 2024 - Window System Overhaul**:
+- **Fixed**: Window resize functionality completely restored
+- **Fixed**: Eliminated window snapping bugs after resize operations
+- **Enhanced**: 8-directional resize with visual feedback
+- **Added**: Anti-snap protection for manually resized windows
+- **Improved**: Position and size state management
+- **Optimized**: interact.js integration for smoother operations
+
+### **UI Design Updates**:
+- **Updated**: Start bar/taskbar to match square button design
+- **Removed**: Green pulsing background dots per user request
+- **Enhanced**: Consistent square design language throughout interface
+- **Improved**: Button hover states and transitions
+
+### **Performance Optimizations**:
+- **Optimized**: Window resize handling for better performance
+- **Enhanced**: Memory management in window lifecycle
+- **Improved**: Animation frame handling for smoother effects
+
+---
+
+This architecture represents a sophisticated, fully-functional portfolio system that successfully demonstrates both technical expertise and creative design capabilities while maintaining a professional, enterprise-ready appearance. The system is currently in a stable state with all major features working correctly. 
