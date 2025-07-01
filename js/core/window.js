@@ -206,8 +206,12 @@ export class WindowManager {
                             },
                             move: this.handleResizeMove.bind(this),
                             end: this.handleResizeEnd.bind(this)
-                        }
-                        // Removed restrictSize modifier to prevent conflicts
+                        },
+                        modifiers: [
+                            interact.modifiers.restrictSize({
+                                min: { width: 200, height: 150 }
+                            })
+                        ]
                     });
 
                 // Store interact instances for potential cleanup/reset
@@ -397,10 +401,21 @@ export class WindowManager {
         // Ensure snapping is completely disabled during resize
         this.isSnappingEnabled = false;
         
-        // Let interact.js handle the positioning automatically
-        // We'll just update our window object state to match
+        // Apply the new dimensions and position from interact.js
+        // interact.js handles the complex resize calculations, we just apply them
+        event.target.style.width = event.rect.width + 'px';
+        event.target.style.height = event.rect.height + 'px';
+        
+        // Update position based on interact.js calculations
+        // This handles edge cases like resizing from top/left edges
+        event.target.style.left = event.rect.left + 'px';
+        event.target.style.top = event.rect.top + 'px';
+        
+        // Update our window object state to match the new dimensions
         windowObj.width = event.rect.width;
         windowObj.height = event.rect.height;
+        windowObj.left = event.rect.left;
+        windowObj.top = event.rect.top;
         
         // Mark that this window is no longer in a snapped/maximized state
         windowObj.isMaximized = false;
