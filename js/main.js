@@ -303,7 +303,9 @@ function handleGlobalKeydown(e) {
 document.addEventListener('DOMContentLoaded', () => {
     try {
         // Initialize core systems
-        bootSystem = new BootSystem();
+        bootSystem = BootSystem.getInstance();
+        console.log('Boot system initialized:', bootSystem);
+        console.log('Global boot system instance:', window.bootSystemInstance);
         
         // Initialize UI after DOM is ready
         initializeUI();

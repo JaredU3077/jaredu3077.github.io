@@ -5,7 +5,13 @@
 
 export class BootSystem {
     constructor() {
+        // Audio enabled by default, only disabled if explicitly set to false
         this.audioEnabled = localStorage.getItem('neuos-audio') !== 'false';
+        // If no setting exists, default to enabled
+        if (localStorage.getItem('neuos-audio') === null) {
+            this.audioEnabled = true;
+            localStorage.setItem('neuos-audio', 'true');
+        }
         this.bootMessages = [
             'Initializing network stack...',
             'Loading kernel modules...',
@@ -20,7 +26,7 @@ export class BootSystem {
         this.audioContext = null;
         this.audioNodes = {};
         this.particles = [];
-        this.particleCount = 150; // Increased particle count
+        this.particleCount = 80; // Calm particle count for lofi vibes
         this.mouseX = 0;
         this.mouseY = 0;
         this.init();
@@ -34,37 +40,44 @@ export class BootSystem {
     }
 
     setupAudioSystem() {
-        // Create audio context for sound effects with better error handling
-        if (this.audioEnabled) {
-            try {
-                // Check for AudioContext support
-                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-                if (AudioContextClass) {
-                    this.audioContext = new AudioContextClass();
+        // Always try to initialize audio system, even if disabled (for seamless enabling later)
+        try {
+            // Check for AudioContext support
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (AudioContextClass) {
+                this.audioContext = new AudioContextClass();
+                
+                // Handle suspended audio context (required by modern browsers)
+                if (this.audioContext.state === 'suspended') {
+                    // Audio context will be resumed on first user interaction
+                    const resumeAudio = () => {
+                        if (this.audioContext && this.audioContext.state === 'suspended') {
+                            this.audioContext.resume().then(() => {
+                                console.log('Audio context resumed successfully');
+                                this.setupAudioNodes();
+                            }).catch(err => {
+                                console.warn('Failed to resume audio context:', err);
+                            });
+                        }
+                        // Remove listeners after first interaction
+                        document.removeEventListener('click', resumeAudio);
+                        document.removeEventListener('keydown', resumeAudio);
+                    };
                     
-                    // Handle suspended audio context (required by modern browsers)
-                    if (this.audioContext.state === 'suspended') {
-                        // Audio context will be resumed on first user interaction
-                        document.addEventListener('click', () => {
-                            if (this.audioContext && this.audioContext.state === 'suspended') {
-                                this.audioContext.resume().catch(err => {
-                                    console.warn('Failed to resume audio context:', err);
-                                });
-                            }
-                        }, { once: true });
-                    }
-
-                    // Pre-create audio nodes for better performance
-                    this.setupAudioNodes();
+                    document.addEventListener('click', resumeAudio, { once: true });
+                    document.addEventListener('keydown', resumeAudio, { once: true });
                 } else {
-                    console.warn('AudioContext not supported in this browser');
-                    this.audioEnabled = false;
+                    // Audio context is already active
+                    this.setupAudioNodes();
                 }
-            } catch (error) {
-                console.warn('Failed to initialize audio context:', error);
+            } else {
+                console.warn('AudioContext not supported in this browser');
                 this.audioEnabled = false;
-                this.audioContext = null;
             }
+        } catch (error) {
+            console.warn('Failed to initialize audio context:', error);
+            this.audioEnabled = false;
+            this.audioContext = null;
         }
     }
 
@@ -200,6 +213,9 @@ export class BootSystem {
         matrixBg.className = 'matrix-background';
         document.body.appendChild(matrixBg);
 
+        // Create calm ambient glows for chillhouse vibes
+        this.createAmbientGlows();
+
         // Initialize mouse tracking
         this.mouseX = 0;
         this.mouseY = 0;
@@ -248,15 +264,21 @@ export class BootSystem {
             particle.classList.add('large');
         }
 
-        // Start particles from bottom with random horizontal position
+        // Ensure particles start from very bottom with random horizontal position
         const startX = Math.random() * 100;
         particle.style.left = startX + '%';
-        particle.style.animationDelay = Math.random() * 5 + 's';
-        particle.style.animationDuration = (12 + Math.random() * 16) + 's';
+        // Add staggered entry to prevent horizontal line formation
+        particle.style.animationDelay = Math.random() * 12 + 's';
+        particle.style.animationDuration = (20 + Math.random() * 15) + 's';
         
-        // Add horizontal drift variation
-        const drift = (Math.random() - 0.5) * 150;
+        // Add horizontal drift variation with smoother movement
+        const drift = (Math.random() - 0.5) * 200;
         particle.style.setProperty('--drift', drift + 'px');
+
+        // Set initial position to guarantee bottom start
+        particle.style.position = 'fixed';
+        particle.style.bottom = '-20px';
+        particle.style.zIndex = '1';
 
         // Add click interaction
         particle.addEventListener('click', (e) => {
@@ -265,12 +287,13 @@ export class BootSystem {
 
         container.appendChild(particle);
         
-        // Remove particle after animation completes
+        // Remove particle after animation completes with buffer
+        const animationTime = parseFloat(particle.style.animationDuration) * 1000;
         setTimeout(() => {
             if (particle.parentNode) {
                 particle.parentNode.removeChild(particle);
             }
-        }, parseFloat(particle.style.animationDuration) * 1000 + 1000);
+        }, animationTime + 2000);
 
         this.particles.push({
             element: particle,
@@ -278,7 +301,8 @@ export class BootSystem {
             originalY: 100,
             velocityX: (Math.random() - 0.5) * 1.5,
             velocityY: -Math.random() * 1.5 - 0.5,
-            attracted: false
+            attracted: false,
+            createdAt: Date.now()
         });
     }
 
@@ -409,6 +433,38 @@ export class BootSystem {
         });
     }
 
+    createAmbientGlows() {
+        // Create calm ambient glow container for chillhouse vibes
+        const ambientContainer = document.createElement('div');
+        ambientContainer.id = 'ambientContainer';
+        ambientContainer.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -2;
+        `;
+        document.body.appendChild(ambientContainer);
+
+        // Create 3 slow-moving ambient glows
+        const glowPositions = [
+            { left: '15%', top: '20%', delay: 0 },
+            { left: '70%', top: '60%', delay: 8 },
+            { left: '40%', top: '80%', delay: 16 }
+        ];
+
+        glowPositions.forEach((pos, index) => {
+            const ambientGlow = document.createElement('div');
+            ambientGlow.className = 'ambient-glow';
+            ambientGlow.style.left = pos.left;
+            ambientGlow.style.top = pos.top;
+            ambientGlow.style.animationDelay = pos.delay + 's';
+            ambientContainer.appendChild(ambientGlow);
+        });
+    }
+
     toggleParticleAnimation() {
         const particles = document.querySelectorAll('.blue-particle');
         const spinners = document.querySelectorAll('.background-spinner');
@@ -436,20 +492,53 @@ export class BootSystem {
     }
 
     startContinuousGeneration() {
-        // Generate new particles continuously from the bottom
-        setInterval(() => {
-            const container = document.getElementById('particleContainer');
-            if (container && this.particles.length < this.particleCount * 1.5) {
-                this.createSingleParticle(container);
+        // Calm particle generation for chillhouse vibes
+        let lastGenerationTime = 0;
+        const generationDelay = 1200; // Slower, more relaxed generation
+        
+        const generateParticle = () => {
+            const now = Date.now();
+            if (now - lastGenerationTime > generationDelay) {
+                const container = document.getElementById('particleContainer');
+                if (container && this.particles.length < this.particleCount * 0.8) {
+                    this.createSingleParticle(container);
+                    lastGenerationTime = now;
+                }
             }
-        }, 800); // Create new particle every 800ms
+            
+            // Clean up particles more efficiently
+            this.cleanupParticles();
+            
+            // Use requestAnimationFrame for better performance
+            requestAnimationFrame(generateParticle);
+        };
+        
+        requestAnimationFrame(generateParticle);
+    }
 
-        // Clean up old particles
-        setInterval(() => {
+    cleanupParticles() {
+        // Throttled cleanup to avoid performance issues
+        if (!this.lastCleanupTime || Date.now() - this.lastCleanupTime > 3000) {
             this.particles = this.particles.filter(particle => {
-                return particle.element.parentNode !== null;
+                const element = particle.element;
+                
+                // Remove if element is no longer in DOM
+                if (!element.parentNode) {
+                    return false;
+                }
+                
+                // Remove if element is far outside viewport (performance optimization)
+                const rect = element.getBoundingClientRect();
+                if (rect.top < -200 || rect.top > window.innerHeight + 200) {
+                    element.remove();
+                    return false;
+                }
+                
+                return true;
             });
-        }, 5000);
+            
+            this.lastCleanupTime = Date.now();
+        }
     }
 
     animateParticles() {
@@ -651,12 +740,8 @@ export class BootSystem {
             setTimeout(() => this.playDesktopReadySound(), 500);
         }
 
-        // Auto-open welcome window
-        setTimeout(() => {
-            if (window.handleAppClick) {
-                window.handleAppClick('welcome');
-            }
-        }, 1500);
+        // Clean desktop start - welcome app removed for clean startup
+        // User can launch welcome app manually if needed
     }
 
     createNetworkAnimations() {
@@ -801,6 +886,9 @@ export class BootSystem {
             spinner.style.transform = `rotate(${newRotation}deg)`;
         });
         
+        // Add enhanced visual effects
+        this.createRotationRipple();
+        
         // Add a temporary visual effect
         document.body.style.transform = 'rotate(2deg)';
         setTimeout(() => {
@@ -809,7 +897,46 @@ export class BootSystem {
         
         if (this.audioEnabled) {
             this.createTone(600, 0.2, 'sine', 0.05);
+            setTimeout(() => this.createTone(800, 0.1, 'triangle', 0.03), 150);
         }
+    }
+
+    createRotationRipple() {
+        // Create a rotating ripple effect from the center
+        const ripple = document.createElement('div');
+        ripple.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(74, 144, 226, 0.8);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 100;
+        `;
+        
+        document.body.appendChild(ripple);
+        
+        // Animate the ripple
+        ripple.animate([
+            { 
+                transform: 'translate(-50%, -50%) scale(1) rotate(0deg)', 
+                opacity: 0.8,
+                borderWidth: '2px'
+            },
+            { 
+                transform: 'translate(-50%, -50%) scale(15) rotate(360deg)', 
+                opacity: 0,
+                borderWidth: '0px'
+            }
+        ], {
+            duration: 1000,
+            easing: 'ease-out'
+        }).addEventListener('finish', () => {
+            ripple.remove();
+        });
     }
 
     increaseParticles() {
@@ -844,28 +971,147 @@ export class BootSystem {
 
     changeParticleColors() {
         const colors = [
-            '#4a90e2', // Original blue
-            '#00d084', // Green
-            '#7c53ff', // Purple
-            '#ff6900', // Orange
-            '#ff4757', // Red
-            '#2ed573', // Light green
-            '#5352ed'  // Indigo
+            { name: 'Blue', color: '#4a90e2', gradient: 'radial-gradient(circle, #4a90e2 0%, #4a90e2aa 50%, transparent 100%)' },
+            { name: 'Green', color: '#00d084', gradient: 'radial-gradient(circle, #00d084 0%, #00d084aa 50%, transparent 100%)' },
+            { name: 'Purple', color: '#7c53ff', gradient: 'radial-gradient(circle, #7c53ff 0%, #7c53ffaa 50%, transparent 100%)' },
+            { name: 'Orange', color: '#ff6900', gradient: 'radial-gradient(circle, #ff6900 0%, #ff6900aa 50%, transparent 100%)' },
+            { name: 'Red', color: '#ff4757', gradient: 'radial-gradient(circle, #ff4757 0%, #ff4757aa 50%, transparent 100%)' },
+            { name: 'Cyan', color: '#2ed573', gradient: 'radial-gradient(circle, #2ed573 0%, #2ed573aa 50%, transparent 100%)' },
+            { name: 'Indigo', color: '#5352ed', gradient: 'radial-gradient(circle, #5352ed 0%, #5352edaa 50%, transparent 100%)' }
         ];
         
         const currentColor = this.currentParticleColor || 0;
         const newColor = (currentColor + 1) % colors.length;
         this.currentParticleColor = newColor;
+        const currentColorData = colors[newColor];
         
+        // Update existing particles with smoother transition
         const particles = document.querySelectorAll('.blue-particle');
-        particles.forEach(particle => {
-            particle.style.background = `radial-gradient(circle, ${colors[newColor]} 0%, ${colors[newColor]}aa 50%, transparent 100%)`;
-            particle.style.boxShadow = `0 0 8px ${colors[newColor]}, 0 0 16px ${colors[newColor]}44`;
+        particles.forEach((particle, index) => {
+            // Stagger the color change for a wave effect
+            setTimeout(() => {
+                particle.style.background = currentColorData.gradient;
+                particle.style.boxShadow = `0 0 12px ${currentColorData.color}, 0 0 24px ${currentColorData.color}44, 0 0 36px ${currentColorData.color}22`;
+                
+                // Add a temporary pulse effect
+                particle.style.transform = 'scale(1.3)';
+                setTimeout(() => {
+                    particle.style.transform = '';
+                }, 200);
+            }, index * 20);
         });
         
+        // Create a burst of new particles with the new color at the bottom
+        for (let i = 0; i < 15; i++) {
+            setTimeout(() => {
+                const burstParticle = document.createElement('div');
+                burstParticle.className = 'blue-particle particle-interactive';
+                burstParticle.style.background = currentColorData.gradient;
+                burstParticle.style.boxShadow = `0 0 15px ${currentColorData.color}, 0 0 30px ${currentColorData.color}66`;
+                
+                // Start from bottom center and spread outward
+                const startX = 45 + (Math.random() - 0.5) * 10;
+                burstParticle.style.left = startX + '%';
+                burstParticle.style.animationDelay = '0s';
+                burstParticle.style.animationDuration = (8 + Math.random() * 6) + 's';
+                
+                const container = document.getElementById('particleContainer');
+                if (container) {
+                    container.appendChild(burstParticle);
+                    
+                    // Remove after animation
+                    setTimeout(() => {
+                        if (burstParticle.parentNode) {
+                            burstParticle.remove();
+                        }
+                    }, parseFloat(burstParticle.style.animationDuration) * 1000);
+                }
+            }, i * 100);
+        }
+        
+        // Show color change notification
+        this.showColorChangeNotification(currentColorData.name, currentColorData.color);
+        
+        // Play enhanced audio feedback
         if (this.audioEnabled) {
             this.createTone(1000, 0.15, 'triangle', 0.06);
+            setTimeout(() => this.createTone(1200, 0.1, 'sine', 0.04), 100);
+            setTimeout(() => this.createTone(800, 0.1, 'triangle', 0.03), 200);
         }
+    }
+
+    showColorChangeNotification(colorName, colorHex) {
+        // Remove existing notification if present
+        const existingNotification = document.querySelector('.color-change-notification');
+        if (existingNotification) {
+            existingNotification.remove();
+        }
+
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = 'color-change-notification';
+        notification.innerHTML = `
+            <div class="notification-content">
+                <div class="color-preview" style="background: ${colorHex}; box-shadow: 0 0 15px ${colorHex}44;"></div>
+                <span>Particle Color: ${colorName}</span>
+            </div>
+        `;
+        
+        // Style the notification
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #232c3d 60%, #2e3a54 100%);
+            color: #eaf1fb;
+            padding: 12px 18px;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(16, 22, 36, 0.8), 0 2px 8px rgba(35, 44, 61, 0.6);
+            border: 1px solid #26334d;
+            z-index: 10000;
+            font-size: 14px;
+            font-weight: 500;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        `;
+        
+        // Style the content
+        const style = document.createElement('style');
+        style.textContent = `
+            .color-change-notification .notification-content {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            .color-change-notification .color-preview {
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+        `;
+        document.head.appendChild(style);
+        
+        document.body.appendChild(notification);
+        
+        // Animate in
+        setTimeout(() => {
+            notification.style.transform = 'translateX(0)';
+        }, 10);
+        
+        // Animate out and remove
+        setTimeout(() => {
+            notification.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+                if (style.parentNode) {
+                    style.remove();
+                }
+            }, 300);
+        }, 2500);
     }
 }
 

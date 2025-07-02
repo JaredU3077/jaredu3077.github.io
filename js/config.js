@@ -26,27 +26,90 @@ export const CONFIG = {
 
     // Terminal commands
     COMMANDS: {
-        HELP: `Available commands:
-• ping [host] - Test network connectivity
-• show resume - Display professional resume  
-• show experience - Show detailed work history
-• show skills - List technical skills
-• show certifications - Display certifications
-• ifconfig - Show network interface configuration
-• netstat - Display network connections
-• tracert [host] - Trace route to destination
-• nslookup [domain] - DNS lookup
-• clear - Clear terminal screen
-• help - Show this help message
+        HELP: `Available Commands:
 
-Background Effects:
-• bg [pause|rotate|help] - Control background animation
-• particles [add|remove|color|count|help] - Manage particles
-• fx [status|toggle|reset|help] - Effects control
+=== SYSTEM NAVIGATION ===
+launch <app>          - Launch applications (network, skills, projects, etc.)
+apps                  - List available applications
+windows               - List open windows
+close [app]           - Close window (current or specified)
+focus <app>           - Focus on specified window
+desktop clear         - Clear desktop and close all windows
 
-Keyboard Shortcuts:
-• SPACE - Toggle animations  • R - Rotate background
-• +/- - Add/remove particles  • C - Change colors`,
+=== VISUAL EFFECTS ===
+particles <cmd>       - Particle system control
+  status             - Show particle system status
+  start/stop         - Control particle generation
+  burst              - Create particle burst effect
+  rain/calm/storm    - Set generation modes
+  clear              - Remove all particles
+  colors             - Change particle colors
+  speed <level>      - Set generation speed (slow/normal/fast/turbo)
+  dance              - Fun particle dance mode
+  stats              - Detailed particle statistics
+
+effects <cmd>         - Visual effects control
+  list               - Show available effects
+  status             - Show effects status
+  enable <effect>    - Enable specific effect
+  disable <effect>   - Disable specific effect
+  toggle             - Toggle particle animation
+  reset              - Reset to default state
+  demo               - Show effects demonstration
+
+=== SYSTEM INFORMATION ===
+resume                - Display resume/CV information
+show <section>        - Show specific resume section
+  experience         - Work experience
+  skills             - Technical skills
+  certifications     - Professional certifications
+  demoscene          - Launch 64MB demoscene with chiptune soundtrack
+
+=== NETWORK TOOLS ===
+ping <host>           - Test network connectivity
+tracert <host>        - Trace network route
+nslookup <host>       - DNS lookup
+arp                   - Show ARP table
+route                 - Show routing table
+
+=== SYSTEM CONTROL ===
+system <cmd>          - System operations
+  info               - System information
+  restart            - Restart Neu-OS
+  shutdown           - System shutdown
+
+theme <cmd>           - Theme control
+  dark/light         - Switch themes
+  reset              - Reset to default
+  particles <show/hide> - Control particle visibility
+
+audio <cmd>           - Audio system control
+  on/off             - Enable/disable audio
+  test               - Play test sequence
+  volume <0-1>       - Set volume level
+  status             - Audio system status
+
+performance <cmd>     - Performance monitoring
+  fps                - Show current FPS
+  optimize           - Optimize performance
+  memory             - Show memory usage
+
+=== KEYBOARD SHORTCUTS ===
+SPACE                 - Toggle particle animations
+R                     - Rotate background
++/-                   - Add/remove particles
+C                     - Change particle colors
+Ctrl+L                - Clear terminal
+Up/Down Arrows        - Command history
+Tab                   - Auto-complete
+
+=== HELP ===
+help                  - Show this help message
+clear                 - Clear terminal output
+exit                  - Close terminal (same as window close)
+
+Type any command to get started. Use Tab for auto-completion.
+Happy exploring! 🚀`,
         PING: 'Pinging 8.8.8.8... Reply from 8.8.8.8: 32ms',
         IFCONFIG: `eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
         inet 192.168.1.100  netmask 255.255.255.0  broadcast 192.168.1.255
@@ -445,29 +508,16 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
         'conway-game-of-life': {
             id: 'conway-game-of-life',
             name: 'Conway\'s Game of Life',
-            description: 'Interactive cellular automaton simulation',
+            description: 'Peaceful cellular automaton simulation',
             type: 'game', // Mark as game for special handling
             icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="13"/></svg>`,
             windows: [{
                 id: 'gameOfLifeWindow',
                 title: 'Conway\'s Game of Life',
                 content: `
-                    <div id="gameOfLifeContainer" style="display: flex; flex-direction: column; height: 100%; padding: 10px;">
-                        <div id="gameControls" style="display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; align-items: center;">
-                            <button id="startStopBtn" class="game-btn" style="padding: 8px 16px; background: #4a90e2; color: white; border: none; border-radius: 4px; cursor: pointer;">Start</button>
-                            <button id="resetBtn" class="game-btn" style="padding: 8px 16px; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer;">Reset</button>
-                            <button id="randomBtn" class="game-btn" style="padding: 8px 16px; background: #00d084; color: white; border: none; border-radius: 4px; cursor: pointer;">Random</button>
-                            <label style="color: #eaf1fb; font-size: 14px; margin-left: 10px;">
-                                Speed: <input id="speedSlider" type="range" min="50" max="1000" value="900" style="margin-left: 5px;">
-                            </label>
-                            <span id="generationCounter" style="color: #eaf1fb; font-size: 14px; margin-left: 10px;">Generation: 0</span>
-                        </div>
-                        <div id="gameCanvas" style="flex: 1; border: 2px solid #26334d; border-radius: 8px; background: #1a1a1a; position: relative; overflow: hidden;">
-                            <canvas id="lifeCanvas" style="display: block; width: 100%; height: 100%; cursor: crosshair;"></canvas>
-                        </div>
-                        <div id="gameInfo" style="margin-top: 10px; font-size: 12px; color: #a0a0a0;">
-                            <p>Click cells to toggle them alive/dead. Use patterns like gliders, blinkers, or create your own!</p>
-                            <p><strong>Rules:</strong> Live cells with 2-3 neighbors survive. Dead cells with exactly 3 neighbors become alive.</p>
+                    <div id="gameOfLifeContainer" style="display: flex; flex-direction: column; height: 100%; position: relative; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 16px; padding: 8px;">
+                        <div id="gameCanvas" style="flex: 1; border-radius: 16px; background: linear-gradient(135deg, #2d1b4e 0%, #1a1a2e 50%, #16213e 100%); position: relative; overflow: hidden; box-shadow: inset 0 0 40px rgba(139, 69, 19, 0.1), 0 0 30px rgba(0,0,0,0.3);">
+                            <canvas id="lifeCanvas" style="display: block; width: 100%; height: 100%; border-radius: 16px;"></canvas>
                         </div>
                     </div>
                 `,
