@@ -211,17 +211,29 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
                 content: `
                     <div class="welcome-content" style="padding: 20px; text-align: center;">
                         <h2>🖥️ Senior Network Engineer Portfolio</h2>
-                        <p><strong>Jared U. (@JaredU_)</strong></p>
+                        <p><strong>Jared U. (@jaredu_)</strong></p>
                         <p>Welcome to my interactive portfolio featuring a simulated network engineer workstation.</p>
+                        
+                        <div style="background: linear-gradient(135deg, #ff6b35, #feca57); padding: 10px; border-radius: 8px; margin: 15px 0; color: white; font-weight: bold;">
+                            🚧 This is a work in progress - More features coming soon! 🚧
+                        </div>
+                        
                         <hr style="margin: 15px 0; border: 1px solid #26334d;">
+                        
                         <div style="text-align: left; margin-top: 15px;">
                             <h3>🚀 Quick Start:</h3>
                             <ul style="list-style-type: none; padding: 0;">
                                 <li>📊 <strong>Network Monitor:</strong> View network topology</li>
-                                <li>💻 <strong>Terminal:</strong> Run commands like 'show resume' or 'ping 8.8.8.8' or 'fx status'</li>
+                                <li>💻 <strong>Terminal:</strong> Run commands like 'show resume' or 'show jared' to view my resume</li>
                                 <li>📚 <strong>Codex:</strong> Search network documentation</li>
                                 <li>🔧 <strong>Device Manager:</strong> Network device overview</li>
                             </ul>
+
+                            <h3>📞 Get In Touch:</h3>
+                            <div style="background: #1e2530; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                                <p style="margin: 0; color: #4a90e2;"><strong>💬 Reach out to me on X.com:</strong></p>
+                                <p style="margin: 5px 0 0 0; font-size: 1.1em;"><a href="https://x.com/jaredu_" target="_blank" style="color: #00acee; text-decoration: none;">@jaredu_</a></p>
+                            </div>
 
                             <h3>✨ Interactive Background:</h3>
                             <div style="font-size: 0.85em; margin-left: 10px;">

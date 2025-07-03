@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Demo</title>
+    <style>
+        body {
+            background: #0d0b1e;
+            color: #00ff41;
+            font-family: 'Share Tech Mono', monospace;
+            padding: 20px;
+        }
+        
+        .debug-info {
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid #00ff41;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        button {
+            background: transparent;
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+            font-family: 'Share Tech Mono', monospace;
+        }
+        
+        button:hover {
+            background: #00ff41;
+            color: #0d0b1e;
+        }
+        
+        .demo-card {
+            border: 1px solid #b388ff;
+            padding: 20px;
+            margin: 20px 0;
+            background: rgba(179, 136, 255, 0.1);
+        }
+        
+        canvas {
+            border: 1px solid #00ff41;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Debug Demo Page</h1>
+    
+    <div class="debug-info">
+        <h3>System Status</h3>
+        <div id="status">Loading...</div>
+    </div>
+    
+    <div class="demo-card">
+        <h3>Matrix Rain Test</h3>
+        <canvas id="matrix-canvas" width="400" height="300"></canvas>
+        <br>
+        <button onclick="testMatrix()">Test Matrix Rain</button>
+        <button onclick="testFullscreen()">Test Fullscreen</button>
+    </div>
+    
+    <div class="demo-card">
+        <h3>Direct Demo Test</h3>
+        <button onclick="testDirectDemo()">Test Direct Demo Creation</button>
+    </div>
+
+    <script src="js/DarkWaveAudio.js"></script>
+    <script src="js/DarkWaveCore.js"></script>
+    <script src="js/demoscene.js"></script>
+    <script>
+        function updateStatus(message) {
+            document.getElementById('status').innerHTML += '<br>' + message;
+            console.log(message);
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStatus('DOM loaded');
+            
+            // Check dependencies
+            if (window.darkWaveCore) {
+                updateStatus('✓ DarkWaveCore loaded');
+            } else {
+                updateStatus('✗ DarkWaveCore NOT loaded');
+            }
+            
+            if (window.darkWaveAudio) {
+                updateStatus('✓ DarkWaveAudio loaded');
+            } else {
+                updateStatus('✗ DarkWaveAudio NOT loaded');
+            }
+            
+            if (window.demoscenePlatform) {
+                updateStatus('✓ DemoscenePlatform loaded');
+            } else {
+                updateStatus('✗ DemoscenePlatform NOT loaded');
+            }
+            
+            // Test matrix rain directly
+            setTimeout(() => {
+                testMatrix();
+            }, 1000);
+        });
+        
+        function testMatrix() {
+            updateStatus('Testing matrix rain...');
+            
+            const canvas = document.getElementById('matrix-canvas');
+            if (!canvas) {
+                updateStatus('✗ Canvas not found');
+                return;
+            }
+            
+            if (!window.darkWaveCore) {
+                updateStatus('✗ DarkWaveCore not available');
+                return;
+            }
+            
+            try {
+                const matrix = window.darkWaveCore.createMatrixRain('matrix-canvas', {
+                    fontSize: 14,
+                    columns: 20,
+                    speed: 1,
+                    color: '#00ff41'
+                });
+                
+                if (matrix) {
+                    updateStatus('✓ Matrix rain created successfully');
+                    
+                    // Stop after 5 seconds
+                    setTimeout(() => {
+                        matrix.stop();
+                        updateStatus('Matrix rain stopped');
+                    }, 5000);
+                } else {
+                    updateStatus('✗ Matrix rain creation failed');
+                }
+            } catch (error) {
+                updateStatus('✗ Error creating matrix rain: ' + error.message);
+            }
+        }
+        
+        function testFullscreen() {
+            updateStatus('Testing fullscreen...');
+            
+            if (!window.demoscenePlatform) {
+                updateStatus('✗ DemoscenePlatform not available');
+                return;
+            }
+            
+            const demo = {
+                id: 'test-demo',
+                title: 'Test Matrix Rain',
+                description: 'A test matrix rain demo',
+                type: 'matrix'
+            };
+            
+            try {
+                window.demoscenePlatform.createFullScreenDemo(demo);
+                updateStatus('✓ Fullscreen demo created');
+            } catch (error) {
+                updateStatus('✗ Error creating fullscreen demo: ' + error.message);
+            }
+        }
+        
+        function testDirectDemo() {
+            updateStatus('Testing direct demo creation...');
+            
+            // Create a simple fullscreen demo manually
+            const container = document.createElement('div');
+            container.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: #0d0b1e;
+                z-index: 10000;
+            `;
+            
+            const canvas = document.createElement('canvas');
+            canvas.id = 'direct-demo-canvas';
+            canvas.style.cssText = `
+                width: 100%;
+                height: 100%;
+                display: block;
+            `;
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.textContent = 'Close';
+            closeBtn.style.cssText = `
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                z-index: 10001;
+                background: transparent;
+                border: 1px solid #00ff41;
+                color: #00ff41;
+                padding: 10px 20px;
+                cursor: pointer;
+            `;
+            closeBtn.onclick = () => {
+                document.body.removeChild(container);
+                updateStatus('Direct demo closed');
+            };
+            
+            container.appendChild(canvas);
+            container.appendChild(closeBtn);
+            document.body.appendChild(container);
+            
+            // Set canvas size
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // Create matrix rain
+            if (window.darkWaveCore) {
+                const matrix = window.darkWaveCore.createMatrixRain('direct-demo-canvas', {
+                    fontSize: 18,
+                    columns: Math.floor(canvas.width / 20),
+                    speed: 1.5,
+                    color: '#00ff41'
+                });
+                
+                if (matrix) {
+                    updateStatus('✓ Direct demo created successfully');
+                } else {
+                    updateStatus('✗ Direct demo creation failed');
+                }
+            } else {
+                updateStatus('✗ DarkWaveCore not available for direct demo');
+            }
+        }
+    </script>
+</body>
+</html> 

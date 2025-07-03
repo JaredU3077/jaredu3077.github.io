@@ -761,6 +761,10 @@ Use 'particles' and 'fx' commands for more controls`;
         if (!bootSystem) {
             return 'Error: Particle system not available';
         }
+        
+        console.log('Particle command called:', args);
+        console.log('Boot system particle container:', bootSystem.particleContainer);
+        console.log('Particles array length:', bootSystem.particles.length);
 
         const subcommand = args[0] || 'status';
         
@@ -775,56 +779,90 @@ Use 'particles' and 'fx' commands for more controls`;
 • Animation: ${isRunning ? 'Running' : 'Stopped'}
 • Mode: ${bootSystem.particleMode || 'normal'}
 
-Commands: start, stop, burst, rain, calm, storm, clear, stats, colors, speed, dance`;
+Commands: start, stop, test, reinit, burst, rain, calm, storm, clear, stats, colors, speed, dance, debug, visible, force, demo`;
             
             case 'start':
+                bootSystem.particleAnimationRunning = true;
                 bootSystem.startContinuousGeneration();
-                return 'Particle generation started';
+                return 'Particle generation started - You should see floating blue particles!';
             
             case 'stop':
                 bootSystem.particleAnimationRunning = false;
                 return 'Particle generation stopped';
             
+            case 'test':
+                // Create a single visible particle for testing
+                if (bootSystem.particleContainer) {
+                    // Create a static test particle first
+                    const testParticle = document.createElement('div');
+                    testParticle.className = 'blue-particle';
+                    testParticle.style.position = 'fixed';
+                    testParticle.style.left = '50%';
+                    testParticle.style.top = '50%';
+                    testParticle.style.transform = 'translate(-50%, -50%)';
+                    testParticle.style.animation = 'none';
+                    testParticle.style.zIndex = '1002';
+                    testParticle.style.background = '#ff0000';
+                    testParticle.style.boxShadow = '0 0 30px #ff0000';
+                    testParticle.textContent = 'TEST';
+                    testParticle.style.color = 'white';
+                    testParticle.style.fontSize = '12px';
+                    testParticle.style.fontWeight = 'bold';
+                    testParticle.style.display = 'flex';
+                    testParticle.style.alignItems = 'center';
+                    testParticle.style.justifyContent = 'center';
+                    testParticle.style.width = '60px';
+                    testParticle.style.height = '60px';
+                    testParticle.style.borderRadius = '50%';
+                    
+                    bootSystem.particleContainer.appendChild(testParticle);
+                    
+                    // Remove after 3 seconds
+                    setTimeout(() => {
+                        if (testParticle.parentNode) {
+                            testParticle.remove();
+                        }
+                    }, 3000);
+                    
+                    // Also create multiple normal animated particles
+                    for (let i = 0; i < 5; i++) {
+                        setTimeout(() => {
+                            bootSystem.createSingleParticle(bootSystem.particleContainer);
+                        }, i * 200);
+                    }
+                    return 'Test particles created! Look for a red "TEST" dot in center and blue floating dots.';
+                } else {
+                    return 'Error: Particle container not available';
+                }
+            
+            case 'reinit':
+                // Force reinitialize the particle system
+                bootSystem.reinitializeParticleSystem();
+                return 'Particle system reinitialized! Try particles test now.';
+            
             case 'burst':
                 // Create a burst of particles
-                for (let i = 0; i < 15; i++) {
-                    setTimeout(() => {
-                        bootSystem.createSingleParticle(bootSystem.particleContainer);
-                    }, i * 100);
-                }
+                bootSystem.createParticleBurst(15);
                 return 'Particle burst initiated! 15 particles released';
             
             case 'rain':
                 // Heavy particle rain mode
-                bootSystem.particleMode = 'rain';
-                bootSystem.particleGenerationRate = 300;
-                bootSystem.startContinuousGeneration();
+                bootSystem.setParticleMode('rain');
                 return 'Particle rain mode activated - Heavy generation (300ms)';
             
             case 'calm':
                 // Calm, peaceful mode
-                bootSystem.particleMode = 'calm';
-                bootSystem.particleGenerationRate = 2000;
-                bootSystem.startContinuousGeneration();
+                bootSystem.setParticleMode('calm');
                 return 'Calm particle mode activated - Peaceful generation (2000ms)';
             
             case 'storm':
                 // Storm mode with rapid generation
-                bootSystem.particleMode = 'storm';
-                bootSystem.particleGenerationRate = 150;
-                bootSystem.startContinuousGeneration();
+                bootSystem.setParticleMode('storm');
                 return 'Particle storm mode activated - Intense generation (150ms)';
             
             case 'clear':
                 // Remove all particles
-                if (bootSystem.particles) {
-                    bootSystem.particles.forEach(p => {
-                        if (p.element && p.element.parentNode) {
-                            p.element.parentNode.removeChild(p.element);
-                        }
-                    });
-                    bootSystem.particles = [];
-                }
+                bootSystem.clearAllParticles();
                 return 'All particles cleared from screen';
             
             case 'stats':
@@ -870,7 +908,7 @@ Commands: start, stop, burst, rain, calm, storm, clear, stats, colors, speed, da
             
             case 'dance':
                 // Fun dance mode - particles with special effects
-                bootSystem.particleMode = 'dance';
+                bootSystem.setParticleMode('dance');
                 for (let i = 0; i < 8; i++) {
                     setTimeout(() => {
                         bootSystem.createSingleParticle(bootSystem.particleContainer);
@@ -881,6 +919,112 @@ Commands: start, stop, burst, rain, calm, storm, clear, stats, colors, speed, da
                     }, i * 200);
                 }
                 return 'Particle dance mode! 🎉 Enjoy the show!';
+            
+            case 'debug':
+                // Debug particle system
+                const container = document.getElementById('particleContainer');
+                const visibleParticles = document.querySelectorAll('.blue-particle');
+                const containerVisible = container && container.offsetParent !== null;
+                const containerStyle = container ? window.getComputedStyle(container) : null;
+                const particleStyle = visibleParticles.length > 0 ? window.getComputedStyle(visibleParticles[0]) : null;
+                
+                // Check if particles are actually in the DOM
+                const particlesInDOM = Array.from(visibleParticles).map(p => ({
+                    visible: p.offsetParent !== null,
+                    opacity: window.getComputedStyle(p).opacity,
+                    zIndex: window.getComputedStyle(p).zIndex,
+                    animation: window.getComputedStyle(p).animation,
+                    position: p.getBoundingClientRect()
+                }));
+                
+                return `Particle Debug Info:
+• Container exists: ${!!container}
+• Container visible: ${containerVisible}
+• Container z-index: ${containerStyle?.zIndex || 'N/A'}
+• Container display: ${containerStyle?.display || 'N/A'}
+• Visible particles: ${visibleParticles.length}
+• Particle z-index: ${particleStyle?.zIndex || 'N/A'}
+• Particle display: ${particleStyle?.display || 'N/A'}
+• Particle opacity: ${particleStyle?.opacity || 'N/A'}
+• Boot system ready: ${!!bootSystem}
+• Particle array length: ${bootSystem.particles?.length || 0}
+• Animation running: ${bootSystem.particleAnimationRunning}
+• Generation rate: ${bootSystem.particleGenerationRate}ms
+• Mode: ${bootSystem.particleMode || 'normal'}
+
+Particles in DOM: ${particlesInDOM.length}
+${particlesInDOM.map((p, i) => `  ${i+1}. visible:${p.visible} opacity:${p.opacity} z:${p.zIndex}`).join('\n')}`;
+            
+            case 'visible':
+                // Create immediately visible test particles
+                if (bootSystem && bootSystem.createVisibleTestParticles) {
+                    bootSystem.createVisibleTestParticles();
+                    return 'Created 5 green test particles! They should be visible immediately.';
+                } else {
+                    return 'Error: Boot system or createVisibleTestParticles method not available';
+                }
+            
+            case 'force':
+                // Force create particles with immediate visibility
+                if (bootSystem && bootSystem.particleContainer) {
+                    for (let i = 0; i < 8; i++) {
+                        setTimeout(() => {
+                            const particle = document.createElement('div');
+                            particle.className = 'blue-particle';
+                            particle.style.position = 'fixed';
+                            particle.style.left = (10 + i * 10) + '%';
+                            particle.style.top = (20 + i * 5) + '%';
+                            particle.style.animation = 'none';
+                            particle.style.zIndex = '1002';
+                            particle.style.background = '#ff6600';
+                            particle.style.boxShadow = '0 0 25px #ff6600';
+                            particle.style.opacity = '1';
+                            particle.style.display = 'block';
+                            particle.style.width = '15px';
+                            particle.style.height = '15px';
+                            particle.style.borderRadius = '50%';
+                            particle.style.border = '2px solid #ff6600';
+                            
+                            bootSystem.particleContainer.appendChild(particle);
+                            
+                            // Remove after 8 seconds
+                            setTimeout(() => {
+                                if (particle.parentNode) {
+                                    particle.remove();
+                                }
+                            }, 8000);
+                        }, i * 300);
+                    }
+                    return 'Created 8 orange force particles! They should be visible immediately and stay for 8 seconds.';
+                } else {
+                    return 'Error: Boot system or particle container not available';
+                }
+            
+            case 'demo':
+                // Demo all particle modes
+                if (bootSystem) {
+                    const modes = ['rain', 'storm', 'calm', 'dance'];
+                    let currentMode = 0;
+                    
+                    const cycleMode = () => {
+                        if (currentMode < modes.length) {
+                            const mode = modes[currentMode];
+                            bootSystem.setParticleMode(mode);
+                            currentMode++;
+                            
+                            // Cycle to next mode after 4 seconds
+                            setTimeout(cycleMode, 4000);
+                        } else {
+                            // Return to normal mode
+                            bootSystem.setParticleMode('normal');
+                        }
+                    };
+                    
+                    cycleMode();
+                    return 'Starting particle mode demo! Cycling through: rain → storm → calm → dance → normal (4 seconds each)';
+                } else {
+                    return 'Error: Boot system not available';
+                }
             
             // Legacy commands for compatibility
             case 'add':
@@ -903,7 +1047,7 @@ Commands: start, stop, burst, rain, calm, storm, clear, stats, colors, speed, da
             
             default:
                 return `Unknown particle command: ${subcommand}
-Available: status, start, stop, burst, rain, calm, storm, clear, stats, colors, speed, dance, add, remove, color, count`;
+Available: status, start, stop, test, reinit, burst, rain, calm, storm, clear, stats, colors, speed, dance, debug, visible, force, demo, add, remove, color, count`;
         }
     }
 
@@ -1787,36 +1931,204 @@ performance help      - Show this help`;
     }
 
     showDemoscene() {
-        // Create the demoscene container
-        this.createDemosceneContainer();
+        // Launch the DarkWave Demoscene Platform
+        this.launchDarkWaveDemoscene();
         
-        return `🌟 DEMOSCENE LOADING... 🌟
+        return `🌟 DARKWAVE DEMOSCENE PLATFORM 🌟
 
 ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ 100%
 
-🎵 NEU-OS PRESENTS: "DIGITAL DRIFT" 🎵
-A 64MB Interactive Demo Experience with Original Chiptune Soundtrack
+🎵 LAUNCHING: "DARKWAVE DEMOSCENE" 🎵
+A Web-Based Demoscene Platform with Dark Wave 8-bit Hacker Aesthetic
 
 ⚡ Features:
-• Plasma Field Generator
-• Infinite Tunnel Dive  
-• 3D Cube Matrix
-• Color Plasma Storm
-• Wave Distortion Engine
-• Epic Finale Sequence
-• Original 8-bit Chiptune Music (140 BPM)
-• Classic Demo Effects
+• Demo Showcase Gallery
+• Interactive Creation Tools
+• Real-time Chiptune Generation
+• Dark Wave Audio Sequences
+• Particle Systems & Visual Effects
+• Community Hub & Comments
+• Educational Tutorials
+• Matrix Rain & Glitch Effects
+• Wireframe Networks
+• Advanced Audio Visualization
 
-🎮 Controls:
-• SPACE - Next Scene
-• ESC - Exit Demo
-• C - Cycle Colors
-• + - Increase Effects
-• - - Decrease Effects
+🎮 Platform Sections:
+• Showcase - Browse demo gallery
+• Create - Build your own demos
+• Community - Share and discuss
+• Learn - Tutorials and guides
 
-🎼 Audio: ${window.bootSystemInstance?.audioContext ? 'READY - Full soundtrack experience!' : 'INITIALIZING - Audio system loading...'}
+🎼 Audio System: ${window.darkWaveAudio?.isInitialized ? 'READY - Full chiptune and dark wave experience!' : 'INITIALIZING - Audio system loading...'}
 
-Demo initializing... Press SPACE to begin the show!`;
+Platform launching... Welcome to the DarkWave Demoscene experience!`;
+    }
+
+    launchDarkWaveDemoscene() {
+        // Remove existing demoscene if present
+        const existing = document.getElementById('demosceneContainer');
+        if (existing) {
+            existing.remove();
+        }
+
+        // Create demoscene container
+        const container = document.createElement('div');
+        container.id = 'demosceneContainer';
+        container.className = 'demoscene-container';
+        
+        // Load the DarkWave demoscene platform
+        container.innerHTML = `
+            <div class="demoscene-header">
+                <div class="demoscene-title">DARKWAVE DEMOSCENE PLATFORM</div>
+                <div class="demoscene-subtitle">Where 8-bit meets dark wave</div>
+                <button class="demoscene-close" onclick="window.terminalInstance?.exitDarkWaveDemoscene()">×</button>
+            </div>
+            <iframe id="demoscene-iframe" src="demoscene.html" frameborder="0"></iframe>
+        `;
+
+        document.body.appendChild(container);
+        
+        // Add styles for the container
+        this.addDarkWaveDemosceneStyles();
+        
+        // Initialize the platform
+        this.initializeDarkWaveDemoscene();
+    }
+
+    addDarkWaveDemosceneStyles() {
+        const style = document.createElement('style');
+        style.id = 'darkWaveDemosceneStyles';
+        style.textContent = `
+            .demoscene-container {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: #0d0b1e;
+                z-index: 10000;
+                overflow: hidden;
+                font-family: 'Orbitron', 'Share Tech Mono', monospace;
+            }
+
+            .demoscene-header {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 60px;
+                background: rgba(13, 11, 30, 0.95);
+                backdrop-filter: blur(10px);
+                border-bottom: 1px solid #b388ff;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10001;
+                box-shadow: 0 0 20px rgba(179, 136, 255, 0.3);
+            }
+
+            .demoscene-title {
+                font-size: 18px;
+                font-weight: 700;
+                color: #b388ff;
+                text-shadow: 0 0 10px #b388ff;
+                letter-spacing: 2px;
+                text-transform: uppercase;
+            }
+
+            .demoscene-subtitle {
+                position: absolute;
+                top: 35px;
+                font-size: 12px;
+                color: #ffffff;
+                opacity: 0.8;
+                letter-spacing: 1px;
+            }
+
+            .demoscene-close {
+                position: absolute;
+                right: 20px;
+                top: 50%;
+                transform: translateY(-50%);
+                background: transparent;
+                border: 1px solid #b388ff;
+                color: #b388ff;
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                cursor: pointer;
+                font-size: 18px;
+                font-weight: bold;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .demoscene-close:hover {
+                background: #b388ff;
+                color: #0d0b1e;
+                box-shadow: 0 0 15px #b388ff;
+            }
+
+            #demoscene-iframe {
+                width: 100%;
+                height: 100%;
+                border: none;
+                margin-top: 60px;
+            }
+
+            @keyframes titleGlow {
+                0%, 100% { text-shadow: 0 0 10px #b388ff; }
+                50% { text-shadow: 0 0 20px #b388ff, 0 0 30px #b388ff; }
+            }
+
+            .demoscene-title {
+                animation: titleGlow 2s ease-in-out infinite;
+            }
+        `;
+
+        document.head.appendChild(style);
+    }
+
+    initializeDarkWaveDemoscene() {
+        // Wait for iframe to load
+        const iframe = document.getElementById('demoscene-iframe');
+        if (iframe) {
+            iframe.onload = () => {
+                console.log('DarkWave Demoscene Platform loaded');
+                
+                // Initialize audio context if needed
+                if (window.darkWaveAudio && !window.darkWaveAudio.isInitialized) {
+                    window.darkWaveAudio.resume();
+                }
+            };
+        }
+    }
+
+    exitDarkWaveDemoscene() {
+        const container = document.getElementById('demosceneContainer');
+        if (container) {
+            container.remove();
+        }
+        
+        const styles = document.getElementById('darkWaveDemosceneStyles');
+        if (styles) {
+            styles.remove();
+        }
+        
+        // Call cleanup on the demoscene platform if it exists
+        const iframe = document.getElementById('demoscene-iframe');
+        if (iframe && iframe.contentWindow && iframe.contentWindow.demoscenePlatform) {
+            iframe.contentWindow.demoscenePlatform.cleanup();
+        }
+        
+        // Stop any running audio
+        if (window.darkWaveAudio) {
+            window.darkWaveAudio.stopAmbientTrack();
+        }
+        
+        console.log('DarkWave Demoscene Platform closed');
     }
 
     createDemosceneContainer() {
@@ -1835,19 +2147,22 @@ Demo initializing... Press SPACE to begin the show!`;
             <div class="demoscene-canvas">
                 <canvas id="demoCanvas"></canvas>
                 <div class="demoscene-overlay">
-                    <div class="demo-title">DIGITAL DRIFT</div>
+                    <div class="demo-title">CYBER HACKER</div>
                     <div class="demo-credits">NEU-OS DEMOSCENE</div>
                     <div class="demo-controls">
-                        <div>SPACE: Next Scene • ESC: Exit • C: Colors</div>
+                        <div>SPACE: Next Scene • ESC: Exit • C: Colors • M: Music</div>
                     </div>
                 </div>
                 <div class="demo-scene-info">
-                    <div id="sceneTitle">PLASMA FIELD</div>
+                    <div id="sceneTitle">DIGITAL PLASMA</div>
                     <div id="sceneCounter">Scene 1/6</div>
                 </div>
                 <div class="music-indicator">
                     <div class="music-note">♪</div>
-                    <div class="music-status">CHIPTUNE READY</div>
+                    <div class="music-status">HACKER CHIPTUNE READY</div>
+                </div>
+                <div class="audio-visualizer">
+                    <canvas id="audioCanvas" width="200" height="50"></canvas>
                 </div>
             </div>
         `;
@@ -1982,6 +2297,22 @@ Demo initializing... Press SPACE to begin the show!`;
                 font-size: 12px;
                 letter-spacing: 1px;
                 animation: musicGlow 2s ease-in-out infinite;
+            }
+
+            .audio-visualizer {
+                position: absolute;
+                bottom: 20px;
+                left: 20px;
+                background: rgba(0, 0, 0, 0.7);
+                border: 1px solid #00ff00;
+                border-radius: 4px;
+                padding: 5px;
+            }
+
+            #audioCanvas {
+                display: block;
+                background: #000;
+                border-radius: 2px;
             }
 
             @keyframes musicBounce {
@@ -2137,6 +2468,9 @@ Demo initializing... Press SPACE to begin the show!`;
                     break;
                 case 'KeyC':
                     colorOffset += 0.5;
+                    break;
+                case 'KeyM':
+                    this.toggleMusic();
                     break;
                 case 'Equal':
                 case 'NumpadAdd':
@@ -2556,7 +2890,7 @@ Demo initializing... Press SPACE to begin the show!`;
             ctx.save();
             ctx.translate(canvas.width / 2, canvas.height / 2);
             ctx.scale(scale + i * 0.02, scale + i * 0.02);
-            ctx.fillText('DIGITAL DRIFT', 0, 0);
+            ctx.fillText('CYBER HACKER', 0, 0);
             ctx.restore();
         }
         
@@ -2566,14 +2900,14 @@ Demo initializing... Press SPACE to begin the show!`;
         ctx.save();
         ctx.translate(canvas.width / 2, canvas.height / 2);
         ctx.scale(scale, scale);
-        ctx.fillText('DIGITAL DRIFT', 0, 0);
+        ctx.fillText('CYBER HACKER', 0, 0);
         ctx.restore();
         
         // Add subtitle
         ctx.font = 'bold 24px Courier New';
         ctx.fillStyle = `hsl(${(textHue + 180) % 360}, 80%, 70%)`;
         ctx.globalAlpha = 0.8 + Math.sin(time * 2) * 0.2;
-        ctx.fillText('THE COMPLETE EXPERIENCE', canvas.width / 2, canvas.height / 2 + 80);
+        ctx.fillText('HACK THE SYSTEM', canvas.width / 2, canvas.height / 2 + 80);
         
         // Reset context
         ctx.globalAlpha = 1;
@@ -2676,47 +3010,61 @@ Demo initializing... Press SPACE to begin the show!`;
             return;
         }
 
-        // Song parameters
-        this.bpm = 140;
+        // Song parameters - Faster, more aggressive hacker style
+        this.bpm = 160; // Increased tempo for more energy
         this.noteLength = (60 / this.bpm) / 4; // 16th note length
         this.songPosition = 0;
         this.patternLength = 16; // 16 beats per pattern
         
-        // Define the chord progression (classic chiptune style)
+        // Hacker-style chord progression (minor keys, dissonant intervals)
         this.chords = [
-            // Pattern 1: Am - F - C - G
-            [220, 261.63, 329.63], // Am
-            [174.61, 220, 261.63], // F  
-            [261.63, 329.63, 392],  // C
+            // Pattern 1: Em - Am - Dm - G (classic hacker progression)
+            [164.81, 196, 246.94], // Em
+            [220, 261.63, 329.63], // Am  
+            [146.83, 174.61, 220], // Dm
             [196, 246.94, 293.66], // G
-            // Pattern 2: Dm - Am - F - G
-            [293.66, 349.23, 440], // Dm
+            // Pattern 2: Cm - Fm - Bb - Eb (darker, more aggressive)
+            [130.81, 155.56, 196], // Cm
+            [174.61, 207.65, 261.63], // Fm
+            [116.54, 138.59, 174.61], // Bb
+            [155.56, 185, 233.08], // Eb
+            // Pattern 3: Bm - Em - Am - D (cyberpunk style)
+            [123.47, 146.83, 185], // Bm
+            [164.81, 196, 246.94], // Em
             [220, 261.63, 329.63], // Am
-            [174.61, 220, 261.63], // F
-            [196, 246.94, 293.66], // G
+            [146.83, 174.61, 220], // D
         ];
 
-        // Melody patterns (frequencies in Hz)
+        // Aggressive melody patterns with hacker-style intervals
         this.melodyPatterns = [
-            // Pattern 1
-            [440, 0, 523.25, 0, 659.25, 0, 523.25, 440, 392, 0, 440, 0, 523.25, 0, 0, 0],
-            // Pattern 2  
-            [659.25, 0, 587.33, 0, 523.25, 0, 440, 0, 392, 0, 349.23, 0, 392, 440, 0, 0],
-            // Pattern 3
-            [880, 0, 0, 783.99, 0, 659.25, 0, 587.33, 523.25, 0, 440, 0, 392, 0, 349.23, 0],
-            // Pattern 4
-            [523.25, 587.33, 659.25, 0, 523.25, 0, 440, 392, 0, 349.23, 392, 440, 523.25, 0, 0, 0]
+            // Pattern 1: Main hacker theme (tritones and minor seconds)
+            [440, 0, 554.37, 0, 659.25, 0, 554.37, 440, 415.30, 0, 440, 0, 554.37, 0, 0, 0],
+            // Pattern 2: Descending hacker line
+            [659.25, 0, 554.37, 0, 440, 0, 415.30, 0, 392, 0, 349.23, 0, 392, 440, 0, 0],
+            // Pattern 3: Aggressive arpeggio
+            [880, 0, 0, 783.99, 0, 659.25, 0, 554.37, 440, 0, 415.30, 0, 392, 0, 349.23, 0],
+            // Pattern 4: Chromatic hacker line
+            [440, 415.30, 392, 0, 440, 0, 415.30, 392, 0, 349.23, 392, 415.30, 440, 0, 0, 0],
+            // Pattern 5: High energy cyberpunk
+            [880, 0, 783.99, 0, 659.25, 0, 554.37, 0, 440, 0, 415.30, 0, 392, 0, 349.23, 0],
+            // Pattern 6: Dark ambient
+            [220, 0, 0, 207.65, 0, 196, 0, 185, 174.61, 0, 164.81, 0, 155.56, 0, 146.83, 0]
         ];
 
-        // Bass patterns
+        // Heavy bass patterns with syncopation
         this.bassPatterns = [
-            [110, 0, 0, 0, 87.31, 0, 0, 0, 130.81, 0, 0, 0, 98, 0, 0, 0],
-            [146.83, 0, 0, 0, 110, 0, 0, 0, 87.31, 0, 0, 0, 98, 0, 0, 0]
+            [82.41, 0, 0, 0, 73.42, 0, 0, 0, 98, 0, 0, 0, 87.31, 0, 0, 0], // Pattern 1
+            [110, 0, 0, 0, 98, 0, 0, 0, 73.42, 0, 0, 0, 87.31, 0, 0, 0],   // Pattern 2
+            [65.41, 0, 0, 0, 58.27, 0, 0, 0, 77.78, 0, 0, 0, 69.30, 0, 0, 0], // Pattern 3
         ];
 
-        // Drum patterns (using noise and sine waves)
-        this.drumPattern = [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0]; // Kick pattern
-        this.hihatPattern = [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]; // Hi-hat pattern
+        // Aggressive drum patterns
+        this.drumPattern = [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0]; // Heavy kick
+        this.hihatPattern = [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]; // Hi-hat
+        this.snarePattern = [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0]; // Snare on 2 and 4
+
+        // Add noise effects for hacker atmosphere
+        this.noisePattern = [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0]; // Digital noise
 
         this.isPlaying = true;
         this.startTime = this.audioContext.currentTime;
@@ -2818,28 +3166,28 @@ Demo initializing... Press SPACE to begin the show!`;
     }
 
     playDrumNote(time, noteIndex) {
-        // Kick drum
+        // Kick drum (heavier, more aggressive)
         if (this.drumPattern[noteIndex]) {
             const kickOsc = this.audioContext.createOscillator();
             const kickGain = this.audioContext.createGain();
             
             kickOsc.type = 'sine';
-            kickOsc.frequency.setValueAtTime(60, time);
-            kickOsc.frequency.exponentialRampToValueAtTime(30, time + 0.1);
+            kickOsc.frequency.setValueAtTime(80, time); // Higher frequency for more punch
+            kickOsc.frequency.exponentialRampToValueAtTime(40, time + 0.15);
             
-            kickGain.gain.setValueAtTime(0.3, time);
-            kickGain.gain.exponentialRampToValueAtTime(0.01, time + 0.1);
+            kickGain.gain.setValueAtTime(0.4, time); // Louder
+            kickGain.gain.exponentialRampToValueAtTime(0.01, time + 0.15);
             
             kickOsc.connect(kickGain);
             kickGain.connect(this.masterGain);
             
             kickOsc.start(time);
-            kickOsc.stop(time + 0.1);
+            kickOsc.stop(time + 0.15);
         }
 
-        // Hi-hat (noise)
+        // Hi-hat (sharper, more digital)
         if (this.hihatPattern[noteIndex]) {
-            const bufferSize = 2048;
+            const bufferSize = 1024; // Smaller buffer for sharper sound
             const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
             const data = buffer.getChannelData(0);
             
@@ -2853,17 +3201,70 @@ Demo initializing... Press SPACE to begin the show!`;
             
             noise.buffer = buffer;
             hihatFilter.type = 'highpass';
-            hihatFilter.frequency.setValueAtTime(8000, time);
+            hihatFilter.frequency.setValueAtTime(12000, time); // Higher frequency for digital feel
             
-            hihatGain.gain.setValueAtTime(0.1, time);
-            hihatGain.gain.exponentialRampToValueAtTime(0.01, time + 0.05);
+            hihatGain.gain.setValueAtTime(0.08, time);
+            hihatGain.gain.exponentialRampToValueAtTime(0.01, time + 0.03); // Shorter decay
             
             noise.connect(hihatFilter);
             hihatFilter.connect(hihatGain);
             hihatGain.connect(this.masterGain);
             
             noise.start(time);
-            noise.stop(time + 0.05);
+            noise.stop(time + 0.03);
+        }
+
+        // Snare drum (digital, aggressive)
+        if (this.snarePattern && this.snarePattern[noteIndex]) {
+            const snareOsc = this.audioContext.createOscillator();
+            const snareGain = this.audioContext.createGain();
+            const snareFilter = this.audioContext.createBiquadFilter();
+            
+            snareOsc.type = 'square';
+            snareOsc.frequency.setValueAtTime(200, time);
+            
+            snareFilter.type = 'bandpass';
+            snareFilter.frequency.setValueAtTime(800, time);
+            snareFilter.Q.setValueAtTime(10, time);
+            
+            snareGain.gain.setValueAtTime(0.3, time);
+            snareGain.gain.exponentialRampToValueAtTime(0.01, time + 0.1);
+            
+            snareOsc.connect(snareFilter);
+            snareFilter.connect(snareGain);
+            snareGain.connect(this.masterGain);
+            
+            snareOsc.start(time);
+            snareOsc.stop(time + 0.1);
+        }
+
+        // Digital noise effects (hacker atmosphere)
+        if (this.noisePattern && this.noisePattern[noteIndex]) {
+            const bufferSize = 512;
+            const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
+            const data = buffer.getChannelData(0);
+            
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+            
+            const noise = this.audioContext.createBufferSource();
+            const noiseGain = this.audioContext.createGain();
+            const noiseFilter = this.audioContext.createBiquadFilter();
+            
+            noise.buffer = buffer;
+            noiseFilter.type = 'lowpass';
+            noiseFilter.frequency.setValueAtTime(2000, time);
+            
+            noiseGain.gain.setValueAtTime(0.05, time);
+            noiseGain.gain.exponentialRampToValueAtTime(0.01, time + 0.2);
+            
+            noise.connect(noiseFilter);
+            noiseFilter.connect(noiseGain);
+            noiseGain.connect(this.masterGain);
+            
+            noise.start(time);
+            noise.stop(time + 0.2);
         }
     }
 
@@ -2899,6 +3300,16 @@ Demo initializing... Press SPACE to begin the show!`;
         this.isPlaying = false;
         if (this.masterGain) {
             this.masterGain.disconnect();
+        }
+    }
+
+    toggleMusic() {
+        if (this.isPlaying) {
+            this.stopChiptune();
+            this.updateMusicIndicator();
+        } else {
+            this.startChiptune();
+            this.updateMusicIndicator();
         }
     }
 

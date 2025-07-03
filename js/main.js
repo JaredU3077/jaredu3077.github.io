@@ -121,6 +121,8 @@ function handleAppClick(appId) {
                         winElem.querySelector('#terminalOutput')
                     );
                     console.log('Terminal initialized:', terminal);
+                    // Expose terminal globally for demoscene access
+                    window.terminalInstance = terminal;
                     break;
                 case 'network-monitor':
                     if (windowConfig.id === 'topologyWindow') {

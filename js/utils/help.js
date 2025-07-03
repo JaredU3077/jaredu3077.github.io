@@ -56,6 +56,7 @@ export class HelpManager {
                         title: 'Information Commands',
                         content: [
                             'show resume - Display professional resume',
+                            'show jared - Display professional resume (alternative)',
                             'show experience - Show detailed work history',
                             'show skills - List technical skills',
                             'show certifications - Display certifications'
@@ -144,7 +145,7 @@ export class HelpManager {
         content += `
                 <div style="margin-top: 30px; padding: 15px; background: rgba(0, 208, 132, 0.1); border-radius: 8px; border: 1px solid rgba(0, 208, 132, 0.3); text-align: center;">
                     <p style="margin: 0; color: #00d084; font-weight: 600;">💡 Pro Tip</p>
-                    <p style="margin: 5px 0 0 0; font-size: 0.9em;">Try running 'show resume' in the terminal to see my professional background!</p>
+                    <p style="margin: 5px 0 0 0; font-size: 0.9em;">Try running 'show resume' or 'show jared' in the terminal to see my professional background!</p>
                 </div>
             </div>
         `;

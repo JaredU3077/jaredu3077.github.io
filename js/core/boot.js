@@ -25,8 +25,16 @@ export class BootSystem {
         this.messageIndex = 0;
         this.audioContext = null;
         this.audioNodes = {};
+        
+        // Particle system initialization
         this.particles = [];
         this.particleCount = 80; // Calm particle count for lofi vibes
+        this.particleContainer = null;
+        this.particleAnimationRunning = true;
+        this.particleGenerationRate = 1200; // Default generation rate
+        this.particleMode = 'normal';
+        this.startTime = Date.now();
+        
         this.mouseX = 0;
         this.mouseY = 0;
         this.init();
@@ -197,11 +205,15 @@ export class BootSystem {
     }
 
     setupParticleSystem() {
+        console.log('Setting up particle system...');
+        
         // Create particle container
-        const particleContainer = document.createElement('div');
-        particleContainer.className = 'particle-container';
-        particleContainer.id = 'particleContainer';
-        document.body.appendChild(particleContainer);
+        this.particleContainer = document.createElement('div');
+        this.particleContainer.className = 'particle-container';
+        this.particleContainer.id = 'particleContainer';
+        this.particleContainer.style.zIndex = '1000'; // Ensure high z-index
+        document.body.appendChild(this.particleContainer);
+        console.log('Particle container created:', this.particleContainer);
 
         // Create single subtle spinning background element
         const spinner = document.createElement('div');
@@ -221,6 +233,14 @@ export class BootSystem {
         this.mouseY = 0;
         this.setupMouseTracking();
 
+        // Initialize particle arrays and state
+        this.particles = [];
+        this.particleCount = 25;
+        this.particleGenerationRate = 1200;
+        this.particleAnimationRunning = true;
+        this.particleMode = 'normal';
+        this.startTime = Date.now();
+
         // Generate initial particles
         this.generateParticles();
         
@@ -229,6 +249,8 @@ export class BootSystem {
         
         // Start continuous particle generation from bottom
         this.startContinuousGeneration();
+        
+        console.log('Particle system setup complete. Container:', this.particleContainer);
     }
 
     setupMouseTracking() {
@@ -244,15 +266,23 @@ export class BootSystem {
     }
 
     generateParticles() {
-        const container = document.getElementById('particleContainer');
-        if (!container) return;
+        if (!this.particleContainer) {
+            console.warn('Particle container not available');
+            return;
+        }
 
         for (let i = 0; i < this.particleCount; i++) {
-            this.createSingleParticle(container);
+            this.createSingleParticle(this.particleContainer);
         }
     }
 
     createSingleParticle(container) {
+        if (!container) {
+            console.warn('Container not provided for particle creation');
+            return;
+        }
+
+        console.log('Creating particle in container:', container);
         const particle = document.createElement('div');
         particle.className = 'blue-particle particle-interactive';
         
@@ -268,17 +298,19 @@ export class BootSystem {
         const startX = Math.random() * 100;
         particle.style.left = startX + '%';
         // Add staggered entry to prevent horizontal line formation
-        particle.style.animationDelay = Math.random() * 12 + 's';
-        particle.style.animationDuration = (20 + Math.random() * 15) + 's';
+        particle.style.animationDelay = Math.random() * 8 + 's';
+        particle.style.animationDuration = (12 + Math.random() * 8) + 's';
         
         // Add horizontal drift variation with smoother movement
-        const drift = (Math.random() - 0.5) * 200;
+        const drift = (Math.random() - 0.5) * 300;
         particle.style.setProperty('--drift', drift + 'px');
 
-        // Set initial position to guarantee bottom start
+        // Set initial position to guarantee bottom start and visibility
         particle.style.position = 'fixed';
-        particle.style.bottom = '-20px';
-        particle.style.zIndex = '1';
+        particle.style.bottom = '-30px';
+        particle.style.zIndex = '1001'; // Higher than container
+        particle.style.opacity = '1'; // Ensure visibility
+        particle.style.display = 'block'; // Ensure display
 
         // Add click interaction
         particle.addEventListener('click', (e) => {
@@ -287,15 +319,8 @@ export class BootSystem {
 
         container.appendChild(particle);
         
-        // Remove particle after animation completes with buffer
-        const animationTime = parseFloat(particle.style.animationDuration) * 1000;
-        setTimeout(() => {
-            if (particle.parentNode) {
-                particle.parentNode.removeChild(particle);
-            }
-        }, animationTime + 2000);
-
-        this.particles.push({
+        // Create particle data object
+        const particleData = {
             element: particle,
             originalX: startX,
             originalY: 100,
@@ -303,7 +328,26 @@ export class BootSystem {
             velocityY: -Math.random() * 1.5 - 0.5,
             attracted: false,
             createdAt: Date.now()
-        });
+        };
+        
+        // Add to particles array
+        this.particles.push(particleData);
+        
+        // Remove particle after animation completes with buffer
+        const animationTime = parseFloat(particle.style.animationDuration) * 1000;
+        setTimeout(() => {
+            if (particle.parentNode) {
+                particle.parentNode.removeChild(particle);
+            }
+            // Remove from particles array
+            const index = this.particles.indexOf(particleData);
+            if (index > -1) {
+                this.particles.splice(index, 1);
+            }
+        }, animationTime + 2000);
+        
+        console.log('Particle created and added to DOM:', particle);
+        return particleData;
     }
 
     updateParticleInteraction() {
@@ -466,6 +510,9 @@ export class BootSystem {
     }
 
     toggleParticleAnimation() {
+        this.particleAnimationRunning = !this.particleAnimationRunning;
+        console.log('Particle animation toggled:', this.particleAnimationRunning ? 'ON' : 'OFF');
+        
         const particles = document.querySelectorAll('.blue-particle');
         const spinners = document.querySelectorAll('.background-spinner');
         
@@ -492,16 +539,42 @@ export class BootSystem {
     }
 
     startContinuousGeneration() {
+        if (!this.particleAnimationRunning) return;
+        
+        console.log('Starting continuous particle generation...');
+        
         // Calm particle generation for chillhouse vibes
         let lastGenerationTime = 0;
-        const generationDelay = 1200; // Slower, more relaxed generation
+        const generationDelay = this.particleGenerationRate || 1200; // Use configured rate
+        const maxParticles = this.particleCount || 25; // Ensure we have a default
         
         const generateParticle = () => {
+            if (!this.particleAnimationRunning) return;
+            
             const now = Date.now();
             if (now - lastGenerationTime > generationDelay) {
-                const container = document.getElementById('particleContainer');
-                if (container && this.particles.length < this.particleCount * 0.8) {
-                    this.createSingleParticle(container);
+                // More lenient particle limit - allow more particles for better visibility
+                if (this.particleContainer && this.particles.length < maxParticles * 1.2) {
+                    console.log('Creating continuous particle, total:', this.particles.length);
+                    
+                    // Create appropriate particle type based on current mode
+                    switch (this.particleMode) {
+                        case 'rain':
+                            this.createRainParticle();
+                            break;
+                        case 'storm':
+                            this.createStormParticle();
+                            break;
+                        case 'calm':
+                            this.createCalmParticle();
+                            break;
+                        case 'dance':
+                            this.createDanceParticle();
+                            break;
+                        default:
+                            this.createSingleParticle(this.particleContainer);
+                    }
+                    
                     lastGenerationTime = now;
                 }
             }
@@ -518,7 +591,7 @@ export class BootSystem {
 
     cleanupParticles() {
         // Throttled cleanup to avoid performance issues
-        if (!this.lastCleanupTime || Date.now() - this.lastCleanupTime > 3000) {
+        if (!this.lastCleanupTime || Date.now() - this.lastCleanupTime > 5000) {
             this.particles = this.particles.filter(particle => {
                 const element = particle.element;
                 
@@ -528,8 +601,9 @@ export class BootSystem {
                 }
                 
                 // Remove if element is far outside viewport (performance optimization)
+                // Increased threshold to allow particles to be visible longer
                 const rect = element.getBoundingClientRect();
-                if (rect.top < -200 || rect.top > window.innerHeight + 200) {
+                if (rect.top < -500 || rect.top > window.innerHeight + 500) {
                     element.remove();
                     return false;
                 }
@@ -626,13 +700,41 @@ export class BootSystem {
             this.playBootSound();
         }
 
-        // Start message cycling
+        // Start progress animation and message cycling
+        this.startProgressAnimation();
         this.cycleBootMessages();
 
         // Auto-progress to login after boot completes
         setTimeout(() => {
             this.showLoginScreen();
-        }, 4000);
+        }, 5000);
+    }
+
+    startProgressAnimation() {
+        const progressFill = document.querySelector('.progress-fill');
+        const progressPercentage = document.querySelector('.progress-percentage');
+        
+        if (!progressFill || !progressPercentage) return;
+
+        let progress = 0;
+        const targetProgress = 100;
+        const duration = 5000; // 5 seconds
+        const interval = 50; // Update every 50ms
+        const increment = (targetProgress / (duration / interval));
+
+        const updateProgress = () => {
+            progress += increment;
+            if (progress > targetProgress) progress = targetProgress;
+            
+            progressFill.style.width = `${progress}%`;
+            progressPercentage.textContent = `${Math.round(progress)}%`;
+            
+            if (progress < targetProgress) {
+                setTimeout(updateProgress, interval);
+            }
+        };
+
+        updateProgress();
     }
 
     cycleBootMessages() {
@@ -641,18 +743,27 @@ export class BootSystem {
 
         const showMessage = () => {
             if (this.messageIndex < this.bootMessages.length) {
-                messageElement.textContent = this.bootMessages[this.messageIndex];
+                const messageText = messageElement.querySelector('.message-text');
+                const messageIcon = messageElement.querySelector('.message-icon');
+                
+                if (messageText) {
+                    messageText.textContent = this.bootMessages[this.messageIndex];
+                }
+                
+                // Update icon based on message type
+                if (messageIcon) {
+                    const icons = ['⚡', '🔒', '🌐', '💾', '🔧', '🖥️', '✅', '🚀'];
+                    messageIcon.textContent = icons[this.messageIndex] || '⚡';
+                }
+                
                 messageElement.style.animation = 'none';
-                
-                // Trigger reflow
-                messageElement.offsetHeight;
-                
-                messageElement.style.animation = 'bootMessageFade 0.5s ease-in-out forwards';
+                messageElement.offsetHeight; // Trigger reflow
+                messageElement.style.animation = 'bootMessageFade 0.8s ease-in-out forwards';
                 
                 this.messageIndex++;
                 
                 // Schedule next message
-                setTimeout(showMessage, 500);
+                setTimeout(showMessage, 600);
             }
         };
 
@@ -726,6 +837,12 @@ export class BootSystem {
 
         // Add network animation elements
         this.createNetworkAnimations();
+
+        // Ensure particle system is active
+        if (this.particleContainer && this.particleAnimationRunning) {
+            console.log('Activating particle system for desktop...');
+            this.startContinuousGeneration();
+        }
 
         // Trigger entrance animation
         setTimeout(() => {
@@ -851,32 +968,6 @@ export class BootSystem {
     }
 
     // Background control methods
-    toggleParticleAnimation() {
-        const particles = document.querySelectorAll('.blue-particle');
-        const spinners = document.querySelectorAll('.background-spinner');
-        
-        particles.forEach(particle => {
-            if (particle.style.animationPlayState === 'paused') {
-                particle.style.animationPlayState = 'running';
-            } else {
-                particle.style.animationPlayState = 'paused';
-            }
-        });
-        
-        spinners.forEach(spinner => {
-            if (spinner.style.animationPlayState === 'paused') {
-                spinner.style.animationPlayState = 'running';
-            } else {
-                spinner.style.animationPlayState = 'paused';
-            }
-        });
-        
-        // Play UI feedback sound
-        if (this.audioEnabled) {
-            this.playUIClickSound();
-        }
-    }
-
     rotateBackground() {
         const spinners = document.querySelectorAll('.background-spinner');
         spinners.forEach((spinner, index) => {
@@ -1019,10 +1110,23 @@ export class BootSystem {
                 if (container) {
                     container.appendChild(burstParticle);
                     
+                    // Track particle in array
+                    const particleData = {
+                        element: burstParticle,
+                        type: this.particleMode,
+                        createdAt: Date.now()
+                    };
+                    this.particles.push(particleData);
+                    
                     // Remove after animation
                     setTimeout(() => {
                         if (burstParticle.parentNode) {
                             burstParticle.remove();
+                        }
+                        // Remove from particles array
+                        const index = this.particles.indexOf(particleData);
+                        if (index > -1) {
+                            this.particles.splice(index, 1);
                         }
                     }, parseFloat(burstParticle.style.animationDuration) * 1000);
                 }
@@ -1112,6 +1216,347 @@ export class BootSystem {
                 }
             }, 300);
         }, 2500);
+    }
+
+    // Particle mode methods for terminal commands
+    createParticleBurst(count = 15) {
+        console.log(`Creating particle burst of ${count} particles`);
+        
+        if (!this.particleContainer) {
+            console.error('Particle container not available for burst');
+            return;
+        }
+        
+        // Create particles with staggered timing for better visual effect
+        for (let i = 0; i < count; i++) {
+            setTimeout(() => {
+                if (this.particleContainer) {
+                    const particleData = this.createSingleParticle(this.particleContainer);
+                    
+                    // Make burst particles more visible by adjusting their animation
+                    if (particleData && particleData.element) {
+                        particleData.element.style.animationDuration = (8 + Math.random() * 4) + 's';
+                        particleData.element.style.animationDelay = '0s';
+                        particleData.element.style.opacity = '1';
+                    }
+                }
+            }, i * 50); // Faster burst timing
+        }
+    }
+
+    setParticleMode(mode) {
+        console.log(`Setting particle mode to: ${mode}`);
+        this.particleMode = mode;
+        
+        // Clear existing particles when changing modes
+        this.clearAllParticles();
+        
+        switch (mode) {
+            case 'rain':
+                this.particleGenerationRate = 300;
+                this.createRainParticles();
+                break;
+            case 'calm':
+                this.particleGenerationRate = 2000;
+                this.createCalmParticles();
+                break;
+            case 'storm':
+                this.particleGenerationRate = 150;
+                this.createStormParticles();
+                break;
+            case 'dance':
+                this.particleGenerationRate = 400;
+                this.createDanceParticles();
+                break;
+            default:
+                this.particleGenerationRate = 1200;
+                this.createNormalParticles();
+        }
+        
+        // Restart generation with new rate
+        this.particleAnimationRunning = true;
+        this.startContinuousGeneration();
+        
+        console.log(`Particle mode set to ${mode} with rate ${this.particleGenerationRate}ms`);
+    }
+
+    createRainParticles() {
+        console.log('Creating rain particles...');
+        if (!this.particleContainer) return;
+        
+        // Create initial rain particles
+        for (let i = 0; i < 10; i++) {
+            setTimeout(() => {
+                this.createRainParticle();
+            }, i * 100);
+        }
+    }
+
+    createRainParticle() {
+        const particle = document.createElement('div');
+        particle.className = 'rain-particle';
+        particle.style.position = 'fixed';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = '-20px';
+        particle.style.width = '2px';
+        particle.style.height = '20px';
+        particle.style.background = 'linear-gradient(to bottom, #4a90e2, #2c5aa0)';
+        particle.style.borderRadius = '1px';
+        particle.style.zIndex = '1001';
+        particle.style.opacity = '0.8';
+        particle.style.boxShadow = '0 0 8px #4a90e2';
+        particle.style.animation = 'rainFall 2s linear infinite';
+        particle.style.animationDelay = Math.random() * 2 + 's';
+        
+        this.particleContainer.appendChild(particle);
+        
+        // Track particle in array
+        const particleData = {
+            element: particle,
+            type: 'rain',
+            createdAt: Date.now()
+        };
+        this.particles.push(particleData);
+        
+        // Remove after animation
+        setTimeout(() => {
+            if (particle.parentNode) {
+                particle.remove();
+            }
+            // Remove from particles array
+            const index = this.particles.indexOf(particleData);
+            if (index > -1) {
+                this.particles.splice(index, 1);
+            }
+        }, 3000);
+    }
+
+    createStormParticles() {
+        console.log('Creating storm particles...');
+        if (!this.particleContainer) return;
+        
+        // Create initial storm particles
+        for (let i = 0; i < 15; i++) {
+            setTimeout(() => {
+                this.createStormParticle();
+            }, i * 50);
+        }
+    }
+
+    createStormParticle() {
+        const particle = document.createElement('div');
+        particle.className = 'storm-particle';
+        particle.style.position = 'fixed';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = '-30px';
+        particle.style.width = '3px';
+        particle.style.height = '25px';
+        particle.style.background = 'linear-gradient(to bottom, #ff6b35, #cc3300)';
+        particle.style.borderRadius = '2px';
+        particle.style.zIndex = '1001';
+        particle.style.opacity = '1';
+        particle.style.boxShadow = '0 0 15px #ff6b35, 0 0 30px rgba(255, 107, 53, 0.5)';
+        particle.style.animation = 'stormFall 1.5s linear infinite';
+        particle.style.animationDelay = Math.random() * 1.5 + 's';
+        
+        this.particleContainer.appendChild(particle);
+        
+        // Track particle in array
+        const particleData = {
+            element: particle,
+            type: 'storm',
+            createdAt: Date.now()
+        };
+        this.particles.push(particleData);
+        
+        // Remove after animation
+        setTimeout(() => {
+            if (particle.parentNode) {
+                particle.remove();
+            }
+            // Remove from particles array
+            const index = this.particles.indexOf(particleData);
+            if (index > -1) {
+                this.particles.splice(index, 1);
+            }
+        }, 2500);
+    }
+
+    createCalmParticles() {
+        console.log('Creating calm particles...');
+        if (!this.particleContainer) return;
+        
+        // Create initial calm particles
+        for (let i = 0; i < 5; i++) {
+            setTimeout(() => {
+                this.createCalmParticle();
+            }, i * 400);
+        }
+    }
+
+    createCalmParticle() {
+        const particle = document.createElement('div');
+        particle.className = 'calm-particle';
+        particle.style.position = 'fixed';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.bottom = '-20px';
+        particle.style.width = '8px';
+        particle.style.height = '8px';
+        particle.style.background = 'radial-gradient(circle, #87ceeb, #4682b4)';
+        particle.style.borderRadius = '50%';
+        particle.style.zIndex = '1001';
+        particle.style.opacity = '0.6';
+        particle.style.boxShadow = '0 0 20px #87ceeb, 0 0 40px rgba(135, 206, 235, 0.3)';
+        particle.style.animation = 'calmFloat 8s ease-in-out infinite';
+        particle.style.animationDelay = Math.random() * 8 + 's';
+        
+        this.particleContainer.appendChild(particle);
+        
+        // Track particle in array
+        const particleData = {
+            element: particle,
+            type: 'calm',
+            createdAt: Date.now()
+        };
+        this.particles.push(particleData);
+        
+        // Remove after animation
+        setTimeout(() => {
+            if (particle.parentNode) {
+                particle.remove();
+            }
+            // Remove from particles array
+            const index = this.particles.indexOf(particleData);
+            if (index > -1) {
+                this.particles.splice(index, 1);
+            }
+        }, 10000);
+    }
+
+    createDanceParticles() {
+        console.log('Creating dance particles...');
+        if (!this.particleContainer) return;
+        
+        // Create initial dance particles
+        for (let i = 0; i < 8; i++) {
+            setTimeout(() => {
+                this.createDanceParticle();
+            }, i * 200);
+        }
+    }
+
+    createDanceParticle() {
+        const colors = ['#ff6b9d', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3'];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        
+        const particle = document.createElement('div');
+        particle.className = 'dance-particle';
+        particle.style.position = 'fixed';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.bottom = '-30px';
+        particle.style.width = '12px';
+        particle.style.height = '12px';
+        particle.style.background = color;
+        particle.style.borderRadius = '50%';
+        particle.style.zIndex = '1001';
+        particle.style.opacity = '1';
+        particle.style.boxShadow = `0 0 25px ${color}, 0 0 50px ${color}80`;
+        particle.style.animation = 'danceFloat 6s ease-in-out infinite';
+        particle.style.animationDelay = Math.random() * 6 + 's';
+        
+        this.particleContainer.appendChild(particle);
+        
+        // Track particle in array
+        const particleData = {
+            element: particle,
+            type: 'dance',
+            createdAt: Date.now()
+        };
+        this.particles.push(particleData);
+        
+        // Remove after animation
+        setTimeout(() => {
+            if (particle.parentNode) {
+                particle.remove();
+            }
+            // Remove from particles array
+            const index = this.particles.indexOf(particleData);
+            if (index > -1) {
+                this.particles.splice(index, 1);
+            }
+        }, 8000);
+    }
+
+    createNormalParticles() {
+        console.log('Creating normal particles...');
+        if (!this.particleContainer) return;
+        
+        // Create initial normal particles
+        for (let i = 0; i < 6; i++) {
+            setTimeout(() => {
+                this.createSingleParticle(this.particleContainer);
+            }, i * 300);
+        }
+    }
+
+    clearAllParticles() {
+        if (this.particleContainer) {
+            this.particleContainer.innerHTML = '';
+        }
+        this.particles = [];
+    }
+
+    // Force reinitialize particle system
+    reinitializeParticleSystem() {
+        console.log('Reinitializing particle system...');
+        
+        // Remove existing container if it exists
+        if (this.particleContainer && this.particleContainer.parentNode) {
+            this.particleContainer.parentNode.removeChild(this.particleContainer);
+        }
+        
+        // Clear particles array
+        this.particles = [];
+        
+        // Recreate the particle system
+        this.setupParticleSystem();
+        
+        console.log('Particle system reinitialized');
+    }
+
+    createVisibleTestParticles() {
+        console.log('Creating visible test particles...');
+        
+        if (!this.particleContainer) {
+            console.error('Particle container not available');
+            return;
+        }
+        
+        // Create 5 immediately visible particles
+        for (let i = 0; i < 5; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'blue-particle';
+            particle.style.position = 'fixed';
+            particle.style.left = (20 + i * 15) + '%';
+            particle.style.top = (30 + i * 10) + '%';
+            particle.style.animation = 'none';
+            particle.style.zIndex = '1002';
+            particle.style.background = '#00ff00';
+            particle.style.boxShadow = '0 0 20px #00ff00';
+            particle.style.opacity = '1';
+            particle.style.display = 'block';
+            
+            this.particleContainer.appendChild(particle);
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                if (particle.parentNode) {
+                    particle.remove();
+                }
+            }, 5000);
+        }
+        
+        console.log('Visible test particles created');
     }
 }
 

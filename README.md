@@ -1,440 +1,267 @@
-# Network Engineer OS (Web Edition)
-
-A modern, interactive website that simulates a desktop operating system for network engineers. Built with HTML5, CSS, and vanilla JavaScript, this project showcases advanced UI/UX concepts, window management, and network visualization tools in a browser environment.
-
-## Project Overview
-
-- **Purpose:** Demonstrate a web-based "OS" for network engineers, featuring draggable/resizable windows, a terminal, network topology visualization, a searchable codex, and more.
-- **Tech Stack:** 
-  - HTML5, CSS3, JavaScript (ES6+)
-  - [vis.js](https://visjs.org/) for network visualization
-  - [Font Awesome](https://fontawesome.com/) for icons
-  - [interact.js](https://interactjs.io/) for window management
-- **Design:** Inspired by macOS and modern desktop environments, with a focus on usability and aesthetics.
-
-## Contributing
-
-Contributions are welcome! If you have any ideas, suggestions, or bug reports, please open an issue or submit a pull request.
-
-## Main Features
-
-### Desktop Environment
-- **Desktop UI:** 
-  - Taskbar with Start menu and running applications
-  - Application icons with custom SVG graphics
-  - Window management system
-- **Window Management:** 
-  - Draggable, resizable, minimizable, maximizable, and closable windows
-  - Smooth animations and transitions
-  - Window snapping and keyboard shortcuts
-  - WCAG 2.1 compliant with ARIA labels and keyboard navigation
-  - Window context menu for additional controls
-  - Z-index management for proper window stacking
-
-### Applications
-1. **Network Monitor:**
-   - Interactive network topology map using vis.js
-   - Real-time network status widgets
-   - Bandwidth usage monitoring
-   - Network alerts and notifications
-   - Detailed node tooltips with performance metrics
-   - Error handling and user notifications
-   - Network state persistence
-   - Customizable network visualization options
-   - Zoom and pan controls
-
-2. **Terminal Emulator:**
-   - Command history and autocomplete
-   - Simulated network/OS commands
-   - Tab support (Ctrl+Tab)
-   - Command output formatting
-   - Error handling and feedback
-
-3. **Codex:**
-   - Searchable reference of financial and network instruments
-   - Categorized content
-   - Real-time search with highlighting
-
-### System Features
-- **Help System:** In-app help for commands, shortcuts, and window controls
-- **Keyboard Shortcuts:** Power-user shortcuts for window and terminal management
-- **Search:** Global search functionality across applications
-- **Accessibility:** Full keyboard navigation and screen reader support
-- **Error Handling:** Comprehensive error handling with user notifications
-
-## Technical Architecture
-
-### Core System Architecture
-
-This application follows a **modular ES6 architecture** with clean separation of concerns, event-driven communication, and configuration-driven initialization.
-
-#### Architecture Patterns
-
-1. **Modular Design**: Each component is a self-contained ES6 module with clear interfaces
-2. **Event-Driven Architecture**: Inter-module communication via EventEmitter pattern
-3. **Configuration-Driven**: Centralized configuration system with environment detection
-4. **Error-First Design**: Comprehensive error handling with custom AppError classes
-5. **Performance-Oriented**: Built-in performance monitoring and optimization
-6. **Accessibility-First**: ARIA compliance and keyboard navigation throughout
-
-### Module Structure
-
-```
-js/
-├── main.js                 # Application entry point and orchestration
-├── config.js              # Centralized configuration management
-├── core/                   # Core system components
-│   ├── boot.js            # Boot sequence, audio, and particle systems
-│   ├── window.js          # Window management with interact.js integration
-│   └── keyboard.js        # Global keyboard shortcut management
-├── apps/                   # Application modules
-│   ├── terminal.js        # Terminal emulator with command processing
-│   ├── network.js         # Network visualization with vis.js
-│   ├── skills.js          # Skills demonstration application
-│   ├── projects.js        # Project portfolio showcase
-│   └── system-status.js   # System monitoring and status
-└── utils/                  # Utility modules
-    ├── utils.js           # Performance, error handling, memory management
-    ├── parser.js          # Content parsing for text files
-    ├── search.js          # Search indexing and query processing
-    └── help.js            # Help system management
-```
-
-### Core Components Deep Dive
-
-#### 1. Boot System (`core/boot.js`)
-**Responsibilities:**
-- System initialization sequence with visual boot messages
-- Web Audio API integration for UI sound effects
-- Particle system with mouse interaction and keyboard controls
-- Background animation management
-- User authentication and desktop initialization
-
-**Key Features:**
-- AudioContext management with browser compatibility
-- Dynamic particle generation and animation
-- Keyboard controls (SPACE, R, +/-, C) for effects
-- Typing sound effects and UI feedback
-- Graceful degradation when audio is unavailable
-
-#### 2. Window Manager (`core/window.js`)
-**Responsibilities:**
-- Complete window lifecycle management (create, focus, minimize, maximize, close)
-- Drag and drop functionality using interact.js
-- Window resizing with boundary constraints
-- Window snapping to screen edges
-- Z-index management and focus handling
-
-**Key Features:**
-- **Smart Snapping**: 15px threshold with visual feedback
-- **Auto-scroll**: Content-aware scrolling for terminal and document windows
-- **Performance Optimization**: Debounced resize and throttled drag events
-- **Accessibility**: Full ARIA support and keyboard navigation
-- **Memory Management**: Proper cleanup of interact.js instances
-
-**Window Lifecycle:**
-```javascript
-Create → Setup Events → Focus → User Interaction → State Management → Cleanup
-```
-
-#### 3. Terminal System (`apps/terminal.js`)
-**Responsibilities:**
-- Command parsing and execution
-- Command history with navigation (arrow keys)
-- Tab completion for available commands
-- Output formatting and display
-- Performance monitoring for command execution
-
-**Command Architecture:**
-```javascript
-Input → Parse → Validate → Execute → Format Output → Update History
-```
-
-**Available Commands:**
-- **System Commands**: `ping`, `ifconfig`, `netstat`, `tracert`, `nslookup`
-- **Content Commands**: `show resume`, `show experience`, `show skills`
-- **Effect Commands**: `bg [pause|rotate|help]`, `particles [add|remove|color]`, `fx [status|toggle|reset]`
-- **Utility Commands**: `clear`, `help`, `reload`
-
-#### 4. Network Visualization (`apps/network.js`)
-**Responsibilities:**
-- Interactive network topology rendering using vis.js
-- Node and edge management with real-time updates
-- Fallback UI when vis.js is unavailable
-- Error handling and graceful degradation
-
-**Network Topology:**
-- **Nodes**: Routers, Switches, Servers, PCs, Firewalls
-- **Visualization**: Physics-based layout with hover interactions
-- **Customization**: Group-based styling and dynamic updates
-- **Performance**: Efficient rendering with update throttling
-
-#### 5. Search System (`utils/search.js`)
-**Responsibilities:**
-- Content indexing for full-text search
-- Real-time search with debounced input
-- Result highlighting and context extraction
-- Search result navigation and scrolling
-
-**Search Features:**
-- **Fuzzy Matching**: Handles partial matches and typos
-- **Context Extraction**: Provides relevant snippets around matches
-- **Live Results**: Real-time updates as user types
-- **Keyboard Navigation**: ESC to clear, click outside to close
-
-### Configuration Management (`config.js`)
-
-The configuration system provides centralized management of:
-
-#### Application Definitions
-```javascript
-applications: {
-  'terminal': {
-    id: 'terminal',
-    name: 'Terminal',
-    icon: '<svg>...</svg>',
-    windows: [{ id: 'terminalWindow', title: 'Terminal', ... }]
-  }
-  // ... other applications
-}
-```
-
-#### System Settings
-- Window defaults (size, position, constraints)
-- Network topology definitions
-- Command configurations
-- File paths and resources
-
-#### Environment Detection
-- Browser capability detection
-- Performance optimization settings
-- Feature flag management
-
-### Performance & Optimization
-
-#### Performance Monitoring (`utils/utils.js`)
-- **PerformanceMonitor**: Tracks execution times for critical operations
-- **Memory Management**: Lifecycle tracking for objects and cleanup
-- **Event Throttling**: Debounced and throttled event handlers
-- **Lazy Loading**: On-demand resource loading
-
-#### Optimization Techniques
-1. **Event Delegation**: Efficient event handling for dynamic content
-2. **RAF Scheduling**: Animation frame optimization for smooth interactions
-3. **Content Virtualization**: Efficient rendering of large datasets
-4. **Resource Caching**: Intelligent caching of parsed content
-
-### Error Handling & Reliability
-
-#### Custom Error System
-```javascript
-export class AppError extends Error {
-  constructor(message, type, details = {}) {
-    super(message);
-    this.type = type;        // ErrorTypes enum
-    this.details = details;  // Additional context
-    this.timestamp = new Date();
-  }
-}
-```
-
-#### Error Types
-- `NETWORK_ERROR`: Network-related failures
-- `VALIDATION_ERROR`: Input validation failures
-- `STATE_ERROR`: Application state inconsistencies
-- `UI_ERROR`: User interface errors
-- `SYSTEM_ERROR`: System-level errors
-- `FILE_LOAD_ERROR`: Resource loading failures
-
-#### Graceful Degradation
-- Fallback UIs when libraries fail to load
-- Alternative functionality when features are unavailable
-- Error boundaries prevent application crashes
-
-### Data Flow Architecture
-
-#### Application Initialization
-```
-main.js → BootSystem → UI Setup → Module Registration → Event Binding → Ready State
-```
-
-#### Window Creation Flow
-```
-User Action → main.js → WindowManager → DOM Creation → Event Setup → App Initialization
-```
-
-#### Command Processing Flow
-```
-User Input → Terminal → Command Parser → Command Handler → Output Formatter → Display
-```
-
-#### Search Flow
-```
-User Input → SearchManager → Index Query → Result Processing → UI Update → Highlight Display
-```
-
-### Memory Management
-
-#### Object Lifecycle Management
-- **Creation**: Proper initialization with cleanup handlers
-- **Usage**: Reference tracking and leak detection
-- **Cleanup**: Automatic cleanup on window close or application exit
-
-#### Memory Optimization
-- **Event Listener Cleanup**: Automatic removal of event listeners
-- **DOM Reference Management**: Weak references where appropriate
-- **Periodic Cleanup**: Scheduled memory optimization
-
-### Accessibility & User Experience
-
-#### Accessibility Features
-- **ARIA Labels**: Complete screen reader support
-- **Keyboard Navigation**: Full keyboard accessibility
-- **Focus Management**: Proper focus handling across windows
-- **Color Contrast**: WCAG 2.1 AA compliance
-- **Semantic HTML**: Proper document structure
-
-#### UX Enhancements
-- **Visual Feedback**: Immediate response to user actions
-- **Progressive Enhancement**: Core functionality without JavaScript
-- **Responsive Design**: Adaptive layouts for different screen sizes
-- **Smooth Animations**: 60fps animations with hardware acceleration
-
-### Browser Compatibility & Progressive Enhancement
-
-#### Core Browser Support
-- **Modern Browsers**: Full feature support (Chrome 90+, Firefox 88+, Safari 14+)
-- **Legacy Browsers**: Graceful degradation with core functionality
-- **Mobile Browsers**: Touch-optimized interactions
-
-#### Progressive Enhancement Strategy
-1. **Base Layer**: Static HTML with basic styling
-2. **Enhancement Layer**: JavaScript functionality and interactions
-3. **Advanced Layer**: Modern browser features (Web Audio, Particles)
-
-### Security Considerations
-
-#### Input Sanitization
-- **HTML Sanitization**: All user input properly escaped
-- **Command Validation**: Whitelist-based command validation
-- **Content Security**: Safe parsing of external content
-
-#### Resource Loading
-- **Same-Origin Policy**: Strict resource loading policies
-- **Error Handling**: Safe failure modes for resource loading
-
-## Code Documentation
-
-This project uses [JSDoc](https://jsdoc.app/) to generate documentation from the source code. The configuration can be found in `jsdoc.json`.
-
-### Generating the Documentation
-
-To generate the documentation, you need to have Node.js and JSDoc installed.
-
-1.  **Install JSDoc and the theme:**
-    ```bash
-    npm install -g jsdoc
-    npm install clean-jsdoc-theme
-    ```
-
-2.  **Generate the documentation:**
-    ```bash
-    jsdoc -c jsdoc.json
-    ```
-    The documentation will be generated in the `docs` directory.
-
-## Getting Started
+# DarkWave Demoscene Platform
+
+A web-based demoscene platform that embodies the dark wave 8-bit hacker aesthetic, inspired by classic demoscene culture and modern web technologies.
+
+## 🌟 Features
+
+### Aesthetic Implementation
+- **Dark Wave 8-bit Hacker Style**: Neon purples, deep blues, and glowing whites on dark backgrounds
+- **Glitch Effects**: Dynamic text distortion and visual artifacts
+- **Scanline Overlay**: CRT-style scanlines for authentic retro feel
+- **Pixelated Rendering**: True 8-bit aesthetic with crisp pixel edges
+- **Neon Glows**: CSS-powered neon effects and animations
+
+### Core Functionality
+- **Demo Showcase**: Gallery of interactive demos with real-time previews
+- **Creation Tools**: Web-based demo editor with canvas, audio, and code tabs
+- **Community Hub**: Comments system and leaderboard for demo ratings
+- **Educational Resources**: Tutorials for demoscene creation
+
+### Audio System
+- **Chiptune Generation**: Web Audio API-powered 8-bit music creation
+- **Dark Wave Sequences**: Atmospheric chord progressions and ambient tracks
+- **Real-time Effects**: Reverb, delay, distortion, and low-pass filtering
+- **Audio Visualizer**: Real-time frequency analysis display
+
+### Visual Effects
+- **Particle Systems**: Dynamic neon particle animations
+- **Matrix Rain**: Classic falling character effects
+- **Wireframe Networks**: Connected node animations
+- **Glitch Text**: Distorted typography with color separation
+
+## 🚀 Getting Started
 
 ### Prerequisites
-
-- A modern web browser (Chrome, Firefox, Safari, Edge)
-- [Node.js](https://nodejs.org/) and [npm](https://www.npmjs.com/) (for generating documentation)
+- Modern web browser with Web Audio API support
+- No server required - runs entirely in the browser
 
 ### Installation
+1. Clone or download the repository
+2. Open `demoscene.html` in your web browser
+3. Click anywhere to initialize audio (required for browser autoplay policies)
 
-1. **Clone or Download:**
-   ```bash
-   git clone <repo-url>
-   cd <project-folder>
-   ```
+### File Structure
+```
+demoscene-platform/
+├── demoscene.html          # Main HTML file
+├── css/
+│   └── DarkWave.css        # Dark wave aesthetic framework
+├── js/
+│   ├── DarkWaveAudio.js    # Chiptune and audio system
+│   ├── DarkWaveCore.js     # Core demoscene functionality
+│   └── demoscene.js        # Main platform controller
+└── README.md              # This file
+```
 
-2. **Open `index.html` in your browser:**
-   - No build step or server required (all static files)
-   - For full functionality, use a modern browser (Chrome, Firefox, Edge, Safari)
-   - Recommended screen resolution: 1920x1080 or higher
+## 🎨 Usage
+
+### Demo Showcase
+- Browse the demo gallery to see sample demos
+- Click "Play" to run demos with synchronized audio
+- Click "Stop" to halt demo playback
+
+### Creation Tools
+1. **Canvas Editor**: Add particles and create visual effects
+2. **Audio Editor**: Generate chiptune melodies and dark wave sequences
+3. **Code Editor**: Write custom demo code in JavaScript
+
+### Community Features
+- Add comments to share thoughts on demos
+- View the leaderboard of top-rated demos
+- Tutorials for learning demoscene techniques
+
+## 🎵 Audio System
+
+### Chiptune Generation
+```javascript
+// Create a chiptune melody
+const melody = darkWaveAudio.createChiptuneMelody('minor', 16);
+darkWaveAudio.playChiptuneMelody(melody, 120);
+
+// Play dark wave sequence
+darkWaveAudio.playDarkWaveSequence('cyber', 4);
+```
+
+### Available Scales
+- `minor`: A minor scale for dark atmospheres
+- `major`: C major scale for brighter melodies
+- `pentatonic`: Five-note scale for minimalist compositions
+
+### Dark Wave Styles
+- `dark`: Am-F-C-G progression
+- `cyber`: Em-C-G-D progression
+- `hacker`: Dm-Am-Bm-G progression
+- `wave`: Cm-Ab-Eb-Bb progression
+
+## 🎨 Visual Effects
+
+### Particle Systems
+```javascript
+// Create particle system
+darkWaveCore.createParticleSystem('canvas-id', {
+    maxParticles: 100,
+    particleSize: 2,
+    speed: 2,
+    colors: ['#b388ff', '#00ffff', '#ff00ff'],
+    life: 100,
+    gravity: 0.1
+});
+```
+
+### Glitch Effects
+```javascript
+// Create glitch text
+darkWaveCore.createGlitchEffect('canvas-id', 'DEMOSCENE', {
+    fontSize: 48,
+    glitchIntensity: 0.1,
+    glitchFrequency: 0.05
+});
+```
+
+### Matrix Rain
+```javascript
+// Create matrix rain effect
+darkWaveCore.createMatrixRain('canvas-id', {
+    fontSize: 14,
+    columns: 50,
+    speed: 1,
+    color: '#00ff41'
+});
+```
+
+## 🛠️ Customization
+
+### CSS Variables
+The platform uses CSS custom properties for easy theming:
+
+```css
+:root {
+    --bg-primary: #0d0b1e;      /* Main background */
+    --bg-secondary: #1a1a2e;    /* Secondary background */
+    --neon-purple: #b388ff;     /* Primary neon color */
+    --neon-blue: #00ffff;       /* Secondary neon color */
+    --neon-pink: #ff00ff;       /* Accent neon color */
+    --text-primary: #ffffff;    /* Primary text color */
+}
+```
+
+### Adding New Effects
+1. Extend the `DarkWaveCore` class with new effect methods
+2. Add corresponding UI controls in the editor
+3. Update the demo gallery to showcase new effects
+
+### Audio Customization
+1. Add new chord progressions to `chordProgressions` object
+2. Create custom scales in `createChiptuneMelody`
+3. Implement new audio effects in the `createEffects` method
+
+## 🎯 Demo Creation Guide
+
+### Basic Demo Structure
+```javascript
+// Get canvas context
+const canvas = document.getElementById('editor-canvas');
+const ctx = canvas.getContext('2d');
+
+// Animation loop
+function animate() {
+    // Clear canvas with fade effect
+    ctx.fillStyle = 'rgba(13, 11, 30, 0.1)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Your demo code here
+    ctx.fillStyle = '#b388ff';
+    ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 4, 4);
+    
+    // Continue animation
+    requestAnimationFrame(animate);
+}
+
+// Start animation
+animate();
+```
+
+### Best Practices
+- Use `requestAnimationFrame` for smooth animations
+- Implement fade effects with `rgba` colors
+- Keep particle counts reasonable for performance
+- Use the dark wave color palette for consistency
+- Add audio synchronization for immersive experiences
+
+## 🔧 Technical Details
+
+### Browser Compatibility
+- **Chrome/Edge**: Full support
+- **Firefox**: Full support
+- **Safari**: Full support (may require user interaction for audio)
+- **Mobile**: Responsive design with touch support
+
+### Performance Optimization
+- Canvas rendering with `imageSmoothingEnabled = false`
+- Efficient particle system with object pooling
+- Audio context management for browser autoplay policies
+- Visibility API integration for background tab optimization
+
+### Security Considerations
+- Code execution in sandboxed environment
+- Input sanitization for user-generated content
+- Local storage for persistence (no server required)
+
+## 🎪 Future Enhancements
+
+### Planned Features
+- **WebGL Support**: 3D demos with Three.js integration
+- **Demo Upload System**: Server-side demo storage and sharing
+- **Real-time Collaboration**: Multi-user demo creation
+- **Advanced Audio**: FM synthesis and tracker-style sequencing
+- **Mobile App**: Progressive Web App with offline support
+
+### Community Features
+- **Virtual Demoparties**: Live streaming of demo competitions
+- **Demo Voting System**: Community rating and feedback
+- **Tutorial Videos**: Interactive learning content
+- **Code Sharing**: GitHub integration for demo source code
+
+## 🤝 Contributing
 
 ### Development Setup
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly in multiple browsers
+5. Submit a pull request
 
-For development with live reloading:
-```bash
-# Using Python
-python -m http.server 8000
+### Code Style
+- Use ES6+ features
+- Follow the existing naming conventions
+- Add comments for complex algorithms
+- Maintain the dark wave aesthetic
 
-# Using Node.js
-npx serve .
+### Testing
+- Test in Chrome, Firefox, Safari, and Edge
+- Verify audio functionality
+- Check mobile responsiveness
+- Ensure accessibility compliance
 
-# Using PHP
-php -S localhost:8000
-```
+## 📄 License
 
-## File Structure
-```
-.
-├── codex.txt              # Financial instruments documentation
-├── index.html             # Main HTML entry point
-├── js/                    # JavaScript modules
-│   ├── main.js           # Application orchestration
-│   ├── config.js         # Configuration management
-│   ├── core/             # Core system modules
-│   │   ├── boot.js       # Boot sequence and effects
-│   │   ├── window.js     # Window management system
-│   │   └── keyboard.js   # Keyboard shortcuts
-│   ├── apps/             # Application modules
-│   │   ├── terminal.js   # Terminal emulator
-│   │   ├── network.js    # Network visualization
-│   │   ├── skills.js     # Skills demonstration
-│   │   ├── projects.js   # Project portfolio
-│   │   └── system-status.js # System monitoring
-│   └── utils/            # Utility modules
-│       ├── utils.js      # Core utilities and helpers
-│       ├── parser.js     # Content parsing system
-│       ├── search.js     # Search functionality
-│       └── help.js       # Help system
-├── jsdoc.json           # JSDoc configuration
-├── README.md            # This documentation
-├── resume.txt           # Resume content
-└── theme.css            # Application styling
-```
+This project is open source and available under the MIT License. See the LICENSE file for details.
 
-## Performance Metrics
+## 🙏 Acknowledgments
 
-The application includes built-in performance monitoring:
+- **Future Crew**: Inspiration from Second Reality (1993)
+- **Farbrausch**: Influence from Debris (2007)
+- **Demoscene Community**: Decades of creative coding inspiration
+- **Web Audio API**: Enabling real-time audio synthesis
+- **Canvas API**: Providing powerful 2D graphics capabilities
 
-- **Window Operations**: Creation, focus, resize timing
-- **Command Execution**: Terminal command processing speed  
-- **Search Performance**: Index query and result rendering
-- **Memory Usage**: Object lifecycle and cleanup tracking
-- **Render Performance**: Animation frame timing
+## 📞 Support
 
-## Browser Support Matrix
+For questions, bug reports, or feature requests:
+- Create an issue on GitHub
+- Join the demoscene community discussions
+- Check the tutorial section for learning resources
 
-| Feature | Chrome 90+ | Firefox 88+ | Safari 14+ | Edge 90+ |
-|---------|------------|-------------|------------|----------|
-| Core UI | ✅ | ✅ | ✅ | ✅ |
-| Window Management | ✅ | ✅ | ✅ | ✅ |
-| Audio Effects | ✅ | ✅ | ⚠️ Limited | ✅ |
-| Particle System | ✅ | ✅ | ✅ | ✅ |
-| Network Visualization | ✅ | ✅ | ✅ | ✅ |
-| Search System | ✅ | ✅ | ✅ | ✅ |
+---
 
-## Credits
-- UI/UX: Inspired by macOS, Windows, and Linux desktop environments
-- Network visualization: [vis.js](https://visjs.org/)
-- Icons: [Font Awesome](https://fontawesome.com/)
-- Window interactions: [interact.js](https://interactjs.io/)
-
-## License
-
-This project is licensed under the MIT License.
-
-
+**Welcome to the DarkWave Demoscene Platform** - Where 8-bit meets dark wave, and creativity knows no bounds! 🎮🎵✨ 

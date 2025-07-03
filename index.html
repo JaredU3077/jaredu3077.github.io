@@ -82,64 +82,152 @@
     <!-- Skip link for accessibility -->
     <a href="#desktop" class="skip-link">Skip to main content</a>
     
-    <!-- Boot Sequence -->
+    <!-- Modern Boot Sequence -->
     <div id="bootSequence" class="boot-sequence" role="dialog" aria-labelledby="boot-title" aria-describedby="boot-desc">
+        <!-- Animated background elements -->
+        <div class="boot-background">
+            <div class="boot-grid"></div>
+            <div class="boot-particles"></div>
+            <div class="boot-scan-lines"></div>
+        </div>
+        
         <div class="boot-container">
             <div class="boot-header">
                 <div class="boot-logo">
-                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                        <path d="M3 12h18M3 6h18M3 18h18"/>
-                        <circle cx="12" cy="12" r="3"/>
-                        <path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>
-                    </svg>
+                    <div class="logo-container">
+                        <svg class="logo-svg" width="80" height="80" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+                            <!-- Modern NEU-OS logo -->
+                            <defs>
+                                <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#4a90e2;stop-opacity:1" />
+                                    <stop offset="50%" style="stop-color:#7c53ff;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#00d084;stop-opacity:1" />
+                                </linearGradient>
+                                <filter id="glow">
+                                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                                    <feMerge> 
+                                        <feMergeNode in="coloredBlur"/>
+                                        <feMergeNode in="SourceGraphic"/>
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                            <!-- Central network node -->
+                            <circle cx="50" cy="50" r="15" fill="url(#logoGradient)" filter="url(#glow)"/>
+                            <!-- Connection lines -->
+                            <path d="M50 20 L50 35 M50 65 L50 80 M20 50 L35 50 M65 50 L80 50" 
+                                  stroke="url(#logoGradient)" stroke-width="3" stroke-linecap="round"/>
+                            <!-- Outer ring -->
+                            <circle cx="50" cy="50" r="35" fill="none" stroke="url(#logoGradient)" 
+                                    stroke-width="2" stroke-dasharray="5,5" opacity="0.6"/>
+                        </svg>
+                        <div class="logo-glow"></div>
+                    </div>
                 </div>
-                <h1 id="boot-title">Neu-OS v2.1.4</h1>
-                <p id="boot-desc">Network Engineering Operating System</p>
+                <h1 id="boot-title" class="boot-title">NEU-OS</h1>
+                <p id="boot-desc" class="boot-subtitle">Network Engineering Operating System</p>
+                <div class="boot-version">v2.1.4</div>
             </div>
+            
             <div class="boot-progress">
-                <div class="progress-bar" role="progressbar" aria-label="Boot progress">
-                    <div class="progress-fill"></div>
+                <div class="progress-container">
+                    <div class="progress-bar" role="progressbar" aria-label="Boot progress">
+                        <div class="progress-fill"></div>
+                        <div class="progress-glow"></div>
+                    </div>
+                    <div class="progress-percentage">0%</div>
                 </div>
                 <div class="boot-messages">
-                    <div class="boot-message" aria-live="polite" aria-atomic="true">Initializing network stack...</div>
+                    <div class="boot-message" aria-live="polite" aria-atomic="true">
+                        <span class="message-icon">⚡</span>
+                        <span class="message-text">Initializing network stack...</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="boot-status">
+                <div class="status-item">
+                    <span class="status-icon">🔒</span>
+                    <span class="status-text">Security: Active</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-icon">🌐</span>
+                    <span class="status-text">Network: Ready</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-icon">⚡</span>
+                    <span class="status-text">Performance: Optimal</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Login Screen -->
+    <!-- Modern Login Screen -->
     <div id="loginScreen" class="login-screen" role="dialog" aria-labelledby="login-title">
+        <!-- Animated background -->
+        <div class="login-background">
+            <div class="login-grid"></div>
+            <div class="login-particles"></div>
+            <div class="login-glow"></div>
+        </div>
+        
         <div class="login-container">
             <div class="login-header">
                 <div class="login-logo">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                        <path d="M3 12h18M3 6h18M3 18h18"/>
-                        <circle cx="12" cy="12" r="3"/>
-                        <path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>
-                    </svg>
-                </div>
-                <h2 id="login-title">Neu-OS</h2>
-                <p>Senior Network Engineer Workstation</p>
-            </div>
-            <div class="login-form">
-                <div class="user-profile">
-                    <div class="user-avatar" aria-hidden="true">👨‍💻</div>
-                    <div class="user-info">
-                        <h3>Jared U.</h3>
-                        <p>Senior Network Engineer</p>
+                    <div class="logo-container">
+                        <svg class="logo-svg" width="60" height="60" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+                            <defs>
+                                <linearGradient id="loginLogoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#4a90e2;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#7c53ff;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                            <circle cx="50" cy="50" r="15" fill="url(#loginLogoGradient)"/>
+                            <path d="M50 20 L50 35 M50 65 L50 80 M20 50 L35 50 M65 50 L80 50" 
+                                  stroke="url(#loginLogoGradient)" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
                     </div>
                 </div>
-                <button id="guestLoginBtn" class="login-btn">
-                    <span>Enter as Guest</span>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                    </svg>
-                </button>
-                <p class="login-footer">Click to explore the interactive portfolio</p>
+                <h2 id="login-title" class="login-title">NEU-OS</h2>
+                <p class="login-subtitle">Senior Network Engineer Workstation</p>
             </div>
-        </div>
-        <div class="login-background" aria-hidden="true">
-            <div class="network-grid"></div>
+            
+            <div class="login-form">
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <div class="avatar-container">
+                            <div class="avatar-icon">👨‍💻</div>
+                            <div class="avatar-status"></div>
+                        </div>
+                    </div>
+                    <div class="user-info">
+                        <h3 class="user-name">Jared U.</h3>
+                        <p class="user-role">Senior Network Engineer</p>
+                        <div class="user-status">
+                            <span class="status-dot"></span>
+                            <span class="status-text">Online</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button id="guestLoginBtn" class="login-btn">
+                    <span class="btn-text">Enter as Guest</span>
+                    <div class="btn-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </div>
+                    <div class="btn-glow"></div>
+                </button>
+                
+                <div class="login-footer">
+                    <p class="footer-text">Click to explore the interactive portfolio</p>
+                    <div class="footer-features">
+                        <span class="feature">🖥️ Interactive OS</span>
+                        <span class="feature">🌐 Network Tools</span>
+                        <span class="feature">⚡ Real-time</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
