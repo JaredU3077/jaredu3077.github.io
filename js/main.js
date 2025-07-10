@@ -143,24 +143,10 @@ async function handleAppClick(appId) {
                     // Store reference to codex app
                     window.codexInstance = codexApp;
                     
-                    // The Codex app now uses WindowManager directly, so we don't need to replace windows
-                    // Just update the window content with the Codex content
-                    const codexContent = codexApp.window.querySelector('.window-content').innerHTML;
-                    winElem.querySelector('.window-content').innerHTML = codexContent;
+                    // Attach the Codex app to the window element
+                    codexApp.attachToWindow(winElem);
                     
-                    // Set up the Codex app's event listeners on the WindowManager window
-                    codexApp.setupEventListeners();
-                    
-                    // Update references to point to the WindowManager window
-                    codexApp.window = winElem;
-                    codexApp.searchInput = winElem.querySelector('.search-input');
-                    codexApp.layersContainer = winElem.querySelector('.layers-container');
-                    codexApp.currentLayerSpan = winElem.querySelector('.current-layer');
-                    codexApp.totalLayersSpan = winElem.querySelector('.total-layers');
-                    codexApp.loadingIndicator = winElem.querySelector('.loading-indicator');
-                    
-                    // Now load the content after DOM elements are properly set up
-                    await codexApp.loadContent();
+                    console.log('Codex initialized:', codexApp);
                     
                     console.log('Codex initialized:', codexApp);
                     break;

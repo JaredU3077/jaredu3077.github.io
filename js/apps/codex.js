@@ -1,4 +1,4 @@
-import { CODEX_DATA, searchCodex, getLayerContent } from '../data/codex-data.js';
+
 
 class CodexApp {
     constructor() {
@@ -7,26 +7,27 @@ class CodexApp {
         this.category = 'knowledge';
         this.description = 'Comprehensive Financial Knowledge Base';
         this.window = null;
-        this.content = null;
+        this.content = null; // Will store the HTML string for the app content
         this.searchInput = null;
+        this.searchBtn = null;
         this.layersContainer = null;
-        this.currentLayer = 1;
-        this.totalLayers = 0;
+        this.loadingIndicator = null;
+        this.searchResultsContainer = null;
         this.isInitialized = false;
         this.parsedData = null;
+        this.totalLayers = 0;
         this.windowManager = null;
     }
 
     async init() {
         if (this.isInitialized) return;
         
-        // Create a temporary window for content generation
-        this.createTemporaryWindow();
+        this.createContentTemplate();
         this.isInitialized = true;
     }
 
-    createTemporaryWindow() {
-        // Create a temporary div to hold the content structure
+    createContentTemplate() {
+        // Create a temporary div to build the HTML structure
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = `
             <div class="codex-header">
@@ -34,77 +35,99 @@ class CodexApp {
                     <input type="text" class="search-input" placeholder="Search layers, instruments, concepts...">
                     <button class="search-btn">🔍</button>
                 </div>
-                <div class="layer-navigation">
-                    <button class="nav-btn prev-btn">◀</button>
-                    <span class="layer-info">Layer <span class="current-layer">1</span> of <span class="total-layers">-</span></span>
-                    <button class="nav-btn next-btn">▶</button>
-                </div>
             </div>
             <div class="codex-content">
-                <div class="layers-container"></div>
+                <div class="search-results-container" style="display: none; position: absolute; top: 0; left: 0; width: 100%; background: white; max-height: 300px; overflow-y: auto; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 10; padding: 10px;"></div>
+                <div class="layers-container" style="position: relative; z-index: 1;"></div>
                 <div class="loading-indicator">Loading knowledge base...</div>
             </div>
         `;
         
-        // Store the content for later use
-        this.content = tempDiv.querySelector('.codex-content').innerHTML;
-        
-        // Get references to elements from the temporary div
-        this.searchInput = tempDiv.querySelector('.search-input');
-        this.layersContainer = tempDiv.querySelector('.layers-container');
-        this.currentLayerSpan = tempDiv.querySelector('.current-layer');
-        this.totalLayersSpan = tempDiv.querySelector('.total-layers');
-        this.loadingIndicator = tempDiv.querySelector('.loading-indicator');
+        // Store the full content HTML (header + content)
+        this.content = tempDiv.innerHTML;
     }
 
-    // Window controls are now handled by WindowManager
-    // No need for custom setupWindowControls method
+    attachToWindow(windowEl) {
+        if (!windowEl) return;
+        
+        this.window = windowEl;
+        
+        // Find the window-content div and inject our content there
+        const windowContent = this.window.querySelector('.window-content');
+        if (windowContent) {
+            windowContent.innerHTML = this.content;
+        } else {
+            console.error('Window content div not found');
+            return;
+        }
+        
+        // Now that elements are in the DOM, get references
+        this.searchInput = this.window.querySelector('.search-input');
+        this.searchBtn = this.window.querySelector('.search-btn');
+        this.layersContainer = this.window.querySelector('.layers-container');
+        this.loadingIndicator = this.window.querySelector('.loading-indicator');
+        this.searchResultsContainer = this.window.querySelector('.search-results-container');
+        
+        // Setup event listeners
+        this.setupEventListeners();
+        
+        // Load content if not already loaded
+        if (!this.parsedData) {
+            this.loadContent();
+        } else {
+            this.renderAllLayers();
+        }
+    }
 
     setupEventListeners() {
-        // Search functionality
+        // Search functionality (live search on input)
         if (this.searchInput) {
             this.searchInput.addEventListener('input', (e) => {
                 this.performSearch(e.target.value);
             });
         }
 
-        // Navigation buttons - use event delegation to avoid null reference issues
+        // Search button click
+        if (this.searchBtn) {
+            this.searchBtn.addEventListener('click', () => {
+                this.performSearch(this.searchInput.value);
+            });
+        }
+
+        // Event delegation for search results clicks
         if (this.window) {
             this.window.addEventListener('click', (e) => {
-                if (e.target.classList.contains('prev-btn')) {
-                    if (this.currentLayer > 1) {
-                        this.currentLayer--;
-                        this.updateLayerDisplay();
-                    }
-                } else if (e.target.classList.contains('next-btn')) {
-                    if (this.currentLayer < this.totalLayers) {
-                        this.currentLayer++;
-                        this.updateLayerDisplay();
+                if (e.target.closest('.search-result-item')) {
+                    const item = e.target.closest('.search-result-item');
+                    const layer = parseInt(item.dataset.layer);
+                    if (!isNaN(layer)) {
+                        const layerEl = this.layersContainer.querySelector(`#layer-${layer}`);
+                        if (layerEl) {
+                            layerEl.scrollIntoView({ behavior: 'smooth' });
+                        }
+                        // Hide results after click for better UX
+                        this.searchResultsContainer.style.display = 'none';
                     }
                 }
             });
         }
 
-        // Keyboard navigation
-        document.addEventListener('keydown', (e) => {
-            if (!this.window || !this.window.classList.contains('active')) return;
-            
-            if (e.key === 'ArrowLeft') {
-                e.preventDefault();
-                const prevBtn = this.window.querySelector('.prev-btn');
-                if (prevBtn) prevBtn.click();
-            } else if (e.key === 'ArrowRight') {
-                e.preventDefault();
-                const nextBtn = this.window.querySelector('.next-btn');
-                if (nextBtn) nextBtn.click();
-            }
-        });
+        // Hide search results when clicking outside
+        if (this.window) {
+            this.window.addEventListener('click', (e) => {
+                if (!e.target.closest('.search-results-container') && 
+                    !e.target.closest('.search-container')) {
+                    if (this.searchResultsContainer) {
+                        this.searchResultsContainer.style.display = 'none';
+                    }
+                }
+            });
+        }
     }
 
     async loadContent() {
         try {
             console.log('Loading codex.txt file...');
-            // Load the actual codex.txt file
             const response = await fetch('codex.txt');
             console.log('Fetch response status:', response.status);
             
@@ -119,19 +142,13 @@ class CodexApp {
             this.parsedData = this.parseCodexContent(rawText);
             this.totalLayers = Object.keys(this.parsedData.layers).length;
             
-            // Update DOM elements if they exist
-            if (this.totalLayersSpan) {
-                this.totalLayersSpan.textContent = this.totalLayers;
-            }
-            
             console.log('Total layers loaded:', this.totalLayers);
             
-            // Hide loading indicator if it exists
             if (this.loadingIndicator) {
                 this.loadingIndicator.style.display = 'none';
             }
             
-            this.updateLayerDisplay();
+            this.renderAllLayers();
             
         } catch (error) {
             console.error('Error loading Codex content:', error);
@@ -142,6 +159,7 @@ class CodexApp {
                         <small>${error.message}</small>
                     </div>
                 `;
+                this.loadingIndicator.style.display = 'block';
             }
         }
     }
@@ -150,71 +168,95 @@ class CodexApp {
         const lines = rawText.split('\n');
         const parsedData = {
             layers: {},
-            searchIndex: {}
+            searchIndex: {}, // Placeholder for potential future use
+            introduction: [] // Store introductory content
         };
         
         let currentLayer = null;
         let currentLayerData = null;
         let inLayer = false;
-        let skipIntro = true; // Skip the introductory text
+        let foundFirstLayer = false;
         
         console.log('Parsing codex content...');
         console.log('Total lines:', lines.length);
         
         for (let i = 0; i < lines.length; i++) {
-            const line = lines[i].trim();
+            let line = lines[i];
+            const trimmed = line.trim();
+            if (!trimmed) continue;
             
-            // Skip empty lines
-            if (!line) continue;
+            const indentLevel = line.length - trimmed.length; // Count leading spaces
             
-            // Skip introductory text until we hit the first layer
-            if (skipIntro && !line.startsWith('Layer ')) {
-                continue;
-            }
-            if (skipIntro && line.startsWith('Layer ')) {
-                skipIntro = false;
-            }
-            
-            // Check for layer headers (e.g., "Layer 1: Basic Instruments")
-            const layerMatch = line.match(/^Layer (\d+):\s*(.+)$/);
-            if (layerMatch) {
-                // Save previous layer if exists
-                if (currentLayer && currentLayerData) {
-                    parsedData.layers[currentLayer] = currentLayerData;
-                    console.log(`Saved layer ${currentLayer}:`, currentLayerData.title);
-                }
-                
-                // Start new layer
-                currentLayer = parseInt(layerMatch[1]);
-                currentLayerData = {
-                    title: layerMatch[2],
-                    description: '',
-                    instruments: []
-                };
-                inLayer = true;
-                console.log(`Starting layer ${currentLayer}: ${layerMatch[2]}`);
-                continue;
-            }
-            
-            // If we're in a layer, parse the content
-            if (inLayer && currentLayerData) {
-                // Check if this line starts with 4 spaces (indented content)
-                if (line.startsWith('    ')) {
-                    const cleanLine = line.substring(4);
+            // Check for layer headers
+            if (indentLevel === 0 && trimmed.startsWith('Layer ')) {
+                foundFirstLayer = true;
+                const layerMatch = trimmed.match(/^Layer (\d+):\s*(.+)$/);
+                if (layerMatch) {
+                    // Save previous layer
+                    if (currentLayer && currentLayerData) {
+                        parsedData.layers[currentLayer] = currentLayerData;
+                        console.log(`Saved layer ${currentLayer}:`, currentLayerData.title);
+                    }
                     
-                    // Check if this is a sub-item (starts with more spaces)
-                    if (cleanLine.startsWith('    ')) {
-                        // This is a sub-item, add it to the last instrument
-                        const subItem = cleanLine.substring(4);
-                        if (currentLayerData.instruments.length > 0) {
-                            const lastInstrument = currentLayerData.instruments[currentLayerData.instruments.length - 1];
-                            if (!lastInstrument.subItems) {
-                                lastInstrument.subItems = [];
-                            }
-                            lastInstrument.subItems.push(subItem);
+                    // Start new layer
+                    currentLayer = parseInt(layerMatch[1]);
+                    currentLayerData = {
+                        title: layerMatch[2],
+                        description: '',
+                        instruments: []
+                    };
+                    inLayer = true;
+                    console.log(`Starting layer ${currentLayer}: ${layerMatch[2]}`);
+                    continue;
+                }
+            }
+            
+            // If we haven't found the first layer yet, collect introductory content
+            if (!foundFirstLayer) {
+                parsedData.introduction.push(trimmed);
+                continue;
+            }
+            
+            // Check for layer headers
+            if (indentLevel === 0 && trimmed.startsWith('Layer ')) {
+                const layerMatch = trimmed.match(/^Layer (\d+):\s*(.+)$/);
+                if (layerMatch) {
+                    // Save previous layer
+                    if (currentLayer && currentLayerData) {
+                        parsedData.layers[currentLayer] = currentLayerData;
+                        console.log(`Saved layer ${currentLayer}:`, currentLayerData.title);
+                    }
+                    
+                    // Start new layer
+                    currentLayer = parseInt(layerMatch[1]);
+                    currentLayerData = {
+                        title: layerMatch[2],
+                        description: '',
+                        instruments: []
+                    };
+                    inLayer = true;
+                    console.log(`Starting layer ${currentLayer}: ${layerMatch[2]}`);
+                    continue;
+                }
+            }
+            
+            // If in a layer, parse indented content
+            if (inLayer && currentLayerData && indentLevel >= 4) {
+                const cleanLine = line.substring(4).trim();
+                
+                if (indentLevel >= 8) {
+                    // Sub-item
+                    const subItem = line.substring(8).trim();
+                    if (currentLayerData.instruments.length > 0) {
+                        const lastInstrument = currentLayerData.instruments[currentLayerData.instruments.length - 1];
+                        if (!lastInstrument.subItems) {
+                            lastInstrument.subItems = [];
                         }
-                    } else if (cleanLine.includes(':') && !cleanLine.startsWith('    ')) {
-                        // This is an instrument
+                        lastInstrument.subItems.push(subItem);
+                    }
+                } else {
+                    // Indent level 4: either description or instrument
+                    if (cleanLine.includes(':')) {
                         const colonIndex = cleanLine.indexOf(':');
                         const instrumentName = cleanLine.substring(0, colonIndex).trim();
                         const instrumentDesc = cleanLine.substring(colonIndex + 1).trim();
@@ -226,23 +268,18 @@ class CodexApp {
                         });
                         console.log(`  Added instrument: ${instrumentName}`);
                     } else {
-                        // This might be a description or additional content
-                        if (!currentLayerData.description) {
-                            currentLayerData.description = cleanLine;
-                        } else {
-                            // Add to existing description
+                        // Add to description
+                        if (currentLayerData.description) {
                             currentLayerData.description += ' ' + cleanLine;
+                        } else {
+                            currentLayerData.description = cleanLine;
                         }
                     }
-                } else if (line.startsWith('Layer ')) {
-                    // We've hit the next layer, so we're done with current layer
-                    inLayer = false;
-                    i--; // Go back one line so we can process this layer header
                 }
             }
         }
         
-        // Don't forget to add the last layer
+        // Add the last layer
         if (currentLayer && currentLayerData) {
             parsedData.layers[currentLayer] = currentLayerData;
             console.log(`Saved final layer ${currentLayer}:`, currentLayerData.title);
@@ -254,61 +291,67 @@ class CodexApp {
         return parsedData;
     }
 
-    updateLayerDisplay() {
-        if (!this.layersContainer) {
-            console.warn('Layers container not available');
+    renderAllLayers() {
+        if (!this.layersContainer || !this.parsedData) {
+            console.warn('Cannot render layers: missing container or data');
             return;
         }
         
-        if (!this.parsedData || !this.parsedData.layers[this.currentLayer]) {
-            this.layersContainer.innerHTML = `
-                <div style="text-align: center; color: #ff6b6b; padding: 20px;">
-                    ❌ Layer ${this.currentLayer} not found
+        this.layersContainer.innerHTML = '';
+        
+        // Render introduction content first
+        if (this.parsedData.introduction && this.parsedData.introduction.length > 0) {
+            this.layersContainer.innerHTML += `
+                <div id="introduction" class="introduction-section">
+                    <h2>Introduction</h2>
+                    <div class="introduction-content">
+                        ${this.parsedData.introduction.map(paragraph => `
+                            <p>${paragraph}</p>
+                        `).join('')}
+                    </div>
                 </div>
             `;
-            return;
         }
         
-        if (this.currentLayerSpan) {
-            this.currentLayerSpan.textContent = this.currentLayer;
-        }
-        
-        const layerContent = this.parsedData.layers[this.currentLayer];
-        
-        this.layersContainer.innerHTML = `
-            <div class="layer-header">
-                <h2>Layer ${this.currentLayer}: ${layerContent.title}</h2>
-                <div class="layer-description">${layerContent.description}</div>
-            </div>
-            <div class="layer-instruments">
-                ${layerContent.instruments.map(instrument => `
-                    <div class="instrument-item">
-                        <h3>${instrument.name}</h3>
-                        <p>${instrument.description}</p>
-                        ${instrument.subItems && instrument.subItems.length > 0 ? `
-                            <div class="sub-items">
-                                <ul>
-                                    ${instrument.subItems.map(subItem => `
-                                        <li>${subItem}</li>
-                                    `).join('')}
-                                </ul>
+        // Render all layers
+        for (let layer = 1; layer <= this.totalLayers; layer++) {
+            const layerContent = this.parsedData.layers[layer];
+            if (!layerContent) continue;
+            
+            this.layersContainer.innerHTML += `
+                <div id="layer-${layer}" class="layer-section">
+                    <h2>Layer ${layer}: ${layerContent.title}</h2>
+                    <div class="layer-description">${layerContent.description}</div>
+                    <div class="layer-instruments">
+                        ${layerContent.instruments.map(instrument => `
+                            <div class="instrument-item">
+                                <h3>${instrument.name}</h3>
+                                <p>${instrument.description}</p>
+                                ${instrument.subItems && instrument.subItems.length > 0 ? `
+                                    <div class="sub-items">
+                                        <ul>
+                                            ${instrument.subItems.map(subItem => `
+                                                <li>${subItem}</li>
+                                            `).join('')}
+                                        </ul>
+                                    </div>
+                                ` : ''}
                             </div>
-                        ` : ''}
+                        `).join('')}
                     </div>
-                `).join('')}
-            </div>
-        `;
+                </div>
+            `;
+        }
     }
 
     performSearch(query) {
         if (!query.trim() || !this.parsedData) {
-            this.updateLayerDisplay();
+            if (this.searchResultsContainer) this.searchResultsContainer.style.display = 'none';
             return;
         }
 
-        // Search through parsed data
-        const searchResults = this.searchInParsedData(query);
-        this.displaySearchResults(searchResults, query);
+        const results = this.searchInParsedData(query);
+        this.displaySearchResults(results, query);
     }
 
     searchInParsedData(query) {
@@ -316,40 +359,23 @@ class CodexApp {
         const searchTerm = query.toLowerCase();
         
         for (const [layerNum, layerData] of Object.entries(this.parsedData.layers)) {
-            // Search in layer title
-            if (layerData.title.toLowerCase().includes(searchTerm)) {
-                results.push({
-                    layer: parseInt(layerNum),
-                    title: layerData.title,
-                    description: layerData.description,
-                    instruments: layerData.instruments
-                });
-                continue;
-            }
-            
-            // Search in layer description
-            if (layerData.description.toLowerCase().includes(searchTerm)) {
-                results.push({
-                    layer: parseInt(layerNum),
-                    title: layerData.title,
-                    description: layerData.description,
-                    instruments: layerData.instruments
-                });
-                continue;
-            }
-            
-            // Search in instruments
-            const matchingInstruments = layerData.instruments.filter(instrument => 
+            let matchingInstruments = layerData.instruments.filter(instrument => 
                 instrument.name.toLowerCase().includes(searchTerm) ||
-                instrument.description.toLowerCase().includes(searchTerm)
+                instrument.description.toLowerCase().includes(searchTerm) ||
+                (instrument.subItems && instrument.subItems.some(sub => sub.toLowerCase().includes(searchTerm)))
             );
             
-            if (matchingInstruments.length > 0) {
+            if (layerData.title.toLowerCase().includes(searchTerm) ||
+                layerData.description.toLowerCase().includes(searchTerm) ||
+                matchingInstruments.length > 0) {
                 results.push({
                     layer: parseInt(layerNum),
                     title: layerData.title,
                     description: layerData.description,
-                    instruments: matchingInstruments
+                    instruments: (layerData.title.toLowerCase().includes(searchTerm) || 
+                                  layerData.description.toLowerCase().includes(searchTerm)) 
+                                 ? layerData.instruments 
+                                 : matchingInstruments
                 });
             }
         }
@@ -358,61 +384,46 @@ class CodexApp {
     }
 
     displaySearchResults(results, query) {
+        if (!this.searchResultsContainer) return;
+        
         if (results.length === 0) {
-            this.layersContainer.innerHTML = `
-                <div class="search-results">
-                    <h3>No results found for "${query}"</h3>
-                    <p>Try searching for different terms or browse through the layers manually.</p>
-                </div>
+            this.searchResultsContainer.innerHTML = `
+                <h3>No results found for "${query}"</h3>
+                <p>Try searching for different terms or browse through the layers manually.</p>
             `;
+            this.searchResultsContainer.style.display = 'block';
             return;
         }
 
-        this.layersContainer.innerHTML = `
-            <div class="search-results">
-                <h3>Search Results for "${query}" (${results.length} found)</h3>
-                ${results.map(result => `
-                    <div class="search-result-item" data-layer="${result.layer}">
-                        <h4>Layer ${result.layer}: ${result.title}</h4>
-                        <p>${result.description}</p>
-                        ${result.instruments ? `
-                            <div class="search-instruments">
-                                <h5>Instruments:</h5>
-                                <ul>
-                                    ${result.instruments.map(instrument => `
-                                        <li><strong>${instrument.name}</strong>: ${instrument.description}</li>
-                                    `).join('')}
-                                </ul>
-                            </div>
-                        ` : ''}
-                    </div>
-                `).join('')}
-            </div>
+        this.searchResultsContainer.innerHTML = `
+            <h3>Search Results for "${query}" (${results.length} found)</h3>
+            ${results.map(result => `
+                <div class="search-result-item" data-layer="${result.layer}" style="cursor: pointer; padding: 10px; border-bottom: 1px solid #ddd;">
+                    <h4>Layer ${result.layer}: ${result.title}</h4>
+                    <p>${result.description.substring(0, 150)}...</p>
+                </div>
+            `).join('')}
         `;
+        this.searchResultsContainer.style.display = 'block';
     }
 
     minimize() {
-        // Window controls are handled by WindowManager
         console.log('Codex minimize called');
     }
 
     maximize() {
-        // Window controls are handled by WindowManager
         console.log('Codex maximize called');
     }
 
     close() {
-        // Window controls are handled by WindowManager
         console.log('Codex close called');
     }
 
     focus() {
-        // Window controls are handled by WindowManager
         console.log('Codex focus called');
     }
 
     blur() {
-        // Window controls are handled by WindowManager
         console.log('Codex blur called');
     }
 }
