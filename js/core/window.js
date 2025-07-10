@@ -48,7 +48,13 @@ export class WindowManager {
      * @returns {HTMLElement} The created window element.
      * @memberof WindowManager
      */
-    createWindow({ id, title, content, width = CONFIG.window.defaultWidth, height = CONFIG.window.defaultHeight, icon, autoScroll = false, type = 'app' }) {
+    createWindow({ id, title, content, width = CONFIG.window.defaultWidth, height = CONFIG.window.defaultHeight, icon, autoScroll = false, type = 'app', defaultSize = null }) {
+        // Use defaultSize if provided, otherwise use the passed width/height
+        if (defaultSize) {
+            width = defaultSize.width;
+            height = defaultSize.height;
+        }
+        
         // Ensure window dimensions are within bounds with proper fallbacks
         const minWidth = CONFIG.window?.minWidth || 300;
         const maxWidth = CONFIG.window?.maxWidth || 1200;
@@ -72,6 +78,9 @@ export class WindowManager {
         windowElement.style.left = `${left}px`;
         windowElement.style.top = `${top}px`;
         windowElement.style.zIndex = this.getNextZIndex();
+        // Add performance optimizations from the start
+        windowElement.style.transform = 'translateZ(0)';
+        windowElement.style.willChange = 'transform';
 
         windowElement.innerHTML = `
             <div class="window-header" role="banner" aria-label="${title} window header">
@@ -173,6 +182,9 @@ export class WindowManager {
                             })
                         ],
                         autoScroll: false, // Disable autoscroll to prevent conflicts
+                        // Performance optimizations
+                        allowFrom: '.window-header',
+                        ignoreFrom: '.window-controls',
                         listeners: {
                             start: (event) => {
                                 // Mark window as being dragged to prevent resize conflicts
@@ -180,9 +192,17 @@ export class WindowManager {
                                 if (windowObj) {
                                     windowObj._isDragging = true;
                                     windowObj._isResizing = false;
+                                    // Optimize for dragging - use transform for better performance
+                                    windowObj.element.style.willChange = 'transform';
+                                    windowObj.element.style.transform = 'translateZ(0)';
+                                    // Add dragging class for CSS optimizations
+                                    windowObj.element.classList.add('dragging');
                                 }
                             },
-                            move: this.handleDragMove.bind(this),
+                            move: (event) => {
+                                // Direct handling for maximum performance - no throttling
+                                this.handleDragMove(event);
+                            },
                             end: this.handleDragEnd.bind(this)
                         }
                     });
@@ -191,6 +211,7 @@ export class WindowManager {
                     .resizable({
                         edges: { left: true, right: true, bottom: true, top: true },
                         margin: 10,
+                        inertia: false,
                         listeners: {
                             start: (event) => {
                                 // Mark window as being resized to prevent drag conflicts and disable snapping
@@ -205,7 +226,7 @@ export class WindowManager {
                                 }
                                 console.log('🔄 Resize started on window:', event.target.id);
                             },
-                            move: this.handleResizeMove.bind(this),
+                            move: throttle(this.handleResizeMove.bind(this), 16), // Throttle to ~60fps
                             end: this.handleResizeEnd.bind(this)
                         },
                         modifiers: [
@@ -260,15 +281,21 @@ export class WindowManager {
         const window = this.windows.get(windowElement.id);
         if (!window) return;
 
-        const x = (parseFloat(window.element.style.left) || 0) + event.dx;
-        const y = (parseFloat(window.element.style.top) || 0) + event.dy;
+        // Get current position efficiently
+        const currentLeft = parseFloat(windowElement.style.left) || 0;
+        const currentTop = parseFloat(windowElement.style.top) || 0;
+        
+        // Calculate new position
+        const newLeft = currentLeft + event.dx;
+        const newTop = currentTop + event.dy;
 
-        window.element.style.left = `${x}px`;
-        window.element.style.top = `${y}px`;
+        // Apply position changes directly for maximum performance
+        windowElement.style.left = `${newLeft}px`;
+        windowElement.style.top = `${newTop}px`;
         
         // Update the window object with new position
-        window.left = x;
-        window.top = y;
+        window.left = newLeft;
+        window.top = newTop;
     }
 
     /**
@@ -284,8 +311,16 @@ export class WindowManager {
         const windowObj = this.windows.get(windowElement.id);
         if (!windowObj) return;
 
-        // Clear dragging flag
+        // Clear dragging flag and reset optimizations
         windowObj._isDragging = false;
+        windowObj.element.style.willChange = 'auto';
+        windowObj.element.classList.remove('dragging');
+
+        // Clear throttle
+        if (this._dragThrottle) {
+            cancelAnimationFrame(this._dragThrottle);
+            this._dragThrottle = null;
+        }
 
         // Update window position
         const left = parseFloat(windowObj.element.style.left) || 0;
@@ -304,10 +339,10 @@ export class WindowManager {
             if (rect.left <= threshold || rect.right >= window.innerWidth - threshold || 
                 rect.top <= threshold || rect.bottom >= window.innerHeight - 54 - threshold) {
                 
-                // Use a small delay to ensure DOM is fully updated
-                setTimeout(() => {
+                // Use requestAnimationFrame for better performance instead of setTimeout
+                requestAnimationFrame(() => {
                     this.checkSnapZones(windowObj);
-                }, 10);
+                });
             }
         }
     }

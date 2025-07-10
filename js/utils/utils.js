@@ -78,55 +78,7 @@ export const ErrorTypes = {
     FILE_LOAD: 'FILE_LOAD_ERROR'
 };
 
-/**
- * Creates a loading indicator element.
- * @param {string} [message='Loading...'] - The message to display.
- * @returns {HTMLElement} The created loading indicator element.
- */
-export function createLoadingIndicator(message = 'Loading...') {
-    const indicator = document.createElement('div');
-    indicator.className = 'loading-indicator';
-    indicator.setAttribute('role', 'status');
-    indicator.setAttribute('aria-live', 'polite');
-    indicator.innerHTML = `
-        <div class="spinner"></div>
-        <div class="message">${message}</div>
-    `;
-    return indicator;
-}
 
-/**
- * Shows a loading indicator in a specified container.
- * @param {HTMLElement} container - The container to append the indicator to.
- * @param {string} message - The loading message.
- * @returns {HTMLElement} The loading indicator element.
- */
-export function showLoading(container, message) {
-    const indicator = createLoadingIndicator(message);
-    container.appendChild(indicator);
-    return indicator;
-}
-
-/**
- * Hides and removes a loading indicator.
- * @param {HTMLElement} indicator - The loading indicator to remove.
- */
-export function hideLoading(indicator) {
-    if (indicator && indicator.parentNode) {
-        indicator.parentNode.removeChild(indicator);
-    }
-}
-
-/**
- * Sanitizes an HTML string by converting it to text and back, removing any unsafe scripts.
- * @param {string} html - The HTML string to sanitize.
- * @returns {string} The sanitized HTML string.
- */
-export function sanitizeHTML(html) {
-    const temp = document.createElement('div');
-    temp.textContent = html;
-    return temp.innerHTML;
-}
 
 /**
  * Validates a command input. (Currently a placeholder).
@@ -220,42 +172,7 @@ export class PerformanceMonitor {
     }
 }
 
-/**
- * A utility for tracking object references to help with manual memory management and cleanup.
- * @class MemoryManager
- */
-export class MemoryManager {
-    constructor() {
-        /** @private @type {WeakMap<object, WeakRef<object>>} */
-        this.weakRefs = new WeakMap();
-        /** @private @type {Set<Function>} */
-        this.cleanupCallbacks = new Set();
-    }
 
-    /**
-     * Tracks an object and its associated cleanup function.
-     * @param {object} obj - The object to track.
-     * @param {Function} cleanup - The function to call to clean up the object's resources.
-     * @returns {object} The tracked object.
-     * @memberof MemoryManager
-     */
-    trackObject(obj, cleanup) {
-        if (cleanup) {
-            this.cleanupCallbacks.add(cleanup);
-        }
-        this.weakRefs.set(obj, new WeakRef(obj));
-        return obj;
-    }
-
-    /**
-     * Runs all registered cleanup callbacks.
-     * @memberof MemoryManager
-     */
-    cleanup() {
-        this.cleanupCallbacks.forEach(callback => callback());
-        this.cleanupCallbacks.clear();
-    }
-}
 
 /**
  * A simple event emitter for pub/sub-style event handling.
@@ -324,7 +241,5 @@ export class EventEmitter {
 // --- SINGLETON EXPORTS ---
 /** @type {PerformanceMonitor} */
 export const performanceMonitor = new PerformanceMonitor();
-/** @type {MemoryManager} */
-export const memoryManager = new MemoryManager();
 /** @type {EventEmitter} */
 export const eventEmitter = new EventEmitter(); 

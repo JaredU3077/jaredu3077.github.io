@@ -12,15 +12,26 @@ export class BootSystem {
             this.audioEnabled = true;
             localStorage.setItem('neuos-audio', 'true');
         }
+        
+        // Background music management
+        this.backgroundMusic = null;
+        this.musicEnabled = localStorage.getItem('neuos-music') !== 'false';
+        if (localStorage.getItem('neuos-music') === null) {
+            this.musicEnabled = true;
+            localStorage.setItem('neuos-music', 'true');
+        }
+        this.userManuallyDisabled = false; // Track if user manually disabled music
+        this.toggleInProgress = false; // Prevent rapid clicking
+        
         this.bootMessages = [
-            'Initializing network stack...',
-            'Loading kernel modules...',
-            'Starting network services...',
-            'Mounting file systems...',
-            'Configuring network interfaces...',
-            'Loading user profile...',
-            'Starting graphical interface...',
-            'Neu-OS ready.'
+            'initializing network stack...',
+            'loading kernel modules...',
+            'starting network services...',
+            'mounting file systems...',
+            'configuring network interfaces...',
+            'loading user profile...',
+            'starting graphical interface...',
+            'neuOS ready.'
         ];
         this.messageIndex = 0;
         this.audioContext = null;
@@ -41,10 +52,34 @@ export class BootSystem {
     }
 
     async init() {
-        this.setupAudioSystem();
-        this.setupEventListeners();
-        this.setupParticleSystem();
-        await this.startBootSequence();
+        try {
+            console.log('BootSystem: Starting initialization...');
+            this.setupAudioSystem();
+            this.setupEventListeners();
+            this.setupParticleSystem();
+            
+            // Initialize Mechvibes player if audio is available
+            if (this.audioContext) {
+                try {
+                    console.log('🎹 BootSystem: Initializing Mechvibes player...');
+                    const { mechvibesPlayer } = await import('../utils/mechvibes.js');
+                    await mechvibesPlayer.init(this.audioContext);
+                    this.mechvibesPlayer = mechvibesPlayer;
+                    console.log('🎹 BootSystem: Mechvibes player initialized successfully');
+                } catch (error) {
+                    console.warn('Mechvibes initialization failed:', error);
+                }
+            } else {
+                console.warn('🎹 BootSystem: Audio context not available for Mechvibes');
+            }
+            
+            console.log('BootSystem: Initialization complete, starting boot sequence...');
+            await this.startBootSequence();
+        } catch (error) {
+            console.error('BootSystem: Initialization failed:', error);
+            // Fallback: show login screen directly
+            this.showLoginScreen();
+        }
     }
 
     setupAudioSystem() {
@@ -93,7 +128,7 @@ export class BootSystem {
         if (!this.audioContext) return;
 
         try {
-            // Create master gain node
+            // Create master gain node for all synthesized sounds
             this.audioNodes.masterGain = this.audioContext.createGain();
             this.audioNodes.masterGain.gain.setValueAtTime(0.3, this.audioContext.currentTime);
             this.audioNodes.masterGain.connect(this.audioContext.destination);
@@ -103,6 +138,8 @@ export class BootSystem {
             this.audioNodes.filter.type = 'lowpass';
             this.audioNodes.filter.frequency.setValueAtTime(2000, this.audioContext.currentTime);
             this.audioNodes.filter.connect(this.audioNodes.masterGain);
+            
+            console.log('Audio nodes setup complete - ready for typing sounds');
         } catch (error) {
             console.warn('Failed to setup audio nodes:', error);
         }
@@ -112,7 +149,7 @@ export class BootSystem {
         // Audio toggle button
         const audioToggle = document.getElementById('audioToggle');
         if (audioToggle) {
-            audioToggle.addEventListener('click', () => this.toggleAudio());
+            audioToggle.addEventListener('click', () => this.toggleBackgroundMusic());
         }
 
         // Guest login button
@@ -176,92 +213,219 @@ export class BootSystem {
     }
 
     setupTypingSounds() {
-        // Add typing sounds to all text inputs
-        document.addEventListener('keydown', (e) => {
-            // Only play typing sounds for actual character input
-            if (e.target.tagName === 'INPUT' && e.target.type === 'text' && 
-                !e.ctrlKey && !e.altKey && !e.metaKey && 
-                e.key.length === 1) {
-                this.playTypingSound();
-            }
-        });
-
-        // Special sounds for special keys
-        document.addEventListener('keydown', (e) => {
-            if (e.target.tagName === 'INPUT' && e.target.type === 'text') {
-                switch(e.key) {
-                    case 'Enter':
-                        this.playEnterSound();
-                        break;
-                    case 'Backspace':
-                        this.playBackspaceSound();
-                        break;
-                    case ' ':
-                        this.playSpaceSound();
-                        break;
-                }
-            }
-        });
+        // REMOVED: Global typing sounds - let individual components handle their own sounds
+        // This was causing conflicts with the terminal's specific implementation
+        console.log('🎹 BootSystem: Typing sounds setup - global listener removed to prevent conflicts');
     }
 
     setupParticleSystem() {
-        console.log('Setting up particle system...');
+        console.log('Setting up enhanced particle system...');
         
-        // Create particle container
+        // Create particle container with improved styling
         this.particleContainer = document.createElement('div');
         this.particleContainer.className = 'particle-container';
         this.particleContainer.id = 'particleContainer';
-        this.particleContainer.style.zIndex = '1000'; // Ensure high z-index
+        this.particleContainer.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+            overflow: hidden;
+            background: transparent !important;
+        `;
         document.body.appendChild(this.particleContainer);
-        console.log('Particle container created:', this.particleContainer);
+        console.log('Enhanced particle container created:', this.particleContainer);
 
-        // Create single subtle spinning background element
-        const spinner = document.createElement('div');
-        spinner.className = 'background-spinner';
-        document.body.appendChild(spinner);
+        // Create enhanced background elements
+        this.createEnhancedBackgroundElements();
 
-        // Create simplified matrix background
-        const matrixBg = document.createElement('div');
-        matrixBg.className = 'matrix-background';
-        document.body.appendChild(matrixBg);
-
-        // Create calm ambient glows for chillhouse vibes
-        this.createAmbientGlows();
-
-        // Initialize mouse tracking
-        this.mouseX = 0;
-        this.mouseY = 0;
-        this.setupMouseTracking();
-
-        // Initialize particle arrays and state
+        // Initialize enhanced particle system
         this.particles = [];
         this.particleCount = 25;
         this.particleGenerationRate = 1200;
         this.particleAnimationRunning = true;
         this.particleMode = 'normal';
         this.startTime = Date.now();
+        
+        // Enhanced particle physics
+        this.particlePhysics = {
+            gravity: 0.02,
+            wind: 0.01,
+            turbulence: 0.005,
+            attraction: 0.03,
+            repulsion: 0.02
+        };
+        
+        // Enhanced color schemes for chillhouse vibes
+        this.colorSchemes = {
+            chillhouse: ['#4a90e2', '#87ceeb', '#4682b4', '#5f9ea0', '#20b2aa'],
+            sunset: ['#ff6b35', '#ff8c42', '#ffa07a', '#ffb347', '#ffd700'],
+            neon: ['#ff6b9d', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'],
+            cosmic: ['#8a2be2', '#9370db', '#ba55d3', '#da70d6', '#ee82ee'],
+            ocean: ['#00ced1', '#40e0d0', '#48d1cc', '#20b2aa', '#008b8b'],
+            forest: ['#228b22', '#32cd32', '#90ee90', '#98fb98', '#00ff7f']
+        };
+        
+        this.currentColorScheme = 'chillhouse';
+        this.currentParticleColor = 0;
 
         // Generate initial particles
         this.generateParticles();
         
-        // Start particle animation loop
+        // Start enhanced particle animation loop
         this.animateParticles();
         
-        // Start continuous particle generation from bottom
+        // Start continuous particle generation
         this.startContinuousGeneration();
         
-        console.log('Particle system setup complete. Container:', this.particleContainer);
+        console.log('Enhanced particle system setup complete');
+    }
+
+    createEnhancedBackgroundElements() {
+        // Create multiple subtle spinning background elements
+        for (let i = 0; i < 3; i++) {
+            const spinner = document.createElement('div');
+            spinner.className = 'background-spinner';
+            spinner.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                width: ${400 + i * 100}px;
+                height: ${400 + i * 100}px;
+                margin: ${-(200 + i * 50)}px 0 0 ${-(200 + i * 50)}px;
+                border: 1px solid rgba(74, 144, 226, ${0.08 - i * 0.02});
+                border-radius: 50%;
+                animation: backgroundSpin ${60 + i * 30}s linear infinite;
+                pointer-events: none;
+                z-index: -${i + 1};
+                opacity: ${0.3 - i * 0.1};
+            `;
+            document.body.appendChild(spinner);
+        }
+
+        // Create enhanced matrix background
+        const matrixBg = document.createElement('div');
+        matrixBg.className = 'matrix-background';
+        matrixBg.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(74, 144, 226, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(135, 206, 235, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(70, 130, 180, 0.04) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -2;
+        `;
+        document.body.appendChild(matrixBg);
+
+        // Create enhanced ambient glows
+        this.createEnhancedAmbientGlows();
+    }
+
+    createEnhancedAmbientGlows() {
+        // Create multiple ambient glow elements for better depth
+        const glowPositions = [
+            { x: '20%', y: '30%', size: '300px', opacity: '0.15' },
+            { x: '80%', y: '70%', size: '400px', opacity: '0.12' },
+            { x: '50%', y: '50%', size: '500px', opacity: '0.08' },
+            { x: '10%', y: '80%', size: '250px', opacity: '0.10' },
+            { x: '90%', y: '20%', size: '350px', opacity: '0.13' }
+        ];
+
+        glowPositions.forEach((pos, index) => {
+            const glow = document.createElement('div');
+            glow.className = 'ambient-glow';
+            glow.style.cssText = `
+                position: fixed;
+                top: ${pos.y};
+                left: ${pos.x};
+                width: ${pos.size};
+                height: ${pos.size};
+                background: radial-gradient(circle, rgba(74, 144, 226, ${pos.opacity}) 0%, transparent 70%);
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: -3;
+                animation: ambientFloat ${8 + index * 2}s ease-in-out infinite;
+                animation-delay: ${index * 0.5}s;
+            `;
+            document.body.appendChild(glow);
+        });
     }
 
     setupMouseTracking() {
+        // Enhanced mouse tracking for particle interaction
+        this.mouseX = 0;
+        this.mouseY = 0;
+        
         document.addEventListener('mousemove', (e) => {
             this.mouseX = e.clientX;
             this.mouseY = e.clientY;
+            
+            // Update particle interactions based on mouse position
             this.updateParticleInteraction();
         });
+        
+        // Add touch support for mobile devices
+        document.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) {
+                this.mouseX = e.touches[0].clientX;
+                this.mouseY = e.touches[0].clientY;
+                this.updateParticleInteraction();
+            }
+        });
+        
+        console.log('Enhanced mouse tracking setup complete');
+    }
 
-        document.addEventListener('click', (e) => {
-            this.createMouseClickEffect(e.clientX, e.clientY);
+    updateParticleInteraction() {
+        if (!this.particles || this.particles.length === 0) return;
+        
+        this.particles.forEach(particleData => {
+            if (!particleData.element) return;
+            
+            const rect = particleData.element.getBoundingClientRect();
+            const particleX = rect.left + rect.width / 2;
+            const particleY = rect.top + rect.height / 2;
+            
+            const distance = Math.sqrt(
+                Math.pow(particleX - this.mouseX, 2) + 
+                Math.pow(particleY - this.mouseY, 2)
+            );
+            
+            const interactionRadius = 100;
+            
+            if (distance < interactionRadius) {
+                // Apply attraction force
+                const force = (interactionRadius - distance) / interactionRadius;
+                const angle = Math.atan2(this.mouseY - particleY, this.mouseX - particleX);
+                
+                particleData.velocityX += Math.cos(angle) * force * 0.02;
+                particleData.velocityY += Math.sin(angle) * force * 0.02;
+                
+                // Add visual feedback
+                particleData.element.classList.add('mouse-attracted');
+                particleData.element.classList.remove('mouse-repelled');
+            } else if (distance < interactionRadius * 1.5) {
+                // Apply repulsion force
+                const force = (distance - interactionRadius) / (interactionRadius * 0.5);
+                const angle = Math.atan2(particleY - this.mouseY, particleX - this.mouseX);
+                
+                particleData.velocityX += Math.cos(angle) * force * 0.01;
+                particleData.velocityY += Math.sin(angle) * force * 0.01;
+                
+                // Add visual feedback
+                particleData.element.classList.add('mouse-repelled');
+                particleData.element.classList.remove('mouse-attracted');
+            } else {
+                // Remove visual feedback
+                particleData.element.classList.remove('mouse-attracted', 'mouse-repelled');
+            }
         });
     }
 
@@ -282,171 +446,294 @@ export class BootSystem {
             return;
         }
 
-        console.log('Creating particle in container:', container);
-        const particle = document.createElement('div');
-        particle.className = 'blue-particle particle-interactive';
+        console.log('Creating enhanced particle in container:', container);
         
-        // Random size variation
-        const size = Math.random();
-        if (size < 0.3) {
+        // Get current color from scheme
+        const colors = this.colorSchemes[this.currentColorScheme];
+        const color = colors[this.currentParticleColor % colors.length];
+        
+        const particle = document.createElement('div');
+        particle.className = 'enhanced-particle particle-interactive';
+        
+        // Enhanced size variation with better distribution
+        const sizeVariation = Math.random();
+        let size, opacity, animationDuration;
+        
+        if (sizeVariation < 0.2) {
+            size = '6px';
+            opacity = '0.6';
+            animationDuration = '18s';
             particle.classList.add('small');
-        } else if (size > 0.7) {
+        } else if (sizeVariation < 0.6) {
+            size = '10px';
+            opacity = '0.8';
+            animationDuration = '15s';
+            particle.classList.add('medium');
+        } else if (sizeVariation < 0.9) {
+            size = '14px';
+            opacity = '1';
+            animationDuration = '12s';
             particle.classList.add('large');
+        } else {
+            size = '18px';
+            opacity = '1';
+            animationDuration = '10s';
+            particle.classList.add('xlarge');
         }
 
-        // Ensure particles start from very bottom with random horizontal position
+        // Enhanced positioning with better distribution
         const startX = Math.random() * 100;
-        particle.style.left = startX + '%';
-        // Add staggered entry to prevent horizontal line formation
-        particle.style.animationDelay = Math.random() * 8 + 's';
-        particle.style.animationDuration = (12 + Math.random() * 8) + 's';
+        const startY = 100 + Math.random() * 20; // Start from bottom with variation
         
-        // Add horizontal drift variation with smoother movement
-        const drift = (Math.random() - 0.5) * 300;
-        particle.style.setProperty('--drift', drift + 'px');
+        // Enhanced physics properties
+        const velocityX = (Math.random() - 0.5) * 2;
+        const velocityY = -Math.random() * 2 - 0.5;
+        const rotationSpeed = (Math.random() - 0.5) * 4;
+        const drift = (Math.random() - 0.5) * 400;
+        
+        // Enhanced styling with better visual effects
+        particle.style.cssText = `
+            position: fixed;
+            left: ${startX}%;
+            bottom: -${Math.random() * 50}px;
+            width: ${size};
+            height: ${size};
+            background: radial-gradient(circle, ${color}, ${color}80);
+            border-radius: 50%;
+            opacity: ${opacity};
+            animation: enhancedParticleFloat ${animationDuration} linear infinite;
+            animation-delay: ${Math.random() * 8}s;
+            box-shadow: 
+                0 0 ${parseInt(size) * 2}px ${color},
+                0 0 ${parseInt(size) * 4}px ${color}80,
+                0 0 ${parseInt(size) * 6}px ${color}40;
+            will-change: transform, opacity;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: auto;
+            border: 1px solid ${color}60;
+            z-index: 1001;
+            display: block;
+            --drift: ${drift}px;
+            --rotation-speed: ${rotationSpeed}deg;
+        `;
 
-        // Set initial position to guarantee bottom start and visibility
-        particle.style.position = 'fixed';
-        particle.style.bottom = '-30px';
-        particle.style.zIndex = '1001'; // Higher than container
-        particle.style.opacity = '1'; // Ensure visibility
-        particle.style.display = 'block'; // Ensure display
-
-        // Add click interaction
+        // Add enhanced click interaction
         particle.addEventListener('click', (e) => {
-            this.onParticleClick(e, particle);
+            this.onEnhancedParticleClick(e, particle);
+        });
+
+        // Add hover effects
+        particle.addEventListener('mouseenter', () => {
+            particle.style.transform = 'scale(1.5)';
+            particle.style.boxShadow = `
+                0 0 ${parseInt(size) * 3}px ${color},
+                0 0 ${parseInt(size) * 6}px ${color}80,
+                0 0 ${parseInt(size) * 9}px ${color}40
+            `;
+        });
+
+        particle.addEventListener('mouseleave', () => {
+            particle.style.transform = '';
+            particle.style.boxShadow = `
+                0 0 ${parseInt(size) * 2}px ${color},
+                0 0 ${parseInt(size) * 4}px ${color}80,
+                0 0 ${parseInt(size) * 6}px ${color}40
+            `;
         });
 
         container.appendChild(particle);
         
-        // Create particle data object
+        // Create enhanced particle data object
         const particleData = {
             element: particle,
             originalX: startX,
-            originalY: 100,
-            velocityX: (Math.random() - 0.5) * 1.5,
-            velocityY: -Math.random() * 1.5 - 0.5,
+            originalY: startY,
+            velocityX: velocityX,
+            velocityY: velocityY,
+            rotationSpeed: rotationSpeed,
             attracted: false,
-            createdAt: Date.now()
+            repelled: false,
+            createdAt: Date.now(),
+            color: color,
+            size: size,
+            physics: {
+                gravity: this.particlePhysics.gravity,
+                wind: this.particlePhysics.wind,
+                turbulence: this.particlePhysics.turbulence
+            }
         };
         
-        // Add to particles array
         this.particles.push(particleData);
         
-        // Remove particle after animation completes with buffer
-        const animationTime = parseFloat(particle.style.animationDuration) * 1000;
-        setTimeout(() => {
-            if (particle.parentNode) {
-                particle.parentNode.removeChild(particle);
-            }
-            // Remove from particles array
-            const index = this.particles.indexOf(particleData);
-            if (index > -1) {
-                this.particles.splice(index, 1);
-            }
-        }, animationTime + 2000);
+        // Cycle to next color
+        this.currentParticleColor = (this.currentParticleColor + 1) % colors.length;
         
-        console.log('Particle created and added to DOM:', particle);
         return particleData;
     }
 
-    updateParticleInteraction() {
-        if (!this.mouseX || !this.mouseY) return;
+    onEnhancedParticleClick(event, particle) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        // Create enhanced click effect
+        const rect = particle.getBoundingClientRect();
+        const x = rect.left + rect.width / 2;
+        const y = rect.top + rect.height / 2;
+        
+        // Create ripple effect
+        this.createEnhancedRippleEffect(x, y, particle.style.background);
+        
+        // Create particle burst from click point
+        this.createClickParticleBurst(x, y, 8);
+        
+        // Play enhanced click sound
+        this.playParticleClickSound();
+        
+        // Show enhanced notification
+        this.showParticleInteractionNotification('Particle clicked! ✨', particle.style.background);
+        
+        // Apply physics to nearby particles
+        this.applyPhysicsToNearbyParticles(x, y, 100);
+        
+        console.log('Enhanced particle clicked at:', x, y);
+    }
 
-        const attractRadius = 120;
-        const repelRadius = 60;
-        const maxForce = 80;
+    createEnhancedRippleEffect(x, y, color) {
+        const ripple = document.createElement('div');
+        ripple.style.cssText = `
+            position: fixed;
+            left: ${x}px;
+            top: ${y}px;
+            width: 0;
+            height: 0;
+            border: 2px solid ${color};
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: enhancedRipple 1s ease-out forwards;
+            pointer-events: none;
+            z-index: 1003;
+        `;
+        
+        document.body.appendChild(ripple);
+        
+        setTimeout(() => {
+            if (ripple.parentNode) {
+                ripple.remove();
+            }
+        }, 1000);
+    }
 
-        this.particles.forEach(particle => {
-            if (!particle.element.parentNode) return;
+    createClickParticleBurst(x, y, count) {
+        for (let i = 0; i < count; i++) {
+            setTimeout(() => {
+                const burstParticle = document.createElement('div');
+                const angle = (i / count) * Math.PI * 2;
+                const distance = 50 + Math.random() * 50;
+                const endX = x + Math.cos(angle) * distance;
+                const endY = y + Math.sin(angle) * distance;
+                
+                burstParticle.style.cssText = `
+                    position: fixed;
+                    left: ${x}px;
+                    top: ${y}px;
+                    width: 8px;
+                    height: 8px;
+                    background: radial-gradient(circle, #fff, #4a90e2);
+                    border-radius: 50%;
+                    box-shadow: 0 0 20px #4a90e2;
+                    animation: clickBurst 0.8s ease-out forwards;
+                    pointer-events: none;
+                    z-index: 1002;
+                    --end-x: ${endX}px;
+                    --end-y: ${endY}px;
+                `;
+                
+                document.body.appendChild(burstParticle);
+                
+                setTimeout(() => {
+                    if (burstParticle.parentNode) {
+                        burstParticle.remove();
+                    }
+                }, 800);
+            }, i * 50);
+        }
+    }
+
+    applyPhysicsToNearbyParticles(centerX, centerY, radius) {
+        this.particles.forEach(particleData => {
+            if (!particleData.element) return;
             
-            const rect = particle.element.getBoundingClientRect();
+            const rect = particleData.element.getBoundingClientRect();
             const particleX = rect.left + rect.width / 2;
             const particleY = rect.top + rect.height / 2;
             
-            const dx = this.mouseX - particleX;
-            const dy = this.mouseY - particleY;
-            const distance = Math.sqrt(dx * dx + dy * dy);
+            const distance = Math.sqrt(
+                Math.pow(particleX - centerX, 2) + 
+                Math.pow(particleY - centerY, 2)
+            );
             
-            // Remove existing mouse interaction classes
-            particle.element.classList.remove('mouse-attracted', 'mouse-repelled');
-            
-            if (distance < repelRadius) {
-                // Repulsion effect (very close to mouse)
-                const force = (repelRadius - distance) / repelRadius;
-                const angle = Math.atan2(dy, dx);
+            if (distance < radius) {
+                // Apply repulsion force
+                const force = (radius - distance) / radius;
+                const angle = Math.atan2(particleY - centerY, particleX - centerX);
                 
-                const repelX = -Math.cos(angle) * force * maxForce;
-                const repelY = -Math.sin(angle) * force * maxForce;
+                particleData.velocityX += Math.cos(angle) * force * 0.5;
+                particleData.velocityY += Math.sin(angle) * force * 0.5;
                 
-                particle.element.style.transform = `translate(${repelX}px, ${repelY}px)`;
-                particle.element.classList.add('mouse-repelled');
-                particle.attracted = false;
-                
-            } else if (distance < attractRadius) {
-                // Attraction effect (medium distance)
-                const force = (attractRadius - distance) / attractRadius;
-                const angle = Math.atan2(dy, dx);
-                
-                const attractX = Math.cos(angle) * force * (maxForce * 0.3);
-                const attractY = Math.cos(angle) * force * (maxForce * 0.3);
-                
-                particle.element.style.transform = `translate(${attractX}px, ${attractY}px)`;
-                particle.element.classList.add('mouse-attracted');
-                particle.attracted = true;
-                
-            } else {
-                // Reset to normal state
-                particle.element.style.transform = '';
-                particle.attracted = false;
+                // Add visual feedback
+                particleData.element.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    particleData.element.style.transform = '';
+                }, 300);
             }
         });
     }
 
-    onParticleClick(event, particle) {
-        event.stopPropagation();
-        
-        // Create explosion effect
-        const rect = particle.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        
-        // Remove the clicked particle
-        particle.remove();
-        
-        // Create mini particles explosion
-        for (let i = 0; i < 8; i++) {
-            const miniParticle = document.createElement('div');
-            miniParticle.className = 'blue-particle small';
-            miniParticle.style.position = 'fixed';
-            miniParticle.style.left = centerX + 'px';
-            miniParticle.style.top = centerY + 'px';
-            miniParticle.style.pointerEvents = 'none';
-            miniParticle.style.zIndex = '1000';
-            
-            const angle = (i / 8) * Math.PI * 2;
-            const velocity = 100 + Math.random() * 50;
-            const vx = Math.cos(angle) * velocity;
-            const vy = Math.sin(angle) * velocity;
-            
-            document.body.appendChild(miniParticle);
-            
-            // Animate explosion
-            miniParticle.animate([
-                { transform: `translate(0px, 0px) scale(1)`, opacity: 1 },
-                { transform: `translate(${vx}px, ${vy}px) scale(0)`, opacity: 0 }
-            ], {
-                duration: 600,
-                easing: 'ease-out'
-            }).addEventListener('finish', () => {
-                miniParticle.remove();
-            });
-        }
-        
-        // Play sound effect if audio enabled
+    playParticleClickSound() {
         if (this.audioEnabled) {
-            this.createTone(800, 0.1, 'sine', 0.05);
+            this.createTone(800, 100, 'sine', 0.1);
+            setTimeout(() => {
+                this.createTone(1000, 100, 'sine', 0.08);
+            }, 50);
         }
+    }
+
+    showParticleInteractionNotification(message, color) {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border-left: 4px solid ${color};
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            z-index: 1004;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        `;
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.transform = 'translateX(0)';
+        }, 10);
+        
+        setTimeout(() => {
+            notification.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 300);
+        }, 2000);
     }
 
     createMouseClickEffect(x, y) {
@@ -624,35 +911,106 @@ export class BootSystem {
         requestAnimationFrame(updateLoop);
     }
 
-    // Enhanced sound effects
-    playTypingSound() {
-        if (!this.audioEnabled || !this.audioContext) return;
+    // Enhanced realistic typing sound effects
+    async playTypingSound(key) {
+        console.log('🎹 BootSystem: playTypingSound called for key:', key);
+        if (!this.audioEnabled || !this.audioContext) {
+            console.warn('🎹 BootSystem: Audio not enabled or context not available');
+            return;
+        }
 
-        const frequency = 400 + Math.random() * 200; // Vary the typing sound
-        const duration = 0.08;
-        this.createTone(frequency, duration, 'square', 0.03);
+        // Ensure audio context is running
+        if (this.audioContext.state === 'suspended') {
+            this.audioContext.resume().catch(err => {
+                console.warn('Failed to resume audio context for typing sound:', err);
+            });
+        }
+
+        // Try Mechvibes first (enabled by default), fallback to synthesized sounds
+        if (this.mechvibesPlayer && this.mechvibesPlayer.isLoaded && this.mechvibesPlayer.isEnabled) {
+            console.log('🎹 BootSystem: Using Mechvibes for key:', key);
+            try {
+                await this.mechvibesPlayer.playKeySound(key);
+                return;
+            } catch (error) {
+                console.warn('🎹 BootSystem: Mechvibes failed, falling back to synthesized sound:', error);
+            }
+        }
+
+        console.log('🎹 BootSystem: Using fallback synthesized sound for key:', key);
+        // Fallback to synthesized sounds - much louder and longer
+        const baseFreq = 800 + Math.random() * 200; // Higher frequency for better audibility
+        const duration = 0.1 + Math.random() * 0.05; // Longer duration (100-150ms)
+        const volume = 0.1 + Math.random() * 0.05; // Much louder volume
+
+        // Single filtered tone - no layering, no delays, no noise
+        this.createFilteredTone(baseFreq, duration, 'triangle', volume, 'lowpass', 800);
     }
 
     playEnterSound() {
         if (!this.audioEnabled || !this.audioContext) return;
         
-        // Play a satisfying "enter" sound
-        this.createTone(600, 0.15, 'sine', 0.05);
-        setTimeout(() => this.createTone(800, 0.1, 'sine', 0.03), 50);
+        // Ensure audio context is running
+        if (this.audioContext.state === 'suspended') {
+            this.audioContext.resume().catch(err => {
+                console.warn('Failed to resume audio context for enter sound:', err);
+            });
+        }
+        
+        // Try Mechvibes first (enabled by default), fallback to synthesized sounds
+        if (this.mechvibesPlayer && this.mechvibesPlayer.isLoaded && this.mechvibesPlayer.isEnabled) {
+            this.mechvibesPlayer.playKeySound('enter');
+            return;
+        }
+        
+        // Fallback to synthesized sounds
+        const baseFreq = 350 + Math.random() * 50;
+        const duration = 0.08 + Math.random() * 0.02;
+        this.createFilteredTone(baseFreq, duration, 'sine', 0.03, 'lowpass', 500);
     }
 
     playBackspaceSound() {
         if (!this.audioEnabled || !this.audioContext) return;
         
-        // Play a "deletion" sound
-        this.createTone(300, 0.1, 'sawtooth', 0.04);
+        // Ensure audio context is running
+        if (this.audioContext.state === 'suspended') {
+            this.audioContext.resume().catch(err => {
+                console.warn('Failed to resume audio context for backspace sound:', err);
+            });
+        }
+        
+        // Try Mechvibes first (enabled by default), fallback to synthesized sounds
+        if (this.mechvibesPlayer && this.mechvibesPlayer.isLoaded && this.mechvibesPlayer.isEnabled) {
+            this.mechvibesPlayer.playKeySound('backspace');
+            return;
+        }
+        
+        // Fallback to synthesized sounds
+        const baseFreq = 300 + Math.random() * 50;
+        const duration = 0.06 + Math.random() * 0.02;
+        this.createFilteredTone(baseFreq, duration, 'triangle', 0.025, 'lowpass', 400);
     }
 
     playSpaceSound() {
         if (!this.audioEnabled || !this.audioContext) return;
         
-        // Subtle space bar sound
-        this.createTone(350, 0.06, 'triangle', 0.02);
+        // Ensure audio context is running
+        if (this.audioContext.state === 'suspended') {
+            this.audioContext.resume().catch(err => {
+                console.warn('Failed to resume audio context for space sound:', err);
+            });
+        }
+        
+        // Try Mechvibes first (enabled by default), fallback to synthesized sounds
+        if (this.mechvibesPlayer && this.mechvibesPlayer.isLoaded && this.mechvibesPlayer.isEnabled) {
+            this.mechvibesPlayer.playKeySound(' ');
+            return;
+        }
+        
+        // Fallback to synthesized sounds
+        const baseFreq = 250 + Math.random() * 50;
+        const duration = 0.07 + Math.random() * 0.02;
+        this.createFilteredTone(baseFreq, duration, 'triangle', 0.02, 'lowpass', 400);
     }
 
     playUIClickSound() {
@@ -694,20 +1052,29 @@ export class BootSystem {
     }
 
     async startBootSequence() {
-        document.body.classList.add('boot-active');
+        console.log('BootSystem: Starting boot sequence...');
         
-        if (this.audioEnabled) {
-            this.playBootSound();
-        }
+        try {
+            document.body.classList.add('boot-active');
+            
+            if (this.audioEnabled) {
+                this.playBootSound();
+            }
 
-        // Start progress animation and message cycling
-        this.startProgressAnimation();
-        this.cycleBootMessages();
+            // Start progress animation and message cycling
+            this.startProgressAnimation();
+            this.cycleBootMessages();
 
-        // Auto-progress to login after boot completes
-        setTimeout(() => {
+            // Auto-progress to login after boot completes
+            setTimeout(() => {
+                console.log('BootSystem: Boot sequence complete, showing login screen...');
+                this.showLoginScreen();
+            }, 5000);
+        } catch (error) {
+            console.error('BootSystem: Boot sequence failed:', error);
+            // Fallback: show login screen directly
             this.showLoginScreen();
-        }, 5000);
+        }
     }
 
     startProgressAnimation() {
@@ -857,34 +1224,17 @@ export class BootSystem {
             setTimeout(() => this.playDesktopReadySound(), 500);
         }
 
+        // Start background music when desktop is ready
+        setTimeout(() => this.setupBackgroundMusic(), 1000);
+
         // Clean desktop start - welcome app removed for clean startup
         // User can launch welcome app manually if needed
     }
 
     createNetworkAnimations() {
-        // Create data packet particles
-        const particleContainer = document.createElement('div');
-        particleContainer.className = 'network-particles';
-        
-        for (let i = 0; i < 6; i++) {
-            const packet = document.createElement('div');
-            packet.className = 'data-packet';
-            particleContainer.appendChild(packet);
-        }
-        
-        document.body.appendChild(particleContainer);
-
-        // Create network nodes
-        const nodeContainer = document.createElement('div');
-        nodeContainer.className = 'network-nodes';
-        
-        for (let i = 0; i < 4; i++) {
-            const node = document.createElement('div');
-            node.className = 'network-node';
-            nodeContainer.appendChild(node);
-        }
-        
-        document.body.appendChild(nodeContainer);
+        // Network animations disabled - no longer creating drifting blue dots
+        // This function is kept for potential future use but doesn't create any elements
+        console.log('Network animations disabled - no drifting blue dots');
     }
 
     toggleAudio() {
@@ -904,6 +1254,263 @@ export class BootSystem {
                 audioOnIcon.style.display = 'none';
                 audioOffIcon.style.display = 'block';
             }
+        }
+    }
+
+    setupBackgroundMusic() {
+        console.log('Setting up background music...');
+        this.backgroundMusic = document.getElementById('backgroundMusic');
+        if (!this.backgroundMusic) {
+            console.warn('Background music element not found');
+            return;
+        }
+
+        console.log('Background music element found:', this.backgroundMusic);
+        console.log('Music enabled state:', this.musicEnabled);
+
+        // Set volume to a comfortable level that won't interfere with typing sounds
+        this.backgroundMusic.volume = 0.2; // Reduced volume to prevent conflicts
+        console.log('Background music volume set to:', this.backgroundMusic.volume);
+        
+        // Add error handling for missing audio file
+        this.backgroundMusic.addEventListener('error', (e) => {
+            console.warn('Background music file not found or cannot be loaded:', e);
+            // Hide audio controls if music file is not available
+            const audioControls = document.getElementById('audioControls');
+            if (audioControls) {
+                audioControls.style.display = 'none';
+            }
+        });
+        
+        // Add load event listener to confirm audio file loaded
+        this.backgroundMusic.addEventListener('loadeddata', () => {
+            console.log('Background music file loaded successfully');
+            console.log('Audio duration:', this.backgroundMusic.duration);
+        });
+        
+        // Add play event listener
+        this.backgroundMusic.addEventListener('play', () => {
+            console.log('Background music started playing');
+            // Ensure audio context is resumed when music plays
+            if (this.audioContext && this.audioContext.state === 'suspended') {
+                this.audioContext.resume().then(() => {
+                    console.log('Audio context resumed due to music playback');
+                }).catch(err => {
+                    console.warn('Failed to resume audio context:', err);
+                });
+            }
+        });
+        
+        // Add pause event listener
+        this.backgroundMusic.addEventListener('pause', () => {
+            console.log('Background music paused');
+        });
+        
+        // Update audio controls to reflect music state
+        this.updateAudioControls();
+        
+        // Start music if enabled
+        if (this.musicEnabled) {
+            console.log('Music is enabled, starting background music...');
+            this.startBackgroundMusic();
+        } else {
+            console.log('Music is disabled, not starting background music');
+        }
+        
+        console.log('Background music system initialized');
+    }
+
+    startBackgroundMusic() {
+        console.log('startBackgroundMusic called - music element:', this.backgroundMusic, 'enabled:', this.musicEnabled);
+        if (!this.backgroundMusic || !this.musicEnabled) {
+            console.log('Background music not available or disabled');
+            return;
+        }
+        
+        // Modern browsers require user interaction before playing audio
+        const playMusic = () => {
+            console.log('Attempting to play background music...');
+            this.backgroundMusic.play().then(() => {
+                console.log('Background music started successfully');
+                // Add visual indicator that music is playing
+                this.showMusicIndicator();
+            }).catch(error => {
+                console.warn('Could not start background music:', error);
+                console.log('Audio element state:', {
+                    paused: this.backgroundMusic.paused,
+                    currentTime: this.backgroundMusic.currentTime,
+                    duration: this.backgroundMusic.duration,
+                    readyState: this.backgroundMusic.readyState,
+                    networkState: this.backgroundMusic.networkState
+                });
+            });
+        };
+        
+        // Try to play immediately, if it fails, wait for user interaction
+        playMusic();
+        
+        // Only set up auto-restart if music is enabled and we haven't already set it up
+        if (this.musicEnabled && !this.autoRestartSetup) {
+            const startOnInteraction = () => {
+                console.log('User interaction detected, attempting to start music...');
+                // Only restart if music is enabled, paused, and user hasn't manually disabled it
+                if (this.backgroundMusic && this.backgroundMusic.paused && this.musicEnabled && !this.userManuallyDisabled) {
+                    console.log('Auto-restarting music due to user interaction...');
+                    playMusic();
+                } else {
+                    console.log('Auto-restart prevented - music disabled or manually paused');
+                }
+            };
+            
+            document.addEventListener('click', startOnInteraction);
+            document.addEventListener('keydown', startOnInteraction);
+            this.autoRestartSetup = true;
+            console.log('Auto-restart listeners set up');
+        }
+    }
+
+    showMusicIndicator() {
+        // Create a subtle visual indicator that music is playing
+        const indicator = document.createElement('div');
+        indicator.style.cssText = `
+            position: fixed;
+            top: 60px;
+            right: 20px;
+            width: 8px;
+            height: 8px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            opacity: 0.7;
+            animation: musicPulse 2s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 7999;
+        `;
+        
+        // Add the pulse animation if it doesn't exist
+        if (!document.querySelector('style[data-music-animation]')) {
+            const style = document.createElement('style');
+            style.setAttribute('data-music-animation', 'true');
+            style.textContent = `
+                @keyframes musicPulse {
+                    0%, 100% { opacity: 0.3; transform: scale(1); }
+                    50% { opacity: 0.8; transform: scale(1.2); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        document.body.appendChild(indicator);
+        
+        // Remove indicator when music stops
+        this.backgroundMusic.addEventListener('pause', () => {
+            indicator.remove();
+        });
+        
+        this.backgroundMusic.addEventListener('ended', () => {
+            indicator.remove();
+        });
+    }
+
+    stopBackgroundMusic() {
+        if (this.backgroundMusic) {
+            this.backgroundMusic.pause();
+            this.backgroundMusic.currentTime = 0;
+            console.log('Background music stopped');
+            
+            // Remove music indicator
+            const indicator = document.querySelector('div[style*="musicPulse"]');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+    }
+
+    toggleBackgroundMusic() {
+        // Prevent rapid clicking
+        if (this.toggleInProgress) {
+            console.log('Toggle already in progress, ignoring click');
+            return;
+        }
+        
+        this.toggleInProgress = true;
+        
+        console.log('Audio toggle clicked - current state:', this.musicEnabled);
+        console.log('Audio element state before toggle:', {
+            paused: this.backgroundMusic?.paused,
+            currentTime: this.backgroundMusic?.currentTime,
+            duration: this.backgroundMusic?.duration,
+            readyState: this.backgroundMusic?.readyState,
+            networkState: this.backgroundMusic?.networkState,
+            volume: this.backgroundMusic?.volume
+        });
+        
+        // Simple toggle logic
+        if (this.musicEnabled) {
+            // Disable music
+            console.log('Disabling background music...');
+            this.musicEnabled = false;
+            this.userManuallyDisabled = true;
+            localStorage.setItem('neuos-music', 'false');
+            
+            if (this.backgroundMusic) {
+                this.backgroundMusic.pause();
+                console.log('Background music paused');
+                
+                // Remove music indicator
+                const indicator = document.querySelector('div[style*="musicPulse"]');
+                if (indicator) {
+                    indicator.remove();
+                }
+            }
+        } else {
+            // Enable music
+            console.log('Enabling background music...');
+            this.musicEnabled = true;
+            this.userManuallyDisabled = false;
+            localStorage.setItem('neuos-music', 'true');
+            
+            if (this.backgroundMusic && this.backgroundMusic.paused) {
+                this.backgroundMusic.play().then(() => {
+                    console.log('Background music resumed successfully');
+                    this.showMusicIndicator();
+                }).catch(error => {
+                    console.warn('Could not resume background music:', error);
+                });
+            } else if (this.backgroundMusic) {
+                console.log('Music already playing or not available');
+            }
+        }
+        
+        this.updateAudioControls();
+        console.log('Audio toggle complete - new state:', this.musicEnabled);
+        console.log('Audio element state after toggle:', {
+            paused: this.backgroundMusic?.paused,
+            currentTime: this.backgroundMusic?.currentTime,
+            duration: this.backgroundMusic?.duration,
+            readyState: this.backgroundMusic?.readyState,
+            networkState: this.backgroundMusic?.networkState,
+            volume: this.backgroundMusic?.volume
+        });
+        
+        // Allow toggle again after a short delay
+        setTimeout(() => {
+            this.toggleInProgress = false;
+        }, 300);
+    }
+
+    updateAudioControls() {
+        const audioToggle = document.getElementById('audioToggle');
+        if (!audioToggle) return;
+        
+        const audioOn = audioToggle.querySelector('.audio-on');
+        const audioOff = audioToggle.querySelector('.audio-off');
+        
+        if (this.musicEnabled) {
+            audioOn.style.display = 'block';
+            audioOff.style.display = 'none';
+        } else {
+            audioOn.style.display = 'none';
+            audioOff.style.display = 'block';
         }
     }
 
@@ -939,6 +1546,50 @@ export class BootSystem {
         setTimeout(() => this.createTone(523, 0.2, 'sine', 0.1), 150); // C octave
     }
 
+    createFilteredTone(frequency, duration, waveType = 'sine', volume = 0.1, filterType = 'lowpass', filterFreq = 1000) {
+        if (!this.audioContext) return;
+
+        try {
+            const oscillator = this.audioContext.createOscillator();
+            const gainNode = this.audioContext.createGain();
+            const filter = this.audioContext.createBiquadFilter();
+            
+            oscillator.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(this.audioContext.destination);
+            
+            oscillator.frequency.value = frequency;
+            oscillator.type = waveType;
+            
+            filter.type = filterType;
+            filter.frequency.value = filterFreq;
+            
+            // Apply very subtle ADSR envelope for smooth, soothing sound
+            this.applyADSREnvelope(gainNode, 0.001, 0.005, 0.4, 0.03, duration, volume);
+            
+            oscillator.start(this.audioContext.currentTime);
+            oscillator.stop(this.audioContext.currentTime + duration + 0.1); // Buffer for release
+            
+            // Cleanup to prevent memory buildup
+            setTimeout(() => {
+                oscillator.disconnect();
+                filter.disconnect();
+                gainNode.disconnect();
+            }, (duration + 0.1) * 1000);
+        } catch (e) {
+            console.warn('Audio synthesis failed:', e);
+        }
+    }
+
+    applyADSREnvelope(gainNode, attack, decay, sustain, release, duration, peakVolume) {
+        const now = this.audioContext.currentTime;
+        gainNode.gain.setValueAtTime(0, now);
+        gainNode.gain.linearRampToValueAtTime(peakVolume, now + attack);
+        gainNode.gain.linearRampToValueAtTime(peakVolume * sustain, now + attack + decay);
+        gainNode.gain.setValueAtTime(peakVolume * sustain, now + duration - release);
+        gainNode.gain.linearRampToValueAtTime(0, now + duration);
+    }
+
     createTone(frequency, duration, waveType = 'sine', volume = 0.1) {
         if (!this.audioContext) return;
 
@@ -961,6 +1612,43 @@ export class BootSystem {
         } catch (e) {
             console.warn('Audio synthesis failed:', e);
         }
+    }
+
+    createNoiseTone(duration, volume) {
+        if (!this.audioContext) return;
+        
+        const bufferSize = this.audioContext.sampleRate * duration;
+        const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
+        const output = buffer.getChannelData(0);
+        
+        for (let i = 0; i < bufferSize; i++) {
+            output[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize); // Fade out noise
+        }
+        
+        const noise = this.audioContext.createBufferSource();
+        const gainNode = this.audioContext.createGain();
+        const filter = this.audioContext.createBiquadFilter();
+        
+        noise.buffer = buffer;
+        noise.connect(filter);
+        filter.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+        
+        filter.type = 'bandpass';
+        filter.frequency.value = 2000 + Math.random() * 1000; // Mid-high for friction
+        
+        // Quick envelope for noise
+        this.applyADSREnvelope(gainNode, 0.001, 0.02, 0.2, 0.03, duration, volume);
+        
+        noise.start(this.audioContext.currentTime);
+        noise.stop(this.audioContext.currentTime + duration + 0.1);
+        
+        // Cleanup
+        setTimeout(() => {
+            noise.disconnect();
+            filter.disconnect();
+            gainNode.disconnect();
+        }, (duration + 0.1) * 1000);
     }
 
     delay(ms) {
@@ -1061,141 +1749,85 @@ export class BootSystem {
     }
 
     changeParticleColors() {
-        const colors = [
-            { name: 'Blue', color: '#4a90e2', gradient: 'radial-gradient(circle, #4a90e2 0%, #4a90e2aa 50%, transparent 100%)' },
-            { name: 'Green', color: '#00d084', gradient: 'radial-gradient(circle, #00d084 0%, #00d084aa 50%, transparent 100%)' },
-            { name: 'Purple', color: '#7c53ff', gradient: 'radial-gradient(circle, #7c53ff 0%, #7c53ffaa 50%, transparent 100%)' },
-            { name: 'Orange', color: '#ff6900', gradient: 'radial-gradient(circle, #ff6900 0%, #ff6900aa 50%, transparent 100%)' },
-            { name: 'Red', color: '#ff4757', gradient: 'radial-gradient(circle, #ff4757 0%, #ff4757aa 50%, transparent 100%)' },
-            { name: 'Cyan', color: '#2ed573', gradient: 'radial-gradient(circle, #2ed573 0%, #2ed573aa 50%, transparent 100%)' },
-            { name: 'Indigo', color: '#5352ed', gradient: 'radial-gradient(circle, #5352ed 0%, #5352edaa 50%, transparent 100%)' }
-        ];
+        console.log('Changing particle colors...');
         
-        const currentColor = this.currentParticleColor || 0;
-        const newColor = (currentColor + 1) % colors.length;
-        this.currentParticleColor = newColor;
-        const currentColorData = colors[newColor];
+        // Cycle to next color scheme
+        const schemes = Object.keys(this.colorSchemes);
+        const currentIndex = schemes.indexOf(this.currentColorScheme);
+        const nextIndex = (currentIndex + 1) % schemes.length;
+        this.currentColorScheme = schemes[nextIndex];
         
-        // Update existing particles with smoother transition
-        const particles = document.querySelectorAll('.blue-particle');
-        particles.forEach((particle, index) => {
-            // Stagger the color change for a wave effect
-            setTimeout(() => {
-                particle.style.background = currentColorData.gradient;
-                particle.style.boxShadow = `0 0 12px ${currentColorData.color}, 0 0 24px ${currentColorData.color}44, 0 0 36px ${currentColorData.color}22`;
+        const colors = this.colorSchemes[this.currentColorScheme];
+        this.currentParticleColor = 0;
+        
+        // Update existing particles with new colors
+        this.particles.forEach((particleData, index) => {
+            if (particleData.element) {
+                const color = colors[index % colors.length];
                 
-                // Add a temporary pulse effect
-                particle.style.transform = 'scale(1.3)';
-                setTimeout(() => {
-                    particle.style.transform = '';
-                }, 200);
-            }, index * 20);
+                // Smooth transition to new color
+                particleData.element.style.transition = 'background 0.5s ease, box-shadow 0.5s ease';
+                particleData.element.style.background = `radial-gradient(circle, ${color}, ${color}80)`;
+                particleData.element.style.boxShadow = `
+                    0 0 ${parseInt(particleData.size) * 2}px ${color},
+                    0 0 ${parseInt(particleData.size) * 4}px ${color}80,
+                    0 0 ${parseInt(particleData.size) * 6}px ${color}40
+                `;
+                particleData.element.style.border = `1px solid ${color}60`;
+                
+                // Update particle data
+                particleData.color = color;
+            }
         });
         
-        // Create a burst of new particles with the new color at the bottom
-        for (let i = 0; i < 15; i++) {
-            setTimeout(() => {
-                const burstParticle = document.createElement('div');
-                burstParticle.className = 'blue-particle particle-interactive';
-                burstParticle.style.background = currentColorData.gradient;
-                burstParticle.style.boxShadow = `0 0 15px ${currentColorData.color}, 0 0 30px ${currentColorData.color}66`;
-                
-                // Start from bottom center and spread outward
-                const startX = 45 + (Math.random() - 0.5) * 10;
-                burstParticle.style.left = startX + '%';
-                burstParticle.style.animationDelay = '0s';
-                burstParticle.style.animationDuration = (8 + Math.random() * 6) + 's';
-                
-                const container = document.getElementById('particleContainer');
-                if (container) {
-                    container.appendChild(burstParticle);
-                    
-                    // Track particle in array
-                    const particleData = {
-                        element: burstParticle,
-                        type: this.particleMode,
-                        createdAt: Date.now()
-                    };
-                    this.particles.push(particleData);
-                    
-                    // Remove after animation
-                    setTimeout(() => {
-                        if (burstParticle.parentNode) {
-                            burstParticle.remove();
-                        }
-                        // Remove from particles array
-                        const index = this.particles.indexOf(particleData);
-                        if (index > -1) {
-                            this.particles.splice(index, 1);
-                        }
-                    }, parseFloat(burstParticle.style.animationDuration) * 1000);
-                }
-            }, i * 100);
-        }
-        
         // Show color change notification
-        this.showColorChangeNotification(currentColorData.name, currentColorData.color);
+        this.showColorChangeNotification(
+            this.currentColorScheme.charAt(0).toUpperCase() + this.currentColorScheme.slice(1),
+            colors[0]
+        );
         
-        // Play enhanced audio feedback
-        if (this.audioEnabled) {
-            this.createTone(1000, 0.15, 'triangle', 0.06);
-            setTimeout(() => this.createTone(1200, 0.1, 'sine', 0.04), 100);
-            setTimeout(() => this.createTone(800, 0.1, 'triangle', 0.03), 200);
-        }
+        console.log(`Particle colors changed to ${this.currentColorScheme} scheme`);
     }
 
     showColorChangeNotification(colorName, colorHex) {
-        // Remove existing notification if present
-        const existingNotification = document.querySelector('.color-change-notification');
-        if (existingNotification) {
-            existingNotification.remove();
-        }
-
-        // Create notification element
         const notification = document.createElement('div');
-        notification.className = 'color-change-notification';
-        notification.innerHTML = `
-            <div class="notification-content">
-                <div class="color-preview" style="background: ${colorHex}; box-shadow: 0 0 15px ${colorHex}44;"></div>
-                <span>Particle Color: ${colorName}</span>
-            </div>
-        `;
-        
-        // Style the notification
         notification.style.cssText = `
             position: fixed;
             top: 20px;
             right: 20px;
-            background: linear-gradient(135deg, #232c3d 60%, #2e3a54 100%);
-            color: #eaf1fb;
-            padding: 12px 18px;
-            border-radius: 8px;
-            box-shadow: 0 8px 32px rgba(16, 22, 36, 0.8), 0 2px 8px rgba(35, 44, 61, 0.6);
-            border: 1px solid #26334d;
-            z-index: 10000;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            border-left: 4px solid ${colorHex};
+            font-family: 'JetBrains Mono', monospace;
             font-size: 14px;
-            font-weight: 500;
+            z-index: 1004;
             transform: translateX(100%);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            pointer-events: none;
+            transition: transform 0.3s ease;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 12px;
         `;
         
-        // Style the content
-        const style = document.createElement('style');
-        style.textContent = `
-            .color-change-notification .notification-content {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
-            .color-change-notification .color-preview {
-                width: 16px;
-                height: 16px;
-                border-radius: 50%;
-                border: 1px solid rgba(255, 255, 255, 0.2);
-            }
+        // Create color preview
+        const colorPreview = document.createElement('div');
+        colorPreview.style.cssText = `
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: ${colorHex};
+            box-shadow: 0 0 10px ${colorHex};
+            border: 2px solid rgba(255, 255, 255, 0.3);
         `;
-        document.head.appendChild(style);
+        
+        const text = document.createElement('span');
+        text.textContent = `Color scheme: ${colorName}`;
+        
+        notification.appendChild(colorPreview);
+        notification.appendChild(text);
         
         document.body.appendChild(notification);
         
@@ -1211,11 +1843,8 @@ export class BootSystem {
                 if (notification.parentNode) {
                     notification.remove();
                 }
-                if (style.parentNode) {
-                    style.remove();
-                }
             }, 300);
-        }, 2500);
+        }, 3000);
     }
 
     // Particle mode methods for terminal commands

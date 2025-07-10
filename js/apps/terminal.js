@@ -3,7 +3,7 @@
  * @author Jared U.
  */
 
-import { ContentParser } from '../utils/parser.js';
+
 import { AppError, ErrorTypes, performanceMonitor, eventEmitter } from '../utils/utils.js';
 import { CONFIG } from '../config.js';
 
@@ -55,12 +55,12 @@ export class Terminal {
      * @memberof Terminal
      */
     setupEventListeners() {
-        // Use passive event listeners for better performance
-        this.inputElement.addEventListener('keydown', this.handleKeyDown.bind(this));
-        this.inputElement.addEventListener('input', this.handleInput.bind(this), { passive: true });
+        // Use arrow functions to preserve 'this' context instead of bind()
+        this.inputElement.addEventListener('keydown', (e) => this.handleKeyDown(e), { capture: true });
+        this.inputElement.addEventListener('input', () => this.handleInput(), { passive: true });
         
         // Handle window resize for terminal resizing
-        window.addEventListener('resize', this.handleResize.bind(this), { passive: true });
+        window.addEventListener('resize', () => this.handleResize(), { passive: true });
     }
 
     /**
@@ -74,6 +74,9 @@ export class Terminal {
         performanceMonitor.startMeasure('terminalKeyDown');
         
         try {
+            // Play typing sounds for ALL keys
+            this.playTypingSound(e.key);
+            
             if (e.key === 'Enter') {
                 e.preventDefault();
                 this.executeCommand();
@@ -92,6 +95,23 @@ export class Terminal {
             }
         } finally {
             performanceMonitor.endMeasure('terminalKeyDown');
+        }
+    }
+
+    /**
+     * Play typing sound using the boot system
+     * @param {string} key - The key that was pressed
+     * @private
+     * @memberof Terminal
+     */
+    async playTypingSound(key) {
+        // Get the boot system instance and play the appropriate sound
+        if (window.bootSystemInstance && window.bootSystemInstance.mechvibesPlayer) {
+            try {
+                await window.bootSystemInstance.mechvibesPlayer.playKeySound(key);
+            } catch (error) {
+                console.warn('Failed to play mechvibes sound:', error);
+            }
         }
     }
 
@@ -441,55 +461,101 @@ export class Terminal {
      * @memberof Terminal
      */
     initializeCommands() {
+        // Core commands that exist
         this.commands.set('help', this.showHelp.bind(this));
         this.commands.set('ping', this.handlePing.bind(this));
         this.commands.set('show', this.handleShow.bind(this));
         this.commands.set('clear', this.clear.bind(this));
-        this.commands.set('ifconfig', () => CONFIG.COMMANDS.IFCONFIG);
-        this.commands.set('netstat', () => CONFIG.COMMANDS.NETSTAT);
         this.commands.set('tracert', this.handleTracert.bind(this));
         this.commands.set('traceroute', this.handleTracert.bind(this));
         this.commands.set('nslookup', this.handleNslookup.bind(this));
         this.commands.set('dig', this.handleNslookup.bind(this));
         this.commands.set('arp', () => this.handleArp());
         this.commands.set('route', () => this.handleRoute());
+        
+        // Resume and personal commands
+        this.commands.set('resume', this.showResume.bind(this));
+        this.commands.set('jared', this.showResume.bind(this));
+        
+        // Audio test commands
+        this.commands.set('test-audio', () => this.testAudio());
+        this.commands.set('play-music', () => this.playMusic());
+        this.commands.set('pause-music', () => this.pauseMusic());
+        
+        // Mechvibes keyboard sound commands
+        this.commands.set('mechvibes', this.handleMechvibes.bind(this));
+        this.commands.set('keyboard', this.handleMechvibes.bind(this));
+        this.commands.set('kb', this.handleMechvibes.bind(this));
+        
+        // Simple commands
+        this.commands.set('ifconfig', () => CONFIG.COMMANDS.IFCONFIG);
+        this.commands.set('netstat', () => CONFIG.COMMANDS.NETSTAT);
         this.commands.set('ls', () => 'resume.txt  codex.txt  network-configs/  scripts/');
         this.commands.set('pwd', () => '/home/jared');
         this.commands.set('whoami', () => 'jared - Senior Network Engineer');
         this.commands.set('date', () => new Date().toString());
         this.commands.set('uptime', () => 'System uptime: 15+ years in networking');
         
-        // Background control commands
+        // Network commands that exist
+        this.commands.set('ssh', this.handleSSH.bind(this));
+        this.commands.set('telnet', () => 'Telnet is disabled for security. Use SSH instead.');
+        
+        // Background and effects commands that exist
         this.commands.set('bg', this.handleBackground.bind(this));
         this.commands.set('particles', this.handleParticles.bind(this));
         this.commands.set('fx', this.handleEffects.bind(this));
         
-        // Application launch commands
+        // Application launch commands that exist
         this.commands.set('launch', this.handleLaunch.bind(this));
         this.commands.set('open', this.handleLaunch.bind(this));
         this.commands.set('start', this.handleLaunch.bind(this));
         
-        // Navigation and control commands
+        // Navigation and control commands that exist
         this.commands.set('apps', this.listApps.bind(this));
         this.commands.set('windows', this.listWindows.bind(this));
         this.commands.set('close', this.handleClose.bind(this));
         this.commands.set('focus', this.handleFocus.bind(this));
         this.commands.set('desktop', this.handleDesktop.bind(this));
         
-        // Application control commands
+        // Application control commands that exist
         this.commands.set('network', this.handleNetworkControl.bind(this));
         this.commands.set('devices', this.handleDeviceControl.bind(this));
         this.commands.set('status', this.handleStatusControl.bind(this));
         this.commands.set('skills', this.handleSkillsControl.bind(this));
         this.commands.set('projects', this.handleProjectsControl.bind(this));
         
-        // System and graphics control
+        // System and graphics control commands that exist
         this.commands.set('system', this.handleSystemControl.bind(this));
         this.commands.set('theme', this.handleThemeControl.bind(this));
         this.commands.set('audio', this.handleAudioControl.bind(this));
         this.commands.set('performance', this.handlePerformanceControl.bind(this));
-        this.commands.set('particles', this.handleParticles.bind(this));
-        this.commands.set('effects', this.handleEffects.bind(this));
+        
+        // Screensaver control commands
+        this.commands.set('screensaver', this.handleScreensaverControl.bind(this));
+        this.commands.set('ss', this.handleScreensaverControl.bind(this));
+        
+        // Cisco-style commands (placeholder responses)
+        this.commands.set('configure', () => 'Entering configuration mode...\nType "exit" to return to privileged EXEC mode.');
+        this.commands.set('interface', () => 'Interface configuration not available in demo mode.');
+        this.commands.set('vlan', () => 'VLAN configuration not available in demo mode.');
+        this.commands.set('ospf', () => 'OSPF configuration not available in demo mode.');
+        this.commands.set('bgp', () => 'BGP configuration not available in demo mode.');
+        this.commands.set('eigrp', () => 'EIGRP configuration not available in demo mode.');
+        this.commands.set('access-list', () => 'Access list configuration not available in demo mode.');
+        this.commands.set('logging', this.handleLogging.bind(this));
+        this.commands.set('monitor', () => 'Monitoring not available in demo mode.');
+        this.commands.set('debug', () => 'Debug mode not available in demo mode.');
+        this.commands.set('reload', () => 'Reload not available in demo mode.');
+        this.commands.set('copy', () => 'Copy command not available in demo mode.');
+        this.commands.set('write', () => 'Write command not available in demo mode.');
+        this.commands.set('erase', () => 'Erase command not available in demo mode.');
+        this.commands.set('terminal', () => 'Terminal configuration not available in demo mode.');
+        this.commands.set('line', () => 'Line configuration not available in demo mode.');
+        this.commands.set('username', () => 'Username configuration not available in demo mode.');
+        this.commands.set('enable', () => 'Already in privileged EXEC mode.');
+        this.commands.set('disable', () => 'Disabling privileged mode...\nType "enable" to return to privileged EXEC mode.');
+        this.commands.set('exit', () => 'Exiting...');
+        this.commands.set('end', () => 'Exiting configuration mode...');
     }
 
     /**
@@ -500,22 +566,25 @@ export class Terminal {
      * @memberof Terminal
      */
     async handlePing(args) {
-        const host = args[0] || 'localhost';
-        let pings = 0;
-        this.writeOutput(`Pinging ${host}...`);
+        const target = args[0];
+        if (!target) {
+            return `Usage: ping <target>
+Examples:
+• ping 192.168.1.1
+• ping core-switch-01
+• ping google.com`;
+        }
+        
+        return `PING ${target} (${target === '192.168.1.1' ? '192.168.1.1' : '8.8.8.8'}): 56 data bytes
+64 bytes from ${target === '192.168.1.1' ? '192.168.1.1' : '8.8.8.8'}: icmp_seq=0 ttl=64 time=1.234 ms
+64 bytes from ${target === '192.168.1.1' ? '192.168.1.1' : '8.8.8.8'}: icmp_seq=1 ttl=64 time=0.987 ms
+64 bytes from ${target === '192.168.1.1' ? '192.168.1.1' : '8.8.8.8'}: icmp_seq=2 ttl=64 time=1.456 ms
+64 bytes from ${target === '192.168.1.1' ? '192.168.1.1' : '8.8.8.8'}: icmp_seq=3 ttl=64 time=1.123 ms
+64 bytes from ${target === '192.168.1.1' ? '192.168.1.1' : '8.8.8.8'}: icmp_seq=4 ttl=64 time=0.876 ms
 
-        return new Promise(resolve => {
-            const interval = setInterval(() => {
-                if (pings >= 4) {
-                    clearInterval(interval);
-                    resolve(`Ping complete.`);
-                    return;
-                }
-                const time = Math.round(Math.random() * 100);
-                this.writeOutput(`Reply from ${host}: time=${time}ms`);
-                pings++;
-            }, 1000);
-        });
+--- ${target} ping statistics ---
+5 packets transmitted, 5 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 0.876/1.135/1.456/0.234 ms`;
     }
 
     /**
@@ -525,16 +594,138 @@ export class Terminal {
      */
     async showResume() {
         try {
+            console.log('Attempting to fetch resume from:', CONFIG.PATHS.RESUME);
             const response = await fetch(CONFIG.PATHS.RESUME);
+            console.log('Resume fetch response:', response.status, response.ok);
+            
             if (!response.ok) {
                 console.warn('Resume file not found, showing fallback content');
-                return this.getFallbackResume();
+                return this.formatResumeAsMarkdown(this.getFallbackResume());
             }
-            return await response.text();
+            
+            const content = await response.text();
+            console.log('Resume content loaded successfully, length:', content.length);
+            return this.formatResumeAsMarkdown(content);
         } catch (error) {
             console.error('Error fetching resume:', error);
-            return this.getFallbackResume();
+            return this.formatResumeAsMarkdown(this.getFallbackResume());
         }
+    }
+
+    /**
+     * Formats resume content as beautiful markdown
+     * @param {string} content - Raw resume content
+     * @returns {string} Formatted markdown
+     */
+    formatResumeAsMarkdown(content) {
+        // Convert the raw resume content to beautiful markdown
+        const lines = content.split('\n');
+        let markdown = '';
+        
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+            
+            if (line.startsWith('@')) {
+                // Header line - make it a title
+                markdown += `# ${line.substring(1)}\n\n`;
+            } else if (line === 'Summary') {
+                markdown += `## 📋 Summary\n\n`;
+            } else if (line === 'Experience') {
+                markdown += `## 💼 Experience\n\n`;
+            } else if (line === 'Skills') {
+                markdown += `## 🛠️ Skills\n\n`;
+            } else if (line === 'Certifications') {
+                markdown += `## 🏆 Certifications\n\n`;
+            } else if (line.match(/^[A-Z][a-zA-Z\s&]+$/)) {
+                // Job title lines
+                markdown += `### ${line}\n\n`;
+            } else if (line.match(/^[A-Z][a-zA-Z\s,]+,\s+[A-Z]{2}$/)) {
+                // Company and location lines
+                markdown += `**${line}**\n\n`;
+            } else if (line.match(/^[A-Z][a-z]+\s+\d{4}\s+-\s+[A-Z][a-z]+$/)) {
+                // Date range lines
+                markdown += `*${line}*\n\n`;
+            } else if (line.startsWith('•') || line.startsWith('-')) {
+                // Bullet points
+                markdown += `• ${line.substring(1).trim()}\n`;
+            } else if (line.match(/^[A-Z][A-Z\s]+$/)) {
+                // All caps section headers
+                markdown += `### ${line}\n\n`;
+            } else if (line.length > 0) {
+                // Regular content
+                markdown += `${line}\n\n`;
+            }
+        }
+        
+        return markdown;
+    }
+
+    /**
+     * Test audio functionality
+     * @returns {string} Audio test results
+     */
+    testAudio() {
+        const audioElement = document.getElementById('backgroundMusic');
+        if (!audioElement) {
+            return 'Audio element not found!';
+        }
+        
+        const state = {
+            paused: audioElement.paused,
+            currentTime: audioElement.currentTime,
+            duration: audioElement.duration,
+            readyState: audioElement.readyState,
+            networkState: audioElement.networkState,
+            volume: audioElement.volume,
+            muted: audioElement.muted
+        };
+        
+        return `Audio Test Results:
+Element found: ${!!audioElement}
+Paused: ${state.paused}
+Current time: ${state.currentTime}
+Duration: ${state.duration}
+Ready state: ${state.readyState}
+Network state: ${state.networkState}
+Volume: ${state.volume}
+Muted: ${state.muted}
+
+Try 'play-music' or 'pause-music' to control audio directly.`;
+    }
+
+    /**
+     * Play music directly
+     * @returns {string} Play result
+     */
+    playMusic() {
+        const audioElement = document.getElementById('backgroundMusic');
+        if (!audioElement) {
+            return 'Audio element not found!';
+        }
+        
+        audioElement.play().then(() => {
+            console.log('Music played successfully via terminal command');
+        }).catch(error => {
+            console.error('Failed to play music:', error);
+        });
+        
+        return 'Attempting to play music... Check console for results.';
+    }
+
+    /**
+     * Pause music directly
+     * @returns {string} Pause result
+     */
+    pauseMusic() {
+        const audioElement = document.getElementById('backgroundMusic');
+        if (!audioElement) {
+            return 'Audio element not found!';
+        }
+        
+        audioElement.pause();
+        console.log('Music paused via terminal command');
+        
+        return 'Music paused.';
     }
 
     /**
@@ -542,59 +733,62 @@ export class Terminal {
      * @returns {string} Fallback resume content
      */
     getFallbackResume() {
-        return `
-JARED U. - SENIOR NETWORK ENGINEER
-========================================
+        return `@JaredU_   |  Senior Network Engineer, Special Projects, Technical Consulting, Sales Engineering
 
-📧 Contact: Available on request
-🌐 Portfolio: https://jaredu3077.github.io
-💼 LinkedIn: https://linkedin.com/in/jaredu
+Summary
+    Seasoned network engineer with 15+ years of experience. Known as 'The Cleaner' for expertise in resolving complex projects and technical debt across healthcare, national retail, video gaming, public transportation, managed service provider, space communications, and manufacturing.
 
-PROFESSIONAL SUMMARY
-====================
-Senior Network Engineer with 15+ years of experience in enterprise network 
-infrastructure, security, and automation. Proven track record in designing, 
-implementing, and maintaining large-scale network environments.
+Experience
+    Senior Network Engineer
+    Denali Advanced Integrations, Redmond, WA
+    December 2023 - Present
+        - Designed and deployed mission-critical network infrastructure for space-to-ground communications, ensuring uninterrupted connectivity for orbital hardware testing under stringent timelines
+        - Achieved a pivotal two-day turnaround to integrate a satellite into the local network, averting costly delays and enabling seamless data flow between space and ground systems
+        - Pioneered network segmentation for multi-site scientific environments, completely eliminating cross-contamination risks and reducing testing incident recovery time by 48 hours
 
-CORE COMPETENCIES
-=================
-• Network Architecture & Design    • Python & Ansible Automation
-• Cisco & Arista Technologies      • Network Security (PCI/HIPAA)
-• BGP, OSPF, VLAN Management      • Cloud Networking (AWS/Azure)
-• SolarWinds & Network Monitoring  • Disaster Recovery Planning
-• Project Management & Leadership  • Documentation & Process Improvement
+    Senior Technology Consultant
+    Riverstrong, Redmond, WA
+    May 2023 - October 2023
+        - Deployed Cisco Meraki and Fortinet solutions for SMB clients, modernizing and updating infrastructure for Utility, Medical, and Government sectors
+        - Fostered trust and restored confidence in critical client relationships through exceptional communication and strategic problem-solving, resolving complex pre-existing technical issues to retain six-figure hardware investments and secure multimillion-dollar project outcomes
 
-KEY ACHIEVEMENTS
-================
-• Led $2.3M network modernization project with 300% performance improvement
-• Designed and implemented next-gen security infrastructure (99.8% threat detection)
-• Built automation platform reducing manual tasks by 80%
-• Achieved 99.99% network uptime across multiple facilities
+    Senior Network Engineer
+    Sound Transit, Seattle, WA
+    April 2022 - March 2023
+        - Modernized a deprecated SolarWinds infrastructure on outdated Windows servers, increasing device inventory accuracy from 78% to 100% visibility for a multi-billion-dollar statewide public transportation agency; leveraged Ansible and Python, meeting PCI compliance auditing
+        - Led a statewide Retail Point of Sale system refresh, coordinating with field technicians to replace all customer-facing ORCA card systems at bus and train stations, ensuring secure and reliable transactions; earned a challenge coin for exceptional project delivery
+        - Resolved multiple Priority 1 and Major Incidents for a statewide public transportation agency, addressing critical issues including a poorly deployed Cisco ISE causing wireless disruptions, data center overheating, NTP failures risking train signaling safety, and site-to-site VPN tunnel outages impacting payment processing and public Wi-Fi; restored operational stability and ensured passenger safety and service continuity
 
-RECENT EXPERIENCE
-=================
-Current: Senior Network Engineer - Denali Advanced Integration
-• Architecting hybrid cloud connectivity for space-to-ground communications
-• Multi-cloud network design (AWS/Azure) with <50ms latency requirements
+    Senior Network Engineer
+    ArenaNet, Bellevue, WA
+    July 2019 - April 2022
+        - Spearheaded a network modernization project, implementing a state-of-the-art Arista leaf-spine architecture, Arista Cloud Vision Wireless, and Arista IDF and access-layer solutions, fully upgrading the entire network infrastructure
+        - Designed and deployed Palo Alto 5250 NGFWs in HA, replacing aging single firewall design
+        - Created security posture and policies implementing hundreds of unique remote workflows over client VPN to ensure operational continuity
+        - Mentored help desk team over multiple years, delegating junior-level network engineering tasks like cable creation and IOS upgrades, racking and stacking, how to use IPAM, and even simple core switch changes, inspiring one member to earn their CCNA certification and enhancing overall team technical proficiency
 
-Previous: Senior Network Engineer - Sound Transit (2022-2023)
-• Developed comprehensive network automation platform
-• Implemented GitLab CI/CD pipeline for network change management
+    Network Engineer
+    Bealls, Bradenton, FL
+    April 2015 - December 2018
+        - Orchestrated Cisco Meraki deployments across 50+ retail locations for a new boutique brand, ensuring flawless connectivity and operational continuity throughout Florida
+        - Led ISP auditing and accounts initiative, saving $250,000 monthly on wasted circuit costs that were never terminated
+        - Restored critical communications infrastructure for a national retailer with 550+ stores across the continental U.S. within 24 hours post-disaster, minimizing downtime and protecting $100,000–$4M in daily revenue per store using Cradlepoint 3G/4G solutions
 
-Previous: Senior Network Engineer - ArenaNet (2019-2022)
-• Complete network infrastructure modernization using Arista leaf-spine
-• Zero-downtime migration of 500+ network endpoints
+Skills
+    - Networking Technologies: Cisco, Brocade, Juniper, Palo Alto, Fortinet, Arista, Meraki, IPV4/IPV6, F5
+    - Security: Isolation and Segmentation, UBAC, NGFW, VPN, Posture and Profiling, PCI, HIPAA
+    - Cloud & Virtualization: AWS, Azure, VMware, Hyper-V
+    - Monitoring & Analytics: SolarWinds, Splunk, Grafana, Wireshark, NetFlow, SNMP
+    - Automation & Scripting: Python, Ansible, bash, git, PowerShell, IaC
+    - Management & Operations: Project Management, Stakeholder Engagement, Vendor Management, Circuit Procurement, Capacity Planning, Change Management, Disaster Recovery, Priority Support
+    - Soft Skills: Contracts and Negotiations, Cross-Functional Collaboration, Mentorship, Leadership, Auditing and Accounting
+    - For Fun: OSINT, Web Scraping, NLP, Vibe Coding, Crypto, NFTs
+    - Studying: NEBIUS AI LLM 12 week course, Nvidia Cumulus Linux AI Networking
 
-CERTIFICATIONS & EDUCATION
-===========================
-• Cisco Certified Network Associate (CCNA)
-• CompTIA Security+
-• Ongoing: Python & Ansible Automation Training
-
-Type 'show experience' for detailed work history
-Type 'show skills' for technical capabilities
-Type 'show certifications' for complete certification list
-        `.trim();
+Certifications
+    - Cisco CCNA (e789b6372c2b4632ac9d485919e3e863)
+    - CompTIA Security+
+    - CompTIA A+`;
     }
 
     /**
@@ -604,129 +798,144 @@ Type 'show certifications' for complete certification list
      * @private
      * @memberof Terminal
      */
-    handleShow(args) {
-        if (!args || args.length === 0) {
-            return 'Usage: show [resume|experience|skills|certifications|demoscene]';
-        }
-
-        const section = args[0].toLowerCase();
-        switch (section) {
+    async handleShow(args) {
+        const subcommand = args[0] || 'help';
+        
+        switch (subcommand) {
             case 'resume':
-                return this.showResume();
-            case 'experience':
-                return this.showExperience();
-            case 'skills':
-                return this.showSkills();
-            case 'certifications':
-                return this.showCertifications();
-            case 'demoscene':
-                return this.showDemoscene();
+            case 'jared':
+                return await this.showResume();
+            
+            case 'running-config':
+                return `Current configuration:
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname core-switch-01
+!
+interface GigabitEthernet1/0/1
+ description Link to edge-router-01
+ ip address 192.168.1.1 255.255.255.0
+ no shutdown
+!
+interface GigabitEthernet1/0/2
+ description Link to server-01
+ ip address 192.168.1.2 255.255.255.0
+ no shutdown
+!
+router ospf 1
+ network 192.168.1.0 0.0.0.255 area 0
+!
+end`;
+            
+            case 'ip route':
+                return `Codes: C - connected, S - static, R - RIP, M - mobile, B - BGP
+       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area
+       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+       E1 - OSPF external type 1, E2 - OSPF external type 2, E - EGP
+       i - IS-IS, L1 - IS-IS level-1, L2 - IS-IS level-2, ia - IS-IS inter area
+       * - candidate default, U - per-user static route, o - ODR
+       P - periodic downloaded static route
+
+Gateway of last resort is 192.168.1.254 to network 0.0.0.0
+
+C    192.168.1.0/24 is directly connected, GigabitEthernet1/0/1
+C    192.168.2.0/24 is directly connected, GigabitEthernet1/0/2
+O    10.0.0.0/8 [110/2] via 192.168.1.254, 00:05:23, GigabitEthernet1/0/1
+S*   0.0.0.0/0 [1/0] via 192.168.1.254`;
+            
+            case 'interface brief':
+                return `Interface              IP-Address      OK? Method Status                Protocol
+GigabitEthernet1/0/1  192.168.1.1      YES NVRAM  up                    up
+GigabitEthernet1/0/2  192.168.1.2      YES NVRAM  up                    up
+GigabitEthernet1/0/3  unassigned       YES NVRAM  administratively down down
+GigabitEthernet1/0/4  unassigned       YES NVRAM  administratively down down
+Vlan1                  unassigned       YES NVRAM  up                    up`;
+            
+            case 'logging':
+                return `Syslog logging: enabled (0 messages dropped, 0 flushes, 0 overruns)
+    Console logging: level debugging, 15 messages logged
+    Monitor logging: level debugging, 0 messages logged
+    Buffer logging: level debugging, 15 messages logged
+    Logging to: 192.168.1.100
+    Logging to: 192.168.1.254
+
+Timestamp logging: enabled
+Logging host: 192.168.1.100
+Logging host: 192.168.1.254`;
+            
+            case 'version':
+                return `Cisco IOS XE Software, Version 16.12.04
+Cisco IOS Software [Amsterdam], Virtual XE Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Version 16.12.4, RELEASE SOFTWARE (fc3)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2020 by Cisco Systems, Inc.
+Compiled Thu 26-Mar-20 10:16 by mcpre
+
+ROM: IOS-XE ROMMON
+core-switch-01 uptime is 2 weeks, 3 days, 4 hours, 23 minutes
+Uptime for this control processor is 2 weeks, 3 days, 4 hours, 25 minutes`;
+            
+            case 'help':
+                return `Available show commands:
+• show resume          - Display Jared's resume
+• show jared           - Display Jared's resume
+• show running-config  - Current configuration
+• show ip route        - Routing table
+• show interface brief - Interface status
+• show logging         - Logging configuration
+• show version         - System version
+• show vlan            - VLAN information
+• show arp             - ARP table
+• show mac address-table - MAC address table`;
+            
             default:
-                return `Unknown section: ${section}. Available: resume, experience, skills, certifications, demoscene`;
+                return `Unknown show command: ${subcommand}
+Type 'show help' for available commands`;
         }
-    }
-
-    showExperience() {
-        return `<div class="terminal-section">
-<div class="terminal-subheading">Professional Experience Summary</div>
-<div class="terminal-detail">
-🏢 <strong>Current:</strong> Senior Network Engineer @ Denali Advanced Integrations<br>
-&nbsp;&nbsp;&nbsp;• Space-to-ground communications infrastructure<br>
-&nbsp;&nbsp;&nbsp;• Mission-critical network deployments<br>
-&nbsp;&nbsp;&nbsp;• Network segmentation for scientific environments<br><br>
-
-🏢 <strong>Previous:</strong> Senior Technology Consultant @ Riverstrong<br>
-&nbsp;&nbsp;&nbsp;• Cisco Meraki and Fortinet deployments<br>
-&nbsp;&nbsp;&nbsp;• SMB infrastructure modernization<br><br>
-
-🏢 <strong>Previous:</strong> Senior Network Engineer @ Sound Transit<br>
-&nbsp;&nbsp;&nbsp;• SolarWinds infrastructure modernization<br>
-&nbsp;&nbsp;&nbsp;• PCI compliance and security auditing<br>
-&nbsp;&nbsp;&nbsp;• Statewide retail POS system refresh<br><br>
-
-🏢 <strong>Previous:</strong> Senior Network Engineer @ ArenaNet<br>
-&nbsp;&nbsp;&nbsp;• Arista leaf-spine architecture implementation<br>
-&nbsp;&nbsp;&nbsp;• Palo Alto NGFW deployment<br>
-&nbsp;&nbsp;&nbsp;• Team mentorship and technical leadership<br><br>
-
-Use 'show resume' for complete details.
-</div>
-</div>`;
-    }
-
-    showSkills() {
-        return `<div class="terminal-section">
-<div class="terminal-subheading">Technical Skills</div>
-<div class="terminal-detail">
-🌐 <strong>Networking:</strong> Cisco, Arista, Juniper, Brocade, Meraki<br>
-🔐 <strong>Security:</strong> Palo Alto, Fortinet, VPN, NGFW, Network Segmentation<br>
-☁️ <strong>Cloud:</strong> AWS, Azure, VMware, Hyper-V<br>
-📊 <strong>Monitoring:</strong> SolarWinds, Splunk, Grafana, Wireshark, NetFlow<br>
-🤖 <strong>Automation:</strong> Python, Ansible, bash, PowerShell, IaC<br>
-📋 <strong>Management:</strong> Project Management, Vendor Relations, Change Management<br>
-🔧 <strong>Protocols:</strong> IPv4/IPv6, BGP, OSPF, EIGRP, MPLS, VLANs<br>
-📡 <strong>Wireless:</strong> Enterprise Wi-Fi, Arista Cloud Vision, RF Planning
-</div>
-</div>`;
-    }
-
-    showCertifications() {
-        return `<div class="terminal-section">
-<div class="terminal-subheading">Professional Certifications</div>
-<div class="terminal-detail">
-✅ <strong>Cisco CCNA</strong> (Active)<br>
-&nbsp;&nbsp;&nbsp;Certificate ID: e789b6372c2b4632ac9d485919e3e863<br><br>
-
-✅ <strong>CompTIA Security+</strong> (Active)<br>
-&nbsp;&nbsp;&nbsp;Information Security Fundamentals<br><br>
-
-✅ <strong>CompTIA A+</strong> (Active)<br>
-&nbsp;&nbsp;&nbsp;Hardware and Software Troubleshooting<br><br>
-
-📚 <strong>Currently Studying:</strong><br>
-&nbsp;&nbsp;&nbsp;• NEBIUS AI LLM 12 week course<br>
-&nbsp;&nbsp;&nbsp;• Nvidia Cumulus Linux AI Networking<br>
-&nbsp;&nbsp;&nbsp;• Advanced Python for Network Automation
-</div>
-</div>`;
     }
 
     handleTracert(args) {
-        const target = args && args.length > 0 ? args[0] : '8.8.8.8';
-        return `Tracing route to ${target}:
+        const target = args[0] || '8.8.8.8';
+        return `Tracing route to ${target} over a maximum of 30 hops:
 
-1    <1 ms    <1 ms    <1 ms  192.168.1.1
-2    15 ms    12 ms    14 ms  10.0.0.1
-3    25 ms    23 ms    26 ms  isp-gateway.net [203.0.113.1]
-4    35 ms    33 ms    37 ms  backbone-1.net [198.51.100.1]
-5    45 ms    43 ms    47 ms  ${target}
+  1    <1 ms    <1 ms    <1 ms  192.168.1.254
+  2     2 ms     2 ms     2 ms  10.0.0.1
+  3     5 ms     4 ms     4 ms  172.16.0.1
+  4    15 ms    15 ms    15 ms  8.8.8.8
 
 Trace complete.`;
     }
 
     handleNslookup(args) {
-        const domain = args && args.length > 0 ? args[0] : 'example.com';
-        return `Server:  192.168.1.1
-Address: 192.168.1.1#53
+        const target = args[0] || 'google.com';
+        return `Server: 8.8.8.8
+Address: 8.8.8.8#53
 
 Non-authoritative answer:
-Name:    ${domain}
-Address: 93.184.216.34
-Address: 2606:2800:220:1:248:1893:25c8:1946`;
+Name: ${target}
+Address: 142.250.191.78
+Name: ${target}
+Address: 2607:f8b0:4004:c0c::65`;
     }
 
     handleArp() {
-        return `ARP Table:
-
-Internet Address      Physical Address      Type
-192.168.1.1          00-50-56-c0-00-01     dynamic
-192.168.1.10         00-0c-29-a1-b2-c3     dynamic  
-192.168.1.20         00-1b-21-d4-e5-f6     dynamic
-192.168.1.100        08-00-27-4e-66-a1     dynamic`;
+        return `Protocol  Address          Age (min)  Hardware Addr   Type   Interface
+Internet  192.168.1.1             -   0011.2233.4455  ARPA   GigabitEthernet1/0/1
+Internet  192.168.1.254           2   0011.2233.4456  ARPA   GigabitEthernet1/0/1
+Internet  192.168.1.100           5   0011.2233.4457  ARPA   GigabitEthernet1/0/2
+Internet  192.168.1.10           10   0011.2233.4458  ARPA   GigabitEthernet1/0/1`;
     }
 
     handleRoute() {
-        return CONFIG.COMMANDS.ROUTE;
+        return `Kernel IP routing table
+Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+default         192.168.1.254   0.0.0.0         UG        0 0          0 eth0
+192.168.1.0     *               255.255.255.0   U         0 0          0 eth0
+192.168.2.0     *               255.255.255.0   U         0 0          0 eth1
+10.0.0.0       192.168.1.254   255.0.0.0       UG        0 0          0 eth0`;
     }
 
     // Background control commands
@@ -762,9 +971,7 @@ Use 'particles' and 'fx' commands for more controls`;
             return 'Error: Particle system not available';
         }
         
-        console.log('Particle command called:', args);
-        console.log('Boot system particle container:', bootSystem.particleContainer);
-        console.log('Particles array length:', bootSystem.particles.length);
+        console.log('Enhanced particle command called:', args);
 
         const subcommand = args[0] || 'status';
         
@@ -773,282 +980,252 @@ Use 'particles' and 'fx' commands for more controls`;
                 const particleCount = bootSystem.particles ? bootSystem.particles.length : 0;
                 const rate = bootSystem.particleGenerationRate || 1200;
                 const isRunning = bootSystem.particleAnimationRunning;
-                return `Particle System Status:
-• Active Particles: ${particleCount}
-• Generation Rate: ${rate}ms
-• Animation: ${isRunning ? 'Running' : 'Stopped'}
-• Mode: ${bootSystem.particleMode || 'normal'}
+                const colorScheme = bootSystem.currentColorScheme || 'chillhouse';
+                const mode = bootSystem.particleMode || 'normal';
+                
+                return `✨ Enhanced Particle System Status:
+• Active Particles: ${particleCount} ✨
+• Generation Rate: ${rate}ms ⚡
+• Animation: ${isRunning ? '🟢 Running' : '🔴 Stopped'}
+• Mode: ${mode} 🎭
+• Color Scheme: ${colorScheme} 🌈
+• Physics: ${bootSystem.particlePhysics ? 'Enabled' : 'Disabled'} ⚛️
 
-Commands: start, stop, test, reinit, burst, rain, calm, storm, clear, stats, colors, speed, dance, debug, visible, force, demo`;
+Quick Commands:
+  start/stop    - Control generation
+  burst         - Create particle burst
+  rain/calm/storm/dance - Set modes
+  colors        - Change color scheme
+  speed <level> - Adjust generation speed
+  clear         - Remove all particles
+  demo          - Show all features`;
             
             case 'start':
                 bootSystem.particleAnimationRunning = true;
                 bootSystem.startContinuousGeneration();
-                return 'Particle generation started - You should see floating blue particles!';
+                return '🎉 Particle generation started! Watch the magic happen ✨';
             
             case 'stop':
                 bootSystem.particleAnimationRunning = false;
-                return 'Particle generation stopped';
-            
-            case 'test':
-                // Create a single visible particle for testing
-                if (bootSystem.particleContainer) {
-                    // Create a static test particle first
-                    const testParticle = document.createElement('div');
-                    testParticle.className = 'blue-particle';
-                    testParticle.style.position = 'fixed';
-                    testParticle.style.left = '50%';
-                    testParticle.style.top = '50%';
-                    testParticle.style.transform = 'translate(-50%, -50%)';
-                    testParticle.style.animation = 'none';
-                    testParticle.style.zIndex = '1002';
-                    testParticle.style.background = '#ff0000';
-                    testParticle.style.boxShadow = '0 0 30px #ff0000';
-                    testParticle.textContent = 'TEST';
-                    testParticle.style.color = 'white';
-                    testParticle.style.fontSize = '12px';
-                    testParticle.style.fontWeight = 'bold';
-                    testParticle.style.display = 'flex';
-                    testParticle.style.alignItems = 'center';
-                    testParticle.style.justifyContent = 'center';
-                    testParticle.style.width = '60px';
-                    testParticle.style.height = '60px';
-                    testParticle.style.borderRadius = '50%';
-                    
-                    bootSystem.particleContainer.appendChild(testParticle);
-                    
-                    // Remove after 3 seconds
-                    setTimeout(() => {
-                        if (testParticle.parentNode) {
-                            testParticle.remove();
-                        }
-                    }, 3000);
-                    
-                    // Also create multiple normal animated particles
-                    for (let i = 0; i < 5; i++) {
-                        setTimeout(() => {
-                            bootSystem.createSingleParticle(bootSystem.particleContainer);
-                        }, i * 200);
-                    }
-                    return 'Test particles created! Look for a red "TEST" dot in center and blue floating dots.';
-                } else {
-                    return 'Error: Particle container not available';
-                }
-            
-            case 'reinit':
-                // Force reinitialize the particle system
-                bootSystem.reinitializeParticleSystem();
-                return 'Particle system reinitialized! Try particles test now.';
+                return '⏸️ Particle generation paused';
             
             case 'burst':
-                // Create a burst of particles
-                bootSystem.createParticleBurst(15);
-                return 'Particle burst initiated! 15 particles released';
+                const burstCount = parseInt(args[1]) || 15;
+                bootSystem.createParticleBurst(burstCount);
+                return `💥 Particle burst initiated! ${burstCount} particles released ✨`;
             
             case 'rain':
-                // Heavy particle rain mode
                 bootSystem.setParticleMode('rain');
-                return 'Particle rain mode activated - Heavy generation (300ms)';
+                return '🌧️ Rain mode activated - Heavy particle generation (300ms)';
             
             case 'calm':
-                // Calm, peaceful mode
                 bootSystem.setParticleMode('calm');
-                return 'Calm particle mode activated - Peaceful generation (2000ms)';
+                return '😌 Calm mode activated - Peaceful generation (2000ms)';
             
             case 'storm':
-                // Storm mode with rapid generation
                 bootSystem.setParticleMode('storm');
-                return 'Particle storm mode activated - Intense generation (150ms)';
+                return '⚡ Storm mode activated - Intense generation (150ms)';
+            
+            case 'dance':
+                bootSystem.setParticleMode('dance');
+                return '💃 Dance mode activated - Fun particle dance! 🎵';
             
             case 'clear':
-                // Remove all particles
                 bootSystem.clearAllParticles();
-                return 'All particles cleared from screen';
-            
-            case 'stats':
-                if (!bootSystem.particles) return 'No particle data available';
-                
-                const now = Date.now();
-                const recent = bootSystem.particles.filter(p => p.createdAt && (now - p.createdAt) < 30000);
-                const old = bootSystem.particles.filter(p => p.createdAt && (now - p.createdAt) >= 30000);
-                
-                return `Detailed Particle Statistics:
-• Total Active: ${bootSystem.particles.length}
-• Recent (30s): ${recent.length}
-• Older: ${old.length}
-• Memory Usage: ~${(bootSystem.particles.length * 0.5).toFixed(1)}KB
-• Generation Rate: ${bootSystem.particleGenerationRate}ms
-• Uptime: ${Math.floor((now - (bootSystem.startTime || now)) / 1000)}s`;
+                return '🧹 All particles cleared from screen';
             
             case 'colors':
-                // Trigger color change effect
-                bootSystem.changeParticleColors();
-                return 'Particle color change triggered!';
+                const scheme = args[1] || 'next';
+                if (scheme === 'next') {
+                    const schemes = Object.keys(bootSystem.colorSchemes);
+                    const currentIndex = schemes.indexOf(bootSystem.currentColorScheme);
+                    const nextIndex = (currentIndex + 1) % schemes.length;
+                    bootSystem.currentColorScheme = schemes[nextIndex];
+                    bootSystem.changeParticleColors();
+                    return `🎨 Color scheme changed to: ${schemes[nextIndex]} ✨`;
+                } else if (bootSystem.colorSchemes[scheme]) {
+                    bootSystem.currentColorScheme = scheme;
+                    bootSystem.changeParticleColors();
+                    return `🎨 Color scheme changed to: ${scheme} ✨`;
+                } else {
+                    const availableSchemes = Object.keys(bootSystem.colorSchemes).join(', ');
+                    return `Available color schemes: ${availableSchemes}
+Usage: particles colors [scheme] or particles colors next`;
+                }
             
             case 'speed':
                 const speed = args[1] || 'normal';
-                switch (speed) {
-                    case 'slow':
-                        bootSystem.particleGenerationRate = 3000;
-                        break;
-                    case 'normal':
-                        bootSystem.particleGenerationRate = 1200;
-                        break;
-                    case 'fast':
-                        bootSystem.particleGenerationRate = 600;
-                        break;
-                    case 'turbo':
-                        bootSystem.particleGenerationRate = 200;
-                        break;
-                    default:
-                        return 'Usage: particles speed [slow|normal|fast|turbo]';
-                }
-                bootSystem.startContinuousGeneration();
-                return `Particle speed set to ${speed} (${bootSystem.particleGenerationRate}ms)`;
-            
-            case 'dance':
-                // Fun dance mode - particles with special effects
-                bootSystem.setParticleMode('dance');
-                for (let i = 0; i < 8; i++) {
-                    setTimeout(() => {
-                        bootSystem.createSingleParticle(bootSystem.particleContainer);
-                        // Trigger color change every few particles
-                        if (i % 3 === 0) {
-                            setTimeout(() => bootSystem.changeParticleColors(), 500);
-                        }
-                    }, i * 200);
-                }
-                return 'Particle dance mode! 🎉 Enjoy the show!';
-            
-            case 'debug':
-                // Debug particle system
-                const container = document.getElementById('particleContainer');
-                const visibleParticles = document.querySelectorAll('.blue-particle');
-                const containerVisible = container && container.offsetParent !== null;
-                const containerStyle = container ? window.getComputedStyle(container) : null;
-                const particleStyle = visibleParticles.length > 0 ? window.getComputedStyle(visibleParticles[0]) : null;
+                const speedMap = {
+                    'slow': 3000,
+                    'normal': 1200,
+                    'fast': 600,
+                    'turbo': 200,
+                    'ultra': 100
+                };
                 
-                // Check if particles are actually in the DOM
-                const particlesInDOM = Array.from(visibleParticles).map(p => ({
-                    visible: p.offsetParent !== null,
-                    opacity: window.getComputedStyle(p).opacity,
-                    zIndex: window.getComputedStyle(p).zIndex,
-                    animation: window.getComputedStyle(p).animation,
-                    position: p.getBoundingClientRect()
-                }));
-                
-                return `Particle Debug Info:
-• Container exists: ${!!container}
-• Container visible: ${containerVisible}
-• Container z-index: ${containerStyle?.zIndex || 'N/A'}
-• Container display: ${containerStyle?.display || 'N/A'}
-• Visible particles: ${visibleParticles.length}
-• Particle z-index: ${particleStyle?.zIndex || 'N/A'}
-• Particle display: ${particleStyle?.display || 'N/A'}
-• Particle opacity: ${particleStyle?.opacity || 'N/A'}
-• Boot system ready: ${!!bootSystem}
-• Particle array length: ${bootSystem.particles?.length || 0}
-• Animation running: ${bootSystem.particleAnimationRunning}
-• Generation rate: ${bootSystem.particleGenerationRate}ms
-• Mode: ${bootSystem.particleMode || 'normal'}
-
-Particles in DOM: ${particlesInDOM.length}
-${particlesInDOM.map((p, i) => `  ${i+1}. visible:${p.visible} opacity:${p.opacity} z:${p.zIndex}`).join('\n')}`;
-            
-            case 'visible':
-                // Create immediately visible test particles
-                if (bootSystem && bootSystem.createVisibleTestParticles) {
-                    bootSystem.createVisibleTestParticles();
-                    return 'Created 5 green test particles! They should be visible immediately.';
+                if (speedMap[speed]) {
+                    bootSystem.particleGenerationRate = speedMap[speed];
+                    bootSystem.startContinuousGeneration();
+                    return `⚡ Particle speed set to ${speed} (${speedMap[speed]}ms)`;
                 } else {
-                    return 'Error: Boot system or createVisibleTestParticles method not available';
-                }
-            
-            case 'force':
-                // Force create particles with immediate visibility
-                if (bootSystem && bootSystem.particleContainer) {
-                    for (let i = 0; i < 8; i++) {
-                        setTimeout(() => {
-                            const particle = document.createElement('div');
-                            particle.className = 'blue-particle';
-                            particle.style.position = 'fixed';
-                            particle.style.left = (10 + i * 10) + '%';
-                            particle.style.top = (20 + i * 5) + '%';
-                            particle.style.animation = 'none';
-                            particle.style.zIndex = '1002';
-                            particle.style.background = '#ff6600';
-                            particle.style.boxShadow = '0 0 25px #ff6600';
-                            particle.style.opacity = '1';
-                            particle.style.display = 'block';
-                            particle.style.width = '15px';
-                            particle.style.height = '15px';
-                            particle.style.borderRadius = '50%';
-                            particle.style.border = '2px solid #ff6600';
-                            
-                            bootSystem.particleContainer.appendChild(particle);
-                            
-                            // Remove after 8 seconds
-                            setTimeout(() => {
-                                if (particle.parentNode) {
-                                    particle.remove();
-                                }
-                            }, 8000);
-                        }, i * 300);
-                    }
-                    return 'Created 8 orange force particles! They should be visible immediately and stay for 8 seconds.';
-                } else {
-                    return 'Error: Boot system or particle container not available';
+                    return `Usage: particles speed [slow|normal|fast|turbo|ultra]`;
                 }
             
             case 'demo':
-                // Demo all particle modes
-                if (bootSystem) {
-                    const modes = ['rain', 'storm', 'calm', 'dance'];
-                    let currentMode = 0;
-                    
-                    const cycleMode = () => {
-                        if (currentMode < modes.length) {
-                            const mode = modes[currentMode];
-                            bootSystem.setParticleMode(mode);
-                            currentMode++;
-                            
-                            // Cycle to next mode after 4 seconds
-                            setTimeout(cycleMode, 4000);
-                        } else {
-                            // Return to normal mode
-                            bootSystem.setParticleMode('normal');
-                        }
-                    };
-                    
-                    cycleMode();
-                    return 'Starting particle mode demo! Cycling through: rain → storm → calm → dance → normal (4 seconds each)';
+                return this.runParticleDemo(bootSystem);
+            
+            case 'physics':
+                const physicsAction = args[1];
+                if (physicsAction === 'on') {
+                    bootSystem.particlePhysics.enabled = true;
+                    return '⚛️ Particle physics enabled';
+                } else if (physicsAction === 'off') {
+                    bootSystem.particlePhysics.enabled = false;
+                    return '⚛️ Particle physics disabled';
                 } else {
-                    return 'Error: Boot system not available';
+                    return `Physics: ${bootSystem.particlePhysics?.enabled ? 'On' : 'Off'}
+Usage: particles physics [on|off]`;
                 }
             
+            case 'interactive':
+                const interactiveAction = args[1];
+                if (interactiveAction === 'on') {
+                    document.body.classList.add('particle-interactive-mode');
+                    return '🖱️ Interactive particle mode enabled - Click particles!';
+                } else if (interactiveAction === 'off') {
+                    document.body.classList.remove('particle-interactive-mode');
+                    return '🖱️ Interactive particle mode disabled';
+                } else {
+                    return `Interactive: ${document.body.classList.contains('particle-interactive-mode') ? 'On' : 'Off'}
+Usage: particles interactive [on|off]`;
+                }
+            
+            case 'help':
+                return `🎮 Enhanced Particle Commands:
+
+Basic Control:
+  start/stop     - Start/stop particle generation
+  burst [count]  - Create particle burst (default: 15)
+  clear          - Remove all particles
+
+Modes:
+  rain           - Heavy rain effect
+  calm           - Peaceful floating
+  storm          - Intense storm effect
+  dance          - Fun dance mode
+
+Visual:
+  colors [scheme] - Change color scheme
+  colors next     - Cycle to next scheme
+  speed <level>   - Adjust generation speed
+
+Advanced:
+  physics [on/off]    - Toggle particle physics
+  interactive [on/off] - Toggle click interactions
+  demo               - Show all features
+
+Color Schemes: chillhouse, sunset, neon, cosmic, ocean, forest
+Speed Levels: slow, normal, fast, turbo, ultra
+
+Try: particles demo 🌟`;
+            
             // Legacy commands for compatibility
-            case 'add':
-                const count = parseInt(args[1]) || 25;
-                for (let i = 0; i < count / 25; i++) {
-                    bootSystem.increaseParticles();
-                }
-                return `Added ~${count} particles to background`;
-            case 'remove':
-                const removeCount = parseInt(args[1]) || 25;
-                for (let i = 0; i < removeCount / 25; i++) {
-                    bootSystem.decreaseParticles();
-                }
-                return `Removed ~${removeCount} particles from background`;
-            case 'color':
-                bootSystem.changeParticleColors();
-                return 'Particle colors changed';
-            case 'count':
-                return `Current particle count: ${bootSystem.particleCount || (bootSystem.particles ? bootSystem.particles.length : 0)}`;
+            case 'test':
+                bootSystem.createVisibleTestParticles();
+                return '🧪 Test particles created! Look for green dots.';
+            
+            case 'reinit':
+                bootSystem.reinitializeParticleSystem();
+                return '🔄 Particle system reinitialized!';
+            
+            case 'stats':
+                return this.getEnhancedParticleStats(bootSystem);
+            
+            case 'debug':
+                return this.getParticleDebugInfo(bootSystem);
             
             default:
                 return `Unknown particle command: ${subcommand}
-Available: status, start, stop, test, reinit, burst, rain, calm, storm, clear, stats, colors, speed, dance, debug, visible, force, demo, add, remove, color, count`;
+Type 'particles help' for available commands 🌟`;
         }
+    }
+
+    runParticleDemo(bootSystem) {
+        const demoSteps = [
+            { action: () => bootSystem.setParticleMode('rain'), message: '🌧️ Step 1: Rain mode' },
+            { action: () => bootSystem.changeParticleColors(), message: '🎨 Step 2: Color change' },
+            { action: () => bootSystem.setParticleMode('storm'), message: '⚡ Step 3: Storm mode' },
+            { action: () => bootSystem.createParticleBurst(20), message: '💥 Step 4: Particle burst' },
+            { action: () => bootSystem.setParticleMode('dance'), message: '💃 Step 5: Dance mode' },
+            { action: () => bootSystem.setParticleMode('calm'), message: '😌 Step 6: Calm mode' },
+            { action: () => bootSystem.setParticleMode('normal'), message: '✨ Demo complete! Welcome to the chillhouse 🎵' }
+        ];
+        
+        let currentStep = 0;
+        const runStep = () => {
+            if (currentStep < demoSteps.length) {
+                demoSteps[currentStep].action();
+                setTimeout(() => {
+                    currentStep++;
+                    runStep();
+                }, 3000);
+            }
+        };
+        
+        runStep();
+        return '🎬 Particle demo starting! Watch the magic happen... ✨';
+    }
+
+    getEnhancedParticleStats(bootSystem) {
+        if (!bootSystem.particles) return 'No particle data available';
+        
+        const now = Date.now();
+        const recent = bootSystem.particles.filter(p => p.createdAt && (now - p.createdAt) < 30000);
+        const old = bootSystem.particles.filter(p => p.createdAt && (now - p.createdAt) >= 30000);
+        
+        const sizeDistribution = {
+            small: bootSystem.particles.filter(p => p.element?.classList.contains('small')).length,
+            medium: bootSystem.particles.filter(p => p.element?.classList.contains('medium')).length,
+            large: bootSystem.particles.filter(p => p.element?.classList.contains('large')).length,
+            xlarge: bootSystem.particles.filter(p => p.element?.classList.contains('xlarge')).length
+        };
+        
+        return `📊 Enhanced Particle Statistics:
+• Total Active: ${bootSystem.particles.length} ✨
+• Recent (30s): ${recent.length} 🆕
+• Older: ${old.length} ⏰
+• Memory Usage: ~${(bootSystem.particles.length * 0.8).toFixed(1)}KB 💾
+• Generation Rate: ${bootSystem.particleGenerationRate}ms ⚡
+• Color Scheme: ${bootSystem.currentColorScheme} 🌈
+• Mode: ${bootSystem.particleMode} 🎭
+
+Size Distribution:
+• Small: ${sizeDistribution.small} 🔵
+• Medium: ${sizeDistribution.medium} 🔷
+• Large: ${sizeDistribution.large} 🔶
+• X-Large: ${sizeDistribution.xlarge} 🔴
+
+Performance: ${bootSystem.particles.length < 50 ? 'Excellent' : bootSystem.particles.length < 100 ? 'Good' : 'Optimization needed'} 🚀`;
+    }
+
+    getParticleDebugInfo(bootSystem) {
+        const container = document.getElementById('particleContainer');
+        const visibleParticles = document.querySelectorAll('.enhanced-particle');
+        const containerVisible = container && container.offsetParent !== null;
+        
+        return `🔍 Particle Debug Information:
+• Container exists: ${!!container} ✅
+• Container visible: ${containerVisible} 👁️
+• Visible particles: ${visibleParticles.length} ✨
+• Boot system ready: ${!!bootSystem} 🔧
+• Particle array length: ${bootSystem.particles?.length || 0} 📊
+• Animation running: ${bootSystem.particleAnimationRunning} ⏯️
+• Generation rate: ${bootSystem.particleGenerationRate}ms ⚡
+• Mode: ${bootSystem.particleMode || 'normal'} 🎭
+• Color scheme: ${bootSystem.currentColorScheme || 'chillhouse'} 🌈
+• Physics enabled: ${bootSystem.particlePhysics?.enabled || false} ⚛️
+
+System Status: ${containerVisible && visibleParticles.length > 0 ? '🟢 Healthy' : '🟡 Needs attention'} 📈`;
     }
 
     handleEffects(args) {
@@ -1256,7 +1433,10 @@ Available: list, status, enable, disable, toggle, reset, demo`;
             'welcome': 'welcome',
             'game': 'conway-game-of-life',
             'conway': 'conway-game-of-life',
-            'life': 'conway-game-of-life'
+            'life': 'conway-game-of-life',
+            'pocket-tanks': 'pocket-tanks',
+            'tanks': 'pocket-tanks',
+            'artillery': 'pocket-tanks'
         };
 
         const appId = appMappings[appName];
@@ -1269,20 +1449,11 @@ Available: list, status, enable, disable, toggle, reset, demo`;
     }
 
     listApps() {
-        return `Available Applications:
-• terminal       - Command line interface
-• network        - Network topology monitor  
-• skills         - Technical skills showcase
-• projects       - Project portfolio
-• status         - System status monitor
-• contact        - Contact information
-• codex          - Documentation browser
-• devices        - Device manager
-• welcome        - Welcome screen
-• game           - Conway's Game of Life
+        return `available applications:
+• terminal       - command line interface
 
-Usage: launch <app-name>
-Example: launch network`;
+usage: launch <app-name>
+example: launch terminal`;
     }
 
     listWindows() {
@@ -1930,6 +2101,66 @@ performance help      - Show this help`;
         }
     }
 
+    handleScreensaverControl(args) {
+        const action = args?.[0];
+        const screensaver = window.spaceScreensaver;
+        
+        if (!screensaver) {
+            return 'Screensaver system not available';
+        }
+        
+        switch(action) {
+            case 'on':
+            case 'enable':
+                screensaver.enable();
+                return 'Screensaver enabled - will activate after 8 seconds of inactivity';
+
+            case 'off':
+            case 'disable':
+                screensaver.disable();
+                return 'Screensaver disabled';
+
+            case 'test':
+            case 'demo':
+                screensaver.startScreensaver();
+                setTimeout(() => {
+                    screensaver.stopScreensaver();
+                }, 3000);
+                return 'Screensaver demo started - will show for 3 seconds';
+
+            case 'timeout':
+                const seconds = parseInt(args[1]);
+                if (isNaN(seconds) || seconds < 1) {
+                    return 'Usage: screensaver timeout <seconds>\nExample: screensaver timeout 15';
+                }
+                screensaver.setTimeout(seconds);
+                return `Screensaver timeout set to ${seconds} seconds`;
+
+            case 'status':
+                const isActive = screensaver.isActive;
+                const timeout = screensaver.IDLE_TIMEOUT / 1000;
+                return `Screensaver Status:
+• Active: ${isActive ? 'Yes' : 'No'}
+• Timeout: ${timeout} seconds
+• Stars: ${screensaver.stars?.length || 0}
+• Shooting Stars: ${screensaver.shootingStars?.length || 0}`;
+
+            case 'help':
+                return `Screensaver Control Commands:
+screensaver on/enable     - Enable screensaver
+screensaver off/disable   - Disable screensaver
+screensaver test/demo     - Test screensaver (3 seconds)
+screensaver timeout <sec> - Set inactivity timeout
+screensaver status        - Show screensaver status
+screensaver help          - Show this help
+
+Shortcut: ss <command> (same as screensaver)`;
+                
+            default:
+                return 'Usage: screensaver [on|off|test|timeout|status|help]';
+        }
+    }
+
     showDemoscene() {
         // Launch the DarkWave Demoscene Platform
         this.launchDarkWaveDemoscene();
@@ -1939,29 +2170,34 @@ performance help      - Show this help`;
 ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ 100%
 
 🎵 LAUNCHING: "DARKWAVE DEMOSCENE" 🎵
-A Web-Based Demoscene Platform with Dark Wave 8-bit Hacker Aesthetic
+A Standalone Web-Based Demoscene Platform with Dark Wave 8-bit Hacker Aesthetic
 
-⚡ Features:
-• Demo Showcase Gallery
-• Interactive Creation Tools
-• Real-time Chiptune Generation
-• Dark Wave Audio Sequences
-• Particle Systems & Visual Effects
-• Community Hub & Comments
-• Educational Tutorials
-• Matrix Rain & Glitch Effects
-• Wireframe Networks
-• Advanced Audio Visualization
+⚡ Enhanced Features:
+• High-Resolution Graphics (No More Pixelation!)
+• Unique 8-bit Audio Tracks (45-second loops)
+• Auto-play Audio with Mute Control
+• Enhanced Particle Systems with Glow Effects
+• Improved Matrix Rain with Trail Effects
+• Advanced Wireframe Networks with Pulsing Nodes
+• Multi-layered Glitch Text with Scanline Effects
+• Responsive Canvas Sizing
+• Smooth 60 FPS Animations
 
 🎮 Platform Sections:
-• Showcase - Browse demo gallery
+• Showcase - Browse enhanced demo gallery
 • Create - Build your own demos
 • Community - Share and discuss
 • Learn - Tutorials and guides
 
-🎼 Audio System: ${window.darkWaveAudio?.isInitialized ? 'READY - Full chiptune and dark wave experience!' : 'INITIALIZING - Audio system loading...'}
+🎼 Audio System: ${window.darkWaveAudio?.isInitialized ? 'READY - Unique tracks per demo!' : 'INITIALIZING - Audio system loading...'}
 
-Platform launching... Welcome to the DarkWave Demoscene experience!`;
+🎯 Demo Audio Tracks:
+• Neon Particles - "Neon Pulse" (Dark Wave, 120 BPM)
+• Matrix Rain - "Digital Rain" (Chiptune, 140 BPM)
+• Wireframe Network - "Network Pulse" (Hacker, 110 BPM)
+• Glitch Text - "Glitch Corruption" (Wave, 90 BPM)
+
+Platform launching... Welcome to the enhanced DarkWave Demoscene experience!`;
     }
 
     launchDarkWaveDemoscene() {
@@ -1983,7 +2219,7 @@ Platform launching... Welcome to the DarkWave Demoscene experience!`;
                 <div class="demoscene-subtitle">Where 8-bit meets dark wave</div>
                 <button class="demoscene-close" onclick="window.terminalInstance?.exitDarkWaveDemoscene()">×</button>
             </div>
-            <iframe id="demoscene-iframe" src="demoscene.html" frameborder="0"></iframe>
+            <iframe id="demoscene-iframe" src="demoscene/demoscene.html" frameborder="0"></iframe>
         `;
 
         document.body.appendChild(container);
@@ -2017,14 +2253,14 @@ Platform launching... Welcome to the DarkWave Demoscene experience!`;
                 left: 0;
                 width: 100%;
                 height: 60px;
-                background: rgba(13, 11, 30, 0.95);
-                backdrop-filter: blur(10px);
+                background: transparent !important;
+                backdrop-filter: none !important;
                 border-bottom: 1px solid #b388ff;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 z-index: 10001;
-                box-shadow: 0 0 20px rgba(179, 136, 255, 0.3);
+                box-shadow: none !important;
             }
 
             .demoscene-title {
@@ -2303,7 +2539,7 @@ Platform launching... Welcome to the DarkWave Demoscene experience!`;
                 position: absolute;
                 bottom: 20px;
                 left: 20px;
-                background: rgba(0, 0, 0, 0.7);
+                background: transparent !important;
                 border: 1px solid #00ff00;
                 border-radius: 4px;
                 padding: 5px;
@@ -3343,6 +3579,215 @@ Platform launching... Welcome to the DarkWave Demoscene experience!`;
                 musicIndicator.querySelector('.music-note').style.opacity = '0.3';
                 musicIndicator.style.cursor = 'default';
             }
+        }
+    }
+
+    // Enhanced Network Engineering Commands
+    handleSSH(args) {
+        const target = args[0];
+        if (!target) {
+            return `Available SSH targets:
+• core-switch-01 (192.168.1.1) - Core switch
+• edge-router-01 (192.168.1.254) - Edge router  
+• firewall-01 (192.168.1.10) - Firewall
+• server-01 (192.168.1.100) - Management server
+• wireless-controller (192.168.1.50) - Wireless controller
+
+Usage: ssh <target>`;
+        }
+        
+        const targets = {
+            'core-switch-01': { ip: '192.168.1.1', type: 'Cisco Catalyst 9300' },
+            'edge-router-01': { ip: '192.168.1.254', type: 'Cisco ISR 4321' },
+            'firewall-01': { ip: '192.168.1.10', type: 'Cisco ASA 5516' },
+            'server-01': { ip: '192.168.1.100', type: 'Ubuntu Server 20.04' },
+            'wireless-controller': { ip: '192.168.1.50', type: 'Cisco WLC 9800' }
+        };
+        
+        if (targets[target]) {
+            const device = targets[target];
+            return `Connecting to ${target} (${device.ip})...
+${device.type}
+Username: admin
+Password: ********
+Connection established.
+${target}#`;
+        } else {
+            return `Error: Unknown target '${target}'
+Available: ${Object.keys(targets).join(', ')}`;
+        }
+    }
+
+    async handleShow(args) {
+        const subcommand = args[0] || 'help';
+        
+        switch (subcommand) {
+            case 'resume':
+            case 'jared':
+                const resumeContent = await this.showResume();
+                // Scroll to top after loading resume content
+                setTimeout(() => {
+                    this.scrollToTop();
+                }, 100);
+                return resumeContent;
+            
+            case 'running-config':
+                return `Current configuration:
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname core-switch-01
+!
+interface GigabitEthernet1/0/1
+ description Link to edge-router-01
+ ip address 192.168.1.1 255.255.255.0
+ no shutdown
+!
+interface GigabitEthernet1/0/2
+ description Link to server-01
+ ip address 192.168.1.2 255.255.255.0
+ no shutdown
+!
+router ospf 1
+ network 192.168.1.0 0.0.0.255 area 0
+!
+end`;
+            
+            case 'ip route':
+                return `Codes: C - connected, S - static, R - RIP, M - mobile, B - BGP
+       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area
+       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+       E1 - OSPF external type 1, E2 - OSPF external type 2, E - EGP
+       i - IS-IS, L1 - IS-IS level-1, L2 - IS-IS level-2, ia - IS-IS inter area
+       * - candidate default, U - per-user static route, o - ODR
+       P - periodic downloaded static route
+
+Gateway of last resort is 192.168.1.254 to network 0.0.0.0
+
+C    192.168.1.0/24 is directly connected, GigabitEthernet1/0/1
+C    192.168.2.0/24 is directly connected, GigabitEthernet1/0/2
+O    10.0.0.0/8 [110/2] via 192.168.1.254, 00:05:23, GigabitEthernet1/0/1
+S*   0.0.0.0/0 [1/0] via 192.168.1.254`;
+            
+            case 'interface brief':
+                return `Interface              IP-Address      OK? Method Status                Protocol
+GigabitEthernet1/0/1  192.168.1.1      YES NVRAM  up                    up
+GigabitEthernet1/0/2  192.168.1.2      YES NVRAM  up                    up
+GigabitEthernet1/0/3  unassigned       YES NVRAM  administratively down down
+GigabitEthernet1/0/4  unassigned       YES NVRAM  administratively down down
+Vlan1                  unassigned       YES NVRAM  up                    up`;
+            
+            case 'logging':
+                return `Syslog logging: enabled (0 messages dropped, 0 flushes, 0 overruns)
+    Console logging: level debugging, 15 messages logged
+    Monitor logging: level debugging, 0 messages logged
+    Buffer logging: level debugging, 15 messages logged
+    Logging to: 192.168.1.100
+    Logging to: 192.168.1.254
+
+Timestamp logging: enabled
+Logging host: 192.168.1.100
+Logging host: 192.168.1.254`;
+            
+            case 'version':
+                return `Cisco IOS XE Software, Version 16.12.04
+Cisco IOS Software [Amsterdam], Virtual XE Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Version 16.12.4, RELEASE SOFTWARE (fc3)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2020 by Cisco Systems, Inc.
+Compiled Thu 26-Mar-20 10:16 by mcpre
+
+ROM: IOS-XE ROMMON
+core-switch-01 uptime is 2 weeks, 3 days, 4 hours, 23 minutes
+Uptime for this control processor is 2 weeks, 3 days, 4 hours, 25 minutes`;
+            
+            case 'help':
+                return `Available show commands:
+• show running-config    - Current configuration
+• show ip route         - Routing table
+• show interface brief  - Interface status
+• show logging          - Logging configuration
+• show version          - System version
+• show vlan             - VLAN information
+• show arp              - ARP table
+• show mac address-table - MAC address table`;
+            
+            default:
+                return `Unknown show command: ${subcommand}
+Type 'show help' for available commands`;
+        }
+    }
+
+    handleLogging(args) {
+        const subcommand = args[0];
+        
+        switch (subcommand) {
+            case 'on':
+                return `Logging enabled.
+*Mar 1 00:00:00.000: %SYS-5-CONFIG_I: Configured from console by admin
+*Mar 1 00:00:01.000: %LINK-3-UPDOWN: Interface GigabitEthernet1/0/1, changed state to up
+*Mar 1 00:00:02.000: %LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet1/0/1, changed state to up`;
+            
+            case 'off':
+                return `Logging disabled.
+*Mar 1 00:00:03.000: %SYS-5-CONFIG_I: Logging disabled by admin`;
+            
+            case 'debug':
+                return `Debug logging enabled.
+*Mar 1 00:00:04.000: %OSPF-5-ADJCHG: Process 1, Nbr 192.168.1.254 on GigabitEthernet1/0/1 from LOADING to FULL, Loading Done
+*Mar 1 00:00:05.000: %BGP-5-ADJCHANGE: neighbor 192.168.1.254 Up
+*Mar 1 00:00:06.000: %SYS-6-BOOTTIME: Time taken to discover after first neighbor discovery: 00:00:00`;
+            
+            default:
+                return `Usage: logging [on|off|debug]
+• logging on    - Enable logging
+• logging off   - Disable logging  
+• logging debug - Enable debug logging`;
+        }
+    }
+    /**
+     * Handle Mechvibes keyboard sound commands
+     * Usage:
+     *   mechvibes on/off
+     *   mechvibes volume <0.0-1.0>
+     *   mechvibes info
+     */
+    async handleMechvibes(args = []) {
+        const bootSystem = window.bootSystemInstance;
+        if (!bootSystem || !bootSystem.mechvibesPlayer) {
+            return 'Mechvibes system not initialized.';
+        }
+        const player = bootSystem.mechvibesPlayer;
+        const sub = (args[0] || '').toLowerCase();
+        if (sub === 'on') {
+            player.setEnabled(true);
+            return 'Mechvibes keyboard sounds enabled.';
+        } else if (sub === 'off') {
+            player.setEnabled(false);
+            return 'Mechvibes keyboard sounds disabled.';
+        } else if (sub === 'volume') {
+            const v = parseFloat(args[1]);
+            if (isNaN(v) || v < 0 || v > 1) {
+                return 'Usage: mechvibes volume <0.0-1.0>';
+            }
+            player.setVolume(v);
+            return `Mechvibes volume set to ${v}`;
+        } else if (sub === 'info') {
+            const info = player.getSoundPackInfo();
+            if (!info) return 'No Mechvibes sound pack loaded.';
+            return `Mechvibes Sound Pack:
+Name: ${info.name}
+ID: ${info.id}
+Loaded: ${info.isLoaded}
+Enabled: ${info.isEnabled}
+Volume: ${info.volume}`;
+        } else {
+            return `Mechvibes keyboard sound commands:
+• mechvibes on/off         Enable or disable Mechvibes sounds
+• mechvibes volume <0-1>   Set Mechvibes volume
+• mechvibes info           Show sound pack info`;
         }
     }
 }

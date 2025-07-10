@@ -1,21 +1,23 @@
+// [neuOS]
 /**
  * @file Main entry point for the application. Initializes all modules and handles global events.
- * @author Jared U.
+ * @author jared u.
  */
 
-import { ContentParser } from './utils/parser.js';
+console.log('neuOS: Starting module imports...');
+
 import { Terminal } from './apps/terminal.js';
 import { WindowManager } from './core/window.js';
-import { NetworkVisualization } from './apps/network.js';
-import { KeyboardManager } from './core/keyboard.js';
 import { HelpManager } from './utils/help.js';
 import { SearchManager } from './utils/search.js';
 import { BootSystem } from './core/boot.js';
-import { SkillsApp } from './apps/skills.js';
-import { ProjectsApp } from './apps/projects.js';
-import { SystemStatus } from './apps/system-status.js';
-import { initializeConwayGameOfLife, destroyConwayGameOfLife } from './apps/conway-game-of-life.js';
 import { CONFIG, createAppButton } from './config.js';
+import { debounce } from './utils/utils.js';
+
+// Import screensaver
+import './core/screensaver.js';
+
+console.log('neuOS: All modules imported successfully');
 
 // --- MODULE INITIALIZATION ---
 /** @type {WindowManager} */
@@ -26,8 +28,7 @@ window.windowManager = windowManager;
 const helpManager = new HelpManager();
 /** @type {SearchManager} */
 const searchManager = new SearchManager();
-/** @type {?NetworkVisualization} */
-let network = null;
+
 /** @type {?Terminal} */
 let terminal = null;
 /** @type {BootSystem} */
@@ -68,7 +69,7 @@ function initializeUI() {
  * Handles the click event for an application icon or menu item.
  * @param {string} appId - The ID of the application to launch.
  */
-function handleAppClick(appId) {
+async function handleAppClick(appId) {
     console.log(`handleAppClick called for appId: ${appId}`);
     
     // Play UI sound effect
@@ -83,7 +84,7 @@ function handleAppClick(appId) {
     }
     console.log(`App config found:`, app);
 
-    app.windows.forEach(windowConfig => {
+    app.windows.forEach(async windowConfig => {
         console.log(`Processing window config:`, windowConfig);
         // If window already open, focus it and do not re-initialize
         let winElem = document.getElementById(windowConfig.id);
@@ -107,10 +108,20 @@ function handleAppClick(appId) {
             width: windowConfig.width,
             height: windowConfig.height,
             icon: app.icon,
-            autoScroll: ['terminal', 'codex', 'device-manager'].includes(appId), // Enable auto-scroll for apps that benefit from it
-            type: app.type || 'app' // Pass the application type (e.g., 'game' vs 'app')
+            autoScroll: ['terminal'].includes(appId), // Enable auto-scroll for apps that benefit from it
+            type: app.type || 'app', // Pass the application type (e.g., 'game' vs 'app')
+            defaultSize: app.defaultSize // Pass the default size for this application
         });
         console.log('Window element created:', winElem);
+        console.log('📱 Window created with default size:', {
+            appId,
+            windowId: windowConfig.id,
+            width: windowConfig.width,
+            height: windowConfig.height,
+            defaultSize: app.defaultSize
+        });
+        
+
         openWindows[windowConfig.id] = winElem;
         try {
             switch (appId) {
@@ -124,94 +135,34 @@ function handleAppClick(appId) {
                     // Expose terminal globally for demoscene access
                     window.terminalInstance = terminal;
                     break;
-                case 'network-monitor':
-                    if (windowConfig.id === 'topologyWindow') {
-                        network = new NetworkVisualization('networkTopology');
-                    }
-                    break;
-                case 'skills':
-                    if (windowConfig.id === 'skillsWindow') {
-                        try {
-                            new SkillsApp(winElem.querySelector('#skillsContainer'));
-                        } catch (error) {
-                            console.warn('SkillsApp not available, showing placeholder');
-                            winElem.querySelector('#skillsContainer').innerHTML = `
-                                <div style="padding: 20px; text-align: center;">
-                                    <h3>🛠️ Skills Module</h3>
-                                    <p>Interactive skills demonstration will be available soon.</p>
-                                    <p>For now, please use the terminal command 'show skills' to view my technical capabilities.</p>
-                                </div>
-                            `;
-                        }
-                    }
-                    break;
-                case 'projects':
-                    if (windowConfig.id === 'projectsWindow') {
-                        try {
-                            new ProjectsApp(winElem.querySelector('#projectsContainer'));
-                        } catch (error) {
-                            console.warn('ProjectsApp not available, showing placeholder');
-                            winElem.querySelector('#projectsContainer').innerHTML = `
-                                <div style="padding: 20px; text-align: center;">
-                                    <h3>📋 Projects Portfolio</h3>
-                                    <p>Interactive project showcase will be available soon.</p>
-                                    <p>For now, please use the terminal command 'show experience' to view my work history.</p>
-                                </div>
-                            `;
-                        }
-                    }
-                    break;
-                case 'system-status':
-                    if (windowConfig.id === 'statusWindow') {
-                        try {
-                            new SystemStatus(winElem.querySelector('#systemStatus'));
-                        } catch (error) {
-                            console.warn('SystemStatus not available, showing placeholder');
-                            winElem.querySelector('#systemStatus').innerHTML = `
-                                <div style="padding: 20px;">
-                                    <h3>📊 System Status</h3>
-                                    <div style="margin: 15px 0;">
-                                        <div style="margin: 10px 0;"><strong>System:</strong> Neu-OS v1.0</div>
-                                        <div style="margin: 10px 0;"><strong>Status:</strong> ✅ Online</div>
-                                        <div style="margin: 10px 0;"><strong>Network:</strong> 🌐 Connected</div>
-                                        <div style="margin: 10px 0;"><strong>Security:</strong> 🔒 Secured</div>
-                                        <div style="margin: 10px 0;"><strong>Performance:</strong> ⚡ Optimal</div>
-                                    </div>
-                                </div>
-                            `;
-                        }
-                    }
-                    break;
-                case 'contact':
-                    // Contact form needs form handling
-                    if (windowConfig.id === 'contactWindow') {
-                        setupContactForm(winElem);
-                    }
-                    break;
                 case 'codex':
-                    if (windowConfig.id === 'codexWindow') {
-                        searchManager.initializeSearch();
-                    }
-                    break;
-                case 'device-manager':
-                    // Device manager already has static content
-                    break;
-                case 'welcome':
-                    // Welcome window needs no special initialization
-                    break;
-                case 'conway-game-of-life':
-                    if (windowConfig.id === 'gameOfLifeWindow') {
-                        initializeConwayGameOfLife();
-                        
-                        // Add cleanup when window is closed
-                        const closeBtn = winElem.querySelector('.window-control.close');
-                        if (closeBtn) {
-                            closeBtn.addEventListener('click', () => {
-                                destroyConwayGameOfLife();
-                                delete openWindows[windowConfig.id];
-                            });
-                        }
-                    }
+                    console.log('Initializing codex...');
+                    const codexApp = new CodexApp();
+                    await codexApp.init();
+                    
+                    // Store reference to codex app
+                    window.codexInstance = codexApp;
+                    
+                    // The Codex app now uses WindowManager directly, so we don't need to replace windows
+                    // Just update the window content with the Codex content
+                    const codexContent = codexApp.window.querySelector('.window-content').innerHTML;
+                    winElem.querySelector('.window-content').innerHTML = codexContent;
+                    
+                    // Set up the Codex app's event listeners on the WindowManager window
+                    codexApp.setupEventListeners();
+                    
+                    // Update references to point to the WindowManager window
+                    codexApp.window = winElem;
+                    codexApp.searchInput = winElem.querySelector('.search-input');
+                    codexApp.layersContainer = winElem.querySelector('.layers-container');
+                    codexApp.currentLayerSpan = winElem.querySelector('.current-layer');
+                    codexApp.totalLayersSpan = winElem.querySelector('.total-layers');
+                    codexApp.loadingIndicator = winElem.querySelector('.loading-indicator');
+                    
+                    // Now load the content after DOM elements are properly set up
+                    await codexApp.loadContent();
+                    
+                    console.log('Codex initialized:', codexApp);
                     break;
             }
         } catch (error) {
@@ -302,25 +253,45 @@ function handleGlobalKeydown(e) {
 }
 
 // --- INITIALIZATION ---
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+            console.log('DOMContentLoaded: Starting neuOS initialization...');
     try {
         // Initialize core systems
+        console.log('DOMContentLoaded: Creating BootSystem instance...');
         bootSystem = BootSystem.getInstance();
         console.log('Boot system initialized:', bootSystem);
         console.log('Global boot system instance:', window.bootSystemInstance);
         
+        // Ensure boot system is properly initialized
+        if (bootSystem && typeof bootSystem.init === 'function') {
+            console.log('DOMContentLoaded: Ensuring boot system is initialized...');
+            await bootSystem.init();
+        }
+        
         // Initialize UI after DOM is ready
+        console.log('DOMContentLoaded: Initializing UI...');
         initializeUI();
         
-        // Initialize keyboard manager after other systems are ready
+        // Fallback: If boot system doesn't start within 3 seconds, force it
         setTimeout(() => {
-            try {
-                const keyboardManager = new KeyboardManager(windowManager, terminal, network);
-                window.keyboardManager = keyboardManager;
-            } catch (error) {
-                console.warn('KeyboardManager initialization failed:', error);
+            if (document.body.classList.contains('boot-active')) {
+                console.log('DOMContentLoaded: Boot system appears to be running normally');
+            } else {
+                console.warn('DOMContentLoaded: Boot system may be stuck, forcing login screen...');
+                if (window.bootSystemInstance) {
+                    window.bootSystemInstance.showLoginScreen();
+                } else {
+                    // Emergency fallback
+                    document.getElementById('bootSequence').style.display = 'none';
+                    document.getElementById('loginScreen').style.display = 'flex';
+                }
             }
-        }, 1000);
+        }, 3000);
+        
+
+        
+        // Initialize starfield background globally
+        new window.StarfieldBackground();
         
         // Set up global event listeners with null checks
 
@@ -342,6 +313,26 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('click', handleGlobalClick);
         document.addEventListener('keydown', handleGlobalKeydown);
         
+        // Add window resize listener for responsive desktop icons
+        window.addEventListener('resize', debounce(() => {
+            const desktopIcons = document.getElementById('desktop-icons');
+            if (desktopIcons) {
+                // Force a reflow to update the grid layout
+                desktopIcons.style.display = 'none';
+                desktopIcons.offsetHeight; // Force reflow
+                desktopIcons.style.display = 'grid';
+                
+                // Log the current responsive state for debugging
+                const computedStyle = getComputedStyle(desktopIcons);
+                console.log('🖥️ Desktop icons responsive update:', {
+                    width: window.innerWidth,
+                    columns: computedStyle.gridTemplateColumns,
+                    gap: computedStyle.gap,
+                    iconMinWidth: computedStyle.getPropertyValue('--icon-min-width')
+                });
+            }
+        }, 150));
+        
     } catch (error) {
         console.error('Failed to initialize application:', error);
         
@@ -349,11 +340,11 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.innerHTML = `
             <div style="display: flex; align-items: center; justify-content: center; height: 100vh; background: #181f2a; color: #eaf1fb; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px;">
                 <div>
-                    <h1 style="color: #ff6b6b; margin-bottom: 20px;">⚠️ Neu-OS Initialization Error</h1>
-                    <p style="margin-bottom: 15px;">The operating system failed to start properly.</p>
-                    <p style="font-size: 0.9em; opacity: 0.8;">Please refresh the page or check the browser console for more details.</p>
+                    <h1 style="color: #ff6b6b; margin-bottom: 20px;">⚠️ neuOS initialization error</h1>
+                    <p style="margin-bottom: 15px;">the operating system failed to start properly.</p>
+                    <p style="font-size: 0.9em; opacity: 0.8;">please refresh the page or check the browser console for more details.</p>
                     <button onclick="location.reload()" style="margin-top: 20px; padding: 10px 20px; background: #4a90e2; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px;">
-                        Restart System
+                        restart system
                     </button>
                 </div>
             </div>

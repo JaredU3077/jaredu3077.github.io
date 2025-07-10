@@ -133,7 +133,7 @@ export class HelpManager {
             `;
             
             section.content.forEach(item => {
-                content += `<li style="margin: 8px 0; padding: 8px; background: rgba(74, 144, 226, 0.1); border-radius: 4px; border-left: 3px solid #4a90e2;">• ${item}</li>`;
+                content += `<li style="margin: 8px 0; padding: 8px; background: transparent; border-radius: 4px; border-left: 3px solid #4a90e2;">• ${item}</li>`;
             });
             
             content += `
@@ -143,7 +143,7 @@ export class HelpManager {
         });
 
         content += `
-                <div style="margin-top: 30px; padding: 15px; background: rgba(0, 208, 132, 0.1); border-radius: 8px; border: 1px solid rgba(0, 208, 132, 0.3); text-align: center;">
+                <div style="margin-top: 30px; padding: 15px; background: transparent; border-radius: 8px; border: 1px solid rgba(0, 208, 132, 0.3); text-align: center;">
                     <p style="margin: 0; color: #00d084; font-weight: 600;">💡 Pro Tip</p>
                     <p style="margin: 5px 0 0 0; font-size: 0.9em;">Try running 'show resume' or 'show jared' in the terminal to see my professional background!</p>
                 </div>

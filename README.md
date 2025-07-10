@@ -1,267 +1,480 @@
-# DarkWave Demoscene Platform
+# neuOS - Network Engineering Operating System
 
-A web-based demoscene platform that embodies the dark wave 8-bit hacker aesthetic, inspired by classic demoscene culture and modern web technologies.
+A sophisticated interactive portfolio website designed as a virtual operating system interface, showcasing network engineering expertise with a perfected space-themed aesthetic and chillhouse vibes.
 
-## 🌟 Features
+## 🎯 Overview
 
-### Aesthetic Implementation
-- **Dark Wave 8-bit Hacker Style**: Neon purples, deep blues, and glowing whites on dark backgrounds
-- **Glitch Effects**: Dynamic text distortion and visual artifacts
-- **Scanline Overlay**: CRT-style scanlines for authentic retro feel
-- **Pixelated Rendering**: True 8-bit aesthetic with crisp pixel edges
-- **Neon Glows**: CSS-powered neon effects and animations
+neuOS is a modern, interactive portfolio website that presents network engineering skills through an operating system metaphor. Built with vanilla JavaScript, HTML5, and CSS3, it features a **perfected space-themed background** with animated stars, transparent boot/login sequences, and a comprehensive suite of interactive applications with **optimized window dragging performance**.
 
-### Core Functionality
-- **Demo Showcase**: Gallery of interactive demos with real-time previews
-- **Creation Tools**: Web-based demo editor with canvas, audio, and code tabs
-- **Community Hub**: Comments system and leaderboard for demo ratings
-- **Educational Resources**: Tutorials for demoscene creation
+### Key Features
+- **✨ Perfected Space Theme**: Animated starfield background with particle effects - **DO NOT MODIFY**
+- **🚀 Optimized Window System**: Fast, responsive, swift window dragging - **DO NOT MODIFY**
+- **OS Interface**: Window-based application system with drag-and-drop functionality
+- **Interactive Terminal**: Full-featured command-line interface
+- **Codex Application**: Comprehensive network engineering knowledge base
+- **Audio System**: Ambient sound effects and audio controls
+- **Responsive Design**: Works seamlessly across all devices
+- **Accessibility**: WCAG compliant with screen reader support
+- **Vertical Desktop Layout**: Compact tower-style desktop icons
 
-### Audio System
-- **Chiptune Generation**: Web Audio API-powered 8-bit music creation
-- **Dark Wave Sequences**: Atmospheric chord progressions and ambient tracks
-- **Real-time Effects**: Reverb, delay, distortion, and low-pass filtering
-- **Audio Visualizer**: Real-time frequency analysis display
-
-### Visual Effects
-- **Particle Systems**: Dynamic neon particle animations
-- **Matrix Rain**: Classic falling character effects
-- **Wireframe Networks**: Connected node animations
-- **Glitch Text**: Distorted typography with color separation
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Modern web browser with Web Audio API support
-- No server required - runs entirely in the browser
-
-### Installation
-1. Clone or download the repository
-2. Open `demoscene.html` in your web browser
-3. Click anywhere to initialize audio (required for browser autoplay policies)
+## 🏗️ Architecture
 
 ### File Structure
 ```
-demoscene-platform/
-├── demoscene.html          # Main HTML file
-├── css/
-│   └── DarkWave.css        # Dark wave aesthetic framework
+jaredu3077.github.io/
+├── index.html                 # Main entry point
+├── theme.css                  # Complete styling system
+├── codex.txt                  # Knowledge base content
 ├── js/
-│   ├── DarkWaveAudio.js    # Chiptune and audio system
-│   ├── DarkWaveCore.js     # Core demoscene functionality
-│   └── demoscene.js        # Main platform controller
-└── README.md              # This file
+│   ├── main.js               # Core application controller
+│   ├── config.js             # System configuration
+│   ├── core/
+│   │   ├── boot.js           # Boot sequence and login system
+│   │   ├── keyboard.js       # Keyboard event handling
+│   │   ├── screensaver.js    # Space screensaver functionality
+│   │   └── window.js         # Optimized window management system
+│   ├── apps/
+│   │   ├── terminal.js       # Interactive terminal application
+│   │   └── codex.js          # Network knowledge base
+│   ├── data/
+│   │   └── codex-data.js     # Knowledge base utilities
+│   └── utils/
+│       ├── help.js           # Help system
+│       ├── parser.js         # Command parsing
+│       ├── search.js         # Search functionality
+│       └── utils.js          # Utility functions
+├── demoscene/                 # Standalone demoscene platform
+└── docs/                      # Documentation
 ```
 
-## 🎨 Usage
+### Core Systems
 
-### Demo Showcase
-- Browse the demo gallery to see sample demos
-- Click "Play" to run demos with synchronized audio
-- Click "Stop" to halt demo playback
+#### 1. Boot System (`js/core/boot.js`)
+- **Purpose**: Handles system initialization, login sequence, and audio management
+- **Features**:
+  - Animated boot sequence with progress indicators
+  - Login screen with user profile
+  - Advanced audio system with Web Audio API
+  - Interactive particle system for background effects
+  - Keyboard shortcuts and controls
+  - Mouse-tracking particle interactions
 
-### Creation Tools
-1. **Canvas Editor**: Add particles and create visual effects
-2. **Audio Editor**: Generate chiptune melodies and dark wave sequences
-3. **Code Editor**: Write custom demo code in JavaScript
+#### 2. Window Management (`js/core/window.js`) - **PERFECTED**
+- **Purpose**: Manages application windows and desktop interface
+- **Features**:
+  - **🚀 Optimized window dragging** - Fast, responsive, swift performance
+  - **Hardware acceleration** with `translateZ(0)` and `will-change: transform`
+  - **No throttling** - Direct event handling for maximum responsiveness
+  - **CSS optimizations** - Disabled transitions during drag operations
+  - Window focus management and stacking
+  - Desktop icon system with vertical tower layout
+  - Window controls (minimize, maximize, close)
+  - Responsive window positioning
+  - **⚠️ DO NOT MODIFY** - Window movement is now perfect
 
-### Community Features
-- Add comments to share thoughts on demos
-- View the leaderboard of top-rated demos
-- Tutorials for learning demoscene techniques
+#### 3. Terminal Application (`js/apps/terminal.js`)
+- **Purpose**: Interactive command-line interface
+- **Features**:
+  - Command parsing and execution
+  - Built-in commands (help, clear, about, etc.)
+  - Command history and auto-completion
+  - Syntax highlighting
+  - Desktop management commands
+  - Network engineering commands
 
-## 🎵 Audio System
+#### 4. Codex Application (`js/apps/codex.js`)
+- **Purpose**: Network engineering knowledge base
+- **Features**:
+  - Layered information architecture
+  - Full-text search functionality
+  - Interactive navigation between layers
+  - Detailed network protocols and tools
+  - Real-time content loading from codex.txt
+  - Responsive design for all screen sizes
 
-### Chiptune Generation
+## 🎨 Design System
+
+### Theme Architecture (`theme.css`)
+The styling system is built around a comprehensive design system with:
+
+#### Color Palette
+- **Primary**: `#6366f1` (Indigo)
+- **Background**: Dark gradient from `#030712` to `#3a3f4e`
+- **Text**: `#f8fafc` (Light gray)
+- **Accents**: Green, orange, purple, red, cyan, yellow, blue
+
+#### Typography
+- **Primary Font**: Apple system fonts with fallbacks
+- **Monospace**: SF Mono, JetBrains Mono, Fira Code
+- **Scale**: 12px to 36px with consistent spacing
+
+#### Components
+- **Windows**: Transparent glass morphism with backdrop blur
+- **Buttons**: Gradient backgrounds with hover effects
+- **Forms**: Styled inputs with focus states
+- **Scrollbars**: Custom styled for consistency
+
+### Space Theme Integration - **PERFECTED**
+- **✨ Starfield Background**: Canvas-based animated stars - **DO NOT MODIFY**
+- **Particle System**: Interactive background particles with physics
+- **Transparent UI**: Boot/login screens show stars through
+- **Chillhouse Vibes**: Relaxed, soothing aesthetic
+- **⚠️ Space background is now perfect - DO NOT TOUCH**
+
+### Desktop Layout
+- **Vertical Tower**: Desktop icons arranged in a compact vertical column
+- **Responsive Design**: Adapts to different screen sizes
+- **Smooth Animations**: Hover effects and transitions
+- **Accessibility**: Screen reader support and keyboard navigation
+
+## 🚀 Technical Implementation
+
+### JavaScript Architecture
+
+#### Module System
+All JavaScript files use ES6 modules with proper imports/exports:
+
 ```javascript
-// Create a chiptune melody
-const melody = darkWaveAudio.createChiptuneMelody('minor', 16);
-darkWaveAudio.playChiptuneMelody(melody, 120);
-
-// Play dark wave sequence
-darkWaveAudio.playDarkWaveSequence('cyber', 4);
+// Example from boot.js
+export class BootSystem {
+    constructor() {
+        this.audioEnabled = localStorage.getItem('neuos-audio') !== 'false';
+        this.particles = [];
+        this.particleCount = 80;
+        // ... initialization
+    }
+    
+    async init() {
+        this.setupAudioSystem();
+        this.setupEventListeners();
+        this.setupParticleSystem();
+        await this.startBootSequence();
+    }
+}
 ```
 
-### Available Scales
-- `minor`: A minor scale for dark atmospheres
-- `major`: C major scale for brighter melodies
-- `pentatonic`: Five-note scale for minimalist compositions
+#### Event Handling
+Comprehensive event system for keyboard, mouse, and touch interactions:
 
-### Dark Wave Styles
-- `dark`: Am-F-C-G progression
-- `cyber`: Em-C-G-D progression
-- `hacker`: Dm-Am-Bm-G progression
-- `wave`: Cm-Ab-Eb-Bb progression
+```javascript
+// Keyboard controls
+document.addEventListener('keydown', (e) => {
+    switch(e.key.toLowerCase()) {
+        case 'space': this.toggleParticleAnimation(); break;
+        case 'r': this.rotateBackground(); break;
+        case '+': this.increaseParticles(); break;
+        case '-': this.decreaseParticles(); break;
+    }
+});
+```
+
+### Audio System
+Advanced Web Audio API implementation:
+
+```javascript
+setupAudioSystem() {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (AudioContextClass) {
+        this.audioContext = new AudioContextClass();
+        this.setupAudioNodes();
+    }
+}
+
+createTone(frequency, duration, waveType = 'sine', volume = 0.1) {
+    const oscillator = this.audioContext.createOscillator();
+    const gainNode = this.audioContext.createGain();
+    // ... audio processing
+}
+```
+
+### Particle System
+Dynamic particle generation and animation with physics:
+
+```javascript
+createSingleParticle(container) {
+    const particle = document.createElement('div');
+    particle.className = 'enhanced-particle';
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+    // ... particle configuration with physics
+}
+```
+
+### Window Management - **PERFECTED**
+Optimized window dragging and resizing with hardware acceleration:
+
+```javascript
+// Performance optimizations for window dragging
+.window {
+    contain: layout style;
+    backface-visibility: hidden;
+    will-change: transform;
+    transform: translateZ(0);
+    /* Hardware acceleration */
+    -webkit-transform: translateZ(0);
+    -moz-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+}
+
+/* Optimized dragging state */
+.window.dragging {
+    transition: none !important;
+    will-change: transform;
+    transform: translateZ(0);
+    contain: layout style;
+}
+```
+
+## 🎮 User Interface
+
+### Boot Sequence
+1. **Initialization**: System startup with progress indicators
+2. **Login Screen**: User profile with guest access
+3. **Desktop**: Main interface with vertical application icons
+
+### Desktop Environment
+- **Vertical Icons**: Compact tower layout on the left side
+- **Windows**: **🚀 Optimized draggable application containers** - **DO NOT MODIFY**
+- **Responsive**: Adapts to different screen sizes
+- **Accessibility**: Full keyboard navigation support
+
+### Applications
+
+#### Terminal
+- **Commands**: `help`, `clear`, `about`, `codex`, `demoscene`
+- **Features**: Command history, auto-completion, syntax highlighting
+- **Integration**: Seamless access to other applications
+- **Desktop Management**: `desktop clean`, `desktop icons` commands
+
+#### Codex
+- **Content**: Network engineering knowledge base loaded from codex.txt
+- **Navigation**: Layered information architecture with layer navigation
+- **Search**: Full-text search across all content with highlighting
+- **Categories**: Protocols, tools, concepts, certifications
+- **Responsive**: Works on all screen sizes
+
+## 🔧 Configuration
+
+### System Settings (`js/config.js`)
+```javascript
+export const CONFIG = {
+    audio: {
+        enabled: true,
+        volume: 0.3,
+        effects: true
+    },
+    particles: {
+        count: 80,
+        animation: true,
+        interaction: true
+    },
+    theme: {
+        space: true,
+        chillhouse: true
+    },
+    desktop: {
+        layout: 'vertical-tower',
+        iconSize: 120,
+        spacing: 24
+    }
+};
+```
+
+### Customization Options
+- **Audio**: Enable/disable sound effects with persistence
+- **Particles**: Adjust particle count and behavior
+- **Theme**: Space theme and chillhouse vibes
+- **Desktop Layout**: Vertical tower layout with responsive design
+- **Accessibility**: Screen reader support and keyboard navigation
+
+## 🎵 Audio Features
+
+### Sound Effects
+- **Boot Sounds**: System startup audio with Web Audio API
+- **Login Sounds**: User authentication audio
+- **UI Sounds**: Button clicks and interactions
+- **Terminal Sounds**: Typing and command execution
+- **Particle Sounds**: Interactive particle effects
+- **Window Sounds**: Window open/close audio
+
+### Audio Controls
+- **Toggle**: Enable/disable all audio with localStorage persistence
+- **Volume**: Adjustable audio levels
+- **Effects**: Individual sound effect controls
+- **Persistence**: Audio preferences saved to localStorage
+
+## 🌟 Space Theme - **PERFECTED**
+
+### Starfield Background - **DO NOT MODIFY**
+- **Canvas**: Full-screen animated starfield
+- **Stars**: Multiple star types with different sizes and speeds
+- **Animation**: Smooth star movement and twinkling effects
+- **Performance**: Optimized for 60 FPS
+- **⚠️ Space background is now perfect - DO NOT TOUCH**
+
+### Particle System
+- **Interactive**: Mouse-responsive particles with physics
+- **Physics**: Realistic particle movement and interactions
+- **Effects**: Glow and trail effects with color variations
+- **Customization**: Adjustable particle count and behavior
+- **Modes**: Normal, calm, dance, rain, storm modes
+
+### Transparent UI
+- **Boot Screen**: Stars visible through transparent elements
+- **Login Screen**: Space theme visible during authentication
+- **Windows**: Glass morphism with backdrop blur
+- **No Background Fills**: Clean, minimal interface
+
+## 🔍 Search System
+
+### Codex Search (`js/utils/search.js`)
+- **Full-Text**: Search across all content with highlighting
+- **Categories**: Filter by content type
+- **Results**: Highlighted search results with context
+- **Navigation**: Direct links to content sections
+
+### Terminal Search
+- **Commands**: Search available commands with auto-completion
+- **History**: Search command history
+- **Help**: Context-sensitive help system
 
 ## 🎨 Visual Effects
 
-### Particle Systems
-```javascript
-// Create particle system
-darkWaveCore.createParticleSystem('canvas-id', {
-    maxParticles: 100,
-    particleSize: 2,
-    speed: 2,
-    colors: ['#b388ff', '#00ffff', '#ff00ff'],
-    life: 100,
-    gravity: 0.1
-});
+### Animations
+- **CSS Transitions**: Smooth state changes with cubic-bezier curves
+- **Keyframe Animations**: Complex motion effects
+- **JavaScript Animations**: Dynamic content updates
+- **Performance**: Optimized for smooth 60 FPS
+
+### Effects
+- **Glow Effects**: Element highlighting with CSS filters
+- **Blur Effects**: Backdrop blur for glass morphism
+- **Gradients**: Dynamic color transitions
+- **Shadows**: Depth and layering with box-shadows
+
+## 📱 Responsive Design
+
+### Mobile Support
+- **Touch Events**: Touch-friendly interactions
+- **Responsive Layout**: Adapts to screen size
+- **Performance**: Optimized for mobile devices
+- **Accessibility**: Mobile accessibility features
+
+### Desktop Features
+- **Keyboard Shortcuts**: Power user features
+- **Mouse Interactions**: Advanced mouse controls
+- **Window Management**: Full desktop experience
+- **Multi-Monitor**: Support for multiple displays
+
+## 🔒 Security
+
+### Content Security Policy
+```html
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data:; font-src 'self' https://cdnjs.cloudflare.com; connect-src 'self';">
 ```
 
-### Glitch Effects
-```javascript
-// Create glitch text
-darkWaveCore.createGlitchEffect('canvas-id', 'DEMOSCENE', {
-    fontSize: 48,
-    glitchIntensity: 0.1,
-    glitchFrequency: 0.05
-});
-```
+### Security Headers
+- **X-Content-Type-Options**: Prevent MIME type sniffing
+- **X-Frame-Options**: Prevent clickjacking
+- **X-XSS-Protection**: XSS protection
 
-### Matrix Rain
-```javascript
-// Create matrix rain effect
-darkWaveCore.createMatrixRain('canvas-id', {
-    fontSize: 14,
-    columns: 50,
-    speed: 1,
-    color: '#00ff41'
-});
-```
+## 🚀 Performance - **OPTIMIZED**
 
-## 🛠️ Customization
+### Window Dragging Performance - **PERFECTED**
+- **🚀 Hardware Acceleration**: `translateZ(0)` and `will-change: transform`
+- **No Throttling**: Direct event handling for maximum responsiveness
+- **CSS Optimizations**: Disabled transitions during drag operations
+- **Batch DOM Updates**: Efficient position updates
+- **⚠️ Window movement is now perfect - DO NOT MODIFY**
 
-### CSS Variables
-The platform uses CSS custom properties for easy theming:
+### Optimization Techniques
+- **Lazy Loading**: Load content on demand
+- **Minification**: Compressed JavaScript and CSS
+- **Caching**: Browser caching for static assets
+- **CDN**: External libraries from CDN
 
-```css
-:root {
-    --bg-primary: #0d0b1e;      /* Main background */
-    --bg-secondary: #1a1a2e;    /* Secondary background */
-    --neon-purple: #b388ff;     /* Primary neon color */
-    --neon-blue: #00ffff;       /* Secondary neon color */
-    --neon-pink: #ff00ff;       /* Accent neon color */
-    --text-primary: #ffffff;    /* Primary text color */
-}
-```
+### Memory Management
+- **Particle Cleanup**: Automatic particle removal
+- **Event Cleanup**: Proper event listener removal
+- **Audio Cleanup**: Audio context management
+- **Window Cleanup**: Proper window disposal
 
-### Adding New Effects
-1. Extend the `DarkWaveCore` class with new effect methods
-2. Add corresponding UI controls in the editor
-3. Update the demo gallery to showcase new effects
+### Performance Optimizations
+- **CSS Containment**: `contain: layout style` for windows
+- **Backface Visibility**: `backface-visibility: hidden` for smooth animations
+- **Will-Change**: Optimized transform properties
+- **RequestAnimationFrame**: Optimized event handlers
 
-### Audio Customization
-1. Add new chord progressions to `chordProgressions` object
-2. Create custom scales in `createChiptuneMelody`
-3. Implement new audio effects in the `createEffects` method
+## 🐛 Debugging
 
-## 🎯 Demo Creation Guide
+### Console Logging
+- **Boot System**: Detailed initialization logs
+- **Audio System**: Audio context status
+- **Particle System**: Particle count and performance
+- **Window System**: Window management events
+- **Codex App**: Content loading and parsing logs
 
-### Basic Demo Structure
-```javascript
-// Get canvas context
-const canvas = document.getElementById('editor-canvas');
-const ctx = canvas.getContext('2d');
+### Error Handling
+- **Graceful Degradation**: Fallbacks for unsupported features
+- **Error Recovery**: Automatic error recovery
+- **User Feedback**: Clear error messages
+- **Debug Mode**: Enhanced logging for development
 
-// Animation loop
-function animate() {
-    // Clear canvas with fade effect
-    ctx.fillStyle = 'rgba(13, 11, 30, 0.1)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // Your demo code here
-    ctx.fillStyle = '#b388ff';
-    ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 4, 4);
-    
-    // Continue animation
-    requestAnimationFrame(animate);
-}
-
-// Start animation
-animate();
-```
-
-### Best Practices
-- Use `requestAnimationFrame` for smooth animations
-- Implement fade effects with `rgba` colors
-- Keep particle counts reasonable for performance
-- Use the dark wave color palette for consistency
-- Add audio synchronization for immersive experiences
-
-## 🔧 Technical Details
-
-### Browser Compatibility
-- **Chrome/Edge**: Full support
-- **Firefox**: Full support
-- **Safari**: Full support (may require user interaction for audio)
-- **Mobile**: Responsive design with touch support
-
-### Performance Optimization
-- Canvas rendering with `imageSmoothingEnabled = false`
-- Efficient particle system with object pooling
-- Audio context management for browser autoplay policies
-- Visibility API integration for background tab optimization
-
-### Security Considerations
-- Code execution in sandboxed environment
-- Input sanitization for user-generated content
-- Local storage for persistence (no server required)
-
-## 🎪 Future Enhancements
+## 🔮 Future Enhancements
 
 ### Planned Features
-- **WebGL Support**: 3D demos with Three.js integration
-- **Demo Upload System**: Server-side demo storage and sharing
-- **Real-time Collaboration**: Multi-user demo creation
-- **Advanced Audio**: FM synthesis and tracker-style sequencing
-- **Mobile App**: Progressive Web App with offline support
+- **PWA Support**: Progressive web app capabilities
+- **Offline Mode**: Offline functionality
+- **Data Sync**: Cloud synchronization
+- **Advanced Audio**: More sophisticated audio effects
+- **Enhanced Particles**: More complex particle systems
+- **Mobile Apps**: Native mobile applications
 
-### Community Features
-- **Virtual Demoparties**: Live streaming of demo competitions
-- **Demo Voting System**: Community rating and feedback
-- **Tutorial Videos**: Interactive learning content
-- **Code Sharing**: GitHub integration for demo source code
+### Technical Improvements
+- **WebAssembly**: Performance-critical code in WASM
+- **WebGL**: Hardware-accelerated graphics
+- **Service Workers**: Background processing
+- **WebRTC**: Real-time communication features
+
+## 📚 Documentation
+
+### Code Documentation
+- **JSDoc**: Comprehensive JavaScript documentation
+- **Inline Comments**: Detailed code explanations
+- **Architecture Diagrams**: System structure documentation
+- **API Reference**: Complete API documentation
+
+### User Documentation
+- **Help System**: Built-in help commands
+- **Tutorial**: Interactive tutorial system
+- **FAQ**: Frequently asked questions
+- **Support**: User support resources
 
 ## 🤝 Contributing
 
 ### Development Setup
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly in multiple browsers
-5. Submit a pull request
+1. Clone the repository
+2. Set up local development server
+3. Install development dependencies
+4. Follow coding standards
+5. Test thoroughly before submitting
 
-### Code Style
-- Use ES6+ features
-- Follow the existing naming conventions
-- Add comments for complex algorithms
-- Maintain the dark wave aesthetic
+### Code Standards
+- **ES6+**: Modern JavaScript features
+- **Modular Design**: Clean separation of concerns
+- **Accessibility**: WCAG 2.1 compliance
+- **Performance**: Optimized for speed and efficiency
 
-### Testing
-- Test in Chrome, Firefox, Safari, and Edge
-- Verify audio functionality
-- Check mobile responsiveness
-- Ensure accessibility compliance
+### **⚠️ IMPORTANT: DO NOT MODIFY**
+- **Space Background**: The starfield and particle system are now perfect
+- **Window Movement**: Window dragging performance is optimized and should not be changed
+- **Theme System**: The chillhouse aesthetic is complete and working perfectly
 
 ## 📄 License
 
-This project is open source and available under the MIT License. See the LICENSE file for details.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 🙏 Acknowledgments
+## 👨‍💻 Author
 
-- **Future Crew**: Inspiration from Second Reality (1993)
-- **Farbrausch**: Influence from Debris (2007)
-- **Demoscene Community**: Decades of creative coding inspiration
-- **Web Audio API**: Enabling real-time audio synthesis
-- **Canvas API**: Providing powerful 2D graphics capabilities
-
-## 📞 Support
-
-For questions, bug reports, or feature requests:
-- Create an issue on GitHub
-- Join the demoscene community discussions
-- Check the tutorial section for learning resources
-
----
-
-**Welcome to the DarkWave Demoscene Platform** - Where 8-bit meets dark wave, and creativity knows no bounds! 🎮🎵✨ 
+**Jared U.** - Senior Network Engineer
+- **GitHub**: [jaredu3077](https://github.com/jaredu3077) 

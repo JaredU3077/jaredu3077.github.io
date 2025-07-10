@@ -3,7 +3,7 @@
  * @author Jared U.
  */
 
-import { ContentParser } from './parser.js';
+
 import { CONFIG } from '../config.js';
 
 /**
@@ -559,7 +559,7 @@ export class SearchManager {
                 outline: targetElement.style.outline
             };
             
-            targetElement.style.background = 'rgba(74, 144, 226, 0.3)';
+            targetElement.style.background = 'transparent';
             targetElement.style.borderRadius = '8px';
             targetElement.style.padding = '10px';
             targetElement.style.transition = 'all 0.3s ease';
