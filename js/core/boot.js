@@ -75,9 +75,6 @@ export class BootSystem {
             guestLoginBtn.addEventListener('click', () => this.bootSequence.handleLogin());
         }
 
-        // Disable skipping boot sequence - only login button should work
-        // Removed keydown and click event listeners that allowed skipping
-
         // Keyboard controls for background effects
         document.addEventListener('keydown', (e) => {
             // Only handle keyboard controls if no input is focused

@@ -30,9 +30,6 @@ export class BootSequence {
                 window.audioSystemInstance.playBootSound();
             }
 
-            // Start message cycling
-            this.cycleBootMessages();
-
             // Wait for progress animation to complete
             await this.startProgressAnimation();
             
@@ -50,81 +47,73 @@ export class BootSequence {
             console.log('Starting progress animation...');
             
             const progressFill = document.querySelector('.progress-fill');
-            const progressPercentage = document.querySelector('.progress-percentage');
             
             if (!progressFill) {
                 console.error('Progress fill element not found');
                 resolve();
                 return;
             }
-            
-            if (!progressPercentage) {
-                console.warn('Progress percentage element not found, continuing without percentage display');
-            }
 
             // Reset progress bar to 0
             progressFill.style.width = '0%';
-            if (progressPercentage) {
-                progressPercentage.textContent = '0%';
-            }
 
-            let progress = 0;
+            let currentProgress = 0;
             const targetProgress = 100;
-            const duration = 2000; // 2 seconds total (much faster)
-            const interval = 25; // Update every 25ms for smoother animation
-            const pauseAt = 85; // Pause at 85%
-            const pauseDuration = 300; // Pause for 300ms
+            const pauseAt = 85;
+            const pauseDuration = 300;
             let isPaused = false;
-            let pauseStartTime = 0;
+            let hasPaused = false;
             
-            // Calculate smooth increment
-            const totalSteps = duration / interval;
-            const increment = targetProgress / totalSteps;
+            // Simple, direct animation
+            const totalDuration = 3000; // 3 seconds
+            const activeDuration = totalDuration - pauseDuration; // 2.7 seconds
+            const updateInterval = 16; // 60fps
+            const totalUpdates = activeDuration / updateInterval;
+            const progressPerUpdate = targetProgress / totalUpdates;
 
             console.log('Progress animation parameters:', {
-                duration,
-                interval,
-                totalSteps,
-                increment,
-                pauseAt,
-                pauseDuration
+                totalDuration,
+                activeDuration,
+                updateInterval,
+                totalUpdates,
+                progressPerUpdate
             });
 
             const updateProgress = () => {
-                // Handle pause at 85% - only pause once
-                if (progress >= pauseAt && !isPaused && !this.hasPaused) {
+                // Handle pause at 85%
+                if (currentProgress >= pauseAt && !isPaused && !hasPaused) {
                     console.log('Pausing at 85%');
                     isPaused = true;
-                    this.hasPaused = true; // Mark that we've paused once
-                    pauseStartTime = Date.now();
-                    setTimeout(updateProgress, pauseDuration);
+                    hasPaused = true;
+                    
+                    setTimeout(() => {
+                        console.log('Resuming after pause');
+                        isPaused = false;
+                        updateProgress();
+                    }, pauseDuration);
                     return;
                 }
                 
-                // Resume after pause
-                if (isPaused && (Date.now() - pauseStartTime) >= pauseDuration) {
-                    console.log('Resuming after pause');
-                    isPaused = false;
-                }
-                
                 if (!isPaused) {
-                    progress += increment;
-                    if (progress > targetProgress) progress = targetProgress;
+                    currentProgress += progressPerUpdate;
+                    if (currentProgress > targetProgress) {
+                        currentProgress = targetProgress;
+                    }
                 }
                 
-                // Update the progress bar
-                progressFill.style.width = `${progress}%`;
-                if (progressPercentage) {
-                    progressPercentage.textContent = `${Math.round(progress)}%`;
-                }
+                // Update the progress bar immediately
+                progressFill.style.width = `${currentProgress}%`;
                 
-                console.log('Progress:', Math.round(progress) + '%');
+                console.log('Progress:', Math.round(currentProgress) + '%');
                 
-                if (progress < targetProgress) {
-                    setTimeout(updateProgress, interval);
+                if (currentProgress < targetProgress) {
+                    setTimeout(updateProgress, updateInterval);
                 } else {
                     console.log('Progress animation complete');
-                    resolve(); // Resolve the promise when animation is complete
+                    setTimeout(() => {
+                        console.log('Progress animation fully complete');
+                        resolve();
+                    }, 200);
                 }
             };
 
