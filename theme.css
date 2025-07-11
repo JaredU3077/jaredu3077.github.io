@@ -1305,7 +1305,6 @@ body::before {
 
 
 /* Hide desktop during boot/login */
-.boot-active #desktop,
 .login-active #desktop {
     display: none;
 }

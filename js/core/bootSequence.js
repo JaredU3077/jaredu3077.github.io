@@ -185,6 +185,7 @@ export class BootSequence {
             if (desktop) {
                 desktop.style.opacity = '1';
                 desktop.style.transform = 'scale(1)';
+                console.log('neuOS: Desktop fade-in animation triggered');
             }
         }, 100);
 
@@ -202,6 +203,8 @@ export class BootSequence {
         }, 1000);
 
         console.log('neuOS: Desktop initialization complete');
+        console.log('neuOS: Desktop element found:', !!desktop);
+        console.log('neuOS: Desktop icons container found:', !!document.getElementById('desktop-icons'));
     }
 
     createNetworkAnimations() {
