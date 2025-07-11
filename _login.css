@@ -1,0 +1,428 @@
+/* neuOS modern premium theme - Apple-inspired design system */
+/* Login Screen and Boot Sequence Styles */
+
+/* Boot Sequence - Apple-inspired */
+.boot-sequence {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--z-modal);
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+    overflow: hidden;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.boot-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.boot-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.boot-container {
+    text-align: center;
+    max-width: 600px;
+    padding: var(--spacing-2xl);
+    position: relative;
+    z-index: 2;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 24px !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    animation: loginContainerSlide 1s ease-out forwards;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.boot-header {
+    margin-bottom: var(--spacing-2xl);
+}
+
+.boot-title {
+    font-size: 4rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 0;
+    text-shadow: 0 0 30px rgba(99, 102, 241, 0.6);
+    animation: titleGlow 2s ease-in-out infinite alternate;
+    letter-spacing: -0.025em;
+    font-family: var(--font-family);
+}
+
+.boot-progress {
+    width: 100%;
+    max-width: 400px;
+}
+
+.progress-container {
+    position: relative;
+    margin-bottom: var(--spacing-lg);
+    width: 100%;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--primary-color);
+    border-radius: var(--border-radius-small);
+    overflow: hidden;
+    position: relative;
+    box-shadow: none;
+    min-width: 300px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--primary-color);
+    border-radius: var(--border-radius-small);
+    width: 0%;
+    animation: bootProgress 4s ease-in-out forwards;
+    position: relative;
+}
+
+.progress-percentage {
+    position: absolute;
+    top: -30px;
+    right: 0;
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    font-family: var(--font-family-mono);
+    font-weight: 500;
+}
+
+/* Login Screen - Apple-inspired */
+.login-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent !important;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--z-modal);
+    opacity: 0;
+    animation: loginFadeIn 1.2s ease-out forwards;
+    overflow: hidden;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.login-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.login-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.login-container {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 24px !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    padding: var(--spacing-2xl);
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    z-index: 2;
+    position: relative;
+    animation: loginContainerSlide 1s ease-out forwards;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.login-header {
+    margin-bottom: var(--spacing-2xl);
+}
+
+.login-title {
+    font-size: 4rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 0;
+    text-shadow: 0 0 30px rgba(99, 102, 241, 0.6);
+    animation: titleGlow 2s ease-in-out infinite alternate;
+    letter-spacing: -0.025em;
+    font-family: var(--font-family);
+}
+
+.login-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.login-btn {
+    width: auto;
+    min-width: 200px;
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: transparent !important;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    border-radius: var(--border-radius);
+    font-size: var(--text-base);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    box-shadow: none !important;
+    position: relative;
+    overflow: hidden;
+    font-family: var(--font-family);
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    margin: 0 auto;
+}
+
+.login-btn:hover {
+    transform: translateY(-2px);
+    background: rgba(99, 102, 241, 0.1) !important;
+    border-color: var(--primary-light);
+    color: var(--primary-light);
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+}
+
+.login-btn:active {
+    transform: translateY(0);
+}
+
+.btn-text {
+    position: relative;
+    z-index: 2;
+}
+
+.btn-icon {
+    position: relative;
+    z-index: 2;
+    transition: transform var(--transition-fast);
+}
+
+.login-btn:hover .btn-icon {
+    transform: translateX(4px);
+}
+
+.btn-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+    border-radius: var(--border-radius);
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+}
+
+.login-btn:hover .btn-glow {
+    opacity: 1;
+}
+
+/* Audio Controls - Transparent neuOS Theme */
+.audio-controls {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 8000;
+    opacity: 0;
+    animation: audioControlsFadeIn 2s ease-out 1s forwards;
+}
+
+.audio-toggle {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all var(--transition);
+    box-shadow: none !important;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.audio-toggle:hover {
+    background: transparent !important;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    transform: scale(1.05);
+    box-shadow: none !important;
+}
+
+.audio-toggle:active {
+    transform: scale(0.95);
+}
+
+.audio-toggle .audio-on,
+.audio-toggle .audio-off {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+    transition: all var(--transition-fast);
+}
+
+.audio-toggle:hover .audio-on,
+.audio-toggle:hover .audio-off {
+    stroke: var(--primary-color);
+    transform: scale(1.1);
+}
+
+/* Animations */
+@keyframes bootBackground {
+    0% { background: #000; }
+    50% { background: linear-gradient(135deg, #0a0f16 0%, #1a1f2a 50%, #0a0f16 100%); }
+    100% { background: linear-gradient(135deg, #0a0f16 0%, #1a1f2a 50%, #0a0f16 100%); }
+}
+
+@keyframes bootLogoGlow {
+    0% { filter: drop-shadow(0 0 20px var(--primary-color)); }
+    100% { filter: drop-shadow(0 0 30px var(--primary-color)) drop-shadow(0 0 40px var(--primary-color)); }
+}
+
+@keyframes textGlow {
+    0% { text-shadow: 0 0 20px var(--primary-color); }
+    100% { text-shadow: 0 0 30px var(--primary-color), 0 0 40px var(--primary-color); }
+}
+
+@keyframes bootProgress {
+    0% { width: 0%; }
+    20% { width: 15%; }
+    40% { width: 35%; }
+    60% { width: 60%; }
+    80% { width: 85%; }
+    100% { width: 100%; }
+}
+
+@keyframes bootMessageFade {
+    0% { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes loginFadeIn {
+    0% { opacity: 0; transform: scale(0.95); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes loginLogoFloat {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(180deg); }
+}
+
+@keyframes audioControlsFadeIn {
+    0% { opacity: 0; transform: translateY(-20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Modern Boot & Login Animations */
+@keyframes logoPulse {
+    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 30px rgba(74, 144, 226, 0.6)); }
+    50% { transform: scale(1.05); filter: drop-shadow(0 0 40px rgba(74, 144, 226, 0.8)); }
+}
+
+@keyframes logoGlow {
+    0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.2); }
+}
+
+@keyframes titleGlow {
+    0% { text-shadow: 0 0 30px rgba(74, 144, 226, 0.8); }
+    100% { text-shadow: 0 0 40px rgba(74, 144, 226, 1), 0 0 60px rgba(74, 144, 226, 0.6); }
+}
+
+@keyframes progressGlow {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+@keyframes messageIconPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+@keyframes statusItemFade {
+    0% { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes statusIconPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+@keyframes loginGlow {
+    0%, 100% { opacity: 0.1; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 0.3; transform: translate(-50%, -50%) scale(1.1); }
+}
+
+@keyframes loginContainerSlide {
+    0% { opacity: 0; transform: translateY(20px) scale(0.98); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes avatarFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+@keyframes statusPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.8; }
+}
+
+@keyframes statusDotPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.7; }
+}
+
+/* Hide desktop during boot/login */
+.login-active #desktop {
+    display: none;
+} 

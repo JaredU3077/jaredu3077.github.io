@@ -33,6 +33,13 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🖥️</text></svg>">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🖥️</text></svg>">
     
+    <link rel="stylesheet" href="_variables.css">
+    <link rel="stylesheet" href="_window.css">
+    <link rel="stylesheet" href="_desktop.css">
+    <link rel="stylesheet" href="_login.css">
+    <link rel="stylesheet" href="_apps.css">
+    <link rel="stylesheet" href="_animations.css">
+    <link rel="stylesheet" href="_responsive.css">
     <link rel="stylesheet" href="theme.css">
     <!-- Include Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -87,6 +94,9 @@
     
     <!-- Modern Boot Sequence -->
     <div id="bootSequence" class="boot-sequence" role="dialog" aria-labelledby="boot-title" aria-describedby="boot-desc">
+        <div class="boot-background">
+            <div class="boot-particles"></div>
+        </div>
         <div class="boot-container">
             <div class="boot-header">
                 <h1 id="boot-title" class="boot-title">neuOS</h1>
@@ -97,15 +107,17 @@
                     <div class="progress-bar" role="progressbar" aria-label="Boot progress">
                         <div class="progress-fill"></div>
                     </div>
+                    <div class="progress-percentage">0%</div>
                 </div>
             </div>
-            
-
         </div>
     </div>
 
     <!-- Modern Login Screen -->
     <div id="loginScreen" class="login-screen" role="dialog" aria-labelledby="login-title">
+        <div class="login-background">
+            <div class="login-particles"></div>
+        </div>
         <div class="login-container">
             <div class="login-header">
                 <h2 id="login-title" class="login-title">neuOS</h2>
@@ -113,7 +125,7 @@
             
             <div class="login-form">
                 <button id="guestLoginBtn" class="login-btn">
-                    <span class="btn-text">Enter</span>
+                    <span class="btn-text">enter</span>
                     <div class="btn-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -121,8 +133,6 @@
                     </div>
                     <div class="btn-glow"></div>
                 </button>
-                
-
             </div>
         </div>
     </div>

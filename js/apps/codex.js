@@ -5,7 +5,7 @@ class CodexApp {
         this.name = 'Codex';
         this.icon = '📚';
         this.category = 'knowledge';
-        this.description = 'Comprehensive Financial Knowledge Base';
+        this.description = '200 Layers of Financial Control';
         this.window = null;
         this.content = null; // Will store the HTML string for the app content
         this.searchInput = null;

@@ -17,6 +17,7 @@ export class BootSequence {
             'neuOS ready.'
         ];
         this.messageIndex = 0;
+        this.hasPaused = false; // Track if we've already paused once
     }
 
     async startBootSequence() {
@@ -29,15 +30,14 @@ export class BootSequence {
                 window.audioSystemInstance.playBootSound();
             }
 
-            // Start progress animation and message cycling
-            this.startProgressAnimation();
+            // Start message cycling
             this.cycleBootMessages();
 
-            // Auto-progress to login after boot completes
-            setTimeout(() => {
-                console.log('BootSequence: Boot sequence complete, showing login screen...');
-                this.showLoginScreen();
-            }, 5000);
+            // Wait for progress animation to complete
+            await this.startProgressAnimation();
+            
+            console.log('BootSequence: Boot sequence complete, showing login screen...');
+            this.showLoginScreen();
         } catch (error) {
             console.error('BootSequence: Boot sequence failed:', error);
             // Fallback: show login screen directly
@@ -46,30 +46,91 @@ export class BootSequence {
     }
 
     startProgressAnimation() {
-        const progressFill = document.querySelector('.progress-fill');
-        const progressPercentage = document.querySelector('.progress-percentage');
-        
-        if (!progressFill || !progressPercentage) return;
-
-        let progress = 0;
-        const targetProgress = 100;
-        const duration = 5000; // 5 seconds
-        const interval = 50; // Update every 50ms
-        const increment = (targetProgress / (duration / interval));
-
-        const updateProgress = () => {
-            progress += increment;
-            if (progress > targetProgress) progress = targetProgress;
+        return new Promise((resolve) => {
+            console.log('Starting progress animation...');
             
-            progressFill.style.width = `${progress}%`;
-            progressPercentage.textContent = `${Math.round(progress)}%`;
+            const progressFill = document.querySelector('.progress-fill');
+            const progressPercentage = document.querySelector('.progress-percentage');
             
-            if (progress < targetProgress) {
-                setTimeout(updateProgress, interval);
+            if (!progressFill) {
+                console.error('Progress fill element not found');
+                resolve();
+                return;
             }
-        };
+            
+            if (!progressPercentage) {
+                console.warn('Progress percentage element not found, continuing without percentage display');
+            }
 
-        updateProgress();
+            // Reset progress bar to 0
+            progressFill.style.width = '0%';
+            if (progressPercentage) {
+                progressPercentage.textContent = '0%';
+            }
+
+            let progress = 0;
+            const targetProgress = 100;
+            const duration = 2000; // 2 seconds total (much faster)
+            const interval = 25; // Update every 25ms for smoother animation
+            const pauseAt = 85; // Pause at 85%
+            const pauseDuration = 300; // Pause for 300ms
+            let isPaused = false;
+            let pauseStartTime = 0;
+            
+            // Calculate smooth increment
+            const totalSteps = duration / interval;
+            const increment = targetProgress / totalSteps;
+
+            console.log('Progress animation parameters:', {
+                duration,
+                interval,
+                totalSteps,
+                increment,
+                pauseAt,
+                pauseDuration
+            });
+
+            const updateProgress = () => {
+                // Handle pause at 85% - only pause once
+                if (progress >= pauseAt && !isPaused && !this.hasPaused) {
+                    console.log('Pausing at 85%');
+                    isPaused = true;
+                    this.hasPaused = true; // Mark that we've paused once
+                    pauseStartTime = Date.now();
+                    setTimeout(updateProgress, pauseDuration);
+                    return;
+                }
+                
+                // Resume after pause
+                if (isPaused && (Date.now() - pauseStartTime) >= pauseDuration) {
+                    console.log('Resuming after pause');
+                    isPaused = false;
+                }
+                
+                if (!isPaused) {
+                    progress += increment;
+                    if (progress > targetProgress) progress = targetProgress;
+                }
+                
+                // Update the progress bar
+                progressFill.style.width = `${progress}%`;
+                if (progressPercentage) {
+                    progressPercentage.textContent = `${Math.round(progress)}%`;
+                }
+                
+                console.log('Progress:', Math.round(progress) + '%');
+                
+                if (progress < targetProgress) {
+                    setTimeout(updateProgress, interval);
+                } else {
+                    console.log('Progress animation complete');
+                    resolve(); // Resolve the promise when animation is complete
+                }
+            };
+
+            // Start the animation
+            updateProgress();
+        });
     }
 
     cycleBootMessages() {
@@ -115,7 +176,7 @@ export class BootSequence {
         const loginScreen = document.getElementById('loginScreen');
         
         if (bootSequence) {
-            bootSequence.style.animation = 'fadeOut 0.5s ease-out forwards';
+            bootSequence.style.animation = 'fadeOut 0.3s ease-out forwards';
             setTimeout(() => {
                 bootSequence.style.display = 'none';
                 document.body.classList.remove('boot-active');
@@ -128,7 +189,7 @@ export class BootSequence {
                         window.audioSystemInstance.playLoginSound();
                     }
                 }
-            }, 500);
+            }, 300);
         }
     }
 
@@ -149,7 +210,7 @@ export class BootSequence {
         await this.delay(1500);
 
         if (loginScreen) {
-            loginScreen.style.animation = 'fadeOut 0.8s ease-out forwards';
+            loginScreen.style.animation = 'fadeOut 0.6s ease-out forwards';
             setTimeout(() => {
                 loginScreen.style.display = 'none';
                 document.body.classList.remove('login-active');
@@ -159,7 +220,7 @@ export class BootSequence {
                     // Initialize main application
                     this.initializeDesktop();
                 }, 100);
-            }, 800);
+            }, 600);
         }
     }
 

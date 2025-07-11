@@ -75,19 +75,8 @@ export class BootSystem {
             guestLoginBtn.addEventListener('click', () => this.bootSequence.handleLogin());
         }
 
-        // Skip boot sequence on any key press or click
-        document.addEventListener('keydown', (e) => {
-            if (document.body.classList.contains('boot-active')) {
-                this.bootSequence.skipBoot();
-            }
-        }, { once: true });
-
-        document.addEventListener('click', (e) => {
-            if (document.body.classList.contains('boot-active') && 
-                !e.target.closest('.audio-toggle')) {
-                this.bootSequence.skipBoot();
-            }
-        }, { once: true });
+        // Disable skipping boot sequence - only login button should work
+        // Removed keydown and click event listeners that allowed skipping
 
         // Keyboard controls for background effects
         document.addEventListener('keydown', (e) => {

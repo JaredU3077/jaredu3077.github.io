@@ -1189,12 +1189,15 @@ For more detailed information, visit: <a href="#" onclick="window.open('resume.t
      * @memberof Terminal
      */
     showDemoscene() {
+        // Open the demoscene website in a new window/tab
+        window.open('demoscene/demoscene.html', '_blank');
+        
         return `
 <div class="terminal-heading">Demoscene Experience</div>
 
-<b>Welcome to the Demoscene!</b>
+<b>Opening Demoscene Website...</b>
 
-This is a secret area of the website featuring retro-style demoscene effects and music.
+The demoscene website is now opening in a new tab/window.
 
 <b>Features:</b>
 • Retro visual effects
@@ -1202,10 +1205,6 @@ This is a secret area of the website featuring retro-style demoscene effects and
 • Particle systems
 • CRT-style filters
 • Vintage computer aesthetics
-
-<b>Commands:</b>
-• show chiptune - Show chiptune player
-• show secret - Show secret website
 
 <b>Controls:</b>
 • Mouse: Navigate effects
@@ -1220,7 +1219,7 @@ This is a secret area of the website featuring retro-style demoscene effects and
 • Retro shaders
 • Vintage color palettes
 
-Type 'show chiptune' to access the chiptune music player.
+The demoscene website should now be open in a new tab. If it didn't open automatically, you can manually navigate to: demoscene/demoscene.html
         `;
     }
 

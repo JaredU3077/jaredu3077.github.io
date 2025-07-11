@@ -181,7 +181,14 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
             id: 'terminal',
             name: 'Terminal',
             description: 'Command line interface',
-            icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/></svg>`,
+            icon: `<svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <!-- Terminal window - white -->
+                <rect x="3" y="6" width="26" height="20" rx="3" stroke="white" fill="none"/>
+                <!-- Terminal lines - purple -->
+                <path d="M10 12h12" stroke="#8b5cf6" stroke-width="2"/>
+                <path d="M10 18h12" stroke="#8b5cf6" stroke-width="2"/>
+                <path d="M10 24h8" stroke="#8b5cf6" stroke-width="2"/>
+            </svg>`,
             defaultSize: { width: 700, height: 500 },
             windows: [{
                 id: 'terminalWindow',
@@ -200,13 +207,21 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
         'codex': {
             id: 'codex',
             name: 'Codex',
-            description: 'Comprehensive Financial Knowledge Base',
-            icon: '📚',
+            description: '200 Layers of Financial Control',
+            icon: `<svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
+                <!-- Jail cell - white -->
+                <rect x="3" y="3" width="26" height="26" stroke="white" fill="none" stroke-width="1.5"/>
+                <!-- Two vertical bars - white -->
+                <line x1="11" y1="3" x2="11" y2="29" stroke="white" fill="none" stroke-width="2.5"/>
+                <line x1="21" y1="3" x2="21" y2="29" stroke="white" fill="none" stroke-width="2.5"/>
+                <!-- Dollar sign - purple, perfectly centered -->
+                <text x="16" y="18" font-size="24" text-anchor="middle" dominant-baseline="middle" fill="#8b5cf6" stroke="none" font-family="Arial, sans-serif" font-weight="bold">$</text>
+            </svg>`,
             category: 'knowledge',
             defaultSize: { width: 1000, height: 700 },
             windows: [{
                 id: 'codexWindow',
-                title: 'Codex - Financial Knowledge Base',
+                title: 'Codex - 200 Layers of Financial Control',
                 content: `
                     <div class="codex-container">
                         <div class="codex-header">

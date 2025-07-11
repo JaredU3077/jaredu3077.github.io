@@ -1,0 +1,179 @@
+/* Desktop and Desktop Icon Styles */
+#desktop {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+}
+
+.boot-active #desktop,
+.login-active #desktop {
+    opacity: 0;
+    visibility: hidden;
+}
+
+body:not(.boot-active):not(.login-active) #desktop {
+    opacity: 1;
+    visibility: visible;
+}
+
+#desktop-icons {
+    position: absolute;
+    top: var(--spacing-xl);
+    left: var(--spacing-xl);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+    max-width: 140px;
+    width: 140px;
+    padding: var(--spacing-lg);
+    transition: all var(--transition);
+    --icon-min-width: 120px;
+    --icon-gap: var(--spacing-lg);
+}
+
+.desktop-icon {
+    width: 120px;
+    height: 120px;
+    padding: var(--spacing-md);
+    border-radius: 16px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    user-select: none;
+    outline: none;
+}
+.desktop-icon .icon {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-color);
+    transition: color var(--transition-fast);
+}
+.desktop-icon .label {
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    text-transform: lowercase;
+    letter-spacing: 0.04em;
+    text-align: center;
+    transition: color var(--transition-fast);
+}
+.desktop-icon:hover,
+.desktop-icon:focus {
+    border-color: var(--primary-color);
+}
+.desktop-icon:hover .icon,
+.desktop-icon:focus .icon {
+    color: var(--primary-color);
+}
+.desktop-icon:hover .label,
+.desktop-icon:focus .label {
+    color: var(--primary-color);
+}
+.desktop-icon:active {
+    transform: scale(0.96);
+}
+
+@media (min-width: 1200px) {
+    #desktop-icons {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-lg);
+        max-width: 140px;
+        width: 140px;
+        padding: var(--spacing-md);
+        --icon-min-width: 120px;
+        --icon-gap: var(--spacing-lg);
+    }
+    .desktop-icon {
+        width: 120px;
+        height: 120px;
+        padding: var(--spacing-md);
+    }
+    .desktop-icon .icon {
+        font-size: var(--text-2xl);
+        margin-bottom: var(--spacing-sm);
+    }
+    .desktop-icon .label {
+        font-size: var(--text-xs);
+    }
+}
+@media (max-width: 768px) {
+    #desktop-icons {
+        top: var(--spacing-md);
+        left: var(--spacing-md);
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+        max-width: 100px;
+        width: 100px;
+        padding: var(--spacing-sm);
+        --icon-min-width: 80px;
+        --icon-gap: var(--spacing-md);
+    }
+    .desktop-icon {
+        width: 80px;
+        height: 80px;
+        padding: var(--spacing-sm);
+    }
+    .desktop-icon .icon {
+        font-size: var(--text-lg);
+        margin-bottom: var(--spacing-xs);
+    }
+    .desktop-icon .label {
+        font-size: var(--text-xs);
+    }
+}
+@media (min-width: 769px) and (max-width: 1199px) {
+    #desktop-icons {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+        max-width: 120px;
+        width: 120px;
+        padding: var(--spacing-sm);
+        --icon-min-width: 100px;
+        --icon-gap: var(--spacing-md);
+    }
+    .desktop-icon {
+        width: 100px;
+        height: 100px;
+        padding: var(--spacing-sm);
+    }
+    .desktop-icon .icon {
+        font-size: var(--text-xl);
+        margin-bottom: var(--spacing-xs);
+    }
+    .desktop-icon .label {
+        font-size: var(--text-xs);
+    }
+}
+@media (max-width: 480px) {
+    #desktop-icons {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-sm);
+        max-width: 80px;
+        width: 80px;
+        padding: var(--spacing-xs);
+        --icon-min-width: 70px;
+        --icon-gap: var(--spacing-sm);
+    }
+    .desktop-icon {
+        min-width: 44px;
+        min-height: 44px;
+        padding: var(--spacing-xs);
+        width: 70px;
+        height: 70px;
+    }
+    .desktop-icon .icon {
+        font-size: var(--text-lg);
+        margin-bottom: var(--spacing-xs);
+    }
+    .desktop-icon .label {
+        font-size: var(--text-xs);
+    }
+}
+/* Prevent desktop icon SVG from inheriting color property */
+.desktop-icon .icon svg, .desktop-icon .icon svg * {
+  color: unset !important;
+} 
