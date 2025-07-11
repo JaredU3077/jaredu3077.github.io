@@ -144,6 +144,19 @@ body {
     text-rendering: optimizeLegibility;
 }
 
+/* Initial state - hide desktop until boot is complete */
+#desktop {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+}
+
+/* Show desktop when boot is active */
+.boot-active #desktop {
+    opacity: 1;
+    visibility: visible;
+}
+
 /* Enhanced Background Animation */
 body::before {
     content: '';

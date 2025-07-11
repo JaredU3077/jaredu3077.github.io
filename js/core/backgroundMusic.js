@@ -106,12 +106,15 @@ export class BackgroundMusic {
             const startOnInteraction = () => {
                 // Only restart if music is enabled, paused, and user hasn't manually disabled it
                 if (this.backgroundMusic && this.backgroundMusic.paused && this.musicEnabled && !this.userManuallyDisabled) {
+                    console.log('neuOS: User interaction detected, starting background music...');
                     playMusic();
                 }
             };
             
+            // Listen for any user interaction to start music
             document.addEventListener('click', startOnInteraction, { once: false });
             document.addEventListener('keydown', startOnInteraction, { once: false });
+            document.addEventListener('touchstart', startOnInteraction, { once: false });
             this.autoRestartSetup = true;
         }
     }

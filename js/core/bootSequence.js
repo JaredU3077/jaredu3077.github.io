@@ -176,7 +176,7 @@ export class BootSequence {
         // Ensure particle system is active
         if (window.particleSystemInstance && window.particleSystemInstance.particleContainer && 
             window.particleSystemInstance.particleAnimationRunning) {
-            console.log('Activating particle system for desktop...');
+            console.log('neuOS: Activating particle system for desktop...');
             window.particleSystemInstance.startContinuousGeneration();
         }
 
@@ -193,15 +193,15 @@ export class BootSequence {
             setTimeout(() => window.audioSystemInstance.playDesktopReadySound(), 500);
         }
 
-        // Start background music when desktop is ready
+        // Start background music when desktop is ready and user has interacted
         setTimeout(() => {
             if (window.backgroundMusicInstance) {
-                window.backgroundMusicInstance.init();
+                // Try to start music, but don't worry if it fails due to autoplay policy
+                window.backgroundMusicInstance.startBackgroundMusic();
             }
         }, 1000);
 
-        // Clean desktop start - welcome app removed for clean startup
-        // User can launch welcome app manually if needed
+        console.log('neuOS: Desktop initialization complete');
     }
 
     createNetworkAnimations() {

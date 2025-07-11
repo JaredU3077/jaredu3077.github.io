@@ -57,6 +57,9 @@ function initializeUI() {
         // Create Desktop Icons
         desktopIcons.insertAdjacentHTML('beforeend', createAppButton(app, 'desktop'));
     });
+    
+    // Desktop is now ready but hidden until boot completes
+    console.log('neuOS: Desktop UI initialized (hidden until boot complete)');
 }
 
 // --- EVENT LISTENERS ---
