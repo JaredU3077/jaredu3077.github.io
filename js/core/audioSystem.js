@@ -270,6 +270,14 @@ export class AudioSystem {
         if (!this.audioContext) return;
 
         try {
+            // Resume audio context if it's suspended (required for autoplay policy)
+            if (this.audioContext.state === 'suspended') {
+                this.audioContext.resume().catch(() => {
+                    // Silently handle if resume fails - this is expected before user interaction
+                    return;
+                });
+            }
+            
             const oscillator = this.audioContext.createOscillator();
             const gainNode = this.audioContext.createGain();
             const filter = this.audioContext.createBiquadFilter();
@@ -297,7 +305,10 @@ export class AudioSystem {
                 gainNode.disconnect();
             }, (duration + 0.1) * 1000);
         } catch (e) {
-            console.warn('Audio synthesis failed:', e);
+            // Silently handle autoplay policy errors - this is expected
+            if (e.name !== 'NotAllowedError') {
+                console.warn('Audio synthesis failed:', e);
+            }
         }
     }
 
@@ -314,6 +325,14 @@ export class AudioSystem {
         if (!this.audioContext) return;
 
         try {
+            // Resume audio context if it's suspended (required for autoplay policy)
+            if (this.audioContext.state === 'suspended') {
+                this.audioContext.resume().catch(() => {
+                    // Silently handle if resume fails - this is expected before user interaction
+                    return;
+                });
+            }
+            
             const oscillator = this.audioContext.createOscillator();
             const gainNode = this.audioContext.createGain();
             
@@ -330,7 +349,10 @@ export class AudioSystem {
             oscillator.start(this.audioContext.currentTime);
             oscillator.stop(this.audioContext.currentTime + duration);
         } catch (e) {
-            console.warn('Audio synthesis failed:', e);
+            // Silently handle autoplay policy errors - this is expected
+            if (e.name !== 'NotAllowedError') {
+                console.warn('Audio synthesis failed:', e);
+            }
         }
     }
 

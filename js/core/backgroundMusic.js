@@ -89,7 +89,12 @@ export class BackgroundMusic {
                 // Add visual indicator that music is playing
                 this.showMusicIndicator();
             }).catch(error => {
-                console.warn('Could not start background music:', error);
+                // Silently handle autoplay policy errors - this is expected
+                if (error.name === 'NotAllowedError') {
+                    // This is normal - music will start on first user interaction
+                } else {
+                    console.warn('Could not start background music:', error);
+                }
             });
         };
         
@@ -99,20 +104,15 @@ export class BackgroundMusic {
         // Only set up auto-restart if music is enabled and we haven't already set it up
         if (this.musicEnabled && !this.autoRestartSetup) {
             const startOnInteraction = () => {
-                console.log('User interaction detected, attempting to start music...');
                 // Only restart if music is enabled, paused, and user hasn't manually disabled it
                 if (this.backgroundMusic && this.backgroundMusic.paused && this.musicEnabled && !this.userManuallyDisabled) {
-                    console.log('Auto-restarting music due to user interaction...');
                     playMusic();
-                } else {
-                    console.log('Auto-restart prevented - music disabled or manually paused');
                 }
             };
             
-            document.addEventListener('click', startOnInteraction);
-            document.addEventListener('keydown', startOnInteraction);
+            document.addEventListener('click', startOnInteraction, { once: false });
+            document.addEventListener('keydown', startOnInteraction, { once: false });
             this.autoRestartSetup = true;
-            console.log('Auto-restart listeners set up');
         }
     }
 
