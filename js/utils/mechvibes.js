@@ -12,7 +12,6 @@ export class MechvibesPlayer {
         this.isEnabled = true;
         this.volume = 50; // Default volume at 50%
         this.loadAttempted = false;
-        console.log('🎹 Mechvibes: Initialized with Howler.js integration');
     }
 
     /**
@@ -21,9 +20,7 @@ export class MechvibesPlayer {
      */
     async init(audioContext) {
         // Howler.js handles its own audio context, so we don't need the passed one
-        console.log('🎹 Mechvibes: Initializing with Howler.js...');
-        await this.loadPack('/');
-        console.log('🎹 Mechvibes player initialized');
+        await this.loadPack('./');
     }
 
     /**
@@ -34,8 +31,6 @@ export class MechvibesPlayer {
         this.loadAttempted = true;
         
         try {
-            console.log('🎹 Loading Mechvibes sound pack...');
-            
             // Load the sound configuration
             const configResponse = await fetch(folder + 'config.json');
             if (!configResponse.ok) {
@@ -43,7 +38,6 @@ export class MechvibesPlayer {
             }
             
             const packData = await configResponse.json();
-            console.log('🎹 Config loaded:', packData.name);
             
             if (typeof packData === 'object') {
                 const sound = packData.sound || 'sound.ogg';  // Fallback to sound.ogg
@@ -52,7 +46,6 @@ export class MechvibesPlayer {
 
                 if (keyDefineType === 'single') {
                     const soundPath = folder + sound;
-                    console.log('🎹 Loading sound file:', soundPath);
                     
                     // Create Howler sound with sprite definitions
                     const soundData = new Howl({ 
@@ -65,7 +58,6 @@ export class MechvibesPlayer {
                     // Wait for the sound to load
                     await new Promise((resolve, reject) => {
                         soundData.once('load', () => {
-                            console.log('🎹 Sound file loaded successfully');
                             Object.assign(packData, { sound: soundData });
                             this.currentPack = packData;
                             resolve();
@@ -77,9 +69,7 @@ export class MechvibesPlayer {
                         });
                     });
                     
-                    console.log('🎹 Mechvibes sound pack loaded successfully:', packData.name);
-                    console.log('🎹 Available sounds:', Object.keys(defines).length);
-                    console.log('🎹 Mechvibes enabled by default - users can type "mechvibes off" to disable');
+                    console.log('🎹 Mechvibes sound pack loaded:', packData.name, `(${Object.keys(defines).length} sounds)`);
                 } else {
                     throw new Error('This implementation assumes a single-file pack');
                 }
@@ -99,7 +89,7 @@ export class MechvibesPlayer {
      * Try alternative file paths if the primary paths fail
      */
     async tryAlternativePaths() {
-        const alternativePaths = ['./', '../', '../../'];
+        const alternativePaths = ['', './', '../', '../../'];
 
         for (const path of alternativePaths) {
             try {
@@ -193,6 +183,16 @@ export class MechvibesPlayer {
     }
 
     /**
+     * Toggle Mechvibes sounds on/off
+     * @returns {boolean} Current enabled state
+     */
+    toggle() {
+        this.isEnabled = !this.isEnabled;
+        console.log('🎹 Mechvibes sounds:', this.isEnabled ? 'enabled' : 'disabled');
+        return this.isEnabled;
+    }
+
+    /**
      * Set the volume for Mechvibes sounds
      * @param {number} volume - Volume level (0 to 100)
      */
@@ -219,20 +219,38 @@ export class MechvibesPlayer {
     }
 
     /**
+     * Get the status of mechvibes for debugging
+     * @returns {string} Status message
+     */
+    getStatus() {
+        const status = {
+            isLoaded: !!this.currentPack,
+            isEnabled: this.isEnabled,
+            volume: this.volume,
+            packName: this.currentPack?.name || 'None',
+            availableSounds: this.currentPack?.defines ? Object.keys(this.currentPack.defines).length : 0
+        };
+        
+        console.log('🎹 Mechvibes Status:', status);
+        return `Mechvibes Status: Loaded=${status.isLoaded}, Enabled=${status.isEnabled}, Volume=${status.volume}, Pack=${status.packName}, Sounds=${status.availableSounds}`;
+    }
+
+    /**
      * Test if Mechvibes is working properly
      * @returns {string} Test result message
      */
     async test() {
+        console.log('🎹 Mechvibes: Testing audio system...');
+        console.log('🎹 Mechvibes: Sound pack loaded:', !!this.currentPack);
+        console.log('🎹 Mechvibes: Enabled:', this.isEnabled);
+        console.log('🎹 Mechvibes: Current pack:', this.currentPack);
+        
         if (!this.currentPack) {
             return '❌ Sound pack not loaded';
         }
         if (!this.isEnabled) {
             return '❌ Mechvibes is disabled';
         }
-        
-        console.log('🎹 Mechvibes: Testing audio system...');
-        console.log('🎹 Mechvibes: Sound pack loaded:', !!this.currentPack);
-        console.log('🎹 Mechvibes: Enabled:', this.isEnabled);
         
         // Play a test sound
         await this.playKeySound('a');

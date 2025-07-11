@@ -473,6 +473,7 @@ export class Terminal {
             { name: 'mechvibes', handler: this.handleMechvibes },
             { name: 'keyboard', handler: this.handleMechvibes },
             { name: 'kb', handler: this.handleMechvibes },
+            { name: 'mechvibes-status', handler: this.handleMechvibesStatus },
             { name: 'audio', handler: this.handleAudioControl }
         ];
     }
@@ -873,6 +874,18 @@ For more detailed information, visit: <a href="#" onclick="window.open('resume.t
         if (window.bootSystemInstance && window.bootSystemInstance.mechvibesPlayer) {
             const isEnabled = window.bootSystemInstance.mechvibesPlayer.toggle();
             return `Keyboard sounds ${isEnabled ? 'enabled' : 'disabled'}.`;
+        }
+        return 'Mechvibes not available.';
+    }
+
+    /**
+     * Handles mechvibes status check.
+     * @returns {string}
+     * @memberof Terminal
+     */
+    handleMechvibesStatus() {
+        if (window.bootSystemInstance && window.bootSystemInstance.mechvibesPlayer) {
+            return window.bootSystemInstance.mechvibesPlayer.getStatus();
         }
         return 'Mechvibes not available.';
     }

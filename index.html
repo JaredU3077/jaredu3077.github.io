@@ -26,7 +26,7 @@
     <!-- Security Headers -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data:; font-src 'self' https://cdnjs.cloudflare.com; connect-src 'self';">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="DENY">
+    <!-- X-Frame-Options should be set via HTTP headers, not meta tags -->
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     
     <!-- Favicon -->
@@ -90,40 +90,17 @@
         <div class="boot-container">
             <div class="boot-header">
                 <h1 id="boot-title" class="boot-title">neuOS</h1>
-                <p id="boot-desc" class="boot-subtitle">network engineering operating system</p>
-                <div class="boot-version">v2.1.4</div>
             </div>
             
             <div class="boot-progress">
                 <div class="progress-container">
                     <div class="progress-bar" role="progressbar" aria-label="Boot progress">
                         <div class="progress-fill"></div>
-                        <div class="progress-glow"></div>
-                    </div>
-                    <div class="progress-percentage">0%</div>
-                </div>
-                <div class="boot-messages">
-                    <div class="boot-message" aria-live="polite" aria-atomic="true">
-                        <span class="message-icon">⚡</span>
-                        <span class="message-text">Initializing network stack...</span>
                     </div>
                 </div>
             </div>
             
-            <div class="boot-status">
-                <div class="status-item">
-                    <span class="status-icon">🔒</span>
-                    <span class="status-text">Security: Active</span>
-                </div>
-                <div class="status-item">
-                    <span class="status-icon">🌐</span>
-                    <span class="status-text">Network: Ready</span>
-                </div>
-                <div class="status-item">
-                    <span class="status-icon">⚡</span>
-                    <span class="status-text">Performance: Optimal</span>
-                </div>
-            </div>
+
         </div>
     </div>
 
@@ -132,29 +109,11 @@
         <div class="login-container">
             <div class="login-header">
                 <h2 id="login-title" class="login-title">neuOS</h2>
-                <p class="login-subtitle">senior network engineer workstation</p>
             </div>
             
             <div class="login-form">
-                <div class="user-profile">
-                    <div class="user-avatar">
-                        <div class="avatar-container">
-                            <div class="avatar-icon">👨‍💻</div>
-                            <div class="avatar-status"></div>
-                        </div>
-                    </div>
-                    <div class="user-info">
-                        <h3 class="user-name">jared u.</h3>
-                        <p class="user-role">senior network engineer</p>
-                        <div class="user-status">
-                            <span class="status-dot"></span>
-                            <span class="status-text">online</span>
-                        </div>
-                    </div>
-                </div>
-                
                 <button id="guestLoginBtn" class="login-btn">
-                    <span class="btn-text">enter as guest</span>
+                    <span class="btn-text">Enter</span>
                     <div class="btn-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -163,14 +122,7 @@
                     <div class="btn-glow"></div>
                 </button>
                 
-                <div class="login-footer">
-                    <p class="footer-text">click to explore the interactive portfolio</p>
-                    <div class="footer-features">
-                        <span class="feature">🖥️ interactive os</span>
-                        <span class="feature">🌐 network tools</span>
-                        <span class="feature">⚡ real-time</span>
-                    </div>
-                </div>
+
             </div>
         </div>
     </div>

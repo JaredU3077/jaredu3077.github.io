@@ -240,30 +240,18 @@ function handleGlobalKeydown(e) {
 
 // --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', async () => {
-            console.log('DOMContentLoaded: Starting neuOS initialization...');
+            console.log('neuOS: Starting system initialization...');
     try {
         // Initialize core systems
-        console.log('DOMContentLoaded: Creating BootSystem instance...');
         bootSystem = BootSystem.getInstance();
-        console.log('Boot system initialized:', bootSystem);
-        console.log('Global boot system instance:', window.bootSystemInstance);
-        
-        // Ensure boot system is properly initialized
-        if (bootSystem && typeof bootSystem.init === 'function') {
-            console.log('DOMContentLoaded: Ensuring boot system is initialized...');
-            await bootSystem.init();
-        }
         
         // Initialize UI after DOM is ready
-        console.log('DOMContentLoaded: Initializing UI...');
         initializeUI();
         
         // Fallback: If boot system doesn't start within 3 seconds, force it
         setTimeout(() => {
-            if (document.body.classList.contains('boot-active')) {
-                console.log('DOMContentLoaded: Boot system appears to be running normally');
-            } else {
-                console.warn('DOMContentLoaded: Boot system may be stuck, forcing login screen...');
+            if (!document.body.classList.contains('boot-active')) {
+                console.warn('neuOS: Boot system may be stuck, forcing login screen...');
                 if (window.bootSystemInstance) {
                     window.bootSystemInstance.showLoginScreen();
                 } else {

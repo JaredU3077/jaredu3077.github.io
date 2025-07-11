@@ -37,7 +37,7 @@ class CodexApp {
                 </div>
             </div>
             <div class="codex-content">
-                <div class="search-results-container" style="display: none; position: absolute; top: 0; left: 0; width: 100%; background: white; max-height: 300px; overflow-y: auto; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 10; padding: 10px;"></div>
+                <div class="search-results-container" style="display: none; position: absolute; top: 0; left: 0; width: 100%; background: transparent !important; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); max-height: 300px; overflow-y: auto; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); z-index: 10; padding: 15px; border-radius: 16px;"></div>
                 <div class="layers-container" style="position: relative; z-index: 1;"></div>
                 <div class="loading-indicator">Loading knowledge base...</div>
             </div>
@@ -388,19 +388,19 @@ class CodexApp {
         
         if (results.length === 0) {
             this.searchResultsContainer.innerHTML = `
-                <h3>No results found for "${query}"</h3>
-                <p>Try searching for different terms or browse through the layers manually.</p>
+                <h3 style="color: #10b981; margin-bottom: 10px; font-weight: 600;">No results found for "${query}"</h3>
+                <p style="color: #f8fafc; margin: 0;">Try searching for different terms or browse through the layers manually.</p>
             `;
             this.searchResultsContainer.style.display = 'block';
             return;
         }
 
         this.searchResultsContainer.innerHTML = `
-            <h3>Search Results for "${query}" (${results.length} found)</h3>
+            <h3 style="color: #10b981; margin-bottom: 15px; font-size: 16px; font-weight: 600;">Search Results for "${query}" (${results.length} found)</h3>
             ${results.map(result => `
-                <div class="search-result-item" data-layer="${result.layer}" style="cursor: pointer; padding: 10px; border-bottom: 1px solid #ddd;">
-                    <h4>Layer ${result.layer}: ${result.title}</h4>
-                    <p>${result.description.substring(0, 150)}...</p>
+                <div class="search-result-item" data-layer="${result.layer}" style="cursor: pointer; padding: 12px; margin-bottom: 8px; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; background: transparent !important; transition: all 0.2s ease; hover:background: rgba(16, 185, 129, 0.1) !important;">
+                    <h4 style="color: #10b981; margin: 0 0 8px 0; font-size: 14px; font-weight: 600;">Layer ${result.layer}: ${result.title}</h4>
+                    <p style="color: #f8fafc; margin: 0; font-size: 12px; line-height: 1.4;">${result.description.substring(0, 150)}...</p>
                 </div>
             `).join('')}
         `;
