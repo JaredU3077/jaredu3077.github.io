@@ -154,20 +154,25 @@ export class BootSequence {
                 loginScreen.style.display = 'none';
                 document.body.classList.remove('login-active');
                 
-                // Initialize main application
-                this.initializeDesktop();
+                // Small delay to ensure CSS transitions apply properly
+                setTimeout(() => {
+                    // Initialize main application
+                    this.initializeDesktop();
+                }, 100);
             }, 800);
         }
     }
 
     initializeDesktop() {
-        // Show desktop with fade-in animation
+        // Let CSS handle the desktop visibility
         const desktop = document.getElementById('desktop');
         
         if (desktop) {
-            desktop.style.opacity = '0';
-            desktop.style.transform = 'scale(0.95)';
-            desktop.style.transition = 'opacity 1s ease-out, transform 1s ease-out';
+            // Remove any inline styles that might interfere with CSS
+            desktop.style.removeProperty('opacity');
+            desktop.style.removeProperty('visibility');
+            desktop.style.removeProperty('transform');
+            desktop.style.removeProperty('transition');
         }
 
         // Add network animation elements
@@ -179,15 +184,6 @@ export class BootSequence {
             console.log('neuOS: Activating particle system for desktop...');
             window.particleSystemInstance.startContinuousGeneration();
         }
-
-        // Trigger entrance animation
-        setTimeout(() => {
-            if (desktop) {
-                desktop.style.opacity = '1';
-                desktop.style.transform = 'scale(1)';
-                console.log('neuOS: Desktop fade-in animation triggered');
-            }
-        }, 100);
 
         // Play desktop ready sound
         if (window.audioSystemInstance && window.audioSystemInstance.audioEnabled) {
@@ -205,6 +201,7 @@ export class BootSequence {
         console.log('neuOS: Desktop initialization complete');
         console.log('neuOS: Desktop element found:', !!desktop);
         console.log('neuOS: Desktop icons container found:', !!document.getElementById('desktop-icons'));
+        console.log('neuOS: Desktop icons count:', document.getElementById('desktop-icons')?.children?.length || 0);
     }
 
     createNetworkAnimations() {

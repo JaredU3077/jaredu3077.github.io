@@ -61,6 +61,8 @@ function initializeUI() {
     // Desktop is now ready but hidden until boot completes
     console.log('neuOS: Desktop UI initialized (hidden until boot complete)');
     console.log('neuOS: Created desktop icons for:', Object.keys(CONFIG.applications));
+    console.log('neuOS: Desktop icons count:', desktopIcons.children.length);
+    console.log('neuOS: Desktop icons HTML:', desktopIcons.innerHTML.substring(0, 200) + '...');
 }
 
 // --- EVENT LISTENERS ---

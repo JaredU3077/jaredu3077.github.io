@@ -144,15 +144,22 @@ body {
     text-rendering: optimizeLegibility;
 }
 
-/* Initial state - hide desktop until boot is complete */
+/* Initial state - hide desktop until login is complete */
 #desktop {
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
 }
 
-/* Show desktop when boot is active */
-.boot-active #desktop {
+/* Hide desktop during boot and login */
+.boot-active #desktop,
+.login-active #desktop {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* Show desktop when neither boot nor login is active (user is using the system) */
+body:not(.boot-active):not(.login-active) #desktop {
     opacity: 1;
     visibility: visible;
 }
