@@ -700,18 +700,17 @@ body:not(.boot-active):not(.login-active) #desktop {
     box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.2);
 }
 .desktop-icon .icon {
-    font-size: 2rem;
-    margin-bottom: var(--spacing-sm);
+    font-size: 2.4rem;
     color: var(--text-color);
     transition: color var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
 }
 .desktop-icon .label {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    text-transform: lowercase;
-    letter-spacing: 0.04em;
-    text-align: center;
-    transition: color var(--transition-fast);
+    display: none;
 }
 .desktop-icon:hover,
 .desktop-icon:focus {
@@ -781,11 +780,15 @@ body:not(.boot-active):not(.login-active) #desktop {
         box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.2);
     }
     .desktop-icon .icon {
-        font-size: 2rem;
-        margin-bottom: var(--spacing-sm);
+        font-size: 2.4rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
     }
     .desktop-icon .label {
-        font-size: 0.9rem;
+        display: none;
     }
 }
 @media (max-width: 768px) {
@@ -810,11 +813,15 @@ body:not(.boot-active):not(.login-active) #desktop {
         box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.2);
     }
     .desktop-icon .icon {
-        font-size: 1.5rem;
-        margin-bottom: var(--spacing-xs);
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
     }
     .desktop-icon .label {
-        font-size: 0.8rem;
+        display: none;
     }
 }
 @media (min-width: 769px) and (max-width: 1199px) {
@@ -837,11 +844,15 @@ body:not(.boot-active):not(.login-active) #desktop {
         box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.2);
     }
     .desktop-icon .icon {
-        font-size: 1.75rem;
-        margin-bottom: var(--spacing-xs);
+        font-size: 2.1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
     }
     .desktop-icon .label {
-        font-size: 0.85rem;
+        display: none;
     }
 }
 @media (max-width: 480px) {
@@ -866,11 +877,15 @@ body:not(.boot-active):not(.login-active) #desktop {
         box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.2);
     }
     .desktop-icon .icon {
-        font-size: 1.25rem;
-        margin-bottom: var(--spacing-xs);
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
     }
     .desktop-icon .label {
-        font-size: 0.75rem;
+        display: none;
     }
 }
 /* Prevent desktop icon SVG from inheriting color property */
