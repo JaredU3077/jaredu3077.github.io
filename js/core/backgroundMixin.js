@@ -21,9 +21,9 @@ export const backgroundMixin = {
         
         // Create three rings with different sizes
         const rings = [
-            { size: 300, opacity: 0.3, animation: 60 },
-            { size: 400, opacity: 0.25, animation: 80 },
-            { size: 500, opacity: 0.2, animation: 100 }
+            { size: 300, opacity: 0.5, animation: 60, borderWidth: 3 },
+            { size: 400, opacity: 0.4, animation: 80, borderWidth: 2 },
+            { size: 500, opacity: 0.3, animation: 100, borderWidth: 2 }
         ];
         
         rings.forEach((ringConfig, index) => {
@@ -38,7 +38,7 @@ export const backgroundMixin = {
                 width: ${ringConfig.size}px !important;
                 height: ${ringConfig.size}px !important;
                 transform: translate(-50%, -50%) !important;
-                border: 1px solid rgba(74, 144, 226, 0.08) !important;
+                border: ${ringConfig.borderWidth}px solid rgba(74, 144, 226, 0.15) !important;
                 border-radius: 50% !important;
                 animation: backgroundSpin ${ringConfig.animation}s linear infinite !important;
                 pointer-events: none !important;
