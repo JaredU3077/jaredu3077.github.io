@@ -12,12 +12,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: var(--z-modal);
+    z-index: 9999;
     opacity: 1;
     transition: opacity 0.5s ease-in-out;
     overflow: hidden;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+    cursor: move;
+    user-select: none;
+    touch-action: none;
 }
 
 .boot-background {
@@ -38,21 +39,7 @@
 }
 
 .boot-container {
-    text-align: center;
-    max-width: 600px;
-    padding: var(--spacing-2xl);
-    position: relative;
-    z-index: 2;
-    background: transparent !important;
-    border: none !important;
-    border-radius: 24px !important;
-    box-shadow: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    animation: loginContainerSlide 1s ease-out forwards;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    /* All styling now handled by .neuos-glass-box */
 }
 
 .boot-header {
@@ -61,13 +48,14 @@
 
 .boot-title {
     font-size: 4rem;
-    font-weight: 700;
+    font-weight: 900;
     color: var(--primary-color);
     margin: 0;
     text-shadow: 0 0 30px rgba(99, 102, 241, 0.6);
-    animation: titleGlow 2s ease-in-out infinite alternate;
     letter-spacing: -0.025em;
     font-family: var(--font-family);
+    /* Glass text effect handled by _glass.css */
+    z-index: 2;
 }
 
 .boot-progress {
@@ -82,18 +70,22 @@
     max-width: 400px;
     margin-left: auto;
     margin-right: auto;
+    display: block;
 }
 
 .progress-bar {
     width: 100%;
     height: 12px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid var(--primary-color);
+    background: rgba(255,255,255,0.015) !important;
+    border: 1px solid rgba(255,255,255,0.2);
     border-radius: var(--border-radius-small);
     overflow: hidden;
     position: relative;
     box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
     min-width: 300px;
+    /* Remove backdrop-filter to prevent double blur effect */
+    /* backdrop-filter: blur(6px) saturate(150%) brightness(120%); */
+    /* -webkit-backdrop-filter: blur(6px) saturate(150%) brightness(120%); */
 }
 
 .progress-fill {
@@ -119,12 +111,14 @@
     display: none;
     align-items: center;
     justify-content: center;
-    z-index: var(--z-modal);
-    opacity: 0;
-    animation: loginFadeIn 1.2s ease-out forwards;
+    z-index: 9999;
+    opacity: 1;
+    /* Remove animation to prevent blur differences */
+    /* animation: loginFadeIn 1.2s ease-out forwards; */
     overflow: hidden;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+    cursor: move;
+    user-select: none;
+    touch-action: none;
 }
 
 .login-background {
@@ -145,22 +139,7 @@
 }
 
 .login-container {
-    background: transparent !important;
-    border: none !important;
-    border-radius: 24px !important;
-    box-shadow: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    padding: var(--spacing-2xl);
-    max-width: 500px;
-    width: 90%;
-    text-align: center;
-    z-index: 2;
-    position: relative;
-    animation: loginContainerSlide 1s ease-out forwards;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    /* All styling now handled by .neuos-glass-box */
 }
 
 .login-header {
@@ -169,13 +148,14 @@
 
 .login-title {
     font-size: 4rem;
-    font-weight: 700;
+    font-weight: 900;
     color: var(--primary-color);
     margin: 0;
     text-shadow: 0 0 30px rgba(99, 102, 241, 0.6);
-    animation: titleGlow 2s ease-in-out infinite alternate;
     letter-spacing: -0.025em;
     font-family: var(--font-family);
+    /* Glass text effect handled by _glass.css */
+    z-index: 2;
 }
 
 .login-form {
@@ -189,7 +169,6 @@
     width: auto;
     min-width: 200px;
     padding: var(--spacing-md) var(--spacing-lg);
-    background: transparent !important;
     color: var(--primary-color);
     border: 1px solid var(--primary-color);
     border-radius: var(--border-radius);
@@ -201,18 +180,15 @@
     align-items: center;
     justify-content: center;
     gap: var(--spacing-sm);
-    box-shadow: none !important;
     position: relative;
     overflow: hidden;
     font-family: var(--font-family);
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
     margin: 0 auto;
+    /* Glass effect handled by _glass.css */
 }
 
 .login-btn:hover {
     transform: translateY(-2px);
-    background: rgba(99, 102, 241, 0.1) !important;
     border-color: var(--primary-light);
     color: var(--primary-light);
     box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
@@ -266,14 +242,11 @@
 
 .audio-toggle {
     background: transparent !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
     border: 1px solid rgba(255,255,255,0.15);
     border-radius: 12px;
     padding: 12px;
     cursor: pointer;
     transition: all var(--transition);
-    box-shadow: none !important;
     color: var(--primary-color);
     display: flex;
     align-items: center;
@@ -281,11 +254,9 @@
 }
 
 .audio-toggle:hover {
-    background: transparent !important;
     border: 1px solid var(--primary-color);
     color: var(--primary-color);
     transform: scale(1.05);
-    box-shadow: none !important;
 }
 
 .audio-toggle:active {
@@ -307,6 +278,8 @@
     stroke: var(--primary-color);
     transform: scale(1.1);
 }
+
+
 
 /* Animations */
 @keyframes bootBackground {

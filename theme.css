@@ -7,6 +7,7 @@
 @import url('_apps.css');
 @import url('_animations.css');
 @import url('_responsive.css');
+@import url('_glass.css');
 
 /* Space Screensaver Integration */
 #spaceScreensaver {
@@ -23,19 +24,9 @@
     opacity: 0;
 }
 
-/* Enhanced Body Background - Ultra Dark Gradient */
+/* Enhanced Body Background - Glass Theme from test1 */
 body {
-    background: 
-        linear-gradient(135deg, 
-            #030712 0%, 
-            #0a0f1a 25%, 
-            #1a1f2e 50%, 
-            #2a2f3e 75%, 
-            #3a3f4e 100%
-        ),
-        radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.03) 0%, transparent 50%),
-        radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.02) 0%, transparent 50%);
+    background: url('https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=2000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfDB8fGVufDB8fHx8fA%3D%3D') center/cover no-repeat;
     min-height: 100vh;
     color: var(--text-color);
     font-family: var(--font-family);
@@ -72,22 +63,8 @@ body:not(.boot-active):not(.login-active) #desktop {
     visibility: visible;
 }
 
-/* Enhanced Background Animation */
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: 
-        radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.02) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.01) 0%, transparent 50%),
-        radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.005) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: -1;
-    animation: backgroundShift 20s ease-in-out infinite;
-}
+/* Enhanced Background Animation - Handled by _glass.css */
+/* body::before is now handled by _glass.css for proper glass effects */
 
 /* Refined Scrollbar - Apple-style */
 ::-webkit-scrollbar {
@@ -446,13 +423,15 @@ body::before {
     left: 50%;
     width: 400px;
     height: 400px;
-    margin: -200px 0 0 -200px;
+    transform: translate(-50%, -50%);
     border: 1px solid rgba(74, 144, 226, 0.08);
     border-radius: 50%;
     animation: backgroundSpin 60s linear infinite;
     pointer-events: none;
-    z-index: -1;
+    z-index: 100;
     opacity: 0.3;
+    margin: 0;
+    padding: 0;
 }
 
 .background-spinner::before {
@@ -470,21 +449,6 @@ body::before {
 @keyframes backgroundSpin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
-}
-
-/* Enhanced matrix background */
-.matrix-background {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: 
-        radial-gradient(circle at 20% 30%, rgba(74, 144, 226, 0.08) 0%, transparent 50%),
-        radial-gradient(circle at 80% 70%, rgba(135, 206, 235, 0.06) 0%, transparent 50%),
-        radial-gradient(circle at 50% 50%, rgba(70, 130, 180, 0.04) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: -2;
 }
 
 /* Enhanced ambient glows */
@@ -575,8 +539,8 @@ body::before {
 }
 
 .boot-sequence, .login-screen, .boot-container, .login-container {
-    background: none !important;
-    box-shadow: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+    /* background: none !important; */
+    /* box-shadow: none !important; */
+    /* backdrop-filter: none !important; */
+    /* -webkit-backdrop-filter: none !important; */
 } 

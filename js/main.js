@@ -17,24 +17,82 @@ import { debounce } from './utils/utils.js';
 // Import screensaver
 import './core/screensaver.js';
 
+// Import glass effect system
+import './core/glassEffect.js';
+import { GlassMorphismSystem } from './core/glassEffect.js';
+import GlassEffects from './utils/glassEffects.js';
+import DraggableSystem from './utils/draggable.js';
+
 console.log('neuOS: All modules imported successfully');
 
 // --- MODULE INITIALIZATION ---
 /** @type {WindowManager} */
-const windowManager = new WindowManager();
-// Expose windowManager globally for other modules to use
-window.windowManager = windowManager;
+let windowManager = null;
 /** @type {HelpManager} */
-const helpManager = new HelpManager();
+let helpManager = null;
 /** @type {SearchManager} */
-const searchManager = new SearchManager();
+let searchManager = null;
 
 /** @type {?Terminal} */
 let terminal = null;
 /** @type {BootSystem} */
 let bootSystem = null;
+/** @type {GlassMorphismSystem} */
+let glassMorphismSystem = null;
+/** @type {GlassEffects} */
+let glassEffects = null;
+/** @type {DraggableSystem} */
+let draggableSystem = null;
 /** @type {Object<string, HTMLElement>} */
 let openWindows = {};
+
+// Initialize modules with error boundaries
+try {
+    windowManager = new WindowManager();
+    // Expose windowManager globally for other modules to use
+    window.windowManager = windowManager;
+    console.log('neuOS: WindowManager initialized successfully');
+} catch (error) {
+    console.error('neuOS: Failed to initialize WindowManager:', error);
+}
+
+try {
+    helpManager = new HelpManager();
+    console.log('neuOS: HelpManager initialized successfully');
+} catch (error) {
+    console.error('neuOS: Failed to initialize HelpManager:', error);
+}
+
+try {
+    searchManager = new SearchManager();
+    console.log('neuOS: SearchManager initialized successfully');
+} catch (error) {
+    console.error('neuOS: Failed to initialize SearchManager:', error);
+}
+
+try {
+    glassMorphismSystem = new GlassMorphismSystem();
+    window.glassMorphismSystem = glassMorphismSystem;
+    console.log('neuOS: GlassMorphismSystem initialized successfully');
+} catch (error) {
+    console.error('neuOS: Failed to initialize GlassMorphismSystem:', error);
+}
+
+try {
+    glassEffects = new GlassEffects();
+    window.glassEffects = glassEffects;
+    console.log('neuOS: GlassEffects initialized successfully');
+} catch (error) {
+    console.error('neuOS: Failed to initialize GlassEffects:', error);
+}
+
+try {
+    draggableSystem = new DraggableSystem();
+    window.draggableSystem = draggableSystem;
+    console.log('neuOS: DraggableSystem initialized successfully');
+} catch (error) {
+    console.error('neuOS: Failed to initialize DraggableSystem:', error);
+}
 
 // --- UI INITIALIZATION ---
 
@@ -76,19 +134,20 @@ function initializeUI() {
  * @param {string} appId - The ID of the application to launch.
  */
 async function handleAppClick(appId) {
-    console.log(`handleAppClick called for appId: ${appId}`);
-    
-    // Play UI sound effect
-    if (window.bootSystemInstance) {
-        window.bootSystemInstance.playUIClickSound();
-    }
-    
-    const app = CONFIG.applications[appId];
-    if (!app) {
-        console.error(`No application config found for appId: ${appId}`);
-        return;
-    }
-    console.log(`App config found:`, app);
+    try {
+        console.log(`handleAppClick called for appId: ${appId}`);
+        
+        // Play UI sound effect
+        if (window.bootSystemInstance) {
+            window.bootSystemInstance.playUIClickSound();
+        }
+        
+        const app = CONFIG.applications[appId];
+        if (!app) {
+            console.error(`No application config found for appId: ${appId}`);
+            return;
+        }
+        console.log(`App config found:`, app);
 
     app.windows.forEach(async windowConfig => {
         console.log(`Processing window config:`, windowConfig);
@@ -174,6 +233,37 @@ async function handleAppClick(appId) {
             winElem.querySelector('.window-content').innerHTML = errorContent;
         }
     });
+    } catch (error) {
+        console.error('neuOS: Application launch error:', error);
+        // Show user-friendly error message
+        const errorMessage = document.createElement('div');
+        errorMessage.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 107, 107, 0.9);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            z-index: 10000;
+            font-family: 'Segoe UI', sans-serif;
+            text-align: center;
+        `;
+        errorMessage.innerHTML = `
+            <h3>⚠️ Application Error</h3>
+            <p>Failed to launch application: ${appId}</p>
+            <p style="font-size: 0.9em; opacity: 0.8;">${error.message}</p>
+        `;
+        document.body.appendChild(errorMessage);
+        
+        // Remove error message after 5 seconds
+        setTimeout(() => {
+            if (errorMessage.parentNode) {
+                errorMessage.remove();
+            }
+        }, 5000);
+    }
 }
 
 // Expose handleAppClick globally for boot system

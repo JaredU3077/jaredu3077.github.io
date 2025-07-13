@@ -14,6 +14,11 @@ class DemoscenePlatform {
         this.fullscreenCtx = null;
         this.animationId = null;
         this.audioInitialized = false;
+        this.userDemos = [];
+        this.filters = {
+            type: 'all',
+            sort: 'popularity'
+        };
         this.init();
     }
     
@@ -140,6 +145,19 @@ class DemoscenePlatform {
         // Define enhanced demos with unique audio tracks
         const demos = [
             {
+                id: 'quantum-vortex',
+                title: 'Quantum Vortex',
+                description: '3D WebGL vortex with black hole physics and audio reactivity',
+                type: 'webgl',
+                audioTrack: 'quantum-synth',
+                duration: 60,
+                effects: ['particle-physics', 'black-hole-gravity', 'audio-reactive'],
+                colors: ['#b388ff', '#00ffff', '#ff00ff', '#00ff41'],
+                popularity: 98,
+                author: 'DarkWave',
+                date: '2024-01-15'
+            },
+            {
                 id: 'neon-particles',
                 title: 'Neon Particles',
                 description: 'Dynamic particle system with neon colors and physics',
@@ -147,7 +165,10 @@ class DemoscenePlatform {
                 audioTrack: 'neon-pulse',
                 duration: 45,
                 effects: ['particle-trails', 'color-cycling', 'gravity-waves'],
-                colors: ['#b388ff', '#00ffff', '#ff00ff', '#00ff41']
+                colors: ['#b388ff', '#00ffff', '#ff00ff', '#00ff41'],
+                popularity: 95,
+                author: 'CyberPunk',
+                date: '2024-01-10'
             },
             {
                 id: 'matrix-rain',
@@ -157,7 +178,10 @@ class DemoscenePlatform {
                 audioTrack: 'digital-rain',
                 duration: 45,
                 effects: ['character-variation', 'speed-cycling', 'glitch-distortion'],
-                colors: ['#00ff41', '#00ff00', '#00cc00']
+                colors: ['#00ff41', '#00ff00', '#00cc00'],
+                popularity: 92,
+                author: 'NeonRider',
+                date: '2024-01-08'
             },
             {
                 id: 'wireframe-network',
@@ -167,7 +191,10 @@ class DemoscenePlatform {
                 audioTrack: 'network-pulse',
                 duration: 45,
                 effects: ['node-pulsing', 'connection-flow', 'energy-particles'],
-                colors: ['#b388ff', '#00ffff', '#ff00ff']
+                colors: ['#b388ff', '#00ffff', '#ff00ff'],
+                popularity: 89,
+                author: 'GlitchMaster',
+                date: '2024-01-05'
             },
             {
                 id: 'glitch-text',
@@ -177,11 +204,55 @@ class DemoscenePlatform {
                 audioTrack: 'glitch-corruption',
                 duration: 45,
                 effects: ['text-corruption', 'color-shifting', 'scanline-effects'],
-                colors: ['#ff00ff', '#00ffff', '#b388ff']
+                colors: ['#ff00ff', '#00ffff', '#b388ff'],
+                popularity: 87,
+                author: 'VortexFan',
+                date: '2024-01-03'
+            },
+            {
+                id: 'holographic-grid',
+                title: 'Holographic Grid',
+                description: 'Futuristic grid with holographic projections and depth',
+                type: 'webgl',
+                audioTrack: 'holographic-wave',
+                duration: 50,
+                effects: ['depth-mapping', 'holographic-layers', 'grid-animation'],
+                colors: ['#00ffff', '#ff00ff', '#ffff00'],
+                popularity: 85,
+                author: 'HoloCreator',
+                date: '2024-01-01'
+            },
+            {
+                id: 'energy-pulse',
+                title: 'Energy Pulse',
+                description: 'Pulsing energy waves with frequency modulation',
+                type: 'particles',
+                audioTrack: 'energy-pulse',
+                duration: 40,
+                effects: ['wave-propagation', 'frequency-mod', 'energy-dissipation'],
+                colors: ['#ff00ff', '#00ff41', '#ffff00'],
+                popularity: 83,
+                author: 'EnergyMaster',
+                date: '2023-12-28'
+            },
+            {
+                id: 'digital-corruption',
+                title: 'Digital Corruption',
+                description: 'Digital artifacts and corruption effects with noise',
+                type: 'glitch',
+                audioTrack: 'corruption-noise',
+                duration: 55,
+                effects: ['digital-artifacts', 'noise-generation', 'corruption-spread'],
+                colors: ['#ff0000', '#00ff00', '#0000ff'],
+                popularity: 81,
+                author: 'CorruptionDev',
+                date: '2023-12-25'
             }
         ];
         
         this.demoGallery = demos;
+        this.loadUserDemos();
+        this.setupFilters();
         this.renderDemoGallery();
     }
     
@@ -193,10 +264,11 @@ class DemoscenePlatform {
             return;
         }
         
-        console.log('Rendering', this.demoGallery.length, 'demos');
+        const filteredDemos = this.getFilteredDemos();
+        console.log('Rendering', filteredDemos.length, 'filtered demos');
         gallery.innerHTML = '';
         
-        this.demoGallery.forEach(demo => {
+        filteredDemos.forEach(demo => {
             // Get audio track name safely
             let audioTrackName = 'Audio Track';
             if (window.darkWaveAudio && window.darkWaveAudio.demosceneTracks && window.darkWaveAudio.demosceneTracks[demo.id]) {
@@ -213,6 +285,11 @@ class DemoscenePlatform {
                     <span class="demo-duration">${demo.duration}s</span>
                     <span class="demo-effects">${demo.effects.length} effects</span>
                     <span class="demo-audio">♪ ${audioTrackName}</span>
+                    <span class="demo-popularity">★ ${demo.popularity}</span>
+                </div>
+                <div class="demo-info">
+                    <span class="demo-author">by ${demo.author}</span>
+                    <span class="demo-date">${demo.date}</span>
                 </div>
                 <button class="neon-button small play-btn" data-demo-id="${demo.id}">Launch Demo</button>
             `;
@@ -230,6 +307,112 @@ class DemoscenePlatform {
                 this.launchFullScreenDemo(demoId);
             });
         });
+    }
+
+    loadUserDemos() {
+        const userDemos = JSON.parse(localStorage.getItem('darkwave-user-demos') || '[]');
+        this.userDemos = userDemos;
+        this.renderUserDemos();
+    }
+
+    renderUserDemos() {
+        const userGallery = document.getElementById('user-demo-gallery');
+        if (!userGallery) return;
+
+        userGallery.innerHTML = '';
+
+        if (this.userDemos.length === 0) {
+            userGallery.innerHTML = '<p class="no-demos">No user demos yet. Create your first demo!</p>';
+            return;
+        }
+
+        this.userDemos.forEach(demo => {
+            const demoCard = document.createElement('article');
+            demoCard.className = 'demo-card user-demo';
+            demoCard.innerHTML = `
+                <canvas id="user-${demo.id}-canvas" width="320" height="200"></canvas>
+                <h3>${demo.title}</h3>
+                <p>${demo.description}</p>
+                <div class="demo-meta">
+                    <span class="demo-duration">${demo.duration}s</span>
+                    <span class="demo-author">by ${demo.author}</span>
+                    <span class="demo-date">${demo.date}</span>
+                </div>
+                <div class="demo-actions">
+                    <button class="neon-button small play-btn" data-demo-id="${demo.id}">Play</button>
+                    <button class="neon-button small edit-btn" data-demo-id="${demo.id}">Edit</button>
+                    <button class="neon-button small delete-btn" data-demo-id="${demo.id}">Delete</button>
+                </div>
+            `;
+            userGallery.appendChild(demoCard);
+        });
+    }
+
+    setupFilters() {
+        // Filter buttons
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const filter = e.target.getAttribute('data-filter');
+                this.setFilter(filter);
+            });
+        });
+
+        // Sort select
+        const sortSelect = document.getElementById('sort-select');
+        if (sortSelect) {
+            sortSelect.addEventListener('change', (e) => {
+                this.setSort(e.target.value);
+            });
+        }
+    }
+
+    setFilter(filter) {
+        this.filters.type = filter;
+        
+        // Update active filter button
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        const activeBtn = document.querySelector(`[data-filter="${filter}"]`);
+        if (activeBtn) {
+            activeBtn.classList.add('active');
+        }
+
+        this.renderDemoGallery();
+    }
+
+    setSort(sort) {
+        this.filters.sort = sort;
+        this.renderDemoGallery();
+    }
+
+    getFilteredDemos() {
+        let demos = [...this.demoGallery];
+
+        // Apply type filter
+        if (this.filters.type !== 'all') {
+            demos = demos.filter(demo => demo.type === this.filters.type);
+        }
+
+        // Apply sort
+        switch (this.filters.sort) {
+            case 'popularity':
+                demos.sort((a, b) => b.popularity - a.popularity);
+                break;
+            case 'newest':
+                demos.sort((a, b) => new Date(b.date) - new Date(a.date));
+                break;
+            case 'oldest':
+                demos.sort((a, b) => new Date(a.date) - new Date(b.date));
+                break;
+            case 'duration':
+                demos.sort((a, b) => b.duration - a.duration);
+                break;
+        }
+
+        return demos;
     }
     
     initializeDemoPreview(demo) {

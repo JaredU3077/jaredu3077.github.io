@@ -1190,7 +1190,7 @@ For more detailed information, visit: <a href="#" onclick="window.open('resume.t
      */
     showDemoscene() {
         // Open the demoscene website in a new window/tab
-        window.open('demoscene/demoscene.html', '_blank');
+        window.open('demoscene/index.html', '_blank');
         
         return `
 <div class="terminal-heading">Demoscene Experience</div>
@@ -1205,6 +1205,8 @@ The demoscene website is now opening in a new tab/window.
 • Particle systems
 • CRT-style filters
 • Vintage computer aesthetics
+• WebGL rendering
+• Quantum vortex effects
 
 <b>Controls:</b>
 • Mouse: Navigate effects
@@ -1218,8 +1220,9 @@ The demoscene website is now opening in a new tab/window.
 • Canvas animations
 • Retro shaders
 • Vintage color palettes
+• Quantum computing effects
 
-The demoscene website should now be open in a new tab. If it didn't open automatically, you can manually navigate to: demoscene/demoscene.html
+The demoscene website should now be open in a new tab. If it didn't open automatically, you can manually navigate to: demoscene/index.html
         `;
     }
 

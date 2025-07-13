@@ -41,6 +41,7 @@
     <link rel="stylesheet" href="_animations.css">
     <link rel="stylesheet" href="_responsive.css">
     <link rel="stylesheet" href="theme.css">
+    <link rel="stylesheet" href="_glass.css">
     <!-- Include Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Include vis.js for network topology map -->
@@ -88,40 +89,51 @@
     </script>
 </head>
 <body>
+    <!-- Glass Distortion SVG Filter from test1 -->
+    <svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute; overflow:hidden">
+        <defs>
+            <filter id="glass-distortion" x="0%" y="0%" width="100%" height="100%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.015 0.015" numOctaves="2" seed="92" result="noise" />
+                <feGaussianBlur in="noise" stdDeviation="2" result="blurred" />
+                <feDisplacementMap in="SourceGraphic" in2="blurred" scale="140" xChannelSelector="R"
+                    yChannelSelector="G" />
+            </filter>
+        </defs>
+    </svg>
+    
     <canvas id="starfield-bg"></canvas>
     
-    <!-- Modern Boot Sequence -->
+
+    
+    <!-- Modern Boot Sequence with Advanced Glass Effects -->
     <div id="bootSequence" class="boot-sequence" role="dialog" aria-labelledby="boot-title" aria-describedby="boot-desc">
         <div class="boot-background">
             <div class="boot-particles"></div>
         </div>
-        <div class="boot-container">
-            <div class="boot-header">
-                <h1 id="boot-title" class="boot-title">neuOS</h1>
-            </div>
-            
-            <div class="boot-progress">
-                <div class="progress-container">
-                    <div class="progress-bar" role="progressbar" aria-label="Boot progress">
-                        <div class="progress-fill"></div>
+        <div class="boot-container neuos-glass-box">
+            <h2 id="boot-title" class="neuos-glass-title">neuOS</h2>
+            <div class="boot-logo-progress" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+                <div class="boot-progress" style="width: auto;">
+                    <div class="progress-container">
+                        <div class="progress-bar" role="progressbar" aria-label="Boot progress">
+                            <div class="progress-fill"></div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modern Login Screen -->
+    <!-- Modern Login Screen with Advanced Glass Effects -->
     <div id="loginScreen" class="login-screen" role="dialog" aria-labelledby="login-title">
         <div class="login-background">
             <div class="login-particles"></div>
         </div>
-        <div class="login-container">
-            <div class="login-header">
-                <h2 id="login-title" class="login-title">neuOS</h2>
-            </div>
+        <div class="login-container neuos-glass-box">
+            <h2 id="login-title" class="neuos-glass-title">neuOS</h2>
             
             <div class="login-form">
-                <button id="guestLoginBtn" class="login-btn">
+                <button id="guestLoginBtn" class="login-btn glass-login-btn">
                     <span class="btn-text">enter</span>
                     <div class="btn-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
