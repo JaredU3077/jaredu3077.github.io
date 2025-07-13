@@ -21,14 +21,14 @@ export const backgroundMixin = {
         
         // Create eight rings with different sizes and speeds
         const rings = [
-            { size: 200, opacity: 0.6, animation: 40, borderWidth: 5, orbSize: 8, orbColor: '#ff6b6b' },
-            { size: 280, opacity: 0.55, animation: 50, borderWidth: 5, orbSize: 6, orbColor: '#4ecdc4' },
-            { size: 360, opacity: 0.5, animation: 60, borderWidth: 5, orbSize: 10, orbColor: '#45b7d1' },
-            { size: 440, opacity: 0.45, animation: 70, borderWidth: 5, orbSize: 7, orbColor: '#96ceb4' },
-            { size: 520, opacity: 0.4, animation: 80, borderWidth: 5, orbSize: 12, orbColor: '#feca57' },
-            { size: 600, opacity: 0.35, animation: 90, borderWidth: 5, orbSize: 9, orbColor: '#ff9ff3' },
-            { size: 680, opacity: 0.3, animation: 100, borderWidth: 5, orbSize: 11, orbColor: '#54a0ff' },
-            { size: 760, opacity: 0.25, animation: 110, borderWidth: 5, orbSize: 8, orbColor: '#5f27cd' }
+            { size: 200, opacity: 0.7, animation: 40, borderWidth: 5, orbSize: 8, orbColor: '#ff6b6b' },
+            { size: 280, opacity: 0.7, animation: 50, borderWidth: 5, orbSize: 6, orbColor: '#4ecdc4' },
+            { size: 360, opacity: 0.7, animation: 60, borderWidth: 5, orbSize: 10, orbColor: '#45b7d1' },
+            { size: 440, opacity: 0.7, animation: 70, borderWidth: 5, orbSize: 7, orbColor: '#96ceb4' },
+            { size: 520, opacity: 0.7, animation: 80, borderWidth: 5, orbSize: 12, orbColor: '#feca57' },
+            { size: 600, opacity: 0.7, animation: 90, borderWidth: 5, orbSize: 9, orbColor: '#ff9ff3' },
+            { size: 680, opacity: 0.7, animation: 100, borderWidth: 5, orbSize: 11, orbColor: '#54a0ff' },
+            { size: 760, opacity: 0.7, animation: 110, borderWidth: 5, orbSize: 8, orbColor: '#5f27cd' }
         ];
         
         rings.forEach((ringConfig, index) => {
@@ -44,7 +44,7 @@ export const backgroundMixin = {
                 width: ${ringConfig.size}px !important;
                 height: ${ringConfig.size}px !important;
                 transform: translate(-50%, -50%) !important;
-                border: ${ringConfig.borderWidth}px solid rgba(74, 144, 226, 0.15) !important;
+                border: ${ringConfig.borderWidth}px solid rgba(74, 144, 226, 0.25) !important;
                 border-radius: 50% !important;
                 animation: backgroundSpin ${ringConfig.animation}s linear infinite !important;
                 pointer-events: none !important;
