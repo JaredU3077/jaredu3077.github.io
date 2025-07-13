@@ -700,7 +700,7 @@ body:not(.boot-active):not(.login-active) #desktop {
     box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.2);
 }
 .desktop-icon .icon {
-    font-size: 2.4rem;
+    font-size: 3.12rem;
     color: var(--text-color);
     transition: color var(--transition-fast);
     display: flex;
@@ -780,7 +780,7 @@ body:not(.boot-active):not(.login-active) #desktop {
         box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.2);
     }
     .desktop-icon .icon {
-        font-size: 2.4rem;
+        font-size: 3.12rem;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -813,7 +813,7 @@ body:not(.boot-active):not(.login-active) #desktop {
         box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.2);
     }
     .desktop-icon .icon {
-        font-size: 1.8rem;
+        font-size: 2.34rem;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -844,7 +844,7 @@ body:not(.boot-active):not(.login-active) #desktop {
         box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.2);
     }
     .desktop-icon .icon {
-        font-size: 2.1rem;
+        font-size: 2.73rem;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -877,7 +877,7 @@ body:not(.boot-active):not(.login-active) #desktop {
         box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.2);
     }
     .desktop-icon .icon {
-        font-size: 1.5rem;
+        font-size: 1.95rem;
         display: flex;
         align-items: center;
         justify-content: center;
