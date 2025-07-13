@@ -4,8 +4,6 @@
  * @author jared u.
  */
 
-console.log('neuOS: Starting module imports...');
-
 import { Terminal } from './apps/terminal.js';
 import { WindowManager } from './core/window.js';
 import { HelpManager } from './utils/help.js';
@@ -22,8 +20,6 @@ import './core/glassEffect.js';
 import { GlassMorphismSystem } from './core/glassEffect.js';
 import GlassEffects from './utils/glassEffects.js';
 import DraggableSystem from './utils/draggable.js';
-
-console.log('neuOS: All modules imported successfully');
 
 // --- MODULE INITIALIZATION ---
 /** @type {WindowManager} */
@@ -51,21 +47,18 @@ try {
     windowManager = new WindowManager();
     // Expose windowManager globally for other modules to use
     window.windowManager = windowManager;
-    console.log('neuOS: WindowManager initialized successfully');
 } catch (error) {
     console.error('neuOS: Failed to initialize WindowManager:', error);
 }
 
 try {
     helpManager = new HelpManager();
-    console.log('neuOS: HelpManager initialized successfully');
 } catch (error) {
     console.error('neuOS: Failed to initialize HelpManager:', error);
 }
 
 try {
     searchManager = new SearchManager();
-    console.log('neuOS: SearchManager initialized successfully');
 } catch (error) {
     console.error('neuOS: Failed to initialize SearchManager:', error);
 }
@@ -73,7 +66,6 @@ try {
 try {
     glassMorphismSystem = new GlassMorphismSystem();
     window.glassMorphismSystem = glassMorphismSystem;
-    console.log('neuOS: GlassMorphismSystem initialized successfully');
 } catch (error) {
     console.error('neuOS: Failed to initialize GlassMorphismSystem:', error);
 }
@@ -81,7 +73,6 @@ try {
 try {
     glassEffects = new GlassEffects();
     window.glassEffects = glassEffects;
-    console.log('neuOS: GlassEffects initialized successfully');
 } catch (error) {
     console.error('neuOS: Failed to initialize GlassEffects:', error);
 }
@@ -89,7 +80,6 @@ try {
 try {
     draggableSystem = new DraggableSystem();
     window.draggableSystem = draggableSystem;
-    console.log('neuOS: DraggableSystem initialized successfully');
 } catch (error) {
     console.error('neuOS: Failed to initialize DraggableSystem:', error);
 }
@@ -117,10 +107,6 @@ function initializeUI() {
     });
     
     // Desktop is now ready but hidden until boot completes
-    console.log('neuOS: Desktop UI initialized (hidden until boot complete)');
-    console.log('neuOS: Created desktop icons for:', Object.keys(CONFIG.applications));
-    console.log('neuOS: Desktop icons count:', desktopIcons.children.length);
-    console.log('neuOS: Desktop icons HTML:', desktopIcons.innerHTML.substring(0, 200) + '...');
 }
 
 // --- EVENT LISTENERS ---
@@ -135,8 +121,6 @@ function initializeUI() {
  */
 async function handleAppClick(appId) {
     try {
-        console.log(`handleAppClick called for appId: ${appId}`);
-        
         // Play UI sound effect
         if (window.bootSystemInstance) {
             window.bootSystemInstance.playUIClickSound();
@@ -147,14 +131,11 @@ async function handleAppClick(appId) {
             console.error(`No application config found for appId: ${appId}`);
             return;
         }
-        console.log(`App config found:`, app);
 
     app.windows.forEach(async windowConfig => {
-        console.log(`Processing window config:`, windowConfig);
         // If window already open, focus it and do not re-initialize
         let winElem = document.getElementById(windowConfig.id);
         if (winElem) {
-            console.log(`Window already open, focusing: ${windowConfig.id}`);
             windowManager.focusWindow(windowManager.windows.get(windowConfig.id));
             return;
         }
@@ -165,7 +146,6 @@ async function handleAppClick(appId) {
         }
         
         // Create window and initialize app logic
-        console.log(`Creating new window for: ${windowConfig.id}`);
         winElem = windowManager.createWindow({
             id: windowConfig.id,
             title: windowConfig.title,
@@ -177,26 +157,16 @@ async function handleAppClick(appId) {
             type: app.type || 'app', // Pass the application type (e.g., 'game' vs 'app')
             defaultSize: app.defaultSize // Pass the default size for this application
         });
-        console.log('Window element created:', winElem);
-        console.log('📱 Window created with default size:', {
-            appId,
-            windowId: windowConfig.id,
-            width: windowConfig.width,
-            height: windowConfig.height,
-            defaultSize: app.defaultSize
-        });
         
 
         openWindows[windowConfig.id] = winElem;
         try {
             switch (appId) {
                 case 'terminal':
-                    console.log('Initializing terminal...');
                     terminal = new Terminal(
                         winElem.querySelector('#terminalInput input'),
                         winElem.querySelector('#terminalOutput')
                     );
-                    console.log('Terminal initialized:', terminal);
                     // Expose terminal globally for demoscene access
                     window.terminalInstance = terminal;
                     break;
@@ -336,7 +306,6 @@ function handleGlobalKeydown(e) {
 
 // --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', async () => {
-            console.log('neuOS: Starting system initialization...');
     try {
         // Initialize core systems
         bootSystem = BootSystem.getInstance();
@@ -392,16 +361,80 @@ document.addEventListener('DOMContentLoaded', async () => {
                 desktopIcons.offsetHeight; // Force reflow
                 desktopIcons.style.display = 'grid';
                 
-                // Log the current responsive state for debugging
-                const computedStyle = getComputedStyle(desktopIcons);
-                console.log('🖥️ Desktop icons responsive update:', {
-                    width: window.innerWidth,
-                    columns: computedStyle.gridTemplateColumns,
-                    gap: computedStyle.gap,
-                    iconMinWidth: computedStyle.getPropertyValue('--icon-min-width')
-                });
+                        // Responsive desktop icons updated
             }
         }, 150));
+
+        // Add neuOS glass widget after login
+        function addNeuOSWidget() {
+            if (document.getElementById('neuosWidget')) return; // Prevent duplicates
+            
+            const widget = document.createElement('div');
+            widget.id = 'neuosWidget';
+            widget.className = 'neuos-widget';
+            widget.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%; width: 100%;">
+                    <span class="neuos-glass-title" style="font-size: 1.8rem; margin: 0; text-align: center;">neuOS</span>
+                </div>
+            `;
+            
+            // Add to body
+            document.body.appendChild(widget);
+            
+            // Simple drag implementation
+            let isDragging = false;
+            let startX = 0, startY = 0;
+            let currentLeft = 0, currentTop = 0;
+
+            widget.addEventListener('mousedown', function(e) {
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                
+                // Get current position
+                const rect = widget.getBoundingClientRect();
+                currentLeft = rect.left;
+                currentTop = rect.top;
+                
+                // Remove transform and set absolute positioning
+                widget.style.transform = 'none';
+                widget.style.left = currentLeft + 'px';
+                widget.style.top = currentTop + 'px';
+                
+                widget.style.cursor = 'grabbing';
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', function(e) {
+                if (!isDragging) return;
+                
+                const deltaX = e.clientX - startX;
+                const deltaY = e.clientY - startY;
+                
+                const newLeft = currentLeft + deltaX;
+                const newTop = currentTop + deltaY;
+                
+                widget.style.left = newLeft + 'px';
+                widget.style.top = newTop + 'px';
+            });
+
+            document.addEventListener('mouseup', function() {
+                if (isDragging) {
+                    isDragging = false;
+                    widget.style.cursor = 'grab';
+                }
+            });
+        }
+
+        // Show widget only after login completion
+        const loginObserver = new MutationObserver(() => {
+            const loginScreen = document.getElementById('loginScreen');
+            if (loginScreen && loginScreen.style.display === 'none' && !document.getElementById('neuosWidget')) {
+                addNeuOSWidget();
+                loginObserver.disconnect();
+            }
+        });
+        loginObserver.observe(document.body, { subtree: true, attributes: true, attributeFilter: ['style'] });
         
     } catch (error) {
         console.error('Failed to initialize application:', error);

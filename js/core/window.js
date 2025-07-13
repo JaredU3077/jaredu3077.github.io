@@ -133,14 +133,7 @@ export class WindowManager {
         this.windows.set(id, windowObj);
         this.windowStack.push(windowObj);
         
-        console.log('🪟 Window created:', { 
-            id, 
-            width, 
-            height, 
-            left, 
-            top,
-            zIndex: windowElement.style.zIndex 
-        });
+        // Window created successfully
         
         this.setupWindowEvents(windowObj);
         this.focusWindow(windowObj);
@@ -224,7 +217,7 @@ export class WindowManager {
                                     // Add visual feedback
                                     windowObj.element.classList.add('resizing');
                                 }
-                                console.log('🔄 Resize started on window:', event.target.id);
+                                // Resize started
                             },
                             move: throttle(this.handleResizeMove.bind(this), 16), // Throttle to ~60fps
                             end: this.handleResizeEnd.bind(this)

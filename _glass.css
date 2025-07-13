@@ -230,8 +230,8 @@
     left: 50% !important;
     top: 50% !important;
     transform: translate(-50%, -50%) !important;
-    width: 350px !important;
-    height: 220px !important;
+    width: 495px !important;
+    height: 308px !important;
     border-radius: 28px !important;
     cursor: grab !important;
     isolation: isolate !important;
@@ -240,9 +240,9 @@
     box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.2) !important;
     z-index: 1000 !important;
     /* Force identical background and backdrop-filter */
-    background: rgba(255,255,255,0.015) !important;
-    backdrop-filter: blur(8px) saturate(150%) brightness(120%) !important;
-    -webkit-backdrop-filter: blur(8px) saturate(150%) brightness(120%) !important;
+    background: rgba(255,255,255,0.0015) !important;
+    backdrop-filter: blur(2px) saturate(150%) brightness(120%) !important;
+    -webkit-backdrop-filter: blur(2px) saturate(150%) brightness(120%) !important;
     /* Force identical padding and layout */
     padding: 32px !important;
     margin: 0 !important;
@@ -256,8 +256,8 @@
     backface-visibility: hidden !important;
     -webkit-backface-visibility: hidden !important;
     /* Force identical content area */
-    min-height: 220px !important;
-    min-width: 350px !important;
+    min-height: 308px !important;
+    min-width: 495px !important;
     overflow: hidden !important;
     /* Force identical transform context */
     transform-style: flat !important;
@@ -317,9 +317,9 @@
 /* Final override to ensure both boxes are absolutely identical */
 #bootBox, #loginBox {
     /* Force identical rendering context */
-    backdrop-filter: blur(8px) saturate(150%) brightness(120%) !important;
-    -webkit-backdrop-filter: blur(8px) saturate(150%) brightness(120%) !important;
-    background: rgba(255,255,255,0.015) !important;
+    backdrop-filter: blur(2px) saturate(150%) brightness(120%) !important;
+    -webkit-backdrop-filter: blur(2px) saturate(150%) brightness(120%) !important;
+    background: rgba(255,255,255,0.0015) !important;
     box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.2) !important;
     /* Force identical transform context */
     transform: translate(-50%, -50%) !important;
@@ -330,8 +330,8 @@
     left: 50% !important;
     top: 50% !important;
     /* Force identical sizing */
-    width: 350px !important;
-    height: 220px !important;
+    width: 495px !important;
+    height: 308px !important;
     border-radius: 28px !important;
     /* Force identical layout */
     display: flex !important;
@@ -354,8 +354,8 @@
     visibility: visible !important;
     z-index: 1000 !important;
     /* Force identical content area */
-    min-height: 220px !important;
-    min-width: 350px !important;
+    min-height: 308px !important;
+    min-width: 495px !important;
     overflow: hidden !important;
     /* Force identical transform origin */
     transform-origin: 50% 50% !important;
@@ -372,4 +372,54 @@
     pointer-events: auto !important;
     /* Allow dragging */
     touch-action: none !important;
+} 
+
+/* neuOS Widget - Smaller than login box */
+.neuos-widget {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 180px;
+    height: 90px;
+    z-index: 1200;
+    cursor: grab;
+    user-select: none;
+    pointer-events: auto;
+    touch-action: none;
+    background: rgba(255,255,255,0.003);
+    backdrop-filter: blur(2px) saturate(150%) brightness(120%);
+    -webkit-backdrop-filter: blur(2px) saturate(150%) brightness(120%);
+    border-radius: 20px;
+    box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.2);
+    padding: 16px;
+    margin: 0;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    isolation: isolate;
+    contain: layout style paint;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: flat;
+    perspective: none;
+    perspective-origin: 50% 50%;
+    -webkit-perspective-origin: 50% 50%;
+    transform-origin: 50% 50%;
+    -webkit-transform-origin: 50% 50%;
+    transition: none;
+    will-change: auto;
+    opacity: 1;
+    visibility: visible;
+    animation: none;
+}
+
+.neuos-widget:hover {
+    cursor: grab;
+}
+
+.neuos-widget:active {
+    cursor: grabbing;
 } 

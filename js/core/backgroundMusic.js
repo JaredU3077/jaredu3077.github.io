@@ -29,7 +29,7 @@ export class BackgroundMusic {
             return;
         }
 
-        console.log('Background music initialized - enabled:', this.musicEnabled);
+        // Background music initialized
 
         // Set volume to a comfortable level that won't interfere with typing sounds
         this.backgroundMusic.volume = 0.2; // Reduced volume to prevent conflicts
@@ -46,8 +46,7 @@ export class BackgroundMusic {
         
         // Add load event listener to confirm audio file loaded
         this.backgroundMusic.addEventListener('loadeddata', () => {
-            console.log('Background music file loaded successfully');
-            console.log('Audio duration:', this.backgroundMusic.duration);
+            // Background music file loaded successfully
         });
         
         // Add play event listener
@@ -57,7 +56,7 @@ export class BackgroundMusic {
             if (window.audioSystemInstance && window.audioSystemInstance.audioContext && 
                 window.audioSystemInstance.audioContext.state === 'suspended') {
                 window.audioSystemInstance.audioContext.resume().then(() => {
-                    console.log('Audio context resumed due to music playback');
+                    // Audio context resumed
                 }).catch(err => {
                     console.warn('Failed to resume audio context:', err);
                 });
@@ -66,7 +65,7 @@ export class BackgroundMusic {
         
         // Add pause event listener
         this.backgroundMusic.addEventListener('pause', () => {
-            console.log('Background music paused');
+            // Background music paused
         });
         
         // Update audio controls to reflect music state
@@ -106,7 +105,6 @@ export class BackgroundMusic {
             const startOnInteraction = () => {
                 // Only restart if music is enabled, paused, and user hasn't manually disabled it
                 if (this.backgroundMusic && this.backgroundMusic.paused && this.musicEnabled && !this.userManuallyDisabled) {
-                    console.log('neuOS: User interaction detected, starting background music...');
                     playMusic();
                 }
             };
@@ -165,7 +163,7 @@ export class BackgroundMusic {
         if (this.backgroundMusic) {
             this.backgroundMusic.pause();
             this.backgroundMusic.currentTime = 0;
-            console.log('Background music stopped');
+            // Background music stopped
             
             // Remove music indicator
             const indicator = document.querySelector('div[style*="musicPulse"]');
@@ -178,33 +176,20 @@ export class BackgroundMusic {
     toggleBackgroundMusic() {
         // Prevent rapid clicking
         if (this.toggleInProgress) {
-            console.log('Toggle already in progress, ignoring click');
             return;
         }
         
         this.toggleInProgress = true;
         
-        console.log('Audio toggle clicked - current state:', this.musicEnabled);
-        console.log('Audio element state before toggle:', {
-            paused: this.backgroundMusic?.paused,
-            currentTime: this.backgroundMusic?.currentTime,
-            duration: this.backgroundMusic?.duration,
-            readyState: this.backgroundMusic?.readyState,
-            networkState: this.backgroundMusic?.networkState,
-            volume: this.backgroundMusic?.volume
-        });
-        
         // Simple toggle logic
         if (this.musicEnabled) {
             // Disable music
-            console.log('Disabling background music...');
             this.musicEnabled = false;
             this.userManuallyDisabled = true;
             localStorage.setItem('neuos-music', 'false');
             
             if (this.backgroundMusic) {
                 this.backgroundMusic.pause();
-                console.log('Background music paused');
                 
                 // Remove music indicator
                 const indicator = document.querySelector('div[style*="musicPulse"]');
@@ -214,33 +199,20 @@ export class BackgroundMusic {
             }
         } else {
             // Enable music
-            console.log('Enabling background music...');
             this.musicEnabled = true;
             this.userManuallyDisabled = false;
             localStorage.setItem('neuos-music', 'true');
             
             if (this.backgroundMusic && this.backgroundMusic.paused) {
                 this.backgroundMusic.play().then(() => {
-                    console.log('Background music resumed successfully');
                     this.showMusicIndicator();
                 }).catch(error => {
                     console.warn('Could not resume background music:', error);
                 });
-            } else if (this.backgroundMusic) {
-                console.log('Music already playing or not available');
             }
         }
         
         this.updateAudioControls();
-        console.log('Audio toggle complete - new state:', this.musicEnabled);
-        console.log('Audio element state after toggle:', {
-            paused: this.backgroundMusic?.paused,
-            currentTime: this.backgroundMusic?.currentTime,
-            duration: this.backgroundMusic?.duration,
-            readyState: this.backgroundMusic?.readyState,
-            networkState: this.backgroundMusic?.networkState,
-            volume: this.backgroundMusic?.volume
-        });
         
         // Allow toggle again after a short delay
         setTimeout(() => {
