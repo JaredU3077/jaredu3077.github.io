@@ -13,6 +13,8 @@ We welcome various types of contributions:
 - **🎨 UI/UX Improvements**: Enhance the user experience
 - **🔧 Code Improvements**: Optimize performance or fix issues
 - **🧪 Testing**: Help test features and report issues
+- **🎵 Audio Enhancements**: Improve Mechvibes and audio systems
+- **🎨 Demoscene**: Contribute to the secret demoscene platform
 
 ## 🚀 Getting Started
 
@@ -130,15 +132,24 @@ js/
 ├── main.js              # Application entry point
 ├── config.js            # Configuration management
 ├── core/                # Core system modules
-│   ├── boot.js         # Boot sequence
+│   ├── boot.js         # Main boot orchestrator
+│   ├── bootSequence.js # Boot animation system
 │   ├── window.js       # Window management
-│   └── particleSystem.js # Particle system
+│   ├── particleSystem.js # Particle system
+│   ├── audioSystem.js  # Audio management
+│   ├── backgroundMusic.js # Background music
+│   ├── screensaver.js  # Screensaver system
+│   └── glassEffect.js  # Glass morphism system
 ├── apps/                # Application modules
 │   ├── terminal.js     # Terminal application
 │   └── codex.js        # Knowledge base
 └── utils/               # Utility modules
     ├── utils.js        # General utilities
-    └── search.js       # Search functionality
+    ├── help.js         # Help system
+    ├── search.js       # Search functionality
+    ├── mechvibes.js    # Typing sound system
+    ├── draggable.js    # Window dragging system
+    └── glassEffects.js # Glass effect utilities
 ```
 
 #### CSS Files
@@ -150,7 +161,26 @@ js/
 ├── _login.css          # Login styles
 ├── _apps.css           # Application styles
 ├── _animations.css     # Animation definitions
-└── _responsive.css     # Responsive styles
+├── _responsive.css     # Responsive styles
+└── _glass.css          # Glass morphism effects
+```
+
+#### Demoscene Platform
+```
+demoscene/
+├── index.html          # Main demoscene interface
+├── demoscene.html      # Alternative interface
+├── manifest.json       # PWA manifest
+├── sw.js              # Service worker
+├── css/
+│   └── DarkWave.css   # Demoscene styling
+└── js/
+    ├── main.js        # Main controller
+    ├── demoscene.js   # Demo platform controller
+    ├── DarkWaveAudio.js # Audio system with synthesis
+    ├── DarkWaveCore.js # Core functionality
+    ├── QuantumVortex.js # Quantum Vortex demo
+    └── WebGLUtils.js  # WebGL utilities and shaders
 ```
 
 ### Naming Conventions
@@ -167,6 +197,16 @@ js/
 - **Classes**: PascalCase (`WindowManager`)
 - **Constants**: UPPER_SNAKE_CASE (`MAX_WINDOW_COUNT`)
 
+### File Tagging System
+
+All files should include appropriate tags in comments:
+
+```javascript
+// [neu-os] - For neuOS core files
+// [game] - For game applications and features
+// [secret] - For demoscene applications and website
+```
+
 ## 🧪 Testing
 
 ### Manual Testing Checklist
@@ -178,13 +218,23 @@ Before submitting a pull request, test the following:
 - [ ] Desktop icons are clickable
 - [ ] Windows can be created and managed
 - [ ] Particle system is visible and interactive
-- [ ] Audio system works (if applicable)
+- [ ] Audio system works (Mechvibes and background music)
+- [ ] Glass morphism effects render properly
 
 #### Applications
 - [ ] Terminal opens and responds to commands
 - [ ] Codex opens and search works
 - [ ] All applications close properly
 - [ ] Window focus management works
+- [ ] "show demoscene" command works
+
+#### Demoscene Platform
+- [ ] Demoscene loads correctly
+- [ ] Quantum Vortex demo works
+- [ ] WebGL graphics render properly
+- [ ] Audio synthesis works
+- [ ] Creation tools function
+- [ ] PWA features work offline
 
 #### Responsive Design
 - [ ] Mobile layout works correctly
@@ -223,6 +273,7 @@ Test in the following browsers:
 - **Installation Guide**: Keep installation instructions current
 - **User Guide**: Document new features
 - **Troubleshooting**: Add solutions for common issues
+- **Architecture Documentation**: Keep architecture docs updated
 
 ## 🔄 Pull Request Process
 
@@ -231,6 +282,7 @@ Test in the following browsers:
 2. **Check Code Style**: Follow the established conventions
 3. **Update Documentation**: Update relevant docs
 4. **Squash Commits**: Clean up commit history
+5. **Add Tags**: Include appropriate file tags
 
 ### Pull Request Template
 ```markdown
@@ -243,12 +295,15 @@ Brief description of changes
 - [ ] Documentation update
 - [ ] Performance improvement
 - [ ] Accessibility improvement
+- [ ] Audio enhancement
+- [ ] Demoscene contribution
 
 ## Testing
 - [ ] Manual testing completed
 - [ ] Cross-browser testing completed
 - [ ] Accessibility testing completed
 - [ ] Performance testing completed
+- [ ] Demoscene testing completed (if applicable)
 
 ## Screenshots (if applicable)
 Add screenshots for UI changes
@@ -259,6 +314,7 @@ Add screenshots for UI changes
 - [ ] Documentation updated
 - [ ] No console errors
 - [ ] No performance regressions
+- [ ] File tags added appropriately
 ```
 
 ### Review Process
@@ -346,6 +402,34 @@ Any other relevant information
 - **Code**: JetBrains Mono
 - **UI**: System fonts (Segoe UI, -apple-system, etc.)
 - **Sizes**: Responsive typography scale
+
+## 🎵 Audio Guidelines
+
+### Mechvibes Integration
+- **Sound Quality**: High-quality typing sounds
+- **Key Mapping**: Comprehensive key-to-sound mapping
+- **Performance**: Low-latency audio playback
+- **Volume Control**: Adjustable volume levels
+
+### Background Music
+- **Looping**: Seamless background music
+- **Controls**: Play/pause functionality
+- **Volume**: Independent volume control
+- **Auto-restart**: Automatic restart on completion
+
+## 🎨 Demoscene Guidelines
+
+### WebGL Development
+- **Performance**: 60fps target for all demos
+- **Shaders**: Custom GLSL shaders
+- **Audio Reactivity**: Visual effects synchronized to audio
+- **Mobile Support**: Touch-friendly controls
+
+### Audio Synthesis
+- **Chiptune Style**: 8-bit aesthetic
+- **Real-time Generation**: Web Audio API synthesis
+- **Effects Chain**: Reverb, delay, distortion
+- **Multiple Tracks**: Unique audio for each demo
 
 ## 🔧 Development Tools
 
@@ -440,6 +524,26 @@ npm run build
 - **Silver**: 6-15 contributions
 - **Gold**: 16+ contributions
 - **Platinum**: Major feature contributions
+
+## 🎮 Terminal Commands
+
+### Available Commands
+- `help` - Show all available commands
+- `particles <mode>` - Control particle system
+- `effects <on|off>` - Toggle visual effects
+- `audio <on|off>` - Toggle audio system
+- `show demoscene` - Access demoscene platform
+- `system <cmd>` - System operations
+- `theme <cmd>` - Theme control
+- `performance <cmd>` - Performance monitoring
+
+### Adding New Commands
+When adding new terminal commands:
+1. Update the help text in `js/config.js`
+2. Implement the command in `js/apps/terminal.js`
+3. Add appropriate error handling
+4. Test thoroughly
+5. Update documentation
 
 ---
 

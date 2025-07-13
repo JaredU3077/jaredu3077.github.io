@@ -5,9 +5,10 @@
 ### System Requirements
 - **Browser**: Modern browser with ES6+ support (Chrome 80+, Firefox 75+, Safari 13+, Edge 80+)
 - **JavaScript**: ES6 modules support enabled
-- **Audio**: Web Audio API support for sound effects
+- **Audio**: Web Audio API support for sound effects and Mechvibes
 - **Storage**: At least 50MB free space for assets
 - **Memory**: 2GB RAM recommended for smooth performance
+- **Graphics**: Hardware acceleration recommended for particle effects
 
 ### Browser Compatibility
 | Browser | Version | Status | Notes |
@@ -25,6 +26,7 @@
 2. **Experience the Boot**: Watch the system initialize with space-themed animations
 3. **Login**: Click "enter" to access the system
 4. **Explore**: Click on desktop icons to launch applications
+5. **Discover**: Access the secret demoscene via terminal command "show demoscene"
 
 ### Option 2: Local Development
 
@@ -121,7 +123,8 @@ jaredu3077.github.io/
 ├── _apps.css                 # Application styles
 ├── _animations.css           # Animation definitions
 ├── _responsive.css           # Responsive design styles
-├── config.json               # System configuration
+├── _glass.css                # Glass morphism effects
+├── config.json               # Mechvibes sound configuration
 ├── codex.txt                 # Knowledge base content
 ├── resume.txt                # Resume content
 ├── mp3.mp3                   # Background music
@@ -130,9 +133,38 @@ jaredu3077.github.io/
 │   ├── main.js              # Application controller
 │   ├── config.js            # Configuration management
 │   ├── core/                # Core system modules
+│   │   ├── boot.js         # Main boot orchestrator
+│   │   ├── bootSequence.js # Boot animation system
+│   │   ├── window.js       # Window management system
+│   │   ├── particleSystem.js # Particle system engine
+│   │   ├── audioSystem.js  # Audio management
+│   │   ├── backgroundMusic.js # Background music system
+│   │   ├── screensaver.js  # Screensaver system
+│   │   └── glassEffect.js  # Glass morphism system
 │   ├── apps/                # Application modules
+│   │   ├── terminal.js     # Terminal application
+│   │   └── codex.js        # Knowledge base app
 │   └── utils/               # Utility modules
+│       ├── utils.js        # General utilities
+│       ├── help.js         # Help system
+│       ├── search.js       # Search functionality
+│       ├── mechvibes.js    # Typing sound system
+│       ├── draggable.js    # Window dragging system
+│       └── glassEffects.js # Glass effect utilities
 ├── demoscene/                # Secret demoscene platform
+│   ├── index.html          # Main demoscene interface
+│   ├── demoscene.html      # Alternative interface
+│   ├── manifest.json       # PWA manifest
+│   ├── sw.js               # Service worker
+│   ├── css/
+│   │   └── DarkWave.css    # Demoscene styling
+│   └── js/
+│       ├── main.js         # Main controller
+│       ├── demoscene.js    # Demo platform controller
+│       ├── DarkWaveAudio.js # Audio system with synthesis
+│       ├── DarkWaveCore.js # Core functionality
+│       ├── QuantumVortex.js # Quantum Vortex demo
+│       └── WebGLUtils.js   # WebGL utilities and shaders
 └── docs/                     # Documentation
 ```
 
@@ -182,8 +214,33 @@ export const CONFIG = {
         ENABLED: true,
         VOLUME: 0.5,
         MECHVIBES: true
+    },
+    
+    // Applications
+    applications: {
+        'terminal': {
+            // Terminal configuration
+        },
+        'codex': {
+            // Codex configuration
+        }
     }
 };
+```
+
+### Mechvibes Configuration
+The `config.json` file contains the Mechvibes sound pack configuration:
+
+```json
+{
+    "id": "sound-pack-1200000000012",
+    "name": "Topre Purple Hybrid - PBT keycaps",
+    "default": true,
+    "sound": "sound.ogg",
+    "defines": {
+        // Key-to-sound mappings
+    }
+}
 ```
 
 ## 🔧 Troubleshooting
@@ -191,20 +248,22 @@ export const CONFIG = {
 ### Common Issues
 
 #### Issue: Audio Not Working
-**Symptoms**: No sound effects or background music
+**Symptoms**: No sound effects, background music, or typing sounds
 **Solutions**:
 1. Check browser audio permissions
 2. Ensure Web Audio API is supported
 3. Try refreshing the page
 4. Check browser console for errors
+5. Verify Mechvibes configuration in config.json
 
 #### Issue: Particles Not Visible
 **Symptoms**: No particle effects on screen
 **Solutions**:
 1. Check browser console for JavaScript errors
 2. Ensure hardware acceleration is enabled
-3. Try different particle modes via terminal
+3. Try different particle modes via terminal: `particles rain`
 4. Check if animations are disabled in browser
+5. Verify particle system initialization
 
 #### Issue: Windows Not Draggable
 **Symptoms**: Cannot drag windows around
@@ -213,6 +272,7 @@ export const CONFIG = {
 2. Ensure no JavaScript errors in console
 3. Try refreshing the page
 4. Check browser compatibility
+5. Verify draggable system initialization
 
 #### Issue: Terminal Commands Not Working
 **Symptoms**: Terminal not responding to commands
@@ -221,6 +281,16 @@ export const CONFIG = {
 2. Ensure JavaScript modules loaded properly
 3. Try typing `help` for available commands
 4. Check browser console for errors
+5. Verify terminal application initialization
+
+#### Issue: Demoscene Not Accessible
+**Symptoms**: "show demoscene" command not working
+**Solutions**:
+1. Ensure demoscene directory exists
+2. Check terminal command implementation
+3. Verify demoscene files are present
+4. Check browser console for errors
+5. Try accessing demoscene directly via URL
 
 ### Performance Issues
 
@@ -230,6 +300,7 @@ export const CONFIG = {
 2. Disable animations: Type `effects off` in terminal
 3. Close unnecessary windows
 4. Check browser performance settings
+5. Disable glass effects if needed
 
 #### High Memory Usage
 **Solutions**:
@@ -237,6 +308,7 @@ export const CONFIG = {
 2. Close unused applications
 3. Clear browser cache
 4. Use a more powerful device
+5. Reduce particle count and effects
 
 ### Browser-Specific Issues
 
@@ -251,6 +323,10 @@ export const CONFIG = {
 #### Safari
 - **Issue**: CSS animations not smooth
 - **Solution**: Enable "Reduce motion" in accessibility settings
+
+#### Edge
+- **Issue**: Glass effects not rendering properly
+- **Solution**: Update to latest version or use Chrome
 
 ## 🚀 Deployment
 
@@ -348,6 +424,34 @@ window.addEventListener('error', (event) => {
 });
 ```
 
+## 🎵 Audio System
+
+### Mechvibes Integration
+- **Sound Pack**: Topre Purple Hybrid - PBT keycaps
+- **Key Mapping**: Comprehensive key-to-sound mapping in config.json
+- **Real-time Playback**: Instant sound response
+- **Volume Control**: Adjustable typing sound volume
+
+### Background Music
+- **Looping**: Seamless background music loop
+- **Controls**: Play/pause toggle with visual indicator
+- **Volume Management**: Independent volume control
+- **Auto-restart**: Automatic restart on completion
+
+## 🎨 Demoscene Platform
+
+### Accessing Demoscene
+1. **Via Terminal**: Type `show demoscene` in the terminal
+2. **Direct URL**: Navigate to `/demoscene/index.html`
+3. **Features**: Quantum Vortex demo, WebGL graphics, procedural audio
+
+### Demoscene Features
+- **Quantum Vortex**: Advanced 3D WebGL particle system
+- **WebGL Rendering**: Pure JavaScript WebGL implementation
+- **Procedural Audio**: Real-time chiptune generation
+- **Creation Tools**: Canvas, WebGL, Audio, and Code editors
+- **PWA Support**: Offline functionality with service worker
+
 ## 🆘 Support
 
 ### Getting Help
@@ -363,6 +467,14 @@ When reporting issues, include:
 - **Steps to Reproduce**: Detailed steps
 - **Console Errors**: Any error messages
 - **Screenshots**: Visual evidence if applicable
+
+### Terminal Commands
+Useful terminal commands for troubleshooting:
+- `help` - Show all available commands
+- `particles <mode>` - Control particle system
+- `effects <on|off>` - Toggle visual effects
+- `audio <on|off>` - Toggle audio system
+- `show demoscene` - Access demoscene platform
 
 ---
 

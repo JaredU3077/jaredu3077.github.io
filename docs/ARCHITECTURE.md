@@ -2,7 +2,7 @@
 
 ## Overview
 
-neuOS is a sophisticated web-based operating system simulator built with modern web technologies. The architecture follows a modular, component-based design with clear separation of concerns and excellent performance optimizations.
+neuOS is a sophisticated web-based operating system simulator built with modern web technologies. The architecture follows a modular, component-based design with clear separation of concerns and excellent performance optimizations. The system features a space-themed interface with glass morphism effects, interactive particle systems, and a secret demoscene platform.
 
 ## 🏗️ System Architecture
 
@@ -13,6 +13,7 @@ neuOS is a sophisticated web-based operating system simulator built with modern 
 3. **Performance-First**: Hardware acceleration and optimized rendering
 4. **Accessibility-First**: WCAG 2.1 compliance throughout
 5. **Security-First**: CSP headers and input validation
+6. **Progressive Enhancement**: Works without JavaScript, enhanced with JS
 
 ### High-Level Architecture
 
@@ -51,7 +52,8 @@ jaredu3077.github.io/
 ├── _apps.css                 # Application styles
 ├── _animations.css           # Animation definitions
 ├── _responsive.css           # Responsive design styles
-├── config.json               # System configuration
+├── _glass.css                # Glass morphism effects
+├── config.json               # Mechvibes sound configuration
 ├── codex.txt                 # Knowledge base content
 ├── resume.txt                # Resume content
 ├── mp3.mp3                   # Background music
@@ -65,13 +67,14 @@ js/
 ├── main.js                   # Application controller
 ├── config.js                 # Configuration management
 ├── core/                     # Core system modules
-│   ├── boot.js              # Boot sequence management
+│   ├── boot.js              # Main boot orchestrator
 │   ├── bootSequence.js      # Boot animation system
 │   ├── window.js            # Window management system
 │   ├── particleSystem.js    # Particle system engine
 │   ├── audioSystem.js       # Audio management
 │   ├── backgroundMusic.js   # Background music system
 │   ├── screensaver.js       # Screensaver system
+│   ├── glassEffect.js       # Glass morphism system
 │   └── Mixins/              # Particle system mixins
 │       ├── backgroundMixin.js
 │       ├── mouseMixin.js
@@ -88,60 +91,94 @@ js/
     ├── utils.js             # General utilities
     ├── help.js              # Help system
     ├── search.js            # Search functionality
-    └── mechvibes.js         # Typing sound system
+    ├── mechvibes.js         # Typing sound system
+    ├── draggable.js         # Window dragging system
+    └── glassEffects.js      # Glass effect utilities
 ```
 
 ### Demoscene Platform
 ```
 demoscene/
-├── demoscene.html           # Main demoscene interface
+├── index.html               # Main demoscene interface
+├── demoscene.html           # Alternative interface
+├── manifest.json            # PWA manifest
+├── sw.js                    # Service worker
+├── README.md                # Demoscene documentation
 ├── css/
 │   └── DarkWave.css         # Demoscene styling
 └── js/
-    ├── demoscene.js         # Main controller
-    ├── DarkWaveAudio.js     # Audio system
-    └── DarkWaveCore.js      # Core functionality
+    ├── main.js              # Main controller
+    ├── demoscene.js         # Demo platform controller
+    ├── DarkWaveAudio.js     # Audio system with synthesis
+    ├── DarkWaveCore.js      # Core functionality
+    ├── QuantumVortex.js     # Quantum Vortex demo
+    └── WebGLUtils.js        # WebGL utilities and shaders
 ```
 
 ## 🔧 Core Systems
 
 ### 1. Boot System (`js/core/boot.js`)
-- **Purpose**: Manages system initialization and login sequence
+- **Purpose**: Main orchestrator that initializes and coordinates all subsystems
 - **Features**: 
-  - Animated boot sequence
-  - Login screen management
-  - Audio system initialization
+  - Modular boot system with focused responsibilities
+  - Global instance management for cross-module communication
+  - Error handling and fallback mechanisms
   - System state management
 
-### 2. Window Management (`js/core/window.js`)
+### 2. Audio System (`js/core/audioSystem.js`)
+- **Purpose**: Handles all audio context, sound effects, and synthesis
+- **Features**:
+  - Audio context initialization and management
+  - Mechvibes player integration
+  - Typing sound effects (enter, backspace, space, general typing)
+  - UI sound effects (clicks, window open/close)
+  - Boot/login sound effects
+  - Audio synthesis and filtering
+  - Audio enable/disable functionality
+
+### 3. Background Music (`js/core/backgroundMusic.js`)
+- **Purpose**: Manages background music playback and controls
+- **Features**:
+  - Background music element management
+  - Music play/pause controls
+  - Volume management
+  - Music indicator visualization
+  - Auto-restart functionality
+  - Music toggle controls
+
+### 4. Window Management (`js/core/window.js`)
 - **Purpose**: Handles all window operations and interactions
 - **Features**:
   - Window creation and destruction
-  - Drag and drop functionality
+  - Drag and drop functionality with interact.js
   - Resize operations
   - Focus management
   - Z-index management
   - Hardware acceleration
+  - Glass morphism effects
 
-### 3. Particle System (`js/core/particleSystem.js`)
+### 5. Particle System (`js/core/particleSystem.js`)
 - **Purpose**: Creates and manages interactive particle effects
 - **Features**:
   - Physics-based particle movement
   - Mouse interaction
-  - Multiple particle modes
+  - Multiple particle modes (rain, storm, calm, dance, normal)
   - Performance optimization
   - Memory management
+  - Color scheme management
+  - Particle burst effects
+  - Keyboard controls for particle manipulation
 
-### 4. Audio System (`js/core/audioSystem.js`)
-- **Purpose**: Manages all audio playback and effects
+### 6. Glass Effect System (`js/core/glassEffect.js`)
+- **Purpose**: Manages glass morphism effects throughout the interface
 - **Features**:
-  - Background music control
-  - Sound effects
-  - Audio context management
-  - Volume control
-  - Mechvibes typing sounds
+  - Backdrop blur effects
+  - Glass distortion filters
+  - Dynamic glass properties
+  - Performance optimization
+  - Cross-browser compatibility
 
-### 5. Configuration System (`js/config.js`)
+### 7. Configuration System (`js/config.js`)
 - **Purpose**: Centralized configuration management
 - **Features**:
   - Environment detection
@@ -149,6 +186,7 @@ demoscene/
   - Application definitions
   - Command definitions
   - Network visualization data
+  - Mechvibes sound configuration
 
 ## 🎮 Application Modules
 
@@ -161,6 +199,9 @@ demoscene/
   - Network simulation commands
   - System control commands
   - Help system integration
+  - Particle system control
+  - Audio system control
+  - Demoscene access via "show demoscene"
 
 ### Codex Application (`js/apps/codex.js`)
 - **Purpose**: Knowledge base and search system
@@ -170,6 +211,30 @@ demoscene/
   - Interactive navigation
   - Responsive design
   - Real-time highlighting
+  - Layer-based content organization
+
+## 🎨 Demoscene Platform
+
+### Quantum Vortex Demo
+- **WebGL Implementation**: Pure JavaScript WebGL with custom shaders
+- **3D Particle Systems**: GPU-accelerated particles with physics simulation
+- **Audio Reactivity**: Visual effects synchronized to audio frequencies
+- **Bloom Effects**: Post-processing with custom shaders
+- **Holographic Elements**: Depth-mapped 3D projections
+
+### Audio System
+- **Chiptune Generation**: 8-bit style music with Web Audio API
+- **FM Synthesis**: Advanced sound synthesis capabilities
+- **Real-time Visualization**: Audio spectrum analysis and visualization
+- **Multiple Tracks**: Unique audio for each demo type
+- **Effects Chain**: Reverb, delay, distortion, and low-pass filters
+
+### Creation Tools
+- **Canvas Editor**: 2D drawing and animation tools
+- **WebGL Editor**: 3D scene creation with custom shaders
+- **Audio Editor**: Waveform editing and synth controls
+- **Code Editor**: Live JavaScript evaluation with sandboxing
+- **Export/Share**: Demo export and sharing capabilities
 
 ## 🔄 Data Flow
 
@@ -201,6 +266,16 @@ demoscene/
 5. Audio state is synchronized
 ```
 
+### Boot System Flow
+```
+1. BootSystem orchestrator initializes
+2. Subsystems are loaded (audio, particles, etc.)
+3. Global instances are created
+4. Boot sequence animation plays
+5. Login screen is displayed
+6. Desktop is initialized
+```
+
 ## 🎨 Styling Architecture
 
 ### CSS Organization
@@ -212,13 +287,14 @@ demoscene/
 - **_apps.css**: Application-specific styles
 - **_animations.css**: Animation definitions
 - **_responsive.css**: Responsive design rules
+- **_glass.css**: Glass morphism effects
 
 ### Design System
 - **Color Palette**: Space-themed with blues and purples
 - **Typography**: JetBrains Mono for code, system fonts for UI
 - **Spacing**: Consistent 8px grid system
 - **Animations**: Smooth 60fps transitions
-- **Glass Morphism**: Backdrop blur effects
+- **Glass Morphism**: Backdrop blur effects with distortion
 
 ## 🔒 Security Architecture
 
@@ -290,6 +366,20 @@ demoscene/
 - **Dependency Inversion**: High-level modules don't depend on low-level modules
 - **Interface Segregation**: Clients only depend on interfaces they use
 
+## 🏷️ Code Conventions
+
+### File Tagging System
+- **neu-os**: All neuOS files include this identifier
+- **game**: Game applications and features
+- **secret**: Demoscene applications and website
+
+### Naming Conventions
+- **Files**: kebab-case for files, camelCase for modules
+- **Variables**: camelCase
+- **Constants**: UPPER_SNAKE_CASE
+- **Classes**: PascalCase
+- **Functions**: camelCase
+
 ## 🔮 Future Architecture
 
 ### Planned Enhancements
@@ -305,6 +395,20 @@ demoscene/
 - **API Integration**: Backend service integration
 - **Caching Strategy**: Intelligent caching system
 
+## 🎵 Audio Architecture
+
+### Mechvibes Integration
+- **Sound Pack**: Topre Purple Hybrid - PBT keycaps
+- **Key Mapping**: Comprehensive key-to-sound mapping
+- **Real-time Playback**: Instant sound response
+- **Volume Control**: Adjustable typing sound volume
+
+### Background Music
+- **Looping**: Seamless background music loop
+- **Controls**: Play/pause toggle with visual indicator
+- **Volume Management**: Independent volume control
+- **Auto-restart**: Automatic restart on completion
+
 ---
 
-*This architecture provides a solid foundation for a modern, performant, and maintainable web application with excellent user experience and developer experience.* 
+*This architecture provides a solid foundation for a modern, performant, and maintainable web application with excellent user experience and developer experience. The modular design allows for easy extension and maintenance while maintaining high performance and accessibility standards.* 
