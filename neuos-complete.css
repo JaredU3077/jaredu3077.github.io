@@ -680,20 +680,24 @@ body:not(.boot-active):not(.login-active) #desktop {
 }
 
 .desktop-icon {
+    position: relative;
     width: 120px;
     height: 120px;
     padding: var(--spacing-md);
-    border-radius: 16px;
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    background: rgba(255,255,255,0.01) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all var(--transition-fast);
+    transition: all 0.3s ease;
     user-select: none;
     outline: none;
+    overflow: hidden;
+    isolation: isolate;
+    box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.2);
 }
 .desktop-icon .icon {
     font-size: var(--text-2xl);
@@ -721,6 +725,38 @@ body:not(.boot-active):not(.login-active) #desktop {
 .desktop-icon:focus .label {
     color: var(--primary-color);
 }
+.desktop-icon::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 12px;
+}
+
+.desktop-icon::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+}
+
+.desktop-icon:hover {
+    transform: translateY(-2px);
+    box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.desktop-icon:hover::before {
+    opacity: 1;
+}
+
 .desktop-icon:active {
     transform: scale(0.96);
 }
@@ -739,6 +775,10 @@ body:not(.boot-active):not(.login-active) #desktop {
         width: 120px;
         height: 120px;
         padding: var(--spacing-md);
+        border-radius: 12px;
+        background: rgba(255,255,255,0.01) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.2);
     }
     .desktop-icon .icon {
         font-size: var(--text-2xl);
@@ -764,6 +804,10 @@ body:not(.boot-active):not(.login-active) #desktop {
         width: 80px;
         height: 80px;
         padding: var(--spacing-sm);
+        border-radius: 12px;
+        background: rgba(255,255,255,0.01) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.2);
     }
     .desktop-icon .icon {
         font-size: var(--text-lg);
@@ -787,6 +831,10 @@ body:not(.boot-active):not(.login-active) #desktop {
         width: 100px;
         height: 100px;
         padding: var(--spacing-sm);
+        border-radius: 12px;
+        background: rgba(255,255,255,0.01) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.2);
     }
     .desktop-icon .icon {
         font-size: var(--text-xl);
@@ -812,6 +860,10 @@ body:not(.boot-active):not(.login-active) #desktop {
         padding: var(--spacing-xs);
         width: 70px;
         height: 70px;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.01) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.2);
     }
     .desktop-icon .icon {
         font-size: var(--text-lg);
