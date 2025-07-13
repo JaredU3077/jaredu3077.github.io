@@ -13,20 +13,26 @@ export const backgroundMixin = {
     },
 
     /**
-     * Creates three persistent, different-sized, centered rings
+     * Creates eight persistent, different-sized, centered rings with solar system orbs
      */
     createBackgroundSpinnerRings() {
-        // Remove any existing rings to avoid duplicates
-        document.querySelectorAll('.background-spinner').forEach(ring => ring.remove());
+        // Remove any existing rings and orbs to avoid duplicates
+        document.querySelectorAll('.background-spinner, .solar-orb').forEach(element => element.remove());
         
-        // Create three rings with different sizes
+        // Create eight rings with different sizes and speeds
         const rings = [
-            { size: 300, opacity: 0.5, animation: 60, borderWidth: 5 },
-            { size: 400, opacity: 0.4, animation: 80, borderWidth: 8 },
-            { size: 500, opacity: 0.3, animation: 100, borderWidth: 10 }
+            { size: 200, opacity: 0.6, animation: 40, borderWidth: 5, orbSize: 8, orbColor: '#ff6b6b' },
+            { size: 280, opacity: 0.55, animation: 50, borderWidth: 5, orbSize: 6, orbColor: '#4ecdc4' },
+            { size: 360, opacity: 0.5, animation: 60, borderWidth: 5, orbSize: 10, orbColor: '#45b7d1' },
+            { size: 440, opacity: 0.45, animation: 70, borderWidth: 5, orbSize: 7, orbColor: '#96ceb4' },
+            { size: 520, opacity: 0.4, animation: 80, borderWidth: 5, orbSize: 12, orbColor: '#feca57' },
+            { size: 600, opacity: 0.35, animation: 90, borderWidth: 5, orbSize: 9, orbColor: '#ff9ff3' },
+            { size: 680, opacity: 0.3, animation: 100, borderWidth: 5, orbSize: 11, orbColor: '#54a0ff' },
+            { size: 760, opacity: 0.25, animation: 110, borderWidth: 5, orbSize: 8, orbColor: '#5f27cd' }
         ];
         
         rings.forEach((ringConfig, index) => {
+            // Create the ring
             const ring = document.createElement('div');
             ring.className = 'background-spinner';
             
@@ -50,6 +56,31 @@ export const backgroundMixin = {
             
             document.body.appendChild(ring);
 
+            // Create the orb for this ring
+            const orb = document.createElement('div');
+            orb.className = 'solar-orb';
+            
+            // Calculate orb position (start at top of ring)
+            const orbRadius = ringConfig.size / 2;
+            
+            orb.style.cssText = `
+                position: fixed !important;
+                top: 50% !important;
+                left: 50% !important;
+                width: ${ringConfig.orbSize}px !important;
+                height: ${ringConfig.orbSize}px !important;
+                background: ${ringConfig.orbColor} !important;
+                border-radius: 50% !important;
+                --orbit-radius: ${orbRadius}px !important;
+                animation: solarOrbit ${ringConfig.animation}s linear infinite !important;
+                pointer-events: none !important;
+                z-index: 101 !important;
+                box-shadow: 0 0 10px ${ringConfig.orbColor} !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            `;
+            
+            document.body.appendChild(orb);
         });
     },
 
