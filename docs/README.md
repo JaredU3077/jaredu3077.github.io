@@ -14,7 +14,7 @@ Welcome to the neuOS documentation! This directory contains comprehensive docume
 
 ### For Users
 1. Visit [https://jaredu3077.github.io](https://jaredu3077.github.io)
-2. Experience the boot sequence
+2. Experience the boot sequence with solar system animation
 3. Click "enter" to access the system
 4. Explore applications and features
 5. Access the secret demoscene via terminal: `show demoscene`
@@ -30,8 +30,9 @@ Welcome to the neuOS documentation! This directory contains comprehensive docume
 neuOS is a sophisticated web-based operating system simulator featuring:
 
 ### Core Features
-- **Space-themed Interface**: Beautiful glass morphism design
-- **Interactive Particle System**: Dynamic visual effects
+- **Solar System Interface**: Dynamic background with 8 rotating rings and orbs
+- **Circular Glass Morphism**: All UI elements use circular design language
+- **Interactive Particle System**: Dynamic visual effects with mouse interaction
 - **Modular Architecture**: Clean, maintainable codebase
 - **Audio Integration**: Mechvibes typing sounds and background music
 - **Responsive Design**: Works on all devices
@@ -47,21 +48,22 @@ neuOS is a sophisticated web-based operating system simulator featuring:
 - **Hardware Acceleration**: Optimized for 60fps performance
 - **PWA Ready**: Progressive web app capabilities
 - **Cross-browser**: Works on all modern browsers
+- **Consolidated CSS**: Single `neuos-complete.css` file for optimal performance
 
 ## 📁 Project Structure
 
 ```
 jaredu3077.github.io/
 ├── index.html                 # Main entry point
-├── theme.css                  # Complete styling system
-├── _variables.css             # CSS custom properties
-├── _window.css               # Window management styles
-├── _desktop.css              # Desktop interface styles
-├── _login.css                # Login screen styles
-├── _apps.css                 # Application styles
-├── _animations.css           # Animation definitions
-├── _responsive.css           # Responsive design styles
-├── _glass.css                # Glass morphism effects
+├── neuos-complete.css         # Complete consolidated styling system
+├── _glass.css                 # Glass morphism effects (legacy)
+├── _variables.css             # CSS custom properties (legacy)
+├── _window.css               # Window management styles (legacy)
+├── _desktop.css              # Desktop interface styles (legacy)
+├── _login.css                # Login screen styles (legacy)
+├── _apps.css                 # Application styles (legacy)
+├── _animations.css           # Animation definitions (legacy)
+├── _responsive.css           # Responsive design styles (legacy)
 ├── config.json               # Mechvibes sound configuration
 ├── codex.txt                 # Knowledge base content
 ├── resume.txt                # Resume content
@@ -79,6 +81,18 @@ jaredu3077.github.io/
 
 ## 🎮 Key Features
 
+### Solar System Background
+- **8 Rotating Rings**: Concentric circles with varying opacity
+- **Orbiting Elements**: Dynamic orbs that rotate around the center
+- **Layered Depth**: Multiple z-index layers for 3D effect
+- **Performance Optimized**: Hardware-accelerated animations
+
+### Circular UI Design
+- **Circular Boot/Login**: 400px diameter circular containers
+- **Circular neuOS Widget**: Perfect circle with glass effects
+- **Circular Desktop Icons**: All icons are circular with glass styling
+- **Consistent Radius**: 50% border-radius throughout interface
+
 ### Interactive Terminal
 - Network simulation commands
 - System control functions
@@ -86,23 +100,23 @@ jaredu3077.github.io/
 - Audio system management
 - Demoscene access
 
-### Particle System
+### Enhanced Particle System
 - Multiple modes (rain, storm, calm, dance, normal)
-- Mouse interaction
+- Mouse interaction with attraction/repulsion
 - Physics-based movement
-- Performance optimized
+- Performance optimized with reduced motion support
 
 ### Audio System
 - Mechvibes typing sounds
-- Background music
+- Background music with controls
 - Real-time audio synthesis
-- Volume controls
+- Volume controls with visual indicators
 
 ### Glass Morphism
 - Backdrop blur effects
 - Dynamic glass properties
 - Cross-browser compatibility
-- Performance optimized
+- Performance optimized with hardware acceleration
 
 ## 🎨 Demoscene Platform
 
@@ -150,6 +164,7 @@ npx live-server --port=8000
 - **Naming**: camelCase for variables, PascalCase for classes
 - **Documentation**: JSDoc for all functions
 - **Testing**: Manual testing checklist before PRs
+- **CSS**: All styles consolidated in `neuos-complete.css`
 
 ## 🐛 Troubleshooting
 
@@ -158,12 +173,14 @@ npx live-server --port=8000
 - **Particles not visible**: Enable hardware acceleration
 - **Windows not draggable**: Check interact.js library loading
 - **Terminal not responding**: Ensure JavaScript modules loaded properly
+- **Circular elements not rendering**: Check CSS border-radius support
 
 ### Performance Issues
 - Reduce particle count: `particles 25`
 - Disable effects: `effects off`
 - Close unnecessary windows
 - Check browser performance settings
+- Enable hardware acceleration
 
 ## 📊 Performance Metrics
 
@@ -171,6 +188,7 @@ npx live-server --port=8000
 - **Animation Frame Rate**: 60fps
 - **Memory Usage**: < 100MB
 - **CPU Usage**: < 20% during normal operation
+- **CSS File Size**: ~78KB consolidated
 
 ## 🔒 Security
 
@@ -248,7 +266,4 @@ This project is open source and available under the MIT License.
 - **Interact.js**: For drag and drop functionality
 - **Font Awesome**: For icons
 - **WebGL Community**: For graphics inspiration
-
----
-
-*neuOS is a modern, performant, and accessible web-based operating system simulator. Built with love for the web community.* 
+- **Apple Design**: For glass morphism inspiration 

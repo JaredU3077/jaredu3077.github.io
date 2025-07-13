@@ -2,7 +2,7 @@
 
 ## Overview
 
-neuOS is a sophisticated web-based operating system simulator built with modern web technologies. The architecture follows a modular, component-based design with clear separation of concerns and excellent performance optimizations. The system features a space-themed interface with glass morphism effects, interactive particle systems, and a secret demoscene platform.
+neuOS is a sophisticated web-based operating system simulator built with modern web technologies. The architecture follows a modular, component-based design with clear separation of concerns and excellent performance optimizations. The system features a solar system-themed interface with circular glass morphism effects, interactive particle systems, and a secret demoscene platform.
 
 ## 🏗️ System Architecture
 
@@ -14,6 +14,7 @@ neuOS is a sophisticated web-based operating system simulator built with modern 
 4. **Accessibility-First**: WCAG 2.1 compliance throughout
 5. **Security-First**: CSP headers and input validation
 6. **Progressive Enhancement**: Works without JavaScript, enhanced with JS
+7. **Circular Design Language**: Consistent circular UI elements throughout
 
 ### High-Level Architecture
 
@@ -23,8 +24,8 @@ neuOS is a sophisticated web-based operating system simulator built with modern 
 ├─────────────────────────────────────────────────────────────┤
 │  Presentation Layer (HTML/CSS)                            │
 │  ├── index.html (Main entry point)                       │
-│  ├── theme.css (Complete styling system)                 │
-│  └── Modular CSS files (_window.css, _desktop.css, etc.) │
+│  ├── neuos-complete.css (Consolidated styling system)    │
+│  └── Legacy CSS files (_window.css, _desktop.css, etc.)  │
 ├─────────────────────────────────────────────────────────────┤
 │  Application Layer (JavaScript)                           │
 │  ├── js/main.js (Application controller)                 │
@@ -44,15 +45,15 @@ neuOS is a sophisticated web-based operating system simulator built with modern 
 ```
 jaredu3077.github.io/
 ├── index.html                 # Main entry point
-├── theme.css                  # Complete styling system
-├── _variables.css             # CSS custom properties
-├── _window.css               # Window management styles
-├── _desktop.css              # Desktop interface styles
-├── _login.css                # Login screen styles
-├── _apps.css                 # Application styles
-├── _animations.css           # Animation definitions
-├── _responsive.css           # Responsive design styles
-├── _glass.css                # Glass morphism effects
+├── neuos-complete.css         # Complete consolidated styling system
+├── _glass.css                 # Glass morphism effects (legacy)
+├── _variables.css             # CSS custom properties (legacy)
+├── _window.css               # Window management styles (legacy)
+├── _desktop.css              # Desktop interface styles (legacy)
+├── _login.css                # Login screen styles (legacy)
+├── _apps.css                 # Application styles (legacy)
+├── _animations.css           # Animation definitions (legacy)
+├── _responsive.css           # Responsive design styles (legacy)
 ├── config.json               # Mechvibes sound configuration
 ├── codex.txt                 # Knowledge base content
 ├── resume.txt                # Resume content
@@ -124,6 +125,7 @@ demoscene/
   - Global instance management for cross-module communication
   - Error handling and fallback mechanisms
   - System state management
+  - Circular boot container with glass morphism
 
 ### 2. Audio System (`js/core/audioSystem.js`)
 - **Purpose**: Handles all audio context, sound effects, and synthesis
@@ -156,12 +158,13 @@ demoscene/
   - Z-index management
   - Hardware acceleration
   - Glass morphism effects
+  - Performance optimizations for dragging
 
 ### 5. Particle System (`js/core/particleSystem.js`)
 - **Purpose**: Creates and manages interactive particle effects
 - **Features**:
   - Physics-based particle movement
-  - Mouse interaction
+  - Mouse interaction with attraction/repulsion
   - Multiple particle modes (rain, storm, calm, dance, normal)
   - Performance optimization
   - Memory management
@@ -177,6 +180,7 @@ demoscene/
   - Dynamic glass properties
   - Performance optimization
   - Cross-browser compatibility
+  - Circular glass containers
 
 ### 7. Configuration System (`js/config.js`)
 - **Purpose**: Centralized configuration management
@@ -198,217 +202,190 @@ demoscene/
   - Tab completion
   - Network simulation commands
   - System control commands
-  - Help system integration
   - Particle system control
-  - Audio system control
-  - Demoscene access via "show demoscene"
+  - Audio system management
+  - Demoscene access
 
 ### Codex Application (`js/apps/codex.js`)
-- **Purpose**: Knowledge base and search system
+- **Purpose**: Knowledge base with search functionality
 - **Features**:
-  - Full-text search
-  - Content categorization
-  - Interactive navigation
+  - Content search and filtering
+  - Layer-based navigation
+  - Real-time search results
   - Responsive design
-  - Real-time highlighting
-  - Layer-based content organization
+  - Accessibility features
 
-## 🎨 Demoscene Platform
+## 🎨 UI/UX Design System
 
-### Quantum Vortex Demo
-- **WebGL Implementation**: Pure JavaScript WebGL with custom shaders
-- **3D Particle Systems**: GPU-accelerated particles with physics simulation
-- **Audio Reactivity**: Visual effects synchronized to audio frequencies
-- **Bloom Effects**: Post-processing with custom shaders
-- **Holographic Elements**: Depth-mapped 3D projections
+### Circular Design Language
+- **Boot/Login Containers**: 400px diameter circular containers
+- **neuOS Widget**: Perfect circle with glass morphism effects
+- **Desktop Icons**: Circular icons with glass styling
+- **Consistent Radius**: 50% border-radius throughout interface
 
-### Audio System
-- **Chiptune Generation**: 8-bit style music with Web Audio API
-- **FM Synthesis**: Advanced sound synthesis capabilities
-- **Real-time Visualization**: Audio spectrum analysis and visualization
-- **Multiple Tracks**: Unique audio for each demo type
-- **Effects Chain**: Reverb, delay, distortion, and low-pass filters
+### Solar System Background
+- **8 Rotating Rings**: Concentric circles with varying opacity
+- **Orbiting Elements**: Dynamic orbs that rotate around center
+- **Layered Depth**: Multiple z-index layers for 3D effect
+- **Performance Optimized**: Hardware-accelerated animations
 
-### Creation Tools
-- **Canvas Editor**: 2D drawing and animation tools
-- **WebGL Editor**: 3D scene creation with custom shaders
-- **Audio Editor**: Waveform editing and synth controls
-- **Code Editor**: Live JavaScript evaluation with sandboxing
-- **Export/Share**: Demo export and sharing capabilities
+### Glass Morphism Effects
+- **Backdrop Blur**: Cross-browser compatible blur effects
+- **Glass Containers**: Semi-transparent with border effects
+- **Dynamic Properties**: Responsive to user interaction
+- **Performance Optimized**: Hardware acceleration enabled
 
-## 🔄 Data Flow
+### Color System
+- **Primary Colors**: Purple-based theme (#6366f1)
+- **Background**: Ultra-dark theme (#030712)
+- **Text**: High contrast white (#f8fafc)
+- **Accents**: Vibrant but calm accent colors
 
-### Application Launch Flow
-```
-1. User clicks desktop icon
-2. handleAppClick() is called
-3. Window is created via WindowManager
-4. Application-specific initialization
-5. Window is focused and displayed
-```
+## 📱 Responsive Design
 
-### Particle System Flow
-```
-1. ParticleSystem initializes
-2. Mixins are applied for functionality
-3. Particles are generated
-4. Animation loop starts
-5. Physics and interactions are updated
-6. Visual elements are rendered
-```
+### Breakpoint System
+- **Desktop**: 1200px+ (Large icons, full features)
+- **Tablet**: 769px-1199px (Medium icons, core features)
+- **Mobile**: 768px and below (Small icons, essential features)
+- **Small Mobile**: 480px and below (Minimal interface)
 
-### Audio System Flow
-```
-1. Audio context is initialized
-2. Audio files are loaded
-3. Playback controls are set up
-4. Volume and effects are managed
-5. Audio state is synchronized
-```
+### Adaptive Features
+- **Icon Sizing**: Responsive icon sizes across breakpoints
+- **Text Scaling**: Fluid typography scaling
+- **Touch Optimization**: Larger touch targets on mobile
+- **Performance**: Reduced effects on lower-end devices
 
-### Boot System Flow
-```
-1. BootSystem orchestrator initializes
-2. Subsystems are loaded (audio, particles, etc.)
-3. Global instances are created
-4. Boot sequence animation plays
-5. Login screen is displayed
-6. Desktop is initialized
-```
+## 🔧 Performance Optimizations
 
-## 🎨 Styling Architecture
+### CSS Consolidation
+- **Single File**: All styles consolidated in `neuos-complete.css`
+- **File Size**: ~78KB optimized
+- **Loading**: Single HTTP request for all styles
+- **Caching**: Improved browser caching
 
-### CSS Organization
-- **theme.css**: Main stylesheet that imports all modules
-- **_variables.css**: CSS custom properties for theming
-- **_window.css**: Window-specific styles
-- **_desktop.css**: Desktop interface styles
-- **_login.css**: Login screen styles
-- **_apps.css**: Application-specific styles
-- **_animations.css**: Animation definitions
-- **_responsive.css**: Responsive design rules
-- **_glass.css**: Glass morphism effects
+### Hardware Acceleration
+- **Transform**: translateZ(0) for GPU acceleration
+- **Will-change**: Optimized for animation performance
+- **Backface-visibility**: Hidden for 3D transforms
+- **Contain**: Layout and style containment
 
-### Design System
-- **Color Palette**: Space-themed with blues and purples
-- **Typography**: JetBrains Mono for code, system fonts for UI
-- **Spacing**: Consistent 8px grid system
-- **Animations**: Smooth 60fps transitions
-- **Glass Morphism**: Backdrop blur effects with distortion
+### JavaScript Optimizations
+- **Module Loading**: ES6 modules for better tree-shaking
+- **Event Delegation**: Efficient event handling
+- **Debouncing**: Optimized for frequent events
+- **Memory Management**: Proper cleanup of event listeners
 
 ## 🔒 Security Architecture
 
 ### Content Security Policy
 - **Script Sources**: Restricted to self and trusted CDNs
-- **Style Sources**: Restricted to self and trusted CDNs
-- **Image Sources**: Restricted to self and data URIs
-- **Font Sources**: Restricted to self and trusted CDNs
+- **Style Sources**: Validated style sources
+- **Image Sources**: Secure image and font sources
+- **Connect Sources**: Restricted network connections
 
 ### Input Validation
-- **Command Parsing**: Sanitized input with validation
-- **XSS Protection**: No inline scripts, proper escaping
-- **CSRF Protection**: No sensitive operations without validation
+- **Command Parsing**: Sanitized command input
+- **Search Queries**: Validated search parameters
+- **Window Management**: Secure window operations
+- **Audio Context**: Safe audio operations
 
-## ♿ Accessibility Architecture
+## ♿ Accessibility Features
 
 ### WCAG 2.1 Compliance
 - **Keyboard Navigation**: Full keyboard support
-- **Screen Reader Support**: Proper ARIA labels
-- **Color Contrast**: High contrast ratios
+- **Screen Readers**: ARIA labels and roles
+- **High Contrast**: WCAG AA contrast ratios
 - **Reduced Motion**: Respects user preferences
-- **Focus Management**: Clear focus indicators
+- **Focus Indicators**: Clear focus management
 
-### Accessibility Features
-- **Live Regions**: For dynamic content updates
-- **Skip Links**: For keyboard navigation
-- **Alt Text**: For all images and icons
-- **Semantic HTML**: Proper heading structure
-
-## 📱 Responsive Design
-
-### Breakpoint Strategy
-- **Mobile**: < 768px
-- **Tablet**: 768px - 1024px
-- **Desktop**: > 1024px
-
-### Adaptive Features
-- **Flexible Layouts**: CSS Grid and Flexbox
-- **Scalable Typography**: Responsive font sizes
-- **Touch Optimization**: Touch-friendly interactions
-- **Performance**: Optimized for mobile devices
-
-## 🚀 Performance Architecture
-
-### Optimization Strategies
-- **Hardware Acceleration**: `translateZ(0)` and `will-change`
-- **Efficient DOM**: Minimal reflows and repaints
-- **Memory Management**: Proper cleanup and garbage collection
-- **Lazy Loading**: On-demand resource loading
-- **Debouncing**: Optimized event handling
-
-### Performance Metrics
-- **Frame Rate**: 60 FPS target
-- **Load Time**: < 3 seconds
-- **Memory Usage**: < 100MB
-- **CPU Usage**: < 20% during normal operation
-
-## 🔧 Development Architecture
-
-### Module System
-- **ES6 Modules**: Modern JavaScript module system
-- **Dependency Injection**: Clean dependency management
-- **Error Boundaries**: Graceful error handling
-- **Type Checking**: JSDoc type annotations
-
-### Code Organization
-- **Single Responsibility**: Each module has one clear purpose
-- **Open/Closed Principle**: Extensible without modification
-- **Dependency Inversion**: High-level modules don't depend on low-level modules
-- **Interface Segregation**: Clients only depend on interfaces they use
-
-## 🏷️ Code Conventions
-
-### File Tagging System
-- **neu-os**: All neuOS files include this identifier
-- **game**: Game applications and features
-- **secret**: Demoscene applications and website
-
-### Naming Conventions
-- **Files**: kebab-case for files, camelCase for modules
-- **Variables**: camelCase
-- **Constants**: UPPER_SNAKE_CASE
-- **Classes**: PascalCase
-- **Functions**: camelCase
-
-## 🔮 Future Architecture
-
-### Planned Enhancements
-- **PWA Support**: Service worker and manifest
-- **WebAssembly**: Performance-critical code
-- **WebGL**: Hardware-accelerated graphics
-- **Real-time Features**: WebSocket integration
-- **Offline Support**: Full offline functionality
-
-### Scalability Considerations
-- **Micro-frontend Architecture**: For larger applications
-- **State Management**: Centralized state management
-- **API Integration**: Backend service integration
-- **Caching Strategy**: Intelligent caching system
+### Semantic HTML
+- **Proper Structure**: Semantic HTML elements
+- **Live Regions**: Dynamic content announcements
+- **Skip Links**: Navigation accessibility
+- **Alt Text**: Descriptive alt text for images
 
 ## 🎵 Audio Architecture
 
-### Mechvibes Integration
-- **Sound Pack**: Topre Purple Hybrid - PBT keycaps
-- **Key Mapping**: Comprehensive key-to-sound mapping
-- **Real-time Playback**: Instant sound response
-- **Volume Control**: Adjustable typing sound volume
+### Audio Context Management
+- **Single Context**: Shared audio context across modules
+- **Permission Handling**: Graceful fallback for denied permissions
+- **Volume Control**: Centralized volume management
+- **Performance**: Optimized audio processing
 
-### Background Music
-- **Looping**: Seamless background music loop
-- **Controls**: Play/pause toggle with visual indicator
-- **Volume Management**: Independent volume control
-- **Auto-restart**: Automatic restart on completion
+### Sound Effects
+- **Mechvibes Integration**: Typing sound effects
+- **UI Feedback**: Click and hover sounds
+- **System Sounds**: Boot and login audio
+- **Background Music**: Looping ambient music
 
----
+## 🌐 Browser Compatibility
 
-*This architecture provides a solid foundation for a modern, performant, and maintainable web application with excellent user experience and developer experience. The modular design allows for easy extension and maintenance while maintaining high performance and accessibility standards.* 
+### Supported Browsers
+- **Chrome 80+**: Full feature support
+- **Firefox 75+**: Excellent performance
+- **Safari 13+**: Good performance
+- **Edge 80+**: Chromium-based support
+
+### Feature Detection
+- **CSS Grid**: Fallback for older browsers
+- **Backdrop Filter**: Graceful degradation
+- **Web Audio API**: Feature detection and fallback
+- **ES6 Modules**: Module loading fallback
+
+## 🔄 State Management
+
+### Global State
+- **Window Manager**: Centralized window state
+- **Audio System**: Global audio state
+- **Particle System**: Particle state management
+- **User Preferences**: Stored preferences
+
+### Event System
+- **Custom Events**: System-wide event communication
+- **Event Delegation**: Efficient event handling
+- **State Synchronization**: Cross-module state sync
+- **Error Handling**: Graceful error recovery
+
+## 📊 Monitoring and Analytics
+
+### Performance Metrics
+- **Page Load Time**: < 3 seconds target
+- **Animation Frame Rate**: 60fps target
+- **Memory Usage**: < 100MB target
+- **CPU Usage**: < 20% during normal operation
+
+### Error Tracking
+- **Console Logging**: Structured error logging
+- **User Feedback**: Error reporting system
+- **Performance Monitoring**: Real-time performance tracking
+- **Accessibility Testing**: Automated accessibility checks
+
+## 🚀 Deployment Architecture
+
+### Static Hosting
+- **GitHub Pages**: Primary hosting platform
+- **CDN Integration**: Fast global delivery
+- **Cache Strategy**: Optimized caching headers
+- **HTTPS Only**: Secure connections enforced
+
+### Build Process
+- **No Build Step**: Pure HTML/CSS/JS
+- **Optimization**: Manual optimization process
+- **Testing**: Manual testing checklist
+- **Deployment**: Direct file deployment
+
+## 🔮 Future Enhancements
+
+### Planned Features
+- **PWA Implementation**: Service worker and manifest
+- **Offline Support**: Cached resources
+- **Advanced Audio**: More sophisticated audio synthesis
+- **Enhanced Demoscene**: More demos and tools
+- **Mobile App**: Native mobile application
+- **Cloud Sync**: User preferences sync
+
+### Technical Improvements
+- **Build System**: Automated build process
+- **Testing Framework**: Automated testing
+- **Performance Monitoring**: Real-time analytics
+- **Accessibility Audit**: Automated accessibility testing 
