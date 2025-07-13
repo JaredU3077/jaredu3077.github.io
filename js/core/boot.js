@@ -34,7 +34,7 @@ export class BootSystem {
 
     async init() {
         try {
-            console.log('neuOS: Initializing core systems...');
+    
             
             // Initialize all subsystems
             this.audioSystem.init();
@@ -53,7 +53,7 @@ export class BootSystem {
             // Setup event listeners
             this.setupEventListeners();
             
-            console.log('neuOS: Core systems ready, starting boot sequence...');
+
             await this.bootSequence.startBootSequence();
         } catch (error) {
             console.error('neuOS: System initialization failed:', error);

@@ -49,7 +49,7 @@ export const backgroundMixin = {
             `;
             
             document.body.appendChild(ring);
-            console.log(`Created ring ${index + 1}: ${ringConfig.size}px, centered at viewport center`);
+
         });
     },
 

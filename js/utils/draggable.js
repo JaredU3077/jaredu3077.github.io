@@ -3,12 +3,10 @@
 
 class DraggableSystem {
     constructor() {
-        console.log('DraggableSystem: Initializing...');
         this.init();
     }
 
     init() {
-        console.log('DraggableSystem: Setting up draggable elements...');
         this.setupDraggableElements();
     }
 
@@ -17,49 +15,34 @@ class DraggableSystem {
         const bootSequence = document.getElementById('bootSequence');
         const loginScreen = document.getElementById('loginScreen');
         
-        console.log('DraggableSystem: Found elements:', {
-            bootSequence: !!bootSequence,
-            loginScreen: !!loginScreen
-        });
+
         
         if (bootSequence) {
             this.dragElement(bootSequence);
-            console.log('DraggableSystem: Boot sequence dragging enabled');
-        } else {
-            console.warn('DraggableSystem: Boot sequence element not found');
         }
         
         if (loginScreen) {
             this.dragElement(loginScreen);
-            console.log('DraggableSystem: Login screen dragging enabled');
-        } else {
-            console.warn('DraggableSystem: Login screen element not found');
         }
         
         // Also handle any other glass containers
         const glassContainers = document.querySelectorAll('.glass-container, .neuos-glass-box');
-        console.log('DraggableSystem: Found glass containers:', glassContainers.length);
         glassContainers.forEach((container, index) => {
             this.dragElement(container);
-            console.log(`DraggableSystem: Glass container ${index} dragging enabled`);
         });
     }
 
     // Fixed 1:1 dragging implementation
     dragElement(elmnt) {
         if (!elmnt) {
-            console.warn('DraggableSystem: Element is null, cannot make draggable');
             return;
         }
-        
-        console.log('DraggableSystem: Making element draggable:', elmnt.id || elmnt.className);
         
         let isDragging = false;
         let initialX = 0, initialY = 0;
         let initialLeft = 0, initialTop = 0;
 
         const onPointerDown = e => {
-            console.log('DraggableSystem: Pointer down on element:', elmnt.id || elmnt.className);
             e.preventDefault();
             
             // Get current position
@@ -98,18 +81,15 @@ class DraggableSystem {
         };
 
         const onPointerUp = () => {
-            console.log('DraggableSystem: Pointer up, removing event listeners');
             isDragging = false;
             document.removeEventListener('pointermove', onPointerMove);
         };
 
         elmnt.addEventListener('pointerdown', onPointerDown);
-        console.log('DraggableSystem: Event listener added for element:', elmnt.id || elmnt.className);
     }
 
     // Method to refresh draggable elements when new ones are added
     refresh() {
-        console.log('DraggableSystem: Refreshing draggable elements...');
         this.setupDraggableElements();
     }
     
@@ -118,9 +98,6 @@ class DraggableSystem {
         const bootSequence = document.getElementById('bootSequence');
         if (bootSequence) {
             this.dragElement(bootSequence);
-            console.log('DraggableSystem: Boot sequence dragging enabled');
-        } else {
-            console.warn('DraggableSystem: Boot sequence element not found for specific enable');
         }
     }
 
@@ -154,17 +131,14 @@ class DraggableSystem {
 
 // Initialize draggable system when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DraggableSystem: DOM loaded, initializing...');
     window.draggableSystem = new DraggableSystem();
 });
 
 // Also initialize after a short delay to ensure all elements are ready
 setTimeout(() => {
     if (!window.draggableSystem) {
-        console.log('DraggableSystem: Delayed initialization...');
         window.draggableSystem = new DraggableSystem();
     } else {
-        console.log('DraggableSystem: Refreshing existing system...');
         window.draggableSystem.refresh();
     }
 }, 100);

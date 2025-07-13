@@ -37,7 +37,7 @@ export class AudioSystem {
                     const resumeAudio = () => {
                         if (this.audioContext && this.audioContext.state === 'suspended') {
                             this.audioContext.resume().then(() => {
-                                console.log('Audio context resumed successfully');
+                    
                                 this.setupAudioNodes();
                             }).catch(err => {
                                 console.warn('Failed to resume audio context:', err);
@@ -80,7 +80,7 @@ export class AudioSystem {
             this.audioNodes.filter.frequency.setValueAtTime(2000, this.audioContext.currentTime);
             this.audioNodes.filter.connect(this.audioNodes.masterGain);
             
-            console.log('Audio nodes setup complete - ready for typing sounds');
+    
         } catch (error) {
             console.warn('Failed to setup audio nodes:', error);
         }
@@ -89,11 +89,11 @@ export class AudioSystem {
     async initMechvibes() {
         if (this.audioContext) {
             try {
-                console.log('🎹 AudioSystem: Initializing Mechvibes player...');
+        
                 const { mechvibesPlayer } = await import('../utils/mechvibes.js');
                 await mechvibesPlayer.init(this.audioContext);
                 this.mechvibesPlayer = mechvibesPlayer;
-                console.log('🎹 AudioSystem: Mechvibes player initialized successfully');
+
             } catch (error) {
                 console.warn('Mechvibes initialization failed:', error);
             }
@@ -104,7 +104,7 @@ export class AudioSystem {
 
     // Enhanced realistic typing sound effects
     async playTypingSound(key) {
-        console.log('🎹 AudioSystem: playTypingSound called for key:', key);
+
         if (!this.audioEnabled || !this.audioContext) {
             console.warn('🎹 AudioSystem: Audio not enabled or context not available');
             return;
@@ -119,7 +119,7 @@ export class AudioSystem {
 
         // Try Mechvibes first (enabled by default), fallback to synthesized sounds
         if (this.mechvibesPlayer && this.mechvibesPlayer.isLoaded && this.mechvibesPlayer.isEnabled) {
-            console.log('🎹 AudioSystem: Using Mechvibes for key:', key);
+            
             try {
                 await this.mechvibesPlayer.playKeySound(key);
                 return;
@@ -128,7 +128,7 @@ export class AudioSystem {
             }
         }
 
-        console.log('🎹 AudioSystem: Using fallback synthesized sound for key:', key);
+        
         // Fallback to synthesized sounds - much louder and longer
         const baseFreq = 800 + Math.random() * 200; // Higher frequency for better audibility
         const duration = 0.1 + Math.random() * 0.05; // Longer duration (100-150ms)

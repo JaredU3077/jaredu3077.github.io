@@ -69,7 +69,7 @@ export class MechvibesPlayer {
                         });
                     });
                     
-                    console.log('🎹 Mechvibes sound pack loaded:', packData.name, `(${Object.keys(defines).length} sounds)`);
+        
                 } else {
                     throw new Error('This implementation assumes a single-file pack');
                 }
@@ -93,10 +93,10 @@ export class MechvibesPlayer {
 
         for (const path of alternativePaths) {
             try {
-                console.log(`🎹 Trying alternative path: ${path}`);
+
                 await this.loadPack(path);
                 if (this.currentPack) {
-                    console.log('🎹 Mechvibes sound pack loaded from alternative path:', this.currentPack.name);
+                    
                     return;
                 }
             } catch (error) {
@@ -179,7 +179,7 @@ export class MechvibesPlayer {
      */
     setEnabled(enabled) {
         this.isEnabled = enabled;
-        console.log('🎹 Mechvibes sounds:', enabled ? 'enabled' : 'disabled');
+
     }
 
     /**
@@ -188,7 +188,7 @@ export class MechvibesPlayer {
      */
     toggle() {
         this.isEnabled = !this.isEnabled;
-        console.log('🎹 Mechvibes sounds:', this.isEnabled ? 'enabled' : 'disabled');
+
         return this.isEnabled;
     }
 
@@ -198,7 +198,7 @@ export class MechvibesPlayer {
      */
     setVolume(volume) {
         this.volume = Math.max(0, Math.min(100, volume));
-        console.log('🎹 Mechvibes volume set to:', this.volume);
+
     }
 
     /**
@@ -231,7 +231,7 @@ export class MechvibesPlayer {
             availableSounds: this.currentPack?.defines ? Object.keys(this.currentPack.defines).length : 0
         };
         
-        console.log('🎹 Mechvibes Status:', status);
+
         return `Mechvibes Status: Loaded=${status.isLoaded}, Enabled=${status.isEnabled}, Volume=${status.volume}, Pack=${status.packName}, Sounds=${status.availableSounds}`;
     }
 
@@ -240,10 +240,7 @@ export class MechvibesPlayer {
      * @returns {string} Test result message
      */
     async test() {
-        console.log('🎹 Mechvibes: Testing audio system...');
-        console.log('🎹 Mechvibes: Sound pack loaded:', !!this.currentPack);
-        console.log('🎹 Mechvibes: Enabled:', this.isEnabled);
-        console.log('🎹 Mechvibes: Current pack:', this.currentPack);
+
         
         if (!this.currentPack) {
             return '❌ Sound pack not loaded';
@@ -262,7 +259,7 @@ export class MechvibesPlayer {
      * @returns {string} Test result message
      */
     async forceTest() {
-        console.log('🎹 Mechvibes: Force testing with synthesized sound...');
+        
         
         // Create a simple test tone using Howler
         const testSound = new Howl({
@@ -280,14 +277,13 @@ export class MechvibesPlayer {
      * @returns {string} Test result message
      */
     async testAudioContext() {
-        console.log('🎹 Testing audio context directly...');
+        
         
         if (!Howler.ctx) {
             return '❌ No audio context available';
         }
         
-        console.log('🎹 Audio context state:', Howler.ctx.state);
-        console.log('🎹 Audio context sample rate:', Howler.ctx.sampleRate);
+        
         
         // Create a simple beep using Howler
         const testSound = new Howl({
@@ -297,7 +293,7 @@ export class MechvibesPlayer {
         
         testSound.play();
         
-        console.log('🎹 Test beep started');
+        
         return '✅ Audio context test completed';
     }
 }

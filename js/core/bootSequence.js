@@ -82,12 +82,10 @@ export class BootSequence {
             const updateProgress = () => {
                 // Handle pause at 85%
                 if (currentProgress >= pauseAt && !isPaused && !hasPaused) {
-                    console.log('Pausing at 85%');
                     isPaused = true;
                     hasPaused = true;
                     
                     setTimeout(() => {
-                        console.log('Resuming after pause');
                         isPaused = false;
                         updateProgress();
                     }, pauseDuration);
@@ -104,14 +102,12 @@ export class BootSequence {
                 // Update the progress bar immediately
                 progressFill.style.width = `${currentProgress}%`;
                 
-                console.log('Progress:', Math.round(currentProgress) + '%');
+
                 
                 if (currentProgress < targetProgress) {
                     setTimeout(updateProgress, updateInterval);
                 } else {
-                    console.log('Progress animation complete');
                     setTimeout(() => {
-                        console.log('Progress animation fully complete');
                         resolve();
                     }, 200);
                 }
@@ -231,7 +227,6 @@ export class BootSequence {
         // Ensure particle system is active
         if (window.particleSystemInstance && window.particleSystemInstance.particleContainer && 
             window.particleSystemInstance.particleAnimationRunning) {
-            console.log('neuOS: Activating particle system for desktop...');
             window.particleSystemInstance.startContinuousGeneration();
         }
 
@@ -248,16 +243,12 @@ export class BootSequence {
             }
         }, 1000);
 
-        console.log('neuOS: Desktop initialization complete');
-        console.log('neuOS: Desktop element found:', !!desktop);
-        console.log('neuOS: Desktop icons container found:', !!document.getElementById('desktop-icons'));
-        console.log('neuOS: Desktop icons count:', document.getElementById('desktop-icons')?.children?.length || 0);
+
     }
 
     createNetworkAnimations() {
         // Network animations disabled - no longer creating drifting blue dots
         // This function is kept for potential future use but doesn't create any elements
-        console.log('Network animations disabled - no drifting blue dots');
     }
 
     delay(ms) {
