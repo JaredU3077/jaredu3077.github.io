@@ -230,9 +230,9 @@
     left: 50% !important;
     top: 50% !important;
     transform: translate(-50%, -50%) !important;
-    width: 495px !important;
-    height: 308px !important;
-    border-radius: 28px !important;
+    width: 400px !important;
+    height: 400px !important;
+    border-radius: 50% !important;
     cursor: grab !important;
     isolation: isolate !important;
     touch-action: none;
@@ -244,7 +244,7 @@
     backdrop-filter: blur(2px) saturate(150%) brightness(120%) !important;
     -webkit-backdrop-filter: blur(2px) saturate(150%) brightness(120%) !important;
     /* Force identical padding and layout */
-    padding: 32px !important;
+    padding: 40px !important;
     margin: 0 !important;
     text-align: center;
     display: flex !important;
@@ -256,8 +256,8 @@
     backface-visibility: hidden !important;
     -webkit-backface-visibility: hidden !important;
     /* Force identical content area */
-    min-height: 308px !important;
-    min-width: 495px !important;
+    min-height: 400px !important;
+    min-width: 400px !important;
     overflow: hidden !important;
     /* Force identical transform context */
     transform-style: flat !important;
@@ -329,16 +329,16 @@
     position: absolute !important;
     left: 50% !important;
     top: 50% !important;
-    /* Force identical sizing */
-    width: 495px !important;
-    height: 308px !important;
-    border-radius: 28px !important;
+    /* Force identical sizing - now circular */
+    width: 400px !important;
+    height: 400px !important;
+    border-radius: 50% !important;
     /* Force identical layout */
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    padding: 32px !important;
+    padding: 40px !important;
     margin: 0 !important;
     /* Force identical rendering */
     isolation: isolate !important;
@@ -354,8 +354,8 @@
     visibility: visible !important;
     z-index: 1000 !important;
     /* Force identical content area */
-    min-height: 308px !important;
-    min-width: 495px !important;
+    min-height: 400px !important;
+    min-width: 400px !important;
     overflow: hidden !important;
     /* Force identical transform origin */
     transform-origin: 50% 50% !important;

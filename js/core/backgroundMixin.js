@@ -21,15 +21,16 @@ export const backgroundMixin = {
         
         // Create eight rings with different sizes and speeds - all with same visibility and style
         const rings = [
-            { size: 200, animation: 40, borderWidth: 1, orbSize: 8, orbColor: '#ff6b6b' },
-            { size: 280, animation: 50, borderWidth: 1, orbSize: 6, orbColor: '#4ecdc4' },
-            { size: 360, animation: 60, borderWidth: 1, orbSize: 10, orbColor: '#45b7d1' },
-            { size: 440, animation: 70, borderWidth: 1, orbSize: 7, orbColor: '#96ceb4' },
-            { size: 520, animation: 80, borderWidth: 1, orbSize: 12, orbColor: '#feca57' },
-            { size: 600, animation: 90, borderWidth: 1, orbSize: 9, orbColor: '#ff9ff3' },
-            { size: 680, animation: 100, borderWidth: 1, orbSize: 11, orbColor: '#54a0ff' },
-            { size: 760, animation: 110, borderWidth: 1, orbSize: 8, orbColor: '#5f27cd' }
+            { size: 200, animation: 40, borderWidth: 1, orbSize: 8 },
+            { size: 280, animation: 50, borderWidth: 1, orbSize: 6 },
+            { size: 360, animation: 60, borderWidth: 1, orbSize: 10 },
+            { size: 440, animation: 70, borderWidth: 1, orbSize: 7 },
+            { size: 520, animation: 80, borderWidth: 1, orbSize: 12 },
+            { size: 600, animation: 90, borderWidth: 1, orbSize: 9 },
+            { size: 680, animation: 100, borderWidth: 1, orbSize: 11 },
+            { size: 760, animation: 110, borderWidth: 1, orbSize: 8 }
         ];
+        const orbColors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff', '#5f27cd'];
         
         rings.forEach((ringConfig, index) => {
             // Create the ring
@@ -44,7 +45,7 @@ export const backgroundMixin = {
                 width: ${ringConfig.size}px !important;
                 height: ${ringConfig.size}px !important;
                 transform: translate(-50%, -50%) !important;
-                border: ${ringConfig.borderWidth}px solid rgba(74, 144, 226, 0.25) !important;
+                border: ${ringConfig.borderWidth}px solid rgba(74, 144, 226, 0.13) !important;
                 border-radius: 50% !important;
                 animation: backgroundSpin ${ringConfig.animation}s linear infinite !important;
                 pointer-events: none !important;
@@ -53,7 +54,7 @@ export const backgroundMixin = {
                 margin: 0 !important;
                 padding: 0 !important;
                 background: none !important;
-                box-shadow: 0 0 18px 4px rgba(74,144,226,0.13);
+                box-shadow: 0 0 12px 2px rgba(74,144,226,0.06);
                 filter: blur(1px);
             `;
             document.body.appendChild(ring);
@@ -62,19 +63,21 @@ export const backgroundMixin = {
             const orb = document.createElement('div');
             orb.className = 'solar-orb';
             const orbRadius = ringConfig.size / 2;
+            // Increase orb size by 10%
+            const orbSize = Math.round(ringConfig.orbSize * 1.1);
             orb.style.cssText = `
                 position: fixed !important;
                 top: 50% !important;
                 left: 50% !important;
-                width: ${ringConfig.orbSize}px !important;
-                height: ${ringConfig.orbSize}px !important;
-                background: ${ringConfig.orbColor} !important;
+                width: ${orbSize}px !important;
+                height: ${orbSize}px !important;
+                background: ${orbColors[index]} !important;
                 border-radius: 50% !important;
                 --orbit-radius: ${orbRadius}px !important;
                 animation: solarOrbit ${ringConfig.animation}s linear infinite !important;
                 pointer-events: none !important;
                 z-index: 101 !important;
-                box-shadow: 0 0 10px ${ringConfig.orbColor} !important;
+                box-shadow: 0 0 10px ${orbColors[index]} !important;
                 margin: 0 !important;
                 padding: 0 !important;
             `;

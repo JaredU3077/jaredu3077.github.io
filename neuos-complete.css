@@ -2534,9 +2534,9 @@ body:not(.boot-active):not(.login-active) #desktop {
     left: 50% !important;
     top: 50% !important;
     transform: translate(-50%, -50%) !important;
-    width: 495px !important;
-    height: 308px !important;
-    border-radius: 28px !important;
+    width: 400px !important;
+    height: 400px !important;
+    border-radius: 50% !important;
     cursor: grab !important;
     isolation: isolate !important;
     touch-action: none;
@@ -2548,7 +2548,7 @@ body:not(.boot-active):not(.login-active) #desktop {
     backdrop-filter: blur(2px) saturate(150%) brightness(120%) !important;
     -webkit-backdrop-filter: blur(2px) saturate(150%) brightness(120%) !important;
     /* Force identical padding and layout */
-    padding: 32px !important;
+    padding: 40px !important;
     margin: 0 !important;
     text-align: center;
     display: flex !important;
@@ -2560,8 +2560,8 @@ body:not(.boot-active):not(.login-active) #desktop {
     backface-visibility: hidden !important;
     -webkit-backface-visibility: hidden !important;
     /* Force identical content area */
-    min-height: 308px !important;
-    min-width: 495px !important;
+    min-height: 400px !important;
+    min-width: 400px !important;
     overflow: hidden !important;
     /* Force identical transform context */
     transform-style: flat !important;
@@ -2633,16 +2633,16 @@ body:not(.boot-active):not(.login-active) #desktop {
     position: absolute !important;
     left: 50% !important;
     top: 50% !important;
-    /* Force identical sizing */
-    width: 495px !important;
-    height: 308px !important;
-    border-radius: 28px !important;
+    /* Force identical sizing - now circular */
+    width: 400px !important;
+    height: 400px !important;
+    border-radius: 50% !important;
     /* Force identical layout */
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    padding: 32px !important;
+    padding: 40px !important;
     margin: 0 !important;
     /* Force identical rendering */
     isolation: isolate !important;
@@ -2658,8 +2658,8 @@ body:not(.boot-active):not(.login-active) #desktop {
     visibility: visible !important;
     z-index: 1000 !important;
     /* Force identical content area */
-    min-height: 308px !important;
-    min-width: 495px !important;
+    min-height: 400px !important;
+    min-width: 400px !important;
     overflow: hidden !important;
     /* Force identical transform origin */
     transform-origin: 50% 50% !important;
@@ -2680,44 +2680,75 @@ body:not(.boot-active):not(.login-active) #desktop {
 
 /* neuOS Widget - Smaller than login box */
 .neuos-widget {
+    /* Force identical rendering context as boot/login boxes */
+    backdrop-filter: blur(2px) saturate(150%) brightness(120%) !important;
+    -webkit-backdrop-filter: blur(2px) saturate(150%) brightness(120%) !important;
+    background: rgba(255,255,255,0.0015) !important;
+    box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.2) !important;
+    /* Transform context - allow JavaScript to modify */
+    transform: translate(-50%, -50%);
+    transform-style: flat;
+    perspective: none;
+    /* Positioning - allow JavaScript to modify */
     position: fixed;
     left: 50%;
     top: 50%;
-    transform: translate(-50%, -50%);
-    width: 180px;
-    height: 90px;
-    z-index: 1200;
-    cursor: grab;
-    user-select: none;
-    pointer-events: auto;
-    touch-action: none;
-    background: rgba(255,255,255,0.003);
-    backdrop-filter: blur(2px) saturate(150%) brightness(120%);
-    -webkit-backdrop-filter: blur(2px) saturate(150%) brightness(120%);
-    border-radius: 20px;
-    box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.2);
-    padding: 16px;
+    /* Force identical sizing but keep as circle */
+    width: 140px !important;
+    height: 140px !important;
+    border-radius: 50% !important;
+    /* Force identical layout */
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    /* Force identical rendering */
+    isolation: isolate !important;
+    contain: layout style paint !important;
+    backface-visibility: hidden !important;
+    -webkit-backface-visibility: hidden !important;
+    /* Prevent any animations or transitions */
+    animation: none !important;
+    transition: none !important;
+    will-change: auto !important;
+    /* Ensure visibility */
+    opacity: 1 !important;
+    visibility: visible !important;
+    z-index: 1200 !important;
+    /* Force identical content area */
+    min-height: 140px !important;
+    min-width: 140px !important;
+    overflow: hidden !important;
+    /* Force identical transform origin */
+    transform-origin: 50% 50% !important;
+    -webkit-transform-origin: 50% 50% !important;
+    perspective-origin: 50% 50% !important;
+    -webkit-perspective-origin: 50% 50% !important;
+    /* Dragging cursor and properties */
+    cursor: grab !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    /* Ensure pointer events work */
+    pointer-events: auto !important;
+    /* Allow dragging */
+    touch-action: none !important;
+}
+
+.neuos-widget .neuos-glass-title {
+    font-size: 1.5rem;
     margin: 0;
     text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    isolation: isolate;
-    contain: layout style paint;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    transform-style: flat;
-    perspective: none;
-    perspective-origin: 50% 50%;
-    -webkit-perspective-origin: 50% 50%;
-    transform-origin: 50% 50%;
-    -webkit-transform-origin: 50% 50%;
-    transition: none;
-    will-change: auto;
-    opacity: 1;
-    visibility: visible;
-    animation: none;
+    color: var(--primary-color);
+    letter-spacing: 0.04em;
+    font-weight: 700;
+    text-shadow: 0 2px 16px rgba(99, 102, 241, 0.8), 0 1px 0 rgba(255, 255, 255, 0.1);
+    font-family: var(--font-family, 'Inter', 'Segoe UI', Arial, sans-serif);
+    line-height: 1;
+    display: block;
 }
 
 .neuos-widget:hover {
