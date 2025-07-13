@@ -2717,3 +2717,537 @@ body:not(.boot-active):not(.login-active) #desktop {
 .neuos-widget:active {
     cursor: grabbing;
 } 
+/* Space Screensaver Integration */
+#spaceScreensaver {
+    transition: opacity 1s ease-in-out;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+#spaceScreensaver.active {
+    opacity: 1;
+}
+
+#spaceScreensaver.inactive {
+    opacity: 0;
+}
+
+/* Enhanced Body Background - Glass Theme from test1 */
+body {
+    min-height: 100vh;
+    color: var(--text-color);
+    font-family: var(--font-family);
+    font-size: var(--text-base);
+    line-height: 1.6;
+    font-weight: 400;
+    transition: background var(--transition-slow);
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* Initial state - hide desktop until login is complete */
+#desktop {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+}
+
+/* Hide desktop during boot and login */
+.boot-active #desktop,
+.login-active #desktop {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* Show desktop when neither boot nor login is active (user is using the system) */
+body:not(.boot-active):not(.login-active) #desktop {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Enhanced Background Animation - Handled by _glass.css */
+/* body::before is now handled by _glass.css for proper glass effects */
+
+/* Refined Scrollbar - Apple-style */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--background-dark);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+    transition: background var(--transition-fast);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color);
+}
+
+/* Universal scroll container styling */
+[data-scroll-container] {
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-color) transparent;
+}
+
+[data-scroll-container]::-webkit-scrollbar {
+    width: 8px;
+}
+
+[data-scroll-container]::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+[data-scroll-container]::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+}
+
+[data-scroll-container]::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-hover);
+}
+
+/* Ensure scrollbars are not affected by resize handles */
+[data-scroll-container]::-webkit-scrollbar,
+[data-scroll-container]::-webkit-scrollbar-thumb,
+[data-scroll-container]::-webkit-scrollbar-track {
+    position: relative;
+    z-index: 20; /* Higher than resize handles */
+}
+
+/* Prevent resize handles from interfering with scrollable content */
+.window-content [data-scroll-container] {
+    position: relative;
+    z-index: 15; /* Higher than resize handles but lower than scrollbar */
+}
+
+/* Additional protection for terminal output and other scrollable elements */
+#terminalOutput,
+.terminal-output,
+.window-content.data-scroll-container {
+    position: relative;
+    z-index: 15; /* Higher than resize handles but lower than scrollbar */
+}
+
+/* Hide desktop during boot/login */
+.login-active #desktop {
+    display: none;
+}
+
+/* Network Data Flow Animations */
+.network-particles {
+    /* Network particles container disabled - no longer showing drifting blue dots */
+    display: none !important;
+}
+
+.data-packet {
+    /* Network data packets disabled - no longer showing drifting blue dots */
+    display: none !important;
+}
+
+/* Animated Data Flow Lines */
+@keyframes dataFlow {
+    0% { 
+        transform: translateX(-100px) translateZ(0); 
+        opacity: 0; 
+    }
+    10% { opacity: 0.8; }
+    90% { opacity: 0.8; }
+    100% { 
+        transform: translateX(calc(100vw + 100px)) translateZ(0); 
+        opacity: 0; 
+    }
+}
+
+.data-packet:nth-child(1) { animation: dataFlow 12s linear infinite; top: 10%; }
+.data-packet:nth-child(2) { animation: dataFlow 15s linear infinite 2s; top: 25%; }
+.data-packet:nth-child(3) { animation: dataFlow 18s linear infinite 4s; top: 40%; }
+.data-packet:nth-child(4) { animation: dataFlow 14s linear infinite 6s; top: 55%; }
+.data-packet:nth-child(5) { animation: dataFlow 16s linear infinite 8s; top: 70%; }
+.data-packet:nth-child(6) { animation: dataFlow 13s linear infinite 10s; top: 85%; }
+
+/* Network Nodes Removed - Green pulsing dots disabled */
+/* Keeping keyframes for potential future use */
+@keyframes networkPulse {
+    0%, 100% { 
+        transform: scale(1) translateZ(0); 
+        opacity: 0.4; 
+    }
+    50% { 
+        transform: scale(1.5) translateZ(0); 
+        opacity: 0.8; 
+    }
+}
+
+/* Network nodes disabled - no longer rendering green pulsing dots */
+.network-node {
+    display: none;
+}
+
+/* Enhanced Interactive Particle Background */
+#particleCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.8;
+}
+
+.particle-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+    overflow: hidden;
+    display: none; /* Hidden by default, only shown when particle commands are used */
+}
+
+.blue-particle {
+    position: fixed;
+    width: 12px;
+    height: 12px;
+    background: #4a90e2;
+    border-radius: 50%;
+    opacity: 1;
+    animation: particleFloat 15s linear infinite;
+    box-shadow: 0 0 20px #4a90e2, 0 0 40px rgba(74, 144, 226, 0.8);
+    will-change: transform, opacity;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: auto;
+    /* Strong fallback for visibility */
+    border: 2px solid #4a90e2;
+    z-index: 1001;
+    display: none; /* Hidden by default, only shown when particle commands are used */
+}
+
+.blue-particle.large {
+    width: 6px;
+    height: 6px;
+    opacity: 0.8;
+    animation-duration: 20s;
+    box-shadow: 0 0 12px #4a90e2, 0 0 24px rgba(74, 144, 226, 0.4);
+}
+
+.blue-particle.small {
+    width: 2px;
+    height: 2px;
+    opacity: 0.4;
+    animation-duration: 10s;
+    box-shadow: 0 0 4px #4a90e2;
+}
+
+@keyframes particleFloat {
+    0% {
+        transform: translate(-10px, calc(100vh + 20px)) rotate(0deg) scale(0.8);
+        opacity: 0.8;
+    }
+    1% {
+        opacity: 1;
+        transform: translate(var(--drift, 0px), calc(100vh - 30px)) rotate(18deg) scale(1);
+    }
+    5% {
+        opacity: 1;
+        transform: translate(calc(var(--drift, 0px) + 20px), calc(100vh - 100px)) rotate(45deg) scale(1.1);
+    }
+    20% {
+        opacity: 1;
+        transform: translate(calc(var(--drift, 0px) + 40px), calc(80vh - 50px)) rotate(72deg) scale(1);
+    }
+    40% {
+        opacity: 1;
+        transform: translate(calc(var(--drift, 0px) + 60px), calc(60vh - 30px)) rotate(99deg) scale(0.95);
+    }
+    60% {
+        opacity: 0.9;
+        transform: translate(calc(var(--drift, 0px) + 80px), calc(40vh - 20px)) rotate(126deg) scale(0.9);
+    }
+    80% {
+        opacity: 0.6;
+        transform: translate(calc(var(--drift, 0px) + 100px), calc(20vh - 10px)) rotate(153deg) scale(0.8);
+    }
+    100% {
+        transform: translate(calc(var(--drift, 0px) + 120px), -50px) rotate(180deg) scale(0);
+        opacity: 0;
+    }
+}
+
+/* Rain particle animation */
+@keyframes rainFall {
+    0% {
+        transform: translateY(-20px) rotate(0deg);
+        opacity: 0.8;
+    }
+    10% {
+        opacity: 1;
+        transform: translateY(10vh) rotate(5deg);
+    }
+    50% {
+        opacity: 1;
+        transform: translateY(50vh) rotate(10deg);
+    }
+    90% {
+        opacity: 0.8;
+        transform: translateY(90vh) rotate(15deg);
+    }
+    100% {
+        transform: translateY(calc(100vh + 20px)) rotate(20deg);
+        opacity: 0;
+    }
+}
+
+/* Storm particle animation */
+@keyframes stormFall {
+    0% {
+        transform: translateY(-30px) rotate(0deg) scale(1);
+        opacity: 1;
+    }
+    5% {
+        opacity: 1;
+        transform: translateY(5vh) rotate(10deg) scale(1.1);
+    }
+    25% {
+        opacity: 1;
+        transform: translateY(25vh) rotate(20deg) scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: translateY(50vh) rotate(30deg) scale(0.9);
+    }
+    75% {
+        opacity: 0.8;
+        transform: translateY(75vh) rotate(40deg) scale(0.8);
+    }
+    100% {
+        transform: translateY(calc(100vh + 30px)) rotate(50deg) scale(0);
+        opacity: 0;
+    }
+}
+
+/* Calm particle animation */
+@keyframes calmFloat {
+    0% {
+        transform: translateY(0) scale(0.8);
+        opacity: 0.6;
+    }
+    25% {
+        transform: translateY(-20vh) scale(1);
+        opacity: 0.8;
+    }
+    50% {
+        transform: translateY(-40vh) scale(1.1);
+        opacity: 1;
+    }
+    75% {
+        transform: translateY(-60vh) scale(1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-80vh) scale(0.8);
+        opacity: 0.6;
+    }
+}
+
+/* Dance particle animation */
+@keyframes danceFloat {
+    0% {
+        transform: translateY(0) scale(0.8) rotate(0deg);
+        opacity: 1;
+    }
+    16.66% {
+        transform: translateY(-15vh) scale(1.2) rotate(60deg);
+        opacity: 1;
+    }
+    33.33% {
+        transform: translateY(-30vh) scale(1) rotate(120deg);
+        opacity: 1;
+    }
+    50% {
+        transform: translateY(-45vh) scale(1.3) rotate(180deg);
+        opacity: 1;
+    }
+    66.66% {
+        transform: translateY(-60vh) scale(1.1) rotate(240deg);
+        opacity: 0.9;
+    }
+    83.33% {
+        transform: translateY(-75vh) scale(0.9) rotate(300deg);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-90vh) scale(0.7) rotate(360deg);
+        opacity: 0.6;
+    }
+}
+
+/* Enhanced Interactive particle effects */
+.particle-interactive {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 5;
+}
+
+.particle-interactive:hover {
+    transform: scale(1.8) !important;
+    opacity: 1 !important;
+    box-shadow: 0 0 25px #4a90e2, 0 0 50px rgba(74, 144, 226, 0.8), 0 0 75px rgba(74, 144, 226, 0.4) !important;
+    z-index: 10;
+}
+
+.particle-interactive.mouse-attracted {
+    transform: scale(1.3) !important;
+    opacity: 0.9 !important;
+    box-shadow: 0 0 15px #4a90e2, 0 0 30px rgba(74, 144, 226, 0.6) !important;
+    z-index: 8;
+}
+
+.particle-interactive.mouse-repelled {
+    transform: scale(0.7) !important;
+    opacity: 0.4 !important;
+    filter: blur(1px);
+}
+
+/* Spinning background effect */
+.background-spinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 400px;
+    height: 400px;
+    transform: translate(-50%, -50%);
+    border: 1px solid rgba(74, 144, 226, 0.08);
+    border-radius: 50%;
+    animation: backgroundSpin 60s linear infinite;
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0.3;
+    margin: 0;
+    padding: 0;
+}
+
+.background-spinner::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    right: -1px;
+    bottom: -1px;
+    border: 1px solid rgba(74, 144, 226, 0.04);
+    border-radius: 50%;
+    animation: backgroundSpin 90s linear infinite reverse;
+}
+
+@keyframes backgroundSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Enhanced ambient glows */
+.ambient-glow {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: -3;
+    animation: ambientFloat 8s ease-in-out infinite;
+}
+
+/* Responsive design for particles */
+@media (max-width: 768px) {
+    .enhanced-particle {
+        transform: scale(0.8);
+    }
+    
+    .enhanced-particle.small {
+        width: 4px;
+        height: 4px;
+    }
+    
+    .enhanced-particle.medium {
+        width: 6px;
+        height: 6px;
+    }
+    
+    .enhanced-particle.large {
+        width: 8px;
+        height: 8px;
+    }
+    
+    .enhanced-particle.xlarge {
+        width: 10px;
+        height: 10px;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .enhanced-particle {
+        animation-duration: 30s !important;
+        transition: none !important;
+    }
+    
+    .background-spinner {
+        animation: none !important;
+    }
+    
+    .ambient-glow {
+        animation: none !important;
+    }
+}
+
+/* Legacy particle support - Hidden by default */
+.blue-particle {
+    position: fixed;
+    width: 12px;
+    height: 12px;
+    background: #4a90e2;
+    border-radius: 50%;
+    opacity: 1;
+    animation: particleFloat 15s linear infinite;
+    box-shadow: 0 0 20px #4a90e2, 0 0 40px rgba(74, 144, 226, 0.8);
+    will-change: transform, opacity;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: auto;
+    border: 2px solid #4a90e2;
+    z-index: 1001;
+    display: none; /* Hidden by default, only shown when particle commands are used */
+}
+
+#starfield-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    min-width: 100vw;
+    min-height: 100vh;
+    background: #030712;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 1;
+    transition: none;
+    display: block;
+}
+
+.boot-sequence, .login-screen, .boot-container, .login-container {
+    /* background: none !important; */
+    /* box-shadow: none !important; */
+    /* backdrop-filter: none !important; */
+    /* -webkit-backdrop-filter: none !important; */
+} 
