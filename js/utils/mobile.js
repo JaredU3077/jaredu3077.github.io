@@ -9,6 +9,7 @@ class MobileUtils {
         this.isTouch = this.detectTouch();
         this.performanceMode = this.isMobile ? 'mobile' : 'desktop';
         this.setupMobileOptimizations();
+        this.applyMobileCSS(); // Add this line
     }
 
     /**
@@ -24,6 +25,17 @@ class MobileUtils {
      */
     detectTouch() {
         return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    }
+
+    /**
+     * Apply mobile CSS classes to body
+     */
+    applyMobileCSS() {
+        if (this.isMobile) {
+            document.body.classList.add('mobile-device');
+            document.body.classList.add('touch-device');
+            console.log('Mobile device detected, applying mobile CSS classes');
+        }
     }
 
     /**
