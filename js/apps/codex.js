@@ -32,14 +32,14 @@ class CodexApp {
         tempDiv.innerHTML = `
             <div class="codex-header">
                 <div class="search-container">
-                    <input type="text" class="search-input" placeholder="Search layers, instruments, concepts...">
-                    <button class="search-btn">🔍</button>
+                    <input type="text" class="search-input" placeholder="Search layers, instruments, concepts..." aria-label="Search codex content">
+                    <button class="search-btn" aria-label="Search">🔍</button>
                 </div>
             </div>
             <div class="codex-content">
-                <div class="search-results-container" style="display: none; position: absolute; top: 0; left: 0; width: 100%; background: transparent !important; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); max-height: 300px; overflow-y: auto; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); z-index: 10; padding: 15px; border-radius: 16px;"></div>
+                <div class="search-results-container" style="display: none; position: absolute; top: 0; left: 0; width: 100%; max-height: 300px; overflow-y: auto; z-index: 10;"></div>
                 <div class="layers-container" style="position: relative; z-index: 1;"></div>
-                <div class="loading-indicator">Loading knowledge base...</div>
+                <div class="loading-indicator" role="status" aria-live="polite">Loading knowledge base...</div>
             </div>
         `;
         
@@ -94,20 +94,21 @@ class CodexApp {
             });
         }
 
-        // Event delegation for search results clicks
+        // Event delegation for search results clicks and keyboard navigation
         if (this.window) {
             this.window.addEventListener('click', (e) => {
                 if (e.target.closest('.search-result-item')) {
                     const item = e.target.closest('.search-result-item');
-                    const layer = parseInt(item.dataset.layer);
-                    if (!isNaN(layer)) {
-                        const layerEl = this.layersContainer.querySelector(`#layer-${layer}`);
-                        if (layerEl) {
-                            layerEl.scrollIntoView({ behavior: 'smooth' });
-                        }
-                        // Hide results after click for better UX
-                        this.searchResultsContainer.style.display = 'none';
-                    }
+                    this.handleSearchResultClick(item);
+                }
+            });
+            
+            // Add keyboard navigation for search results
+            this.window.addEventListener('keydown', (e) => {
+                if (e.target.closest('.search-result-item') && (e.key === 'Enter' || e.key === ' ')) {
+                    e.preventDefault();
+                    const item = e.target.closest('.search-result-item');
+                    this.handleSearchResultClick(item);
                 }
             });
         }
@@ -302,14 +303,14 @@ class CodexApp {
         // Render introduction content first
         if (this.parsedData.introduction && this.parsedData.introduction.length > 0) {
             this.layersContainer.innerHTML += `
-                <div id="introduction" class="introduction-section">
+                <section id="introduction" class="introduction-section">
                     <h2>Introduction</h2>
                     <div class="introduction-content">
                         ${this.parsedData.introduction.map(paragraph => `
                             <p>${paragraph}</p>
                         `).join('')}
                     </div>
-                </div>
+                </section>
             `;
         }
         
@@ -319,12 +320,12 @@ class CodexApp {
             if (!layerContent) continue;
             
             this.layersContainer.innerHTML += `
-                <div id="layer-${layer}" class="layer-section">
+                <section id="layer-${layer}" class="layer-section">
                     <h2>Layer ${layer}: ${layerContent.title}</h2>
                     <div class="layer-description">${layerContent.description}</div>
                     <div class="layer-instruments">
                         ${layerContent.instruments.map(instrument => `
-                            <div class="instrument-item">
+                            <article class="instrument-item">
                                 <h3>${instrument.name}</h3>
                                 <p>${instrument.description}</p>
                                 ${instrument.subItems && instrument.subItems.length > 0 ? `
@@ -336,10 +337,10 @@ class CodexApp {
                                         </ul>
                                     </div>
                                 ` : ''}
-                            </div>
+                            </article>
                         `).join('')}
                     </div>
-                </div>
+                </section>
             `;
         }
     }
@@ -388,21 +389,25 @@ class CodexApp {
         
         if (results.length === 0) {
             this.searchResultsContainer.innerHTML = `
-                <h3 style="color: #10b981; margin-bottom: 10px; font-weight: 600;">No results found for "${query}"</h3>
-                <p style="color: #f8fafc; margin: 0;">Try searching for different terms or browse through the layers manually.</p>
+                <div class="search-results">
+                    <h3>No results found for "${query}"</h3>
+                    <p>Try searching for different terms or browse through the layers manually.</p>
+                </div>
             `;
             this.searchResultsContainer.style.display = 'block';
             return;
         }
 
         this.searchResultsContainer.innerHTML = `
-            <h3 style="color: #10b981; margin-bottom: 15px; font-size: 16px; font-weight: 600;">Search Results for "${query}" (${results.length} found)</h3>
-            ${results.map(result => `
-                <div class="search-result-item" data-layer="${result.layer}" style="cursor: pointer; padding: 12px; margin-bottom: 8px; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; background: transparent !important; transition: all 0.2s ease; hover:background: rgba(16, 185, 129, 0.1) !important;">
-                    <h4 style="color: #10b981; margin: 0 0 8px 0; font-size: 14px; font-weight: 600;">Layer ${result.layer}: ${result.title}</h4>
-                    <p style="color: #f8fafc; margin: 0; font-size: 12px; line-height: 1.4;">${result.description.substring(0, 150)}...</p>
-                </div>
-            `).join('')}
+            <div class="search-results">
+                <h3>Search Results for "${query}" (${results.length} found)</h3>
+                ${results.map(result => `
+                    <article class="search-result-item" data-layer="${result.layer}" role="button" tabindex="0">
+                        <h4>Layer ${result.layer}: ${result.title}</h4>
+                        <p>${result.description.substring(0, 150)}...</p>
+                    </article>
+                `).join('')}
+            </div>
         `;
         this.searchResultsContainer.style.display = 'block';
     }
@@ -421,6 +426,23 @@ class CodexApp {
 
     focus() {
         console.log('Codex focus called');
+    }
+
+    handleSearchResultClick(item) {
+        const layer = parseInt(item.dataset.layer);
+        if (!isNaN(layer)) {
+            const layerEl = this.layersContainer.querySelector(`#layer-${layer}`);
+            if (layerEl) {
+                layerEl.scrollIntoView({ behavior: 'smooth' });
+                // Add a brief highlight effect
+                layerEl.style.background = 'rgba(99, 102, 241, 0.1)';
+                setTimeout(() => {
+                    layerEl.style.background = '';
+                }, 2000);
+            }
+            // Hide results after click for better UX
+            this.searchResultsContainer.style.display = 'none';
+        }
     }
 
     blur() {

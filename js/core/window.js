@@ -55,30 +55,51 @@ export class WindowManager {
             height = defaultSize.height;
         }
         
+        // Mobile-specific window sizing
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+            width = window.innerWidth - 40;
+            height = window.innerHeight - 100;
+        }
+        
         // Ensure window dimensions are within bounds with proper fallbacks
-        const minWidth = CONFIG.window?.minWidth || 300;
-        const maxWidth = CONFIG.window?.maxWidth || 1200;
-        const minHeight = CONFIG.window?.minHeight || 200;
-        const maxHeight = CONFIG.window?.maxHeight || 800;
+        const minWidth = isMobile ? 300 : (CONFIG.window?.minWidth || 300);
+        const maxWidth = isMobile ? window.innerWidth : (CONFIG.window?.maxWidth || 1200);
+        const minHeight = isMobile ? 200 : (CONFIG.window?.minHeight || 200);
+        const maxHeight = isMobile ? window.innerHeight : (CONFIG.window?.maxHeight || 800);
         
         width = Math.min(Math.max(width, minWidth), maxWidth);
         height = Math.min(Math.max(height, minHeight), maxHeight);
 
-        // Center the window on screen
-        const left = (window.innerWidth - width) / 2;
-        const top = (window.innerHeight - height) / 2;
+        const desktop = document.getElementById('desktop');
+        if (!desktop) {
+            throw new Error('Desktop element not found! Cannot create window.');
+        }
+        // Use desktop clientWidth/clientHeight for centering
+        let left = (desktop.clientWidth - width) / 2;
+        let top = (desktop.clientHeight - height) / 2;
+        
+        // Mobile-specific positioning
+        if (isMobile) {
+            left = 0;
+            top = 0;
+        } else {
+            // Clamp to desktop
+            left = Math.max(0, Math.min(left, desktop.clientWidth - width));
+            top = Math.max(0, Math.min(top, desktop.clientHeight - height));
+        }
 
         const windowElement = document.createElement('div');
         windowElement.className = type === 'game' ? 'window game-window' : 'window';
         windowElement.id = id;
         windowElement.setAttribute('role', 'dialog');
         windowElement.setAttribute('aria-label', title);
+        windowElement.style.position = 'absolute'; // Ensure absolute positioning
         windowElement.style.width = `${width}px`;
         windowElement.style.height = `${height}px`;
         windowElement.style.left = `${left}px`;
         windowElement.style.top = `${top}px`;
         windowElement.style.zIndex = this.getNextZIndex();
-        // Add performance optimizations from the start
         windowElement.style.transform = 'translateZ(0)';
         windowElement.style.willChange = 'transform';
 
@@ -106,12 +127,8 @@ export class WindowManager {
             <div class="window-resize se" title="Resize window"></div>
             <div class="window-resize sw" title="Resize window"></div>
         `;
-
-        const desktop = document.getElementById('desktop');
-        if (!desktop) {
-            throw new Error('Desktop element not found! Cannot create window.');
-        }
         desktop.appendChild(windowElement);
+        window.scrollTo(0, 0);
 
         const windowObj = {
             element: windowElement,
@@ -134,6 +151,13 @@ export class WindowManager {
         this.windowStack.push(windowObj);
         
         // Window created successfully
+        console.log('Window created successfully:', {
+            id: windowObj.id,
+            title: windowObj.title,
+            element: !!windowObj.element,
+            header: !!windowObj.element.querySelector('.window-header'),
+            controls: !!windowObj.element.querySelector('.window-controls')
+        });
         
         this.setupWindowEvents(windowObj);
         this.focusWindow(windowObj);
@@ -157,6 +181,12 @@ export class WindowManager {
         const controls = window.element.querySelector('.window-controls');
         const resizeHandles = window.element.querySelectorAll('.window-resize');
 
+        console.log('Setting up window events for:', window.id, {
+            header: !!header,
+            controls: !!controls,
+            resizeHandles: resizeHandles.length
+        });
+
         if (!header || !controls) {
             console.error('Window header or controls not found');
             return;
@@ -170,7 +200,15 @@ export class WindowManager {
                         inertia: false,
                         modifiers: [
                             interact.modifiers.restrictRect({
-                                restriction: 'parent',
+                                restriction: () => {
+                                    const desktop = document.getElementById('desktop');
+                                    return {
+                                        top: 0,
+                                        left: 0,
+                                        right: desktop.clientWidth,
+                                        bottom: desktop.clientHeight
+                                    };
+                                },
                                 endOnly: true
                             })
                         ],
@@ -187,9 +225,8 @@ export class WindowManager {
                                     windowObj._isResizing = false;
                                     // Optimize for dragging - use transform for better performance
                                     windowObj.element.style.willChange = 'transform';
-                                    windowObj.element.style.transform = 'translateZ(0)';
-                                    // Add dragging class for CSS optimizations
-                                    windowObj.element.classList.add('dragging');
+                                    // Bring to front on drag start
+                                    this.focusWindow(windowObj);
                                 }
                             },
                             move: (event) => {
@@ -244,9 +281,33 @@ export class WindowManager {
             const maximizeBtn = controls.querySelector('.maximize');
             const closeBtn = controls.querySelector('.close');
 
-            if (minimizeBtn) minimizeBtn.addEventListener('click', () => this.minimizeWindow(window));
-            if (maximizeBtn) maximizeBtn.addEventListener('click', () => this.toggleMaximize(window));
-            if (closeBtn) closeBtn.addEventListener('click', () => this.closeWindow(window));
+            console.log('Setting up window controls for:', window.id, {
+                minimizeBtn: !!minimizeBtn,
+                maximizeBtn: !!maximizeBtn,
+                closeBtn: !!closeBtn
+            });
+
+            if (minimizeBtn) {
+                minimizeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    console.log('Minimize clicked for window:', window.id);
+                    this.minimizeWindow(window);
+                });
+            }
+            if (maximizeBtn) {
+                maximizeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    console.log('Maximize clicked for window:', window.id);
+                    this.toggleMaximize(window);
+                });
+            }
+            if (closeBtn) {
+                closeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    console.log('Close clicked for window:', window.id);
+                    this.closeWindow(window);
+                });
+            }
         } catch (error) {
             console.error('Failed to setup window controls:', error);
         }
@@ -304,6 +365,18 @@ export class WindowManager {
         const windowObj = this.windows.get(windowElement.id);
         if (!windowObj) return;
 
+        // Clamp position to viewport
+        const width = windowElement.offsetWidth;
+        const height = windowElement.offsetHeight;
+        let left = parseFloat(windowElement.style.left) || 0;
+        let top = parseFloat(windowElement.style.top) || 0;
+        left = Math.max(0, Math.min(left, window.innerWidth - width));
+        top = Math.max(0, Math.min(top, window.innerHeight - height));
+        windowElement.style.left = `${left}px`;
+        windowElement.style.top = `${top}px`;
+        windowObj.left = left;
+        windowObj.top = top;
+
         // Clear dragging flag and reset optimizations
         windowObj._isDragging = false;
         windowObj.element.style.willChange = 'auto';
@@ -314,13 +387,6 @@ export class WindowManager {
             cancelAnimationFrame(this._dragThrottle);
             this._dragThrottle = null;
         }
-
-        // Update window position
-        const left = parseFloat(windowObj.element.style.left) || 0;
-        const top = parseFloat(windowObj.element.style.top) || 0;
-        
-        windowObj.left = left;
-        windowObj.top = top;
 
         // NEVER snap windows that have been manually resized to prevent resize interference
         // Only check snap zones for brand new windows that haven't been resized
@@ -682,6 +748,10 @@ export class WindowManager {
         window.element.style.display = '';
         window.element.classList.add('restoring');
         window.element.style.transform = '';
+        window.element.style.left = window.originalPosition.left;
+        window.element.style.top = window.originalPosition.top;
+        window.element.style.width = window.originalPosition.width;
+        window.element.style.height = window.originalPosition.height;
         setTimeout(() => {
             window.element.classList.remove('restoring');
         }, 300);
@@ -715,28 +785,23 @@ export class WindowManager {
             height: window.element.style.height
         };
 
-        // Use config values for proper maximize dimensions
-        const maxWidth = CONFIG.WINDOW.MAXIMIZED_WIDTH || '90%';
-        const maxHeight = CONFIG.WINDOW.MAXIMIZED_HEIGHT || '90%';
-        const margin = CONFIG.WINDOW.MAXIMIZED_MARGIN || '5%';
-
         window.element.classList.add('maximizing');
         window.element.classList.add('maximized');
-        
-        // Center the window with proper margins
-        window.element.style.left = margin;
-        window.element.style.top = margin;
-        window.element.style.width = maxWidth;
-        window.element.style.height = maxHeight;
-        
+
+        // Fill the desktop exactly
+        window.element.style.left = '0px';
+        window.element.style.top = '0px';
+        window.element.style.width = '100vw';
+        window.element.style.height = '100vh';
+
         setTimeout(() => {
             window.element.classList.remove('maximizing');
         }, 300);
-        
+
         console.log('🔍 Window maximized:', { 
             id: window.id, 
-            width: maxWidth, 
-            height: maxHeight
+            width: '100vw', 
+            height: '100vh'
         });
     }
 

@@ -12,6 +12,9 @@ import { BootSystem } from './core/boot.js';
 import { CONFIG, createAppButton } from './config.js';
 import { debounce } from './utils/utils.js';
 
+// Import mobile utilities
+import './utils/mobile.js';
+
 // Import screensaver
 import './core/screensaver.js';
 
@@ -109,6 +112,57 @@ function initializeUI() {
     // Desktop is now ready but hidden until boot completes
 }
 
+// --- DESKTOP ICON STATE MANAGEMENT ---
+function resetDesktopIconState(icon) {
+    // Remove any inline styles that might interfere with CSS
+    icon.style.removeProperty('border-color');
+    icon.style.removeProperty('box-shadow');
+    icon.style.removeProperty('background');
+    icon.style.removeProperty('transform');
+    icon.style.setProperty('background', '', 'important');
+    icon.style.setProperty('box-shadow', '', 'important');
+    icon.style.setProperty('border-color', '', 'important');
+    icon.style.setProperty('transform', '', 'important');
+    
+    // Also reset any glass-reflection child
+    const reflection = icon.querySelector('.glass-reflection');
+    if (reflection) {
+        reflection.style.removeProperty('transform');
+    }
+    
+    const label = icon.querySelector('.label');
+    if (label) {
+        label.style.removeProperty('opacity');
+        label.style.removeProperty('transform');
+        label.style.removeProperty('color');
+    }
+    
+    const iconEl = icon.querySelector('.icon');
+    if (iconEl) {
+        iconEl.style.removeProperty('color');
+    }
+}
+
+/**
+ * Refreshes desktop icon event handlers after dynamic creation
+ */
+function refreshDesktopIconHandlers() {
+    const icons = document.querySelectorAll('.desktop-icon');
+    icons.forEach(icon => {
+        // Remove any existing handlers to prevent duplicates
+        icon.removeEventListener('mouseleave', resetDesktopIconState);
+        icon.removeEventListener('blur', resetDesktopIconState);
+        icon.removeEventListener('mouseenter', resetDesktopIconState);
+        
+        // Re-attach handlers
+        icon.addEventListener('mouseleave', () => resetDesktopIconState(icon));
+        icon.addEventListener('blur', () => resetDesktopIconState(icon));
+        icon.addEventListener('mouseenter', () => {
+            setTimeout(() => resetDesktopIconState(icon), 10);
+        });
+    });
+}
+
 // --- EVENT LISTENERS ---
 
 
@@ -136,7 +190,12 @@ async function handleAppClick(appId) {
         // If window already open, focus it and do not re-initialize
         let winElem = document.getElementById(windowConfig.id);
         if (winElem) {
-            windowManager.focusWindow(windowManager.windows.get(windowConfig.id));
+            // Check if window is minimized and restore it
+            const windowObj = windowManager.windows.get(windowConfig.id);
+            if (windowObj && windowObj.isMinimized) {
+                windowManager.restoreWindow(windowObj);
+            }
+            windowManager.focusWindow(windowObj);
             return;
         }
         
@@ -310,8 +369,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Initialize core systems
         bootSystem = BootSystem.getInstance();
         
+        // Ensure window manager is properly initialized
+        if (windowManager) {
+            windowManager.setupEventListeners();
+        }
+        
         // Initialize UI after DOM is ready
         initializeUI();
+        
+        // Refresh desktop icon handlers after initialization
+        refreshDesktopIconHandlers();
         
         // Fallback: If boot system doesn't start within 3 seconds, force it
         setTimeout(() => {
@@ -371,7 +438,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             const widget = document.createElement('div');
             widget.id = 'neuosWidget';
-            widget.className = 'neuos-widget';
+            widget.className = 'neuos-widget glass-interactive';
+            widget.setAttribute('tabindex', '0');
+            widget.setAttribute('role', 'button');
+            widget.setAttribute('aria-label', 'neuOS desktop widget - click to interact');
             widget.innerHTML = `
                 <div style="display: flex; align-items: center; justify-content: center; height: 100%; width: 100%;">
                     <span class="neuos-glass-title" style="font-size: 1.8rem; margin: 0; text-align: center;">neuOS</span>
@@ -381,49 +451,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Add to body
             document.body.appendChild(widget);
             
-            // Simple drag implementation
-            let isDragging = false;
-            let startX = 0, startY = 0;
-            let currentLeft = 0, currentTop = 0;
-
-            widget.addEventListener('mousedown', function(e) {
-                isDragging = true;
-                startX = e.clientX;
-                startY = e.clientY;
-                
-                // Get current position
-                const rect = widget.getBoundingClientRect();
-                currentLeft = rect.left;
-                currentTop = rect.top;
-                
-                // Remove transform and set absolute positioning
-                widget.style.transform = 'none';
-                widget.style.left = currentLeft + 'px';
-                widget.style.top = currentTop + 'px';
-                
-                widget.style.cursor = 'grabbing';
-                e.preventDefault();
-            });
-
-            document.addEventListener('mousemove', function(e) {
-                if (!isDragging) return;
-                
-                const deltaX = e.clientX - startX;
-                const deltaY = e.clientY - startY;
-                
-                const newLeft = currentLeft + deltaX;
-                const newTop = currentTop + deltaY;
-                
-                widget.style.left = newLeft + 'px';
-                widget.style.top = newTop + 'px';
-            });
-
-            document.addEventListener('mouseup', function() {
-                if (isDragging) {
-                    isDragging = false;
-                    widget.style.cursor = 'grab';
-                }
-            });
+            // Let the DraggableSystem handle the dragging
+            // The widget will be automatically picked up by the draggable system
         }
 
         // Show widget only after login completion
@@ -431,6 +460,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             const loginScreen = document.getElementById('loginScreen');
             if (loginScreen && loginScreen.style.display === 'none' && !document.getElementById('neuosWidget')) {
                 addNeuOSWidget();
+                // Refresh desktop icon handlers after login
+                refreshDesktopIconHandlers();
+                // Refresh draggable system to ensure all widgets are draggable
+                if (window.draggableSystem) {
+                    window.draggableSystem.refresh();
+                    // Specifically refresh neuOS widget to ensure it's draggable
+                    setTimeout(() => {
+                        window.draggableSystem.refreshNeuOSWidget();
+                    }, 100);
+                }
+                // Also refresh glass effects for the new widget
+                if (window.glassMorphismSystem) {
+                    window.glassMorphismSystem.enhanceAllGlassElements();
+                }
                 loginObserver.disconnect();
             }
         });

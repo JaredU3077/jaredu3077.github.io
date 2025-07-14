@@ -312,9 +312,7 @@
 
 /* Hover Device Optimizations */
 @media (hover: hover) and (pointer: fine) {
-    .desktop-icon:hover {
-        transform: scale(1.05);
-    }
+    /* Desktop icon hover effects are now handled in _desktop.css to prevent conflicts */
     
     .window-control:hover {
         transform: scale(1.1);

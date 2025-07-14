@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desktop Icon Hover Test</title>
+    <link rel="stylesheet" href="_variables.css">
+    <link rel="stylesheet" href="_desktop.css">
+    <link rel="stylesheet" href="theme.css">
+    <style>
+        body {
+            background: #181f2a;
+            color: #eaf1fb;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .test-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .test-section {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #4a90e2;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Desktop Icon Hover Test</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: Basic Desktop Icons</h2>
+        <div class="test-container">
+            <div class="desktop-icon" data-app="test1">
+                <div class="icon">🖥️</div>
+                <div class="label">Test App 1</div>
+            </div>
+            <div class="desktop-icon" data-app="test2">
+                <div class="icon">📁</div>
+                <div class="label">Test App 2</div>
+            </div>
+            <div class="desktop-icon" data-app="test3">
+                <div class="icon">⚙️</div>
+                <div class="label">Test App 3</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 2: Multiple Hover Cycles</h2>
+        <p>Hover over these icons multiple times to test for stuck states:</p>
+        <div class="test-container">
+            <div class="desktop-icon" data-app="cycle1">
+                <div class="icon">🔄</div>
+                <div class="label">Cycle Test 1</div>
+            </div>
+            <div class="desktop-icon" data-app="cycle2">
+                <div class="icon">🔄</div>
+                <div class="label">Cycle Test 2</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 3: Focus States</h2>
+        <p>Use Tab key to navigate and test focus states:</p>
+        <div class="test-container">
+            <div class="desktop-icon" data-app="focus1" tabindex="0">
+                <div class="icon">🎯</div>
+                <div class="label">Focus Test 1</div>
+            </div>
+            <div class="desktop-icon" data-app="focus2" tabindex="0">
+                <div class="icon">🎯</div>
+                <div class="label">Focus Test 2</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Test the reset functionality
+        function testResetFunctionality() {
+            const icons = document.querySelectorAll('.desktop-icon');
+            icons.forEach(icon => {
+                icon.addEventListener('mouseleave', () => {
+                    console.log('Mouse left:', icon.dataset.app);
+                    // Remove any inline styles
+                    icon.style.removeProperty('border-color');
+                    icon.style.removeProperty('box-shadow');
+                    icon.style.removeProperty('background');
+                    icon.style.removeProperty('transform');
+                    
+                    const label = icon.querySelector('.label');
+                    if (label) {
+                        label.style.removeProperty('opacity');
+                        label.style.removeProperty('transform');
+                        label.style.removeProperty('color');
+                    }
+                    
+                    const iconEl = icon.querySelector('.icon');
+                    if (iconEl) {
+                        iconEl.style.removeProperty('color');
+                    }
+                });
+                
+                icon.addEventListener('mouseenter', () => {
+                    console.log('Mouse entered:', icon.dataset.app);
+                    // Small delay to ensure CSS takes over properly
+                    setTimeout(() => {
+                        icon.style.removeProperty('border-color');
+                        icon.style.removeProperty('box-shadow');
+                        icon.style.removeProperty('background');
+                        icon.style.removeProperty('transform');
+                    }, 10);
+                });
+            });
+        }
+        
+        // Initialize test when DOM is ready
+        document.addEventListener('DOMContentLoaded', testResetFunctionality);
+    </script>
+</body>
+</html> 

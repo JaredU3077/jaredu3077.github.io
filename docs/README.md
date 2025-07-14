@@ -39,8 +39,8 @@ neuOS is a sophisticated web-based operating system simulator featuring:
 - **Accessibility**: WCAG 2.1 compliant
 
 ### Applications
-- **Terminal**: Command-line interface with network simulation
-- **Codex**: Knowledge base with search functionality
+- **Terminal**: Enhanced command-line interface with network simulation
+- **Codex**: Knowledge base with real-time search functionality
 - **Demoscene**: Secret platform with WebGL graphics and audio synthesis
 
 ### Technical Highlights
@@ -81,6 +81,20 @@ jaredu3077.github.io/
 
 ## 🎮 Key Features
 
+### Enhanced Window Management
+- **Improved Dragging**: Smooth window movement with interact.js integration
+- **Smart Resizing**: Multi-directional resize handles with snap-to-grid
+- **Focus Management**: Proper window stacking and focus handling
+- **Performance Optimized**: Hardware-accelerated window operations
+- **Accessibility**: Full keyboard navigation and screen reader support
+
+### Advanced Application System
+- **Terminal Enhancements**: Better command parsing, history management, and tab completion
+- **Codex Improvements**: Real-time search with fuzzy matching and layer navigation
+- **Performance Monitoring**: Built-in performance tracking and optimization
+- **Error Handling**: Graceful error handling with user-friendly messages
+- **Auto-scroll**: Smart content scrolling for dynamic applications
+
 ### Solar System Background
 - **8 Rotating Rings**: Concentric circles with varying opacity
 - **Orbiting Elements**: Dynamic orbs that rotate around the center
@@ -94,11 +108,11 @@ jaredu3077.github.io/
 - **Consistent Radius**: 50% border-radius throughout interface
 
 ### Interactive Terminal
-- Network simulation commands
-- System control functions
-- Particle system control
-- Audio system management
-- Demoscene access
+- Enhanced network simulation commands
+- Improved system control functions
+- Better particle system control
+- Advanced audio system management
+- Demoscene access with performance monitoring
 
 ### Enhanced Particle System
 - Multiple modes (rain, storm, calm, dance, normal)
@@ -107,13 +121,13 @@ jaredu3077.github.io/
 - Performance optimized with reduced motion support
 
 ### Audio System
-- Mechvibes typing sounds
-- Background music with controls
+- Mechvibes typing sounds with improved integration
+- Background music with enhanced controls
 - Real-time audio synthesis
 - Volume controls with visual indicators
 
 ### Glass Morphism
-- Backdrop blur effects
+- Backdrop blur effects with better performance
 - Dynamic glass properties
 - Cross-browser compatibility
 - Performance optimized with hardware acceleration
@@ -246,24 +260,4 @@ We welcome contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for de
 1. Check this documentation
 2. Review browser console for errors
 3. Search existing GitHub issues
-4. Create a new issue with detailed information
-
-### Reporting Issues
-Include:
-- Browser and version
-- Operating system
-- Steps to reproduce
-- Console errors
-- Screenshots if applicable
-
-## 📄 License
-
-This project is open source and available under the MIT License.
-
-## 🙏 Acknowledgments
-
-- **Mechvibes**: For the typing sound system
-- **Interact.js**: For drag and drop functionality
-- **Font Awesome**: For icons
-- **WebGL Community**: For graphics inspiration
-- **Apple Design**: For glass morphism inspiration 
+4. Create a new issue with detailed information 

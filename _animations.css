@@ -304,6 +304,16 @@
     100% { transform: rotate(360deg); }
 }
 
+/* Solar Orbit Animation */
+@keyframes solarOrbit {
+    0% { 
+        transform: translate(-50%, -50%) rotate(0deg) translateX(var(--orbit-radius)) rotate(0deg); 
+    }
+    100% { 
+        transform: translate(-50%, -50%) rotate(360deg) translateX(var(--orbit-radius)) rotate(-360deg); 
+    }
+}
+
 /* Scan Line Animation */
 @keyframes scanMove {
     0% { transform: translateY(-100%); }

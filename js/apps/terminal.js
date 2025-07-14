@@ -55,6 +55,11 @@ export class Terminal {
         this.inputElement.addEventListener('keydown', (e) => this.handleKeyDown(e), { capture: true });
         this.inputElement.addEventListener('input', () => this.handleInput(), { passive: true });
         window.addEventListener('resize', () => this.handleResize(), { passive: true });
+        
+        // Mobile-specific event handlers
+        if (window.innerWidth <= 768) {
+            this.setupMobileEventListeners();
+        }
     }
 
     /**
@@ -127,6 +132,85 @@ export class Terminal {
      */
     handleResize() {
         this.scrollToBottom();
+    }
+
+    /**
+     * Sets up mobile-specific event listeners.
+     * @private
+     * @memberof Terminal
+     */
+    setupMobileEventListeners() {
+        // Mobile touch input handling
+        this.inputElement.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: true });
+        this.inputElement.addEventListener('touchend', (e) => this.handleTouchEnd(e), { passive: true });
+        
+        // Mobile keyboard handling
+        this.inputElement.addEventListener('focus', () => this.handleMobileFocus(), { passive: true });
+        this.inputElement.addEventListener('blur', () => this.handleMobileBlur(), { passive: true });
+        
+        // Mobile input optimization
+        this.inputElement.addEventListener('input', (e) => this.handleMobileInput(e), { passive: true });
+    }
+
+    /**
+     * Handles mobile touch start events.
+     * @param {TouchEvent} e - The touch event.
+     * @private
+     * @memberof Terminal
+     */
+    handleTouchStart(e) {
+        // Prevent zoom on double tap
+        e.preventDefault();
+    }
+
+    /**
+     * Handles mobile touch end events.
+     * @param {TouchEvent} e - The touch event.
+     * @private
+     * @memberof Terminal
+     */
+    handleTouchEnd(e) {
+        // Handle touch feedback
+        this.inputElement.style.transform = 'scale(0.98)';
+        setTimeout(() => {
+            this.inputElement.style.transform = '';
+        }, 100);
+    }
+
+    /**
+     * Handles mobile focus events.
+     * @private
+     * @memberof Terminal
+     */
+    handleMobileFocus() {
+        // Ensure input is visible on mobile
+        setTimeout(() => {
+            this.inputElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 300);
+    }
+
+    /**
+     * Handles mobile blur events.
+     * @private
+     * @memberof Terminal
+     */
+    handleMobileBlur() {
+        // Reset any mobile-specific styles
+        this.inputElement.style.transform = '';
+    }
+
+    /**
+     * Handles mobile input events.
+     * @param {InputEvent} e - The input event.
+     * @private
+     * @memberof Terminal
+     */
+    handleMobileInput(e) {
+        // Optimize input for mobile keyboards
+        if (e.inputType === 'insertText') {
+            // Handle mobile-specific input behavior
+            this.currentInput = this.inputElement.value;
+        }
     }
 
     /**

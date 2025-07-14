@@ -1,0 +1,365 @@
+/* neuOS Mobile Optimizations */
+
+/* Mobile Detection */
+@media (max-width: 768px) {
+    /* Critical Mobile Window Management */
+    .window {
+        min-width: 100% !important;
+        min-height: 100% !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
+        width: 100% !important;
+        height: 100% !important;
+        top: 0 !important;
+        left: 0 !important;
+        border-radius: 0 !important;
+        position: fixed !important;
+        z-index: 1000 !important;
+    }
+    
+    /* Mobile Window Controls */
+    .window-control {
+        min-width: 44px !important;
+        min-height: 44px !important;
+        padding: 12px !important;
+        font-size: 18px !important;
+    }
+    
+    .window-header {
+        min-height: 60px !important;
+        padding: 12px 16px !important;
+    }
+    
+    .window-title {
+        font-size: 16px !important;
+        line-height: 1.4 !important;
+    }
+    
+    /* Mobile Touch Targets */
+    .desktop-icon {
+        min-width: 44px !important;
+        min-height: 44px !important;
+        padding: 12px !important;
+        margin: 8px !important;
+    }
+    
+    .desktop-icon .icon {
+        font-size: 24px !important;
+        margin-bottom: 8px !important;
+    }
+    
+    .desktop-icon .label {
+        font-size: 12px !important;
+        line-height: 1.2 !important;
+    }
+    
+    /* Mobile Terminal Optimization */
+    .terminal-window {
+        min-width: 100% !important;
+        min-height: 100% !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
+    }
+    
+    .terminal-input {
+        font-size: 16px !important;
+        padding: 12px !important;
+        min-height: 44px !important;
+    }
+    
+    .terminal-output {
+        font-size: 14px !important;
+        line-height: 1.4 !important;
+        padding: 12px !important;
+    }
+    
+    /* Mobile Codex Optimization */
+    .codex-window {
+        min-width: 100% !important;
+        min-height: 100% !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
+    }
+    
+    .codex-header {
+        flex-direction: column !important;
+        gap: 12px !important;
+        padding: 16px !important;
+    }
+    
+    .search-container {
+        width: 100% !important;
+    }
+    
+    .search-input {
+        font-size: 16px !important;
+        padding: 12px !important;
+        min-height: 44px !important;
+    }
+    
+    .layer-navigation {
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+    }
+    
+    .layer-btn {
+        min-width: 44px !important;
+        min-height: 44px !important;
+        padding: 8px 12px !important;
+        font-size: 14px !important;
+    }
+    
+    .codex-content {
+        padding: 16px !important;
+        font-size: 14px !important;
+        line-height: 1.5 !important;
+    }
+    
+    /* Mobile Audio Controls */
+    .audio-controls {
+        bottom: 20px !important;
+        right: 20px !important;
+    }
+    
+    .audio-toggle {
+        min-width: 44px !important;
+        min-height: 44px !important;
+        padding: 12px !important;
+        font-size: 18px !important;
+    }
+    
+    /* Mobile Login Screen */
+    .login-container {
+        width: 90% !important;
+        max-width: 400px !important;
+        padding: 24px !important;
+    }
+    
+    .login-btn {
+        min-width: 200px !important;
+        min-height: 44px !important;
+        padding: 16px 24px !important;
+        font-size: 16px !important;
+    }
+    
+    /* Mobile Boot Sequence */
+    .boot-container {
+        width: 90% !important;
+        max-width: 400px !important;
+        padding: 24px !important;
+    }
+    
+    /* Mobile Performance Optimizations */
+    .particle-container {
+        display: none !important;
+    }
+    
+    .network-particles,
+    .data-packet {
+        display: none !important;
+    }
+    
+    .enhanced-particle {
+        display: none !important;
+    }
+    
+    /* Mobile Background Simplification */
+    .desktop::before {
+        opacity: 0.2 !important;
+        animation: none !important;
+    }
+    
+    /* Mobile Spacing */
+    #desktop-icons {
+        top: 16px !important;
+        left: 16px !important;
+        gap: 16px !important;
+        padding: 16px !important;
+    }
+}
+
+/* Small Mobile (480px and down) */
+@media (max-width: 480px) {
+    .desktop-icon {
+        width: 60px !important;
+        height: 60px !important;
+        padding: 8px !important;
+    }
+    
+    .desktop-icon .icon {
+        font-size: 20px !important;
+    }
+    
+    .desktop-icon .label {
+        font-size: 10px !important;
+    }
+    
+    .window-header {
+        min-height: 50px !important;
+        padding: 8px 12px !important;
+    }
+    
+    .window-title {
+        font-size: 14px !important;
+    }
+    
+    .terminal-input,
+    .search-input {
+        font-size: 14px !important;
+        padding: 8px !important;
+    }
+    
+    .codex-content {
+        padding: 12px !important;
+        font-size: 12px !important;
+    }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+    /* Remove hover effects on touch devices */
+    .desktop-icon:hover,
+    .window-control:hover,
+    .login-btn:hover,
+    .nav-btn:hover,
+    .search-input:hover {
+        transform: none !important;
+        box-shadow: none !important;
+    }
+    
+    /* Add touch feedback */
+    .desktop-icon:active,
+    .window-control:active,
+    .login-btn:active,
+    .nav-btn:active {
+        transform: scale(0.95) !important;
+        transition: transform 0.1s ease !important;
+    }
+    
+    /* Increase touch targets */
+    .window-control {
+        min-width: 44px !important;
+        min-height: 44px !important;
+    }
+    
+    .desktop-icon {
+        min-width: 44px !important;
+        min-height: 44px !important;
+    }
+    
+    .login-btn {
+        min-width: 200px !important;
+        min-height: 44px !important;
+    }
+    
+    .search-input {
+        min-height: 44px !important;
+    }
+}
+
+/* Mobile Orientation Handling */
+@media (orientation: landscape) and (max-height: 500px) {
+    #desktop-icons {
+        top: 8px !important;
+        left: 8px !important;
+        gap: 8px !important;
+        padding: 8px !important;
+    }
+    
+    .desktop-icon {
+        width: 50px !important;
+        height: 50px !important;
+        padding: 6px !important;
+    }
+    
+    .desktop-icon .icon {
+        font-size: 16px !important;
+        margin-bottom: 4px !important;
+    }
+    
+    .desktop-icon .label {
+        font-size: 8px !important;
+    }
+}
+
+/* Mobile Accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .window,
+    .desktop-icon,
+    .login-btn,
+    .audio-toggle {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* High Contrast Mode for Mobile */
+@media (prefers-contrast: high) {
+    .window {
+        border: 2px solid #ffffff !important;
+        background: #000000 !important;
+        color: #ffffff !important;
+    }
+    
+    .desktop-icon {
+        border: 2px solid #ffffff !important;
+        background: #000000 !important;
+        color: #ffffff !important;
+    }
+    
+    .window-control {
+        background: #ffffff !important;
+        color: #000000 !important;
+        border: 2px solid #ffffff !important;
+    }
+}
+
+/* Mobile Focus States */
+@media (max-width: 768px) {
+    .desktop-icon:focus,
+    .window-control:focus,
+    .login-btn:focus,
+    .search-input:focus {
+        outline: 2px solid #6366f1 !important;
+        outline-offset: 2px !important;
+    }
+    
+    /* Improve focus visibility */
+    .desktop-icon:focus-visible,
+    .window-control:focus-visible,
+    .login-btn:focus-visible,
+    .search-input:focus-visible {
+        outline: 2px solid #6366f1 !important;
+        outline-offset: 2px !important;
+    }
+}
+
+/* Mobile Loading States */
+@media (max-width: 768px) {
+    .loading-spinner {
+        width: 40px !important;
+        height: 40px !important;
+    }
+    
+    .loading-text {
+        font-size: 14px !important;
+    }
+}
+
+/* Mobile Error States */
+@media (max-width: 768px) {
+    .error-message {
+        font-size: 14px !important;
+        padding: 12px !important;
+        margin: 8px !important;
+    }
+}
+
+/* Mobile Success States */
+@media (max-width: 768px) {
+    .success-message {
+        font-size: 14px !important;
+        padding: 12px !important;
+        margin: 8px !important;
+    }
+} 

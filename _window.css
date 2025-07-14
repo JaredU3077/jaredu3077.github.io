@@ -1,11 +1,11 @@
-/* Window and Window Header Styles - Enhanced Glass Morphism */
+/* Window and Window Header Styles - Theme 5 Ultra Transparent Glass */
 .window {
     position: absolute;
     background: rgba(255, 255, 255, 0.001) !important;
     backdrop-filter: blur(8px) saturate(140%) brightness(110%) !important;
     -webkit-backdrop-filter: blur(8px) saturate(140%) brightness(110%) !important;
     color: var(--text-color);
-    border-radius: 18px;
+    border-radius: 12px !important;
     box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.08), 0 0 8px rgba(255, 255, 255, 0.05) !important;
     min-width: 340px;
     min-height: 220px;
@@ -13,7 +13,7 @@
     /* Remove transition during drag for better performance */
     transition: none;
     overflow: hidden;
-    z-index: var(--z-modal);
+    z-index: 1000;
     display: flex;
     flex-direction: column;
     /* Optimize for dragging performance */
@@ -32,47 +32,10 @@
     isolation: isolate;
 }
 
-/* Enhanced Glass Reflection for Windows */
-.window::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, transparent 40%, rgba(255, 255, 255, 0.05) 60%, transparent 100%);
-    opacity: 0.3;
-    mix-blend-mode: screen;
-    z-index: 1;
-    border-radius: inherit;
-    pointer-events: none;
-}
-
-/* Enhanced Glass Edge Glow for Windows */
-.window::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask-composite: exclude;
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    z-index: 2;
-    pointer-events: none;
-}
+/* Theme 5 Ultra Transparent - No extra glass effects */
 
 .window.focused {
-    box-shadow: 
-        0 0 0 2px var(--primary-color),
-        0px 4px 16px rgba(0, 0, 0, 0.12),
-        0 0 12px rgba(255, 255, 255, 0.08),
-        var(--shadow-glow) !important;
-    border: 1px solid var(--primary-color) !important;
-    transform: scale(1.01);
-    background: rgba(255, 255, 255, 0.002) !important;
+    background: rgba(255, 255, 255, 0.012) !important;
 }
 
 /* Optimized dragging state */
@@ -89,8 +52,23 @@
     contain: layout style;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-    /* Enhanced glass during drag */
-    box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.12), 0 0 12px rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Window minimize/maximize animations */
+.window.minimizing {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.window.restoring {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.window.maximizing {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.window.unmaximizing {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .window-header {
@@ -102,7 +80,7 @@
     backdrop-filter: blur(4px) saturate(130%) brightness(105%) !important;
     -webkit-backdrop-filter: blur(4px) saturate(130%) brightness(105%) !important;
     border-bottom: 1px solid rgba(255,255,255,0.05) !important;
-    border-radius: 18px 18px 0 0;
+    border-radius: 12px 12px 0 0 !important;
     user-select: none;
     position: relative;
     z-index: 3;
@@ -149,7 +127,8 @@
     display: flex;
     gap: 8px;
     position: relative;
-    z-index: 4;
+    z-index: 10;
+    pointer-events: auto;
 }
 
 .window-control {
@@ -161,7 +140,7 @@
     -webkit-backdrop-filter: blur(2px) saturate(130%) brightness(105%) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
     cursor: pointer;
-    transition: all var(--transition-fast);
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -169,31 +148,13 @@
     color: var(--text-color);
     user-select: none;
     position: relative;
+    z-index: 11;
+    pointer-events: auto;
     overflow: hidden;
-}
-
-/* Enhanced Glass Reflection for Window Controls */
-.window-control::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, transparent 50%);
-    opacity: 0;
-    transition: opacity var(--transition-fast);
-    border-radius: inherit;
 }
 
 .window-control:hover {
     background: var(--primary-color) !important;
-    transform: scale(1.1);
-    box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
-}
-
-.window-control:hover::before {
-    opacity: 1;
 }
 
 .window-control:active {
@@ -229,11 +190,11 @@
 }
 
 [data-scroll-container]::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.2);
     border-radius: 4px;
     transition: background var(--transition-fast);
-    backdrop-filter: blur(2px) saturate(130%) brightness(105%);
-    -webkit-backdrop-filter: blur(2px) saturate(130%) brightness(105%);
+    backdrop-filter: blur(2px) saturate(150%) brightness(110%);
+    -webkit-backdrop-filter: blur(2px) saturate(150%) brightness(110%);
 }
 
 [data-scroll-container]::-webkit-scrollbar-thumb:hover {
@@ -263,13 +224,24 @@
     padding: 20px;
 }
 
-/* Enhanced Terminal Window Glass Effects - Ultra Transparent Theme */
+/* Terminal Window - Ultra Transparent Glass */
 #terminalWindow {
     background: rgba(255, 255, 255, 0.001) !important;
     backdrop-filter: blur(8px) saturate(140%) brightness(110%) !important;
     -webkit-backdrop-filter: blur(8px) saturate(140%) brightness(110%) !important;
     border: 1px solid rgba(255,255,255,0.05) !important;
+    border-radius: 12px !important;
     box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.08), 0 0 8px rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Override general window border-radius for terminal */
+#terminalWindow.window {
+    border-radius: 12px !important;
+}
+
+/* Terminal window header border-radius */
+#terminalWindow .window-header {
+    border-radius: 12px 12px 0 0 !important;
 }
 
 #terminalWindow .window-content {
@@ -303,13 +275,24 @@
     -webkit-backdrop-filter: none !important;
 }
 
-/* Enhanced Codex Window Glass Effects - Ultra Transparent Theme */
+/* Codex Window - Ultra Transparent Glass */
 #codexWindow {
     background: rgba(255, 255, 255, 0.001) !important;
     backdrop-filter: blur(8px) saturate(140%) brightness(110%) !important;
     -webkit-backdrop-filter: blur(8px) saturate(140%) brightness(110%) !important;
     border: 1px solid rgba(255,255,255,0.05) !important;
+    border-radius: 12px !important;
     box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.08), 0 0 8px rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Override general window border-radius for codex */
+#codexWindow.window {
+    border-radius: 12px !important;
+}
+
+/* Codex window header border-radius */
+#codexWindow .window-header {
+    border-radius: 12px 12px 0 0 !important;
 }
 
 #codexWindow .window-content {
@@ -318,7 +301,7 @@
     -webkit-backdrop-filter: blur(4px) saturate(130%) brightness(105%) !important;
 }
 
-/* Terminal Output Styling */
+/* Terminal Output - Completely transparent */
 #terminalOutput {
     background: transparent !important;
     color: var(--text-color);
@@ -334,7 +317,7 @@
     -webkit-backdrop-filter: none !important;
 }
 
-/* Terminal Input Styling */
+/* Terminal Input - Completely transparent */
 #terminalInput {
     background: transparent !important;
     color: var(--text-color);

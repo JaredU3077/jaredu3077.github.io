@@ -70,7 +70,7 @@ js/
 ├── core/                     # Core system modules
 │   ├── boot.js              # Main boot orchestrator
 │   ├── bootSequence.js      # Boot animation system
-│   ├── window.js            # Window management system
+│   ├── window.js            # Enhanced window management system
 │   ├── particleSystem.js    # Particle system engine
 │   ├── audioSystem.js       # Audio management
 │   ├── backgroundMusic.js   # Background music system
@@ -86,8 +86,8 @@ js/
 │       ├── controlMixin.js
 │       └── modeMixin.js
 ├── apps/                     # Application modules
-│   ├── terminal.js          # Terminal application
-│   └── codex.js             # Knowledge base app
+│   ├── terminal.js          # Enhanced terminal application
+│   └── codex.js             # Improved knowledge base app
 └── utils/                    # Utility modules
     ├── utils.js             # General utilities
     ├── help.js              # Help system
@@ -148,17 +148,18 @@ demoscene/
   - Auto-restart functionality
   - Music toggle controls
 
-### 4. Window Management (`js/core/window.js`)
-- **Purpose**: Handles all window operations and interactions
+### 4. Enhanced Window Management (`js/core/window.js`)
+- **Purpose**: Handles all window operations and interactions with improved performance
 - **Features**:
-  - Window creation and destruction
-  - Drag and drop functionality with interact.js
-  - Resize operations
-  - Focus management
-  - Z-index management
-  - Hardware acceleration
-  - Glass morphism effects
-  - Performance optimizations for dragging
+  - **Advanced Window Creation**: Smart positioning and sizing with bounds checking
+  - **Improved Dragging**: Smooth window movement with interact.js integration
+  - **Smart Resizing**: Multi-directional resize handles with snap-to-grid functionality
+  - **Focus Management**: Proper window stacking and focus handling
+  - **Performance Optimized**: Hardware-accelerated window operations
+  - **Accessibility**: Full keyboard navigation and screen reader support
+  - **Auto-scroll**: Smart content scrolling for dynamic applications
+  - **Error Handling**: Graceful error handling with user-friendly messages
+  - **State Management**: Comprehensive window state tracking and restoration
 
 ### 5. Particle System (`js/core/particleSystem.js`)
 - **Purpose**: Creates and manages interactive particle effects
@@ -175,7 +176,7 @@ demoscene/
 ### 6. Glass Effect System (`js/core/glassEffect.js`)
 - **Purpose**: Manages glass morphism effects throughout the interface
 - **Features**:
-  - Backdrop blur effects
+  - Backdrop blur effects with better performance
   - Glass distortion filters
   - Dynamic glass properties
   - Performance optimization
@@ -194,26 +195,30 @@ demoscene/
 
 ## 🎮 Application Modules
 
-### Terminal Application (`js/apps/terminal.js`)
-- **Purpose**: Command-line interface for system interaction
+### Enhanced Terminal Application (`js/apps/terminal.js`)
+- **Purpose**: Command-line interface for system interaction with improved functionality
 - **Features**:
-  - Command parsing and execution
-  - Command history
-  - Tab completion
-  - Network simulation commands
-  - System control commands
-  - Particle system control
-  - Audio system management
-  - Demoscene access
+  - **Advanced Command Parsing**: Better command parsing and execution
+  - **Command History**: Enhanced history management with navigation
+  - **Tab Completion**: Intelligent tab completion for commands
+  - **Performance Monitoring**: Built-in performance tracking and optimization
+  - **Error Handling**: Graceful error handling with user-friendly messages
+  - **Network Simulation**: Enhanced network simulation commands
+  - **System Control**: Improved system control functions
+  - **Particle System Control**: Better particle system control
+  - **Audio System Management**: Advanced audio system management
+  - **Demoscene Access**: Demoscene access with performance monitoring
 
-### Codex Application (`js/apps/codex.js`)
-- **Purpose**: Knowledge base with search functionality
+### Enhanced Codex Application (`js/apps/codex.js`)
+- **Purpose**: Knowledge base with advanced search functionality
 - **Features**:
-  - Content search and filtering
-  - Layer-based navigation
-  - Real-time search results
-  - Responsive design
-  - Accessibility features
+  - **Real-time Search**: Dynamic search with instant results
+  - **Fuzzy Matching**: Intelligent search with typo tolerance
+  - **Layer Navigation**: Advanced layer-based navigation
+  - **Performance Optimization**: Optimized content loading and rendering
+  - **Error Handling**: Graceful error handling for content loading
+  - **Accessibility**: Enhanced accessibility features
+  - **Responsive Design**: Improved responsive design patterns
 
 ## 🎨 UI/UX Design System
 
@@ -230,7 +235,7 @@ demoscene/
 - **Performance Optimized**: Hardware-accelerated animations
 
 ### Glass Morphism Effects
-- **Backdrop Blur**: Cross-browser compatible blur effects
+- **Backdrop Blur**: Cross-browser compatible blur effects with better performance
 - **Glass Containers**: Semi-transparent with border effects
 - **Dynamic Properties**: Responsive to user interaction
 - **Performance Optimized**: Hardware acceleration enabled

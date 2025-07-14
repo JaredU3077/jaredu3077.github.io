@@ -22,13 +22,25 @@
     /* Outer shadow blur - enhanced */
     --outer-shadow-blur: 32px; /* Increased for more depth */
 
-    /* New enhanced glass variables */
-    --glass-background: rgba(255, 255, 255, 0.008); /* Much more transparent */
-    --glass-backdrop-blur: 12px; /* Increased blur */
-    --glass-saturation: 180%; /* Increased saturation */
-    --glass-brightness: 140%; /* Increased brightness */
-    --glass-reflection-opacity: 0.3; /* Enhanced reflection */
-    --glass-edge-glow: 0 0 25px rgba(255, 255, 255, 0.4); /* Enhanced edge glow */
+    /* New enhanced glass variables - Ultra Transparent Theme */
+    --glass-background: rgba(255, 255, 255, 0.001); /* Ultra transparent */
+    --glass-backdrop-blur: 8px; /* Reduced blur for subtlety */
+    --glass-saturation: 140%; /* Reduced saturation */
+    --glass-brightness: 110%; /* Reduced brightness */
+    --glass-reflection-opacity: 0.2; /* Reduced reflection */
+    --glass-edge-glow: 0 0 8px rgba(255, 255, 255, 0.05); /* Minimal edge glow */
+
+    /* Glass intensity levels - Ultra Transparent */
+    --glass-light: rgba(255, 255, 255, 0.0005);
+    --glass-medium: rgba(255, 255, 255, 0.001);
+    --glass-heavy: rgba(255, 255, 255, 0.002);
+    --glass-ultra: rgba(255, 255, 255, 0.005);
+
+    /* Glass blur levels - Ultra Transparent */
+    --glass-blur-light: 2px;
+    --glass-blur-medium: 4px;
+    --glass-blur-heavy: 8px;
+    --glass-blur-ultra: 12px;
 }
 
 /* Remove background shapes - they don't exist in test1 */
@@ -80,6 +92,23 @@
     z-index: 3;
     transform: translateZ(25px);
     border-radius: inherit;
+    pointer-events: none;
+}
+
+/* Ensure glass reflections don't interfere with window controls */
+.window .glass-reflection {
+    z-index: 1;
+    pointer-events: none;
+}
+
+.window .window-controls {
+    z-index: 10 !important;
+    pointer-events: auto !important;
+}
+
+.window .window-control {
+    z-index: 11 !important;
+    pointer-events: auto !important;
 }
 
 /* Enhanced Glass Edge Glow */
@@ -155,6 +184,108 @@
 
 .glass-interactive:hover {
     transform: scale(1.05);
+}
+
+/* Glass Utility Classes - Apply to any element */
+.glass-light {
+    background: var(--glass-light) !important;
+    backdrop-filter: blur(var(--glass-blur-light)) saturate(150%) brightness(110%) !important;
+    -webkit-backdrop-filter: blur(var(--glass-blur-light)) saturate(150%) brightness(110%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.1), 0 0 15px rgba(255, 255, 255, 0.1) !important;
+}
+
+.glass-medium {
+    background: var(--glass-medium) !important;
+    backdrop-filter: blur(var(--glass-blur-medium)) saturate(160%) brightness(120%) !important;
+    -webkit-backdrop-filter: blur(var(--glass-blur-medium)) saturate(160%) brightness(120%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.12), 0 0 20px rgba(255, 255, 255, 0.15) !important;
+}
+
+.glass-heavy {
+    background: var(--glass-heavy) !important;
+    backdrop-filter: blur(var(--glass-blur-heavy)) saturate(180%) brightness(140%) !important;
+    -webkit-backdrop-filter: blur(var(--glass-blur-heavy)) saturate(180%) brightness(140%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.15), 0 0 25px rgba(255, 255, 255, 0.2) !important;
+}
+
+.glass-ultra {
+    background: var(--glass-ultra) !important;
+    backdrop-filter: blur(var(--glass-blur-ultra)) saturate(200%) brightness(150%) !important;
+    -webkit-backdrop-filter: blur(var(--glass-blur-ultra)) saturate(200%) brightness(150%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0px 12px 40px rgba(0, 0, 0, 0.2), 0 0 30px rgba(255, 255, 255, 0.25) !important;
+}
+
+/* Glass Border Radius Utilities */
+.glass-rounded {
+    border-radius: 12px !important;
+}
+
+.glass-circular {
+    border-radius: 50% !important;
+}
+
+.glass-pill {
+    border-radius: 9999px !important;
+}
+
+/* Glass Hover Effects */
+.glass-hover {
+    transition: all 0.3s ease !important;
+}
+
+.glass-hover:hover {
+    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 0px 12px 35px rgba(0, 0, 0, 0.2), 0 0 30px rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Glass Focus Effects */
+.glass-focus:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 2px var(--primary-color), 0px 8px 32px rgba(0, 0, 0, 0.15), 0 0 25px rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Glass Animation Utilities */
+.glass-pulse {
+    animation: glassPulse 2s ease-in-out infinite !important;
+}
+
+@keyframes glassPulse {
+    0%, 100% { 
+        box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.15), 0 0 20px rgba(255, 255, 255, 0.1) !important;
+    }
+    50% { 
+        box-shadow: 0px 12px 40px rgba(0, 0, 0, 0.2), 0 0 30px rgba(255, 255, 255, 0.2) !important;
+    }
+}
+
+.glass-breathe {
+    animation: glassBreathe 3s ease-in-out infinite !important;
+}
+
+@keyframes glassBreathe {
+    0%, 100% { 
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    50% { 
+        transform: scale(1.02);
+        opacity: 1;
+    }
+}
+
+/* Glass Text Effects */
+.glass-text {
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5) !important;
+    color: var(--text-color) !important;
+}
+
+.glass-text-glow {
+    text-shadow: 0 0 30px rgba(99, 102, 241, 0.8) !important;
+    color: var(--primary-color) !important;
 }
 
 /* Responsive Design */
@@ -285,6 +416,7 @@
 /* Enhanced neuOS Widget */
 .neuos-widget {
     position: absolute !important;
+    /* Initial centered position - will be overridden by dragging system */
     left: 50% !important;
     top: 50% !important;
     transform: translate(-50%, -50%) !important;
@@ -313,11 +445,10 @@
     align-items: center !important;
 }
 
-.neuos-widget:hover {
-    transform: translate(-50%, -50%) scale(1.05) !important;
-    box-shadow: 0px 12px 35px rgba(0, 0, 0, 0.25), var(--glass-edge-glow) !important;
+/* When widget is being dragged, allow positioning override */
+.neuos-widget[style*="left:"] {
+    transform: none !important;
 }
 
-.neuos-widget:active {
-    transform: translate(-50%, -50%) scale(0.95) !important;
-} 
+/* Removed hover and active effects to prevent interference with dragging */
+/* Hover effects are now handled by JavaScript only */ 

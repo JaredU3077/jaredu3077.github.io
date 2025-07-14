@@ -230,7 +230,7 @@
     opacity: 1;
 }
 
-/* Audio Controls - Transparent neuOS Theme */
+/* Audio Controls - neuOS Glass Theme */
 .audio-controls {
     position: fixed;
     top: 20px;
@@ -241,36 +241,71 @@
 }
 
 .audio-toggle {
-    background: transparent !important;
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 12px;
-    padding: 12px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--glass-background);
+    backdrop-filter: blur(var(--glass-backdrop-blur)) 
+                    saturate(var(--glass-saturation)) 
+                    brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) 
+                             saturate(var(--glass-saturation)) 
+                             brightness(var(--glass-brightness));
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
     cursor: pointer;
-    transition: all var(--transition);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     color: var(--primary-color);
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.audio-toggle::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.05) 50%,
+        transparent 100%
+    );
+    pointer-events: none;
+    z-index: 1;
 }
 
 .audio-toggle:hover {
-    border: 1px solid var(--primary-color);
-    color: var(--primary-color);
     transform: scale(1.05);
+    box-shadow: 0px 12px 35px rgba(0, 0, 0, 0.25), var(--glass-edge-glow);
+    border-color: var(--primary-color);
 }
 
 .audio-toggle:active {
     transform: scale(0.95);
+    box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.audio-toggle:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
 }
 
 .audio-toggle .audio-on,
 .audio-toggle .audio-off {
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     stroke: currentColor;
     stroke-width: 2;
     fill: none;
-    transition: all var(--transition-fast);
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 2;
 }
 
 .audio-toggle:hover .audio-on,

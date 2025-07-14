@@ -9,6 +9,8 @@ export class GlassMorphismSystem {
         this.interactiveElements = new Map();
         this.animationFrames = new Map();
         this.mousePosition = { x: 0, y: 0 };
+        this.glassElements = new Set();
+        this.focusedElement = null; // Track currently focused element
         this.init();
     }
 
@@ -27,18 +29,21 @@ export class GlassMorphismSystem {
 
     setup() {
         this.setupInteractiveElements();
-        this.setupMouseTracking();
+        this.setupFocusedMouseTracking(); // Changed from setupMouseTracking
         this.setupBreathingAnimations();
         this.setupGlassDistortion();
         this.setupDynamicGlassParameters();
         this.setupEnhancedReflections();
+        this.setupMutationObserver();
+        this.enhanceExistingElements();
     }
 
     /**
      * Setup interactive 3D tilt effects for glass containers from test1
      */
     setupInteractiveElements() {
-        const glassContainers = document.querySelectorAll('.glass-container, .boot-container, .login-container, .neuos-glass-box, .neuos-widget');
+        // Apply tilting to desktop icons and glass containers, but NOT to application windows
+        const glassContainers = document.querySelectorAll('.glass-container, .boot-container, .login-container, .neuos-glass-box, .neuos-widget, .desktop-icon');
         
         glassContainers.forEach(container => {
             this.makeInteractive(container);
@@ -75,30 +80,44 @@ export class GlassMorphismSystem {
             element.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
         };
 
+        // Add focus/blur handlers for mouse tracking
+        const handleMouseEnter = () => {
+            this.focusedElement = element;
+            this.updateGlassReflection();
+        };
+
         const handleMouseLeave = () => {
-            element.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
+            if (this.focusedElement === element) {
+                this.focusedElement = null;
+            }
+            // Remove inline transform so CSS can take over
+            element.style.removeProperty('transform');
         };
 
         element.addEventListener('mousemove', handleMouseMove);
+        element.addEventListener('mouseenter', handleMouseEnter);
         element.addEventListener('mouseleave', handleMouseLeave);
         
         // Store references for cleanup
         this.interactiveElements.set(element, {
             mousemove: handleMouseMove,
+            mouseenter: handleMouseEnter,
             mouseleave: handleMouseLeave
         });
     }
 
     /**
-     * Setup global mouse tracking for advanced effects from test1
+     * Setup focused mouse tracking - only update effects when element is focused
      */
-    setupMouseTracking() {
+    setupFocusedMouseTracking() {
         document.addEventListener('mousemove', (e) => {
             this.mousePosition.x = e.clientX;
             this.mousePosition.y = e.clientY;
             
-            // Update glass reflection based on mouse position
-            this.updateGlassReflection();
+            // Only update glass reflection if an element is focused
+            if (this.focusedElement) {
+                this.updateGlassReflection();
+            }
         });
     }
 
@@ -106,7 +125,10 @@ export class GlassMorphismSystem {
      * Update glass reflection based on mouse position from test1
      */
     updateGlassReflection() {
-        const reflections = document.querySelectorAll('.glass-reflection');
+        // Only update reflections for the focused element
+        if (!this.focusedElement) return;
+        
+        const reflections = this.focusedElement.querySelectorAll('.glass-reflection');
         const windowWidth = window.innerWidth;
         const windowHeight = window.innerHeight;
         
@@ -122,7 +144,7 @@ export class GlassMorphismSystem {
      * Setup breathing animations for titles from test1
      */
     setupBreathingAnimations() {
-        const titles = document.querySelectorAll('.glass-title, .boot-title, .login-title, .breathing-title');
+        const titles = document.querySelectorAll('.glass-title, .boot-title, .login-title');
         
         titles.forEach(title => {
             if (!title.classList.contains('glass-title') && !title.classList.contains('breathing-title')) {
@@ -158,19 +180,14 @@ export class GlassMorphismSystem {
      * Setup dynamic glass parameters from test1
      */
     setupDynamicGlassParameters() {
-        // Set enhanced glass parameters for better transparency and shine
+        // Set Theme 5 ultra-transparent glass parameters
         const updateGlassParameters = () => {
-            document.documentElement.style.setProperty('--shadow-blur', '12px');
-            document.documentElement.style.setProperty('--shadow-spread', '-3px');
-            document.documentElement.style.setProperty('--shadow-color', 'rgba(255, 255, 255, 0.8)');
-            document.documentElement.style.setProperty('--tint-opacity', '0.015');
-            document.documentElement.style.setProperty('--frost-blur', '4px');
-            document.documentElement.style.setProperty('--glass-background', 'rgba(255, 255, 255, 0.008)');
-            document.documentElement.style.setProperty('--glass-backdrop-blur', '12px');
-            document.documentElement.style.setProperty('--glass-saturation', '180%');
-            document.documentElement.style.setProperty('--glass-brightness', '140%');
-            document.documentElement.style.setProperty('--glass-reflection-opacity', '0.3');
-            document.documentElement.style.setProperty('--glass-edge-glow', '0 0 25px rgba(255, 255, 255, 0.4)');
+            document.documentElement.style.setProperty('--glass-background', 'rgba(255, 255, 255, 0.001)');
+            document.documentElement.style.setProperty('--glass-backdrop-blur', '8px');
+            document.documentElement.style.setProperty('--glass-saturation', '140%');
+            document.documentElement.style.setProperty('--glass-brightness', '110%');
+            document.documentElement.style.setProperty('--glass-reflection-opacity', '0.2');
+            document.documentElement.style.setProperty('--glass-edge-glow', '0 0 8px rgba(255, 255, 255, 0.05)');
         };
 
         updateGlassParameters();
@@ -180,8 +197,8 @@ export class GlassMorphismSystem {
      * Setup enhanced reflection effects
      */
     setupEnhancedReflections() {
-        // Add reflection layers to glass elements
-        const glassElements = document.querySelectorAll('.glass-container, .neuos-glass-box, .neuos-widget, .glass-login-btn');
+        // Add reflection layers to glass elements - EXCLUDE application windows to prevent interference
+        const glassElements = document.querySelectorAll('.glass-container, .neuos-glass-box, .neuos-widget, .glass-login-btn, .desktop-icon');
         
         glassElements.forEach(element => {
             this.addReflectionLayer(element);
@@ -201,6 +218,71 @@ export class GlassMorphismSystem {
         const edge = document.createElement('div');
         edge.className = 'glass-edge';
         element.appendChild(edge);
+        
+        this.glassElements.add(element);
+    }
+
+    /**
+     * Setup mutation observer to automatically enhance new glass elements
+     */
+    setupMutationObserver() {
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === Node.ELEMENT_NODE) {
+                        this.enhanceElement(node);
+                        
+                        // Also check child elements
+                        const childElements = node.querySelectorAll ? node.querySelectorAll('*') : [];
+                        childElements.forEach(child => this.enhanceElement(child));
+                    }
+                });
+            });
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    }
+
+    /**
+     * Enhance existing elements with glass effects
+     */
+    enhanceExistingElements() {
+        const elementsToEnhance = document.querySelectorAll('.glass-container, .neuos-glass-box, .neuos-widget, .glass-login-btn, .desktop-icon, .glass-title, .boot-title, .login-title');
+        
+        elementsToEnhance.forEach(element => {
+            this.enhanceElement(element);
+        });
+    }
+
+    /**
+     * Enhance a single element with glass effects
+     */
+    enhanceElement(element) {
+        if (!element || this.glassElements.has(element)) return;
+
+        // Check if element should have glass effects - EXCLUDE application windows
+        const glassClasses = ['glass-container', 'neuos-glass-box', 'neuos-widget', 'glass-login-btn', 'desktop-icon'];
+        const hasGlassClass = glassClasses.some(className => element.classList.contains(className));
+        
+        if (hasGlassClass) {
+            this.addReflectionLayer(element);
+            
+            // Only apply interactive effects to desktop icons and glass containers, NOT application windows
+            const shouldBeInteractive = element.classList.contains('desktop-icon') || 
+                                      element.classList.contains('glass-container') || 
+                                      element.classList.contains('neuos-glass-box') || 
+                                      element.classList.contains('neuos-widget') ||
+                                      element.classList.contains('glass-login-btn');
+            
+            if (shouldBeInteractive) {
+                this.makeInteractive(element);
+            }
+            
+            this.glassElements.add(element);
+        }
     }
 
     /**
@@ -234,6 +316,7 @@ export class GlassMorphismSystem {
             this.makeInteractive(element);
         }
         
+        this.glassElements.add(element);
         return element;
     }
 
@@ -285,17 +368,42 @@ export class GlassMorphismSystem {
     }
 
     /**
+     * Apply enhanced glass effects to all matching elements
+     */
+    enhanceAllGlassElements() {
+        const selectors = [
+            '.glass-container',
+            '.neuos-glass-box', 
+            '.neuos-widget',
+            '.glass-login-btn',
+            '.desktop-icon',
+            '.glass-title',
+            '.boot-title',
+            '.login-title'
+        ];
+
+        selectors.forEach(selector => {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(element => {
+                this.enhanceElement(element);
+            });
+        });
+    }
+
+    /**
      * Cleanup and destroy the system
      */
     destroy() {
         // Remove event listeners
         this.interactiveElements.forEach((handlers, element) => {
             element.removeEventListener('mousemove', handlers.mousemove);
+            element.removeEventListener('mouseenter', handlers.mouseenter);
             element.removeEventListener('mouseleave', handlers.mouseleave);
         });
         
         this.interactiveElements.clear();
         this.animationFrames.clear();
+        this.glassElements.clear();
         
         this.isInitialized = false;
     }
