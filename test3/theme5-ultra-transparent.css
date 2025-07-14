@@ -1,0 +1,66 @@
+/* Theme 5: Ultra Transparent Glass */
+/* This theme uses extremely subtle transparent glass for a barely visible, minimal look */
+
+/* Terminal Window - Ultra Transparent Glass */
+#terminalWindow {
+    background: rgba(255, 255, 255, 0.001) !important;
+    backdrop-filter: blur(8px) saturate(140%) brightness(110%) !important;
+    -webkit-backdrop-filter: blur(8px) saturate(140%) brightness(110%) !important;
+    border: 1px solid rgba(255,255,255,0.05) !important;
+    box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.08), 0 0 8px rgba(255, 255, 255, 0.05) !important;
+}
+
+#terminalWindow .window-content {
+    background: rgba(255, 255, 255, 0.0005) !important;
+    backdrop-filter: blur(4px) saturate(130%) brightness(105%) !important;
+    -webkit-backdrop-filter: blur(4px) saturate(130%) brightness(105%) !important;
+}
+
+/* Codex Window - Ultra Transparent Glass */
+#codexWindow {
+    background: rgba(255, 255, 255, 0.001) !important;
+    backdrop-filter: blur(8px) saturate(140%) brightness(110%) !important;
+    -webkit-backdrop-filter: blur(8px) saturate(140%) brightness(110%) !important;
+    border: 1px solid rgba(255,255,255,0.05) !important;
+    box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.08), 0 0 8px rgba(255, 255, 255, 0.05) !important;
+}
+
+#codexWindow .window-content {
+    background: rgba(255, 255, 255, 0.0005) !important;
+    backdrop-filter: blur(4px) saturate(130%) brightness(105%) !important;
+    -webkit-backdrop-filter: blur(4px) saturate(130%) brightness(105%) !important;
+}
+
+/* Desktop Icons - Ultra Transparent Glass */
+.desktop-icon {
+    background: rgba(255, 255, 255, 0.001) !important;
+    backdrop-filter: blur(8px) saturate(140%) brightness(110%) !important;
+    -webkit-backdrop-filter: blur(8px) saturate(140%) brightness(110%) !important;
+    border: 1px solid rgba(255,255,255,0.05) !important;
+    box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.08), 0 0 8px rgba(255, 255, 255, 0.05) !important;
+}
+
+.desktop-icon:hover {
+    background: rgba(255, 255, 255, 0.002) !important;
+    box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.12), 0 0 12px rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Terminal Output - Completely transparent */
+#terminalOutput {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Terminal Input - Completely transparent */
+#terminalInput {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+#terminalInput input {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+} 

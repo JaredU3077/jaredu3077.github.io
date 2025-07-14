@@ -1,0 +1,66 @@
+/* Theme 6: neuOS Widget Exact Glass */
+/* This theme uses the EXACT same glass properties as the neuOS widget from _glass.css */
+
+/* Terminal Window - Exact neuOS Widget Glass */
+#terminalWindow {
+    background: var(--glass-background) !important;
+    backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+    -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0px 8px var(--outer-shadow-blur) rgba(0, 0, 0, 0.15), var(--glass-edge-glow) !important;
+}
+
+#terminalWindow .window-content {
+    background: var(--glass-background) !important;
+    backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+    -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+}
+
+/* Codex Window - Exact neuOS Widget Glass */
+#codexWindow {
+    background: var(--glass-background) !important;
+    backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+    -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0px 8px var(--outer-shadow-blur) rgba(0, 0, 0, 0.15), var(--glass-edge-glow) !important;
+}
+
+#codexWindow .window-content {
+    background: var(--glass-background) !important;
+    backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+    -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+}
+
+/* Desktop Icons - Exact neuOS Widget Glass */
+.desktop-icon {
+    background: var(--glass-background) !important;
+    backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+    -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0px 8px var(--outer-shadow-blur) rgba(0, 0, 0, 0.15), var(--glass-edge-glow) !important;
+}
+
+.desktop-icon:hover {
+    background: rgba(255, 255, 255, 0.012) !important;
+    box-shadow: 0px 12px 35px rgba(0, 0, 0, 0.25), var(--glass-edge-glow) !important;
+}
+
+/* Terminal Output - Completely transparent */
+#terminalOutput {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Terminal Input - Completely transparent */
+#terminalInput {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+#terminalInput input {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+} 
