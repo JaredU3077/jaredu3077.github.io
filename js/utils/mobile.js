@@ -16,8 +16,12 @@ class MobileUtils {
      * Detect if device is mobile
      */
     detectMobile() {
-        return window.innerWidth <= 768 || 
-               /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        // More conservative mobile detection
+        const isMobileUserAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const isSmallScreen = window.innerWidth <= 768;
+        
+        // Only consider it mobile if both conditions are met
+        return isMobileUserAgent && isSmallScreen;
     }
 
     /**
@@ -35,6 +39,11 @@ class MobileUtils {
             document.body.classList.add('mobile-device');
             document.body.classList.add('touch-device');
             console.log('Mobile device detected, applying mobile CSS classes');
+        } else {
+            // Remove mobile classes if not mobile
+            document.body.classList.remove('mobile-device');
+            document.body.classList.remove('touch-device');
+            console.log('Desktop device detected, removing mobile CSS classes');
         }
     }
 
@@ -159,7 +168,13 @@ class MobileUtils {
      * Handle mobile resize
      */
     handleMobileResize() {
+        const wasMobile = this.isMobile;
         this.isMobile = this.detectMobile();
+        
+        // Update mobile classes if detection changed
+        if (wasMobile !== this.isMobile) {
+            this.applyMobileCSS();
+        }
         
         if (this.isMobile) {
             this.optimizeForMobile();
