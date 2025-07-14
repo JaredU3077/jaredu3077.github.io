@@ -409,6 +409,25 @@ export const configManager = new ConfigManager();
 // Export CONFIG as UI_CONFIG for backward compatibility  
 export { CONFIG as UI_CONFIG };
 
+// GitHub Pages specific configuration
+const isGitHubPages = window.location.hostname.includes('github.io');
+const isLocalhost = window.location.hostname === 'localhost';
+
+// Environment-specific settings
+const ENV_CONFIG = {
+    isGitHubPages,
+    isLocalhost,
+    // Reduce features on GitHub Pages for better performance
+    maxParticles: isGitHubPages ? 50 : 100,
+    audioEnabled: isLocalhost, // Disable audio on GitHub Pages initially
+    debugMode: isLocalhost,
+    // Service worker path
+    swPath: isLocalhost ? '/sw.js' : './sw.js'
+};
+
+// Export for use in other modules
+window.ENV_CONFIG = ENV_CONFIG;
+
 /**
  * Helper function to create SVG icon
  * @param {Object} config - Icon configuration

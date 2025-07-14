@@ -365,6 +365,15 @@ function handleGlobalKeydown(e) {
 
 // --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', async () => {
+    // GitHub Pages debugging
+    console.log('neuOS: Environment check:', {
+        hostname: window.location.hostname,
+        protocol: window.location.protocol,
+        isLocalhost: window.location.hostname === 'localhost',
+        isGitHubPages: window.location.hostname.includes('github.io'),
+        userAgent: navigator.userAgent
+    });
+    
     try {
         // Initialize core systems
         bootSystem = BootSystem.getInstance();
@@ -408,6 +417,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Initialize starfield background globally
         new window.StarfieldBackground();
+        
+        // GitHub Pages specific optimizations
+        if (window.location.hostname.includes('github.io')) {
+            console.log('neuOS: Applying GitHub Pages optimizations');
+            // Disable heavy features on GitHub Pages to improve performance
+            if (window.particleSystemInstance) {
+                window.particleSystemInstance.maxParticles = 50; // Reduce particle count
+            }
+        }
         
         // Set up global event listeners with null checks
 

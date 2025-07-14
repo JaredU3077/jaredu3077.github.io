@@ -33,7 +33,7 @@
     <meta property="twitter:image" content="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'><rect width='400' height='400' fill='%23181f2a'/><circle cx='200' cy='200' r='60' fill='none' stroke='%234a90e2' stroke-width='4'/><path d='M200 140v60M200 260v60M140 200h60M260 200h60' stroke='%234a90e2' stroke-width='4'/><text x='200' y='340' text-anchor='middle' fill='%23eaf1fb' font-family='Arial' font-size='24'>neuOS</text></svg>">
     
     <!-- Security Headers -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: https://images.unsplash.com; font-src 'self' https://cdnjs.cloudflare.com; connect-src 'self';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: https://images.unsplash.com; font-src 'self' https://cdnjs.cloudflare.com; connect-src 'self' https://unpkg.com https://cdnjs.cloudflare.com;">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <!-- X-Frame-Options should be set via HTTP headers, not meta tags -->
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
@@ -159,7 +159,7 @@
     </div>
 
     <!-- Background Music -->
-    <audio id="backgroundMusic" loop>
+    <audio id="backgroundMusic" loop preload="none">
         <source src="mp3.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
@@ -198,12 +198,37 @@
     <script type="module" src="js/apps/codex.js"></script>
     <script type="module" src="js/main.js"></script>
     
+    <!-- Fallback for module loading issues -->
+    <script>
+        // Handle module loading errors
+        window.addEventListener('error', function(e) {
+            if (e.target.tagName === 'SCRIPT' && e.target.type === 'module') {
+                console.error('Module loading failed:', e.target.src, e.error);
+                // Show fallback message
+                document.body.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: center; height: 100vh; background: #181f2a; color: #eaf1fb; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px;">
+                        <div>
+                            <h1 style="color: #ff6b6b; margin-bottom: 20px;">⚠️ neuOS module error</h1>
+                            <p style="margin-bottom: 15px;">module loading failed. this may be due to github pages restrictions.</p>
+                            <p style="font-size: 0.9em; opacity: 0.8;">please check the browser console for details.</p>
+                            <button onclick="location.reload()" style="margin-top: 20px; padding: 10px 20px; background: #4a90e2; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px;">
+                                reload page
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+    </script>
+    
     <!-- Service Worker Registration -->
     <script>
         // Register service worker for PWA functionality
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
+                // Use relative path for GitHub Pages compatibility
+                const swPath = window.location.hostname === 'localhost' ? '/sw.js' : './sw.js';
+                navigator.serviceWorker.register(swPath)
                     .then((registration) => {
                         console.log('neuOS: Service Worker registered successfully:', registration);
                         
