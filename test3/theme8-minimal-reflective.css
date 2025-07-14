@@ -1,100 +1,51 @@
 /* Theme 8: Minimal Reflective Glass */
-/* This theme uses theme 3 as base with added reflection effects and minimal opacity */
+/* This theme uses the exact same glass styling as the theme switcher and test instructions panels */
 
-/* Terminal Window - Minimal Reflective Glass */
+/* Terminal Window - Theme Switcher Exact Glass */
 #terminalWindow {
-    background: rgba(255, 255, 255, 0.002) !important;
-    backdrop-filter: blur(6px) saturate(150%) brightness(120%) !important;
-    -webkit-backdrop-filter: blur(6px) saturate(150%) brightness(120%) !important;
-    border: 1px solid rgba(255,255,255,0.08) !important;
-    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1), 0 0 15px rgba(255, 255, 255, 0.1) !important;
-    position: relative !important;
-}
-
-#terminalWindow::before {
-    content: '' !important;
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, transparent 40%, rgba(255, 255, 255, 0.05) 60%, transparent 100%) !important;
-    opacity: 0.3 !important;
-    mix-blend-mode: screen !important;
-    z-index: 1 !important;
-    border-radius: inherit !important;
-    pointer-events: none !important;
+    background: var(--glass-background) !important;
+    backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+    -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 12px !important;
+    box-shadow: 0px 8px var(--outer-shadow-blur) rgba(0, 0, 0, 0.15), var(--glass-edge-glow) !important;
 }
 
 #terminalWindow .window-content {
-    background: rgba(255, 255, 255, 0.001) !important;
-    backdrop-filter: blur(3px) saturate(140%) brightness(115%) !important;
-    -webkit-backdrop-filter: blur(3px) saturate(140%) brightness(115%) !important;
-    position: relative !important;
-    z-index: 2 !important;
+    background: var(--glass-background) !important;
+    backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+    -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
 }
 
-/* Codex Window - Minimal Reflective Glass */
+/* Codex Window - Theme Switcher Exact Glass */
 #codexWindow {
-    background: rgba(255, 255, 255, 0.002) !important;
-    backdrop-filter: blur(6px) saturate(150%) brightness(120%) !important;
-    -webkit-backdrop-filter: blur(6px) saturate(150%) brightness(120%) !important;
-    border: 1px solid rgba(255,255,255,0.08) !important;
-    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1), 0 0 15px rgba(255, 255, 255, 0.1) !important;
-    position: relative !important;
-}
-
-#codexWindow::before {
-    content: '' !important;
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, transparent 40%, rgba(255, 255, 255, 0.05) 60%, transparent 100%) !important;
-    opacity: 0.3 !important;
-    mix-blend-mode: screen !important;
-    z-index: 1 !important;
-    border-radius: inherit !important;
-    pointer-events: none !important;
+    background: var(--glass-background) !important;
+    backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+    -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 12px !important;
+    box-shadow: 0px 8px var(--outer-shadow-blur) rgba(0, 0, 0, 0.15), var(--glass-edge-glow) !important;
 }
 
 #codexWindow .window-content {
-    background: rgba(255, 255, 255, 0.001) !important;
-    backdrop-filter: blur(3px) saturate(140%) brightness(115%) !important;
-    -webkit-backdrop-filter: blur(3px) saturate(140%) brightness(115%) !important;
-    position: relative !important;
-    z-index: 2 !important;
+    background: var(--glass-background) !important;
+    backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+    -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
 }
 
-/* Desktop Icons - Minimal Reflective Glass */
+/* Desktop Icons - Theme Switcher Exact Glass */
 .desktop-icon {
-    background: rgba(255, 255, 255, 0.002) !important;
-    backdrop-filter: blur(6px) saturate(150%) brightness(120%) !important;
-    -webkit-backdrop-filter: blur(6px) saturate(150%) brightness(120%) !important;
-    border: 1px solid rgba(255,255,255,0.08) !important;
-    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1), 0 0 15px rgba(255, 255, 255, 0.1) !important;
-    position: relative !important;
-}
-
-.desktop-icon::before {
-    content: '' !important;
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, transparent 40%, rgba(255, 255, 255, 0.05) 60%, transparent 100%) !important;
-    opacity: 0.3 !important;
-    mix-blend-mode: screen !important;
-    z-index: 1 !important;
-    border-radius: inherit !important;
-    pointer-events: none !important;
+    background: var(--glass-background) !important;
+    backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+    -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 12px !important;
+    box-shadow: 0px 8px var(--outer-shadow-blur) rgba(0, 0, 0, 0.15), var(--glass-edge-glow) !important;
 }
 
 .desktop-icon:hover {
-    background: rgba(255, 255, 255, 0.004) !important;
-    box-shadow: 0px 6px 25px rgba(0, 0, 0, 0.15), 0 0 20px rgba(255, 255, 255, 0.15) !important;
+    background: rgba(255, 255, 255, 0.012) !important;
+    box-shadow: 0px 12px 35px rgba(0, 0, 0, 0.25), var(--glass-edge-glow) !important;
 }
 
 /* Terminal Output - Completely transparent */

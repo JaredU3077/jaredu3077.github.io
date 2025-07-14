@@ -1,54 +1,61 @@
-/* Theme 4: Circular Widget Style Adapted for Windows */
-/* This theme mimics the circular widget style but adapted for rectangular terminal windows */
+/* Theme 4: Circular Widget Style Adapted */
+/* This theme uses the exact same glass styling as the theme switcher and test instructions panels */
 
-/* Terminal Window - Circular Widget Style Adapted */
+/* Terminal Window - Theme Switcher Exact Glass */
 #terminalWindow {
     background: var(--glass-background) !important;
     backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
     -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
     border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 12px !important;
     box-shadow: 0px 8px var(--outer-shadow-blur) rgba(0, 0, 0, 0.15), var(--glass-edge-glow) !important;
-    border-radius: 20px !important;
 }
 
 #terminalWindow .window-content {
     background: var(--glass-background) !important;
     backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
     -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
-    border-radius: 20px !important;
 }
 
-/* Codex Window - Circular Widget Style Adapted */
+/* Codex Window - Theme Switcher Exact Glass */
 #codexWindow {
     background: var(--glass-background) !important;
     backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
     -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
     border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 12px !important;
     box-shadow: 0px 8px var(--outer-shadow-blur) rgba(0, 0, 0, 0.15), var(--glass-edge-glow) !important;
-    border-radius: 20px !important;
 }
 
 #codexWindow .window-content {
     background: var(--glass-background) !important;
     backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
     -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
-    border-radius: 20px !important;
 }
 
-/* Window Header - Rounded to match */
-#terminalWindow .window-header,
-#codexWindow .window-header {
-    border-radius: 20px 20px 0 0 !important;
+/* Desktop Icons - Theme Switcher Exact Glass */
+.desktop-icon {
+    background: var(--glass-background) !important;
+    backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+    -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 12px !important;
+    box-shadow: 0px 8px var(--outer-shadow-blur) rgba(0, 0, 0, 0.15), var(--glass-edge-glow) !important;
 }
 
-/* Terminal Output - Transparent for text visibility */
+.desktop-icon:hover {
+    background: rgba(255, 255, 255, 0.012) !important;
+    box-shadow: 0px 12px 35px rgba(0, 0, 0, 0.25), var(--glass-edge-glow) !important;
+}
+
+/* Terminal Output - Completely transparent */
 #terminalOutput {
     background: transparent !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
 }
 
-/* Terminal Input - Transparent for text visibility */
+/* Terminal Input - Completely transparent */
 #terminalInput {
     background: transparent !important;
     backdrop-filter: none !important;

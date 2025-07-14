@@ -1,12 +1,13 @@
 /* Theme 6: neuOS Widget Exact Glass */
-/* This theme uses the EXACT same glass properties as the neuOS widget from _glass.css */
+/* This theme uses the exact same glass styling as the theme switcher and test instructions panels */
 
-/* Terminal Window - Exact neuOS Widget Glass */
+/* Terminal Window - Theme Switcher Exact Glass */
 #terminalWindow {
     background: var(--glass-background) !important;
     backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
     -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 12px !important;
     box-shadow: 0px 8px var(--outer-shadow-blur) rgba(0, 0, 0, 0.15), var(--glass-edge-glow) !important;
 }
 
@@ -16,12 +17,13 @@
     -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
 }
 
-/* Codex Window - Exact neuOS Widget Glass */
+/* Codex Window - Theme Switcher Exact Glass */
 #codexWindow {
     background: var(--glass-background) !important;
     backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
     -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 12px !important;
     box-shadow: 0px 8px var(--outer-shadow-blur) rgba(0, 0, 0, 0.15), var(--glass-edge-glow) !important;
 }
 
@@ -31,12 +33,13 @@
     -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
 }
 
-/* Desktop Icons - Exact neuOS Widget Glass */
+/* Desktop Icons - Theme Switcher Exact Glass */
 .desktop-icon {
     background: var(--glass-background) !important;
     backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
     -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 12px !important;
     box-shadow: 0px 8px var(--outer-shadow-blur) rgba(0, 0, 0, 0.15), var(--glass-edge-glow) !important;
 }
 
