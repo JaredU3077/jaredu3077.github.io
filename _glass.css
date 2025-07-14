@@ -1,32 +1,40 @@
-/* neuOS True test1 Glass Morphism Theme */
-/* Exact implementation of the test1 theme with proper glass effects */
+/* neuOS True test1 Glass Morphism Theme - Enhanced Transparency & Shine */
+/* Exact implementation of the test1 theme with improved glass effects */
 
 :root {
-    /* Inner shadow - from test1 */
+    /* Inner shadow - enhanced for more shine */
     --shadow-offset: 0;
-    --shadow-blur: 9px; /* Consistent with test2 */
-    --shadow-spread: -5px;
-    --shadow-color: rgba(255, 255, 255, 0.7);
+    --shadow-blur: 12px; /* Increased for more shine */
+    --shadow-spread: -3px; /* Reduced for more transparency */
+    --shadow-color: rgba(255, 255, 255, 0.8); /* Increased opacity for shine */
 
-    /* Painted glass - from test1 */
+    /* Painted glass - enhanced transparency */
     --tint-color: 255, 255, 255;
-    --tint-opacity: 0.03; /* Consistent with test2 */
+    --tint-opacity: 0.015; /* Reduced for more transparency */
 
-    /* Background frost - from test1 */
-    --frost-blur: 2px;
+    /* Background frost - enhanced blur */
+    --frost-blur: 4px; /* Increased for more glass effect */
 
-    /* SVG noise/distortion - from test1 */
-    --noise-frequency: 0.01; /* Consistent with test2 */
-    --distortion-strength: 33; /* Consistent with test2 */
+    /* SVG noise/distortion - enhanced */
+    --noise-frequency: 0.008; /* Reduced for smoother effect */
+    --distortion-strength: 25; /* Reduced for subtler effect */
 
-    /* Outer shadow blur - from test1 */
-    --outer-shadow-blur: 24px;
+    /* Outer shadow blur - enhanced */
+    --outer-shadow-blur: 32px; /* Increased for more depth */
+
+    /* New enhanced glass variables */
+    --glass-background: rgba(255, 255, 255, 0.008); /* Much more transparent */
+    --glass-backdrop-blur: 12px; /* Increased blur */
+    --glass-saturation: 180%; /* Increased saturation */
+    --glass-brightness: 140%; /* Increased brightness */
+    --glass-reflection-opacity: 0.3; /* Enhanced reflection */
+    --glass-edge-glow: 0 0 25px rgba(255, 255, 255, 0.4); /* Enhanced edge glow */
 }
 
 /* Remove background shapes - they don't exist in test1 */
 /* Remove breathing animations - they don't exist in test1 */
 
-/* True Glass Container from test1 - EXACT COPY */
+/* True Glass Container from test1 - ENHANCED TRANSPARENCY & SHINE */
 .glass-container {
     position: absolute;
     left: 50%;
@@ -38,82 +46,60 @@
     cursor: move;
     isolation: isolate;
     touch-action: none;
-    box-shadow: 0px 6px var(--outer-shadow-blur) rgba(0, 0, 0, 0.2);
+    box-shadow: 0px 8px var(--outer-shadow-blur) rgba(0, 0, 0, 0.15), var(--glass-edge-glow);
     z-index: 1000;
-    background: rgba(255,255,255,0.015) !important;
-    backdrop-filter: blur(8px) saturate(150%) brightness(120%);
-    -webkit-backdrop-filter: blur(8px) saturate(150%) brightness(120%);
+    background: var(--glass-background) !important;
+    backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness));
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border for definition */
 }
 
-/* Remove the ::before pseudo-element for .glass-container */
-
-/* Glass Text Container - simplified from test1 */
-.glass-text-container {
-    position: relative;
-    perspective: 1500px;
-    transform-style: preserve-3d;
-    will-change: transform;
-}
-
-/* Glass Title - no breathing animation */
-.glass-title {
-    font-size: 4rem;
-    font-weight: 900;
-    color: var(--primary-color);
-    margin: 0;
-    white-space: nowrap;
-    position: relative;
-    z-index: 2;
-    text-shadow: 0 0 30px rgba(99, 102, 241, 0.6);
-    letter-spacing: -0.025em;
-    font-family: var(--font-family);
-}
-
-/* Glass Layer from test1 */
+/* Enhanced Glass Layer with better transparency */
 .glass-layer {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    /* Remove backdrop-filter - let .neuos-glass-box handle it */
-    background: rgba(255, 255, 255, 0.003);
+    background: rgba(255, 255, 255, 0.002); /* Much more transparent */
     z-index: 1;
     transform: translateZ(10px);
-    box-shadow: 0 0 20px rgba(74, 144, 226, 0.3);
+    box-shadow: 0 0 30px rgba(74, 144, 226, 0.2); /* Enhanced glow */
 }
 
-/* Glass Reflection Layer from test1 */
-/* .glass-reflection {
+/* Enhanced Glass Reflection Layer - MORE SHINY */
+.glass-reflection {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, transparent 50%);
-    opacity: 0.5;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, transparent 40%, rgba(255, 255, 255, 0.1) 60%, transparent 100%);
+    opacity: var(--glass-reflection-opacity);
     mix-blend-mode: screen;
     z-index: 3;
     transform: translateZ(25px);
-} */
+    border-radius: inherit;
+}
 
-/* Glass Edge Glow from test1 */
-/* .glass-edge {
+/* Enhanced Glass Edge Glow */
+.glass-edge {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    box-shadow: var(--glass-edge-glow);
     z-index: 0;
     transform: translateZ(-5px);
-} */
+    border-radius: inherit;
+}
 
-/* Enhanced Login Button with Glass Effect from test1 */
+/* Enhanced Login Button with Improved Glass Effect */
 .glass-login-btn {
     position: relative;
-    background: rgba(255,255,255,0.01) !important;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255,255,255,0.005) !important; /* Much more transparent */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Enhanced border */
     border-radius: 12px;
     padding: 16px 32px;
     color: var(--primary-color);
@@ -121,18 +107,19 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    /* Remove backdrop-filter - let parent handle it */
     overflow: hidden;
     isolation: isolate;
-    box-shadow: 0px 6px var(--outer-shadow-blur) rgba(0, 0, 0, 0.2);
+    box-shadow: 0px 8px var(--outer-shadow-blur) rgba(0, 0, 0, 0.15), var(--glass-edge-glow);
     z-index: 1000;
+    backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness));
 }
 
 .glass-login-btn::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, transparent 50%);
     opacity: 0;
     transition: opacity 0.3s ease;
     border-radius: 12px;
@@ -144,7 +131,7 @@
     inset: 0;
     border-radius: 12px;
     padding: 1px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), transparent);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask-composite: exclude;
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -153,7 +140,8 @@
 
 .glass-login-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.3);
+    box-shadow: 0px 12px 35px rgba(0, 0, 0, 0.25), var(--glass-edge-glow);
+    background: rgba(255,255,255,0.008) !important; /* Slightly more visible on hover */
 }
 
 .glass-login-btn:hover::before {
@@ -223,7 +211,7 @@
     to { transform: rotate(360deg); }
 } 
 
-/* Unified neuOS Glass Box - Use this for both boot and login */
+/* Unified neuOS Glass Box - ENHANCED TRANSPARENCY & SHINE */
 .neuos-glass-box {
     /* Force identical positioning and sizing */
     position: absolute !important;
@@ -236,190 +224,100 @@
     cursor: grab !important;
     isolation: isolate !important;
     touch-action: none;
-    /* Force identical shadow */
-    box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.2) !important;
+    /* Enhanced shadow with more shine */
+    box-shadow: 0px 8px var(--outer-shadow-blur) rgba(0, 0, 0, 0.15), var(--glass-edge-glow) !important;
     z-index: 1000 !important;
-    /* Force identical background and backdrop-filter */
-    background: rgba(255,255,255,0.0015) !important;
-    backdrop-filter: blur(2px) saturate(150%) brightness(120%) !important;
-    -webkit-backdrop-filter: blur(2px) saturate(150%) brightness(120%) !important;
+    /* Enhanced background and backdrop-filter for more transparency */
+    background: var(--glass-background) !important;
+    backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+    -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
     /* Force identical padding and layout */
     padding: 40px !important;
     margin: 0 !important;
     text-align: center;
     display: flex !important;
     flex-direction: column !important;
-    align-items: center !important;
     justify-content: center !important;
-    /* Force identical rendering context */
-    contain: layout style paint !important;
-    backface-visibility: hidden !important;
-    -webkit-backface-visibility: hidden !important;
-    /* Force identical content area */
-    min-height: 400px !important;
-    min-width: 400px !important;
-    overflow: hidden !important;
-    /* Force identical transform context */
-    transform-style: flat !important;
-    perspective: none !important;
-    perspective-origin: 50% 50% !important;
-    -webkit-perspective-origin: 50% 50% !important;
-    transform-origin: 50% 50% !important;
-    -webkit-transform-origin: 50% 50% !important;
-    /* Prevent any transitions or animations that might cause differences */
-    transition: none !important;
-    will-change: auto !important;
-    /* Ensure visibility */
-    opacity: 1 !important;
-    visibility: visible !important;
-    /* Remove any animations that might affect blur */
-    animation: none !important;
-    /* Dragging properties */
-    user-select: none !important;
-    -webkit-user-select: none !important;
-    -moz-user-select: none !important;
-    -ms-user-select: none !important;
+    align-items: center !important;
+    /* Enhanced border for definition */
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
-/* Remove specific login box overrides - both boxes should be identical */
-/* #loginBox {
-    perspective-origin: 50% 50% !important;
-    -webkit-perspective-origin: 50% 50% !important;
-    transform-origin: 50% 50% !important;
-    -webkit-transform-origin: 50% 50% !important;
-} */
-
+/* Enhanced neuOS Glass Title */
 .neuos-glass-title {
-    font-size: 4rem;
-    font-weight: 900;
-    color: var(--primary-color);
-    margin: 0;
-    white-space: nowrap;
-    position: relative;
-    z-index: 2;
-    text-shadow: 0 0 30px rgba(99, 102, 241, 0.6);
-    letter-spacing: -0.025em;
-    font-family: var(--font-family);
-    margin-bottom: var(--spacing-2xl);
+    font-size: 3.5rem !important;
+    font-weight: 900 !important;
+    color: var(--primary-color) !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+    position: relative !important;
+    z-index: 2 !important;
+    text-shadow: 0 0 40px rgba(99, 102, 241, 0.8) !important; /* Enhanced glow */
+    letter-spacing: -0.025em !important;
+    font-family: var(--font-family) !important;
+    opacity: 1 !important;
 }
 
-/* Override existing classes to use the unified component */
+/* Enhanced Glass Container */
 .glass-container {
-    /* Remove all properties - use .neuos-glass-box instead */
-    all: unset;
+    background: var(--glass-background) !important;
+    backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+    -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
 }
 
+/* Enhanced Glass Title */
 .glass-title {
-    /* Remove all properties - use .neuos-glass-title instead */
-    all: unset;
+    text-shadow: 0 0 40px rgba(99, 102, 241, 0.8) !important; /* Enhanced glow */
 }
 
-/* Final override to ensure both boxes are absolutely identical */
+/* Enhanced Boot and Login Boxes */
 #bootBox, #loginBox {
-    /* Force identical rendering context */
-    backdrop-filter: blur(2px) saturate(150%) brightness(120%) !important;
-    -webkit-backdrop-filter: blur(2px) saturate(150%) brightness(120%) !important;
-    background: rgba(255,255,255,0.0015) !important;
-    box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.2) !important;
-    /* Force identical transform context */
-    transform: translate(-50%, -50%) !important;
-    transform-style: flat !important;
-    perspective: none !important;
-    /* Force identical positioning */
+    /* Enhanced background and backdrop-filter */
+    background: var(--glass-background) !important;
+    backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+    -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+    /* Enhanced shadow */
+    box-shadow: 0px 8px var(--outer-shadow-blur) rgba(0, 0, 0, 0.15), var(--glass-edge-glow) !important;
+    /* Enhanced border */
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Enhanced neuOS Widget */
+.neuos-widget {
     position: absolute !important;
     left: 50% !important;
     top: 50% !important;
-    /* Force identical sizing - now circular */
-    width: 400px !important;
-    height: 400px !important;
+    transform: translate(-50%, -50%) !important;
+    width: 120px !important;
+    height: 120px !important;
     border-radius: 50% !important;
-    /* Force identical layout */
+    cursor: grab !important;
+    isolation: isolate !important;
+    touch-action: none;
+    /* Enhanced background and backdrop-filter */
+    background: var(--glass-background) !important;
+    backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+    -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+    /* Enhanced shadow */
+    box-shadow: 0px 8px var(--outer-shadow-blur) rgba(0, 0, 0, 0.15), var(--glass-edge-glow) !important;
+    z-index: 1000 !important;
+    /* Enhanced border */
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    /* Layout */
+    padding: 20px !important;
+    margin: 0 !important;
+    text-align: center;
     display: flex !important;
     flex-direction: column !important;
-    align-items: center !important;
     justify-content: center !important;
-    padding: 40px !important;
-    margin: 0 !important;
-    /* Force identical rendering */
-    isolation: isolate !important;
-    contain: layout style paint !important;
-    backface-visibility: hidden !important;
-    -webkit-backface-visibility: hidden !important;
-    /* Prevent any animations or transitions */
-    animation: none !important;
-    transition: none !important;
-    will-change: auto !important;
-    /* Ensure visibility */
-    opacity: 1 !important;
-    visibility: visible !important;
-    z-index: 1000 !important;
-    /* Force identical content area */
-    min-height: 400px !important;
-    min-width: 400px !important;
-    overflow: hidden !important;
-    /* Force identical transform origin */
-    transform-origin: 50% 50% !important;
-    -webkit-transform-origin: 50% 50% !important;
-    perspective-origin: 50% 50% !important;
-    -webkit-perspective-origin: 50% 50% !important;
-    /* Dragging cursor and properties */
-    cursor: grab !important;
-    user-select: none !important;
-    -webkit-user-select: none !important;
-    -moz-user-select: none !important;
-    -ms-user-select: none !important;
-    /* Ensure pointer events work */
-    pointer-events: auto !important;
-    /* Allow dragging */
-    touch-action: none !important;
-} 
-
-/* neuOS Widget - Smaller than login box */
-.neuos-widget {
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 180px;
-    height: 90px;
-    z-index: 1200;
-    cursor: grab;
-    user-select: none;
-    pointer-events: auto;
-    touch-action: none;
-    background: rgba(255,255,255,0.003);
-    backdrop-filter: blur(2px) saturate(150%) brightness(120%);
-    -webkit-backdrop-filter: blur(2px) saturate(150%) brightness(120%);
-    border-radius: 20px;
-    box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.2);
-    padding: 16px;
-    margin: 0;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    isolation: isolate;
-    contain: layout style paint;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    transform-style: flat;
-    perspective: none;
-    perspective-origin: 50% 50%;
-    -webkit-perspective-origin: 50% 50%;
-    transform-origin: 50% 50%;
-    -webkit-transform-origin: 50% 50%;
-    transition: none;
-    will-change: auto;
-    opacity: 1;
-    visibility: visible;
-    animation: none;
+    align-items: center !important;
 }
 
 .neuos-widget:hover {
-    cursor: grab;
+    transform: translate(-50%, -50%) scale(1.05) !important;
+    box-shadow: 0px 12px 35px rgba(0, 0, 0, 0.25), var(--glass-edge-glow) !important;
 }
 
 .neuos-widget:active {
-    cursor: grabbing;
+    transform: translate(-50%, -50%) scale(0.95) !important;
 } 

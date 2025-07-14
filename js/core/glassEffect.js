@@ -1,6 +1,6 @@
 /**
- * neuOS True test1 Glass Morphism System
- * Exact implementation of the test1 theme with proper glass effects
+ * neuOS True test1 Glass Morphism System - Enhanced Transparency & Shine
+ * Exact implementation of the test1 theme with improved glass effects
  */
 
 export class GlassMorphismSystem {
@@ -31,13 +31,14 @@ export class GlassMorphismSystem {
         this.setupBreathingAnimations();
         this.setupGlassDistortion();
         this.setupDynamicGlassParameters();
+        this.setupEnhancedReflections();
     }
 
     /**
      * Setup interactive 3D tilt effects for glass containers from test1
      */
     setupInteractiveElements() {
-        const glassContainers = document.querySelectorAll('.glass-container, .boot-container, .login-container');
+        const glassContainers = document.querySelectorAll('.glass-container, .boot-container, .login-container, .neuos-glass-box, .neuos-widget');
         
         glassContainers.forEach(container => {
             this.makeInteractive(container);
@@ -67,7 +68,7 @@ export class GlassMorphismSystem {
             const y = (e.clientY - centerY) / (rect.height / 2);
             
             // Enhanced rotation from test1 with better limits
-            const maxRotation = 25;
+            const maxRotation = 20; // Reduced for more subtle effect
             const rotateX = -y * maxRotation;
             const rotateY = x * maxRotation;
             
@@ -110,8 +111,8 @@ export class GlassMorphismSystem {
         const windowHeight = window.innerHeight;
         
         reflections.forEach(reflection => {
-            const x = (this.mousePosition.x / windowWidth - 0.5) * 20;
-            const y = (this.mousePosition.y / windowHeight - 0.5) * 20;
+            const x = (this.mousePosition.x / windowWidth - 0.5) * 30; // Increased movement
+            const y = (this.mousePosition.y / windowHeight - 0.5) * 30; // Increased movement
             
             reflection.style.transform = `translateZ(25px) translateX(${x}px) translateY(${y}px)`;
         });
@@ -140,9 +141,9 @@ export class GlassMorphismSystem {
             const displacementMap = document.querySelector('feDisplacementMap');
             
             if (turbulence && displacementMap) {
-                // Set fixed values from JSON
-                const frequency = 0.01;
-                const scale = 33;
+                // Set enhanced values for better transparency
+                const frequency = 0.008; // Reduced for smoother effect
+                const scale = 25; // Reduced for subtler effect
                 
                 turbulence.setAttribute('baseFrequency', `${frequency} ${frequency}`);
                 displacementMap.setAttribute('scale', scale);
@@ -157,16 +158,49 @@ export class GlassMorphismSystem {
      * Setup dynamic glass parameters from test1
      */
     setupDynamicGlassParameters() {
-        // Set glass parameters to match JSON exactly
+        // Set enhanced glass parameters for better transparency and shine
         const updateGlassParameters = () => {
-            document.documentElement.style.setProperty('--shadow-blur', '9px');
-            document.documentElement.style.setProperty('--shadow-spread', '-5px');
-            document.documentElement.style.setProperty('--shadow-color', '#ffffff');
-            document.documentElement.style.setProperty('--tint-opacity', '0.03');
-            document.documentElement.style.setProperty('--frost-blur', '2px');
+            document.documentElement.style.setProperty('--shadow-blur', '12px');
+            document.documentElement.style.setProperty('--shadow-spread', '-3px');
+            document.documentElement.style.setProperty('--shadow-color', 'rgba(255, 255, 255, 0.8)');
+            document.documentElement.style.setProperty('--tint-opacity', '0.015');
+            document.documentElement.style.setProperty('--frost-blur', '4px');
+            document.documentElement.style.setProperty('--glass-background', 'rgba(255, 255, 255, 0.008)');
+            document.documentElement.style.setProperty('--glass-backdrop-blur', '12px');
+            document.documentElement.style.setProperty('--glass-saturation', '180%');
+            document.documentElement.style.setProperty('--glass-brightness', '140%');
+            document.documentElement.style.setProperty('--glass-reflection-opacity', '0.3');
+            document.documentElement.style.setProperty('--glass-edge-glow', '0 0 25px rgba(255, 255, 255, 0.4)');
         };
 
         updateGlassParameters();
+    }
+
+    /**
+     * Setup enhanced reflection effects
+     */
+    setupEnhancedReflections() {
+        // Add reflection layers to glass elements
+        const glassElements = document.querySelectorAll('.glass-container, .neuos-glass-box, .neuos-widget, .glass-login-btn');
+        
+        glassElements.forEach(element => {
+            this.addReflectionLayer(element);
+        });
+    }
+
+    /**
+     * Add reflection layer to glass element
+     */
+    addReflectionLayer(element) {
+        if (element.querySelector('.glass-reflection')) return; // Already has reflection
+        
+        const reflection = document.createElement('div');
+        reflection.className = 'glass-reflection';
+        element.appendChild(reflection);
+        
+        const edge = document.createElement('div');
+        edge.className = 'glass-edge';
+        element.appendChild(edge);
     }
 
     /**
@@ -204,53 +238,45 @@ export class GlassMorphismSystem {
     }
 
     /**
-     * Create a glass text element with advanced effects from test1
+     * Create glass text element
      */
     createGlassText(text, options = {}) {
         const {
-            containerClass = 'glass-text-container',
-            textClass = 'breathing-title',
-            interactive = true
+            className = 'glass-text',
+            containerClass = 'glass-text-container'
         } = options;
 
         const container = document.createElement('div');
         container.className = containerClass;
         
-        const textElement = document.createElement('h1');
-        textElement.className = textClass;
+        const textElement = document.createElement('div');
+        textElement.className = className;
         textElement.textContent = text;
         
         container.appendChild(textElement);
-        
-        if (interactive) {
-            this.makeInteractive(container);
-        }
         
         return container;
     }
 
     /**
-     * Create a glass button with enhanced effects from test1
+     * Create glass button element
      */
     createGlassButton(text, options = {}) {
         const {
-            buttonClass = 'glass-login-btn',
-            interactive = true
+            className = 'glass-login-btn'
         } = options;
 
         const button = document.createElement('button');
-        button.className = buttonClass;
+        button.className = className;
         button.textContent = text;
         
-        if (interactive) {
-            this.makeInteractive(button);
-        }
+        this.addGlassEffect(button, { interactive: true });
         
         return button;
     }
 
     /**
-     * Update glass parameters dynamically from test1
+     * Update glass parameters dynamically
      */
     updateGlassParameters(parameters = {}) {
         Object.entries(parameters).forEach(([property, value]) => {
@@ -263,18 +289,14 @@ export class GlassMorphismSystem {
      */
     destroy() {
         // Remove event listeners
-        this.interactiveElements.forEach((listeners, element) => {
-            element.removeEventListener('mousemove', listeners.mousemove);
-            element.removeEventListener('mouseleave', listeners.mouseleave);
-        });
-        
-        // Cancel animation frames
-        this.animationFrames.forEach(frameId => {
-            cancelAnimationFrame(frameId);
+        this.interactiveElements.forEach((handlers, element) => {
+            element.removeEventListener('mousemove', handlers.mousemove);
+            element.removeEventListener('mouseleave', handlers.mouseleave);
         });
         
         this.interactiveElements.clear();
         this.animationFrames.clear();
+        
         this.isInitialized = false;
     }
 }
@@ -282,11 +304,13 @@ export class GlassMorphismSystem {
 // Initialize the glass morphism system
 const glassSystem = new GlassMorphismSystem();
 
-// Export for module usage and global access
+// Export for module systems
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = GlassMorphismSystem;
-} else {
-    // Make available globally for non-module usage
+}
+
+// Export for browser
+if (typeof window !== 'undefined') {
     window.GlassMorphismSystem = GlassMorphismSystem;
     window.glassSystem = glassSystem;
 } 
