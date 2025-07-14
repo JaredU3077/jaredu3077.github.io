@@ -21,6 +21,11 @@ export class AudioSystem {
 
     init() {
         this.setupAudioSystem();
+        
+        // Mobile-specific audio optimizations
+        if (window.innerWidth <= 768) {
+            this.setupMobileAudioOptimizations();
+        }
     }
 
     setupAudioSystem() {
@@ -414,6 +419,101 @@ export class AudioSystem {
     }
 
     // Expose sound methods globally for other components
+    /**
+     * Setup mobile-specific audio optimizations
+     */
+    setupMobileAudioOptimizations() {
+        // Reduce audio complexity on mobile for better performance
+        this.mobileOptimized = true;
+        
+        // Lower volume on mobile to prevent audio issues
+        if (this.audioNodes.masterGain) {
+            this.audioNodes.masterGain.gain.setValueAtTime(0.15, this.audioContext.currentTime);
+        }
+        
+        // Add mobile-specific audio event handlers
+        this.setupMobileAudioEventHandlers();
+        
+        console.log('🎹 AudioSystem: Mobile audio optimizations applied');
+    }
+
+    /**
+     * Setup mobile-specific audio event handlers
+     */
+    setupMobileAudioEventHandlers() {
+        // Handle mobile audio interruptions
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                this.pauseMobileAudio();
+            } else {
+                this.resumeMobileAudio();
+            }
+        });
+
+        // Handle mobile audio focus
+        window.addEventListener('focus', () => {
+            this.resumeMobileAudio();
+        });
+
+        window.addEventListener('blur', () => {
+            this.pauseMobileAudio();
+        });
+
+        // Handle mobile audio context state changes
+        if (this.audioContext) {
+            this.audioContext.addEventListener('statechange', () => {
+                console.log('🎹 AudioSystem: Audio context state changed to:', this.audioContext.state);
+            });
+        }
+    }
+
+    /**
+     * Pause audio on mobile when app loses focus
+     */
+    pauseMobileAudio() {
+        if (this.audioContext && this.audioContext.state === 'running') {
+            this.audioContext.suspend().then(() => {
+                console.log('🎹 AudioSystem: Audio paused for mobile optimization');
+            }).catch(err => {
+                console.warn('Failed to pause audio context:', err);
+            });
+        }
+    }
+
+    /**
+     * Resume audio on mobile when app gains focus
+     */
+    resumeMobileAudio() {
+        if (this.audioContext && this.audioContext.state === 'suspended') {
+            this.audioContext.resume().then(() => {
+                console.log('🎹 AudioSystem: Audio resumed for mobile optimization');
+            }).catch(err => {
+                console.warn('Failed to resume audio context:', err);
+            });
+        }
+    }
+
+    /**
+     * Mobile-optimized typing sound
+     */
+    async playMobileTypingSound(key) {
+        if (!this.audioEnabled || !this.audioContext || !this.mobileOptimized) {
+            return;
+        }
+
+        // Ensure audio context is running
+        if (this.audioContext.state === 'suspended') {
+            await this.audioContext.resume();
+        }
+
+        // Use simpler sounds on mobile for better performance
+        const baseFreq = 600 + Math.random() * 200;
+        const duration = 0.05 + Math.random() * 0.02; // Shorter duration
+        const volume = 0.05 + Math.random() * 0.02; // Lower volume
+
+        this.createFilteredTone(baseFreq, duration, 'sine', volume, 'lowpass', 600);
+    }
+
     static getInstance() {
         if (!window.audioSystemInstance) {
             window.audioSystemInstance = new AudioSystem();

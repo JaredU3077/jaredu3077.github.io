@@ -124,6 +124,139 @@ class CodexApp {
                 }
             });
         }
+
+        // Mobile-specific event handlers
+        if (window.innerWidth <= 768) {
+            this.setupMobileEventListeners();
+        }
+    }
+
+    /**
+     * Sets up mobile-specific event listeners for Codex
+     */
+    setupMobileEventListeners() {
+        // Mobile search input optimization
+        if (this.searchInput) {
+            this.searchInput.addEventListener('focus', () => {
+                this.handleMobileSearchFocus();
+            });
+
+            this.searchInput.addEventListener('blur', () => {
+                this.handleMobileSearchBlur();
+            });
+
+            // Mobile touch handling for search
+            this.searchInput.addEventListener('touchstart', (e) => {
+                this.handleMobileTouchStart(e);
+            }, { passive: true });
+
+            this.searchInput.addEventListener('touchend', (e) => {
+                this.handleMobileTouchEnd(e);
+            }, { passive: true });
+        }
+
+        // Mobile search button optimization
+        if (this.searchBtn) {
+            this.searchBtn.addEventListener('touchstart', (e) => {
+                this.handleMobileButtonTouch(e);
+            }, { passive: true });
+        }
+
+        // Mobile content scrolling optimization
+        if (this.layersContainer) {
+            this.layersContainer.addEventListener('touchstart', (e) => {
+                this.handleMobileScrollStart(e);
+            }, { passive: true });
+
+            this.layersContainer.addEventListener('touchmove', (e) => {
+                this.handleMobileScrollMove(e);
+            }, { passive: true });
+        }
+    }
+
+    /**
+     * Handle mobile search input focus
+     */
+    handleMobileSearchFocus() {
+        // Ensure search input is visible on mobile
+        setTimeout(() => {
+            if (this.searchInput) {
+                this.searchInput.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                });
+            }
+        }, 300);
+
+        // Show mobile keyboard hints
+        if (this.searchInput) {
+            this.searchInput.setAttribute('autocomplete', 'off');
+            this.searchInput.setAttribute('autocorrect', 'off');
+            this.searchInput.setAttribute('autocapitalize', 'off');
+        }
+    }
+
+    /**
+     * Handle mobile search input blur
+     */
+    handleMobileSearchBlur() {
+        // Reset any mobile-specific styles
+        if (this.searchInput) {
+            this.searchInput.style.transform = '';
+        }
+    }
+
+    /**
+     * Handle mobile touch start on search input
+     */
+    handleMobileTouchStart(e) {
+        // Prevent zoom on double tap
+        e.preventDefault();
+    }
+
+    /**
+     * Handle mobile touch end on search input
+     */
+    handleMobileTouchEnd(e) {
+        // Add touch feedback
+        if (this.searchInput) {
+            this.searchInput.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                this.searchInput.style.transform = '';
+            }, 100);
+        }
+    }
+
+    /**
+     * Handle mobile button touch
+     */
+    handleMobileButtonTouch(e) {
+        // Add touch feedback for search button
+        if (this.searchBtn) {
+            this.searchBtn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.searchBtn.style.transform = '';
+            }, 100);
+        }
+    }
+
+    /**
+     * Handle mobile scroll start
+     */
+    handleMobileScrollStart(e) {
+        // Optimize scrolling for mobile
+        this.layersContainer.style.overflowY = 'auto';
+        this.layersContainer.style.webkitOverflowScrolling = 'touch';
+    }
+
+    /**
+     * Handle mobile scroll move
+     */
+    handleMobileScrollMove(e) {
+        // Ensure smooth scrolling on mobile
+        if (this.layersContainer) {
+            this.layersContainer.style.overflowY = 'auto';
+        }
     }
 
     async loadContent() {
