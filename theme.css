@@ -1,13 +1,13 @@
 /* neuOS modern premium theme - Apple-inspired design system */
 /* Import modular sub-theme files */
-@import url('_variables.css');
-@import url('_window.css');
-@import url('_desktop.css');
-@import url('_login.css');
-@import url('_apps.css');
-@import url('_animations.css');
-@import url('_responsive.css');
-@import url('_glass.css');
+@import url('variables.css');
+@import url('window.css');
+@import url('desktop.css');
+@import url('login.css');
+@import url('apps.css');
+@import url('animations.css');
+@import url('responsive.css');
+@import url('glass.css');
 
 /* Space Screensaver Integration */
 #spaceScreensaver {
