@@ -393,6 +393,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             }
         }, 3000);
+
+        // Additional fallback: Ensure desktop becomes visible after login
+        setTimeout(() => {
+            const desktop = document.getElementById('desktop');
+            if (desktop && !document.body.classList.contains('boot-active') && !document.body.classList.contains('login-active')) {
+                console.log('neuOS: Ensuring desktop is visible...');
+                desktop.style.opacity = '1';
+                desktop.style.visibility = 'visible';
+            }
+        }, 5000);
         
 
         
@@ -459,6 +469,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const loginObserver = new MutationObserver(() => {
             const loginScreen = document.getElementById('loginScreen');
             if (loginScreen && loginScreen.style.display === 'none' && !document.getElementById('neuosWidget')) {
+                // Ensure desktop is visible
+                const desktop = document.getElementById('desktop');
+                if (desktop) {
+                    desktop.style.opacity = '1';
+                    desktop.style.visibility = 'visible';
+                    console.log('neuOS: Desktop made visible via login observer');
+                }
+                
                 addNeuOSWidget();
                 // Refresh desktop icon handlers after login
                 refreshDesktopIconHandlers();

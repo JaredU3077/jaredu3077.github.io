@@ -26,6 +26,12 @@ body:not(.boot-active):not(.login-active) #desktop {
     visibility: visible;
 }
 
+/* Ensure desktop is visible when no boot/login classes are present */
+#desktop:not(.boot-active):not(.login-active) {
+    opacity: 1;
+    visibility: visible;
+}
+
 body:not(.boot-active):not(.login-active) {
     overflow: hidden;
 }

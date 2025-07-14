@@ -210,7 +210,7 @@ export class BootSequence {
     }
 
     initializeDesktop() {
-        // Let CSS handle the desktop visibility
+        // Ensure proper desktop visibility
         const desktop = document.getElementById('desktop');
         
         if (desktop) {
@@ -219,6 +219,15 @@ export class BootSequence {
             desktop.style.removeProperty('visibility');
             desktop.style.removeProperty('transform');
             desktop.style.removeProperty('transition');
+            
+            // Ensure desktop is visible after login
+            setTimeout(() => {
+                if (!document.body.classList.contains('boot-active') && !document.body.classList.contains('login-active')) {
+                    desktop.style.opacity = '1';
+                    desktop.style.visibility = 'visible';
+                    console.log('neuOS: Desktop made visible after login');
+                }
+            }, 100);
         }
 
         // Add network animation elements
@@ -242,8 +251,6 @@ export class BootSequence {
                 window.backgroundMusicInstance.startBackgroundMusic();
             }
         }, 1000);
-
-
     }
 
     createNetworkAnimations() {
