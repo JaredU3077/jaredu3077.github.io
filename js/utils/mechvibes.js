@@ -117,15 +117,22 @@ export class MechvibesPlayer {
         }
 
         try {
-            // Convert key to keyCode for the original Mechvibes approach
-            const keyCode = this.getKeyCode(key);
-            const soundId = `${keyCode}`;
-            
+            let keyCode = this.getKeyCode(key);
+            let soundId = `${keyCode}`;
+            // WORKAROUND: Force 'b' to use 'a' soundId
+            if (keyCode === 66) {
+                soundId = '65';
+            }
+            const mappingExists = this.currentPack.defines && this.currentPack.defines[soundId];
             if (this.currentPack && this.currentPack.sound) {
-                this.playSound(soundId, this.volume);
+                if (!mappingExists) {
+                    this.playSound('65', this.volume, key, keyCode); // 65 = 'a'
+                } else {
+                    this.playSound(soundId, this.volume, key, keyCode);
+                }
             }
         } catch (error) {
-            console.warn('Mechvibes sound playback failed:', error);
+            // Silently ignore errors in production
         }
     }
 
@@ -157,19 +164,21 @@ export class MechvibesPlayer {
      * Play sound using the original Mechvibes approach
      * @param {string} soundId - The sound ID (keyCode as string)
      * @param {number} volume - Volume level (0-100)
+     * @param {string} [key] - The original key pressed (for logging)
+     * @param {number} [keyCode] - The keyCode (for logging)
      */
-    playSound(soundId, volume) {
+    playSound(soundId, volume, key, keyCode) {
         if (!this.currentPack) return;
-        
         const playType = this.currentPack.key_define_type || 'single';
         const sound = this.currentPack.sound;
-        
         if (!sound) return;
-        
         sound.volume(Number(volume / 100));
-        
         if (playType === 'single') {
-            sound.play(soundId);
+            try {
+                sound.play(soundId);
+            } catch (err) {
+                // Silently ignore errors in production
+            }
         }
     }
 
