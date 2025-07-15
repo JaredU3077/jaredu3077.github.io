@@ -24,6 +24,9 @@ import { GlassMorphismSystem } from './core/glassEffect.js';
 import GlassEffects from './utils/glassEffects.js';
 import DraggableSystem from './utils/draggable.js';
 
+// Create namespace for globals to avoid direct window pollution
+window.neuOS = window.neuOS || {};
+
 // --- MODULE INITIALIZATION ---
 /** @type {WindowManager} */
 let windowManager = null;
@@ -48,8 +51,7 @@ let openWindows = {};
 // Initialize modules with error boundaries
 try {
     windowManager = new WindowManager();
-    // Expose windowManager globally for other modules to use
-    window.windowManager = windowManager;
+    window.neuOS.windowManager = windowManager;
 } catch (error) {
     console.error('neuOS: Failed to initialize WindowManager:', error);
 }
@@ -68,21 +70,21 @@ try {
 
 try {
     glassMorphismSystem = new GlassMorphismSystem();
-    window.glassMorphismSystem = glassMorphismSystem;
+    window.neuOS.glassMorphismSystem = glassMorphismSystem;
 } catch (error) {
     console.error('neuOS: Failed to initialize GlassMorphismSystem:', error);
 }
 
 try {
     glassEffects = new GlassEffects();
-    window.glassEffects = glassEffects;
+    window.neuOS.glassEffects = glassEffects;
 } catch (error) {
     console.error('neuOS: Failed to initialize GlassEffects:', error);
 }
 
 try {
     draggableSystem = new DraggableSystem();
-    window.draggableSystem = draggableSystem;
+    window.neuOS.draggableSystem = draggableSystem;
 } catch (error) {
     console.error('neuOS: Failed to initialize DraggableSystem:', error);
 }
@@ -164,10 +166,39 @@ function refreshDesktopIconHandlers() {
 }
 
 // --- EVENT LISTENERS ---
-
-
+// (Reserved for future global event handling expansions)
 
 // --- APPLICATION LAUNCHER ---
+
+/**
+ * Displays a temporary error notification to the user.
+ * @param {string} title - The error title.
+ * @param {string} message - The error message.
+ * @param {string} [details] - Optional additional details.
+ */
+function showErrorNotification(title, message, details = '') {
+    const errorMessage = document.createElement('div');
+    errorMessage.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(255, 107, 107, 0.9);
+        color: white;
+        padding: 20px;
+        border-radius: 8px;
+        z-index: 10000;
+        font-family: 'Segoe UI', sans-serif;
+        text-align: center;
+    `;
+    errorMessage.innerHTML = `
+        <h3>⚠️ ${title}</h3>
+        <p>${message}</p>
+        ${details ? `<p style="font-size: 0.9em; opacity: 0.8;">${details}</p>` : ''}
+    `;
+    document.body.appendChild(errorMessage);
+    setTimeout(() => errorMessage.remove(), 5000);
+}
 
 /**
  * Handles the click event for an application icon or menu item.
@@ -186,112 +217,86 @@ async function handleAppClick(appId) {
             return;
         }
 
-    app.windows.forEach(async windowConfig => {
-        // If window already open, focus it and do not re-initialize
-        let winElem = document.getElementById(windowConfig.id);
-        if (winElem) {
-            // Check if window is minimized and restore it
-            const windowObj = windowManager.windows.get(windowConfig.id);
-            if (windowObj && windowObj.isMinimized) {
-                windowManager.restoreWindow(windowObj);
+        for (const windowConfig of app.windows) {
+            // If window already open, focus it and do not re-initialize
+            let winElem = document.getElementById(windowConfig.id);
+            if (winElem) {
+                // Check if window is minimized and restore it
+                const windowObj = windowManager.windows.get(windowConfig.id);
+                if (windowObj && windowObj.isMinimized) {
+                    windowManager.restoreWindow(windowObj);
+                }
+                windowManager.focusWindow(windowObj);
+                continue;
             }
-            windowManager.focusWindow(windowObj);
-            return;
-        }
-        
-        // Play window opening sound
-        if (window.bootSystemInstance) {
-            window.bootSystemInstance.playWindowOpenSound();
-        }
-        
-        // Create window and initialize app logic
-        winElem = windowManager.createWindow({
-            id: windowConfig.id,
-            title: windowConfig.title,
-            content: windowConfig.content,
-            width: windowConfig.width,
-            height: windowConfig.height,
-            icon: app.icon,
-            autoScroll: ['terminal'].includes(appId), // Enable auto-scroll for apps that benefit from it
-            type: app.type || 'app', // Pass the application type (e.g., 'game' vs 'app')
-            defaultSize: app.defaultSize // Pass the default size for this application
-        });
-        
+            
+            // Play window opening sound
+            if (window.bootSystemInstance) {
+                window.bootSystemInstance.playWindowOpenSound();
+            }
+            
+            // Create window and initialize app logic
+            winElem = windowManager.createWindow({
+                id: windowConfig.id,
+                title: windowConfig.title,
+                content: windowConfig.content,
+                width: windowConfig.width,
+                height: windowConfig.height,
+                icon: app.icon,
+                autoScroll: ['terminal'].includes(appId), // Enable auto-scroll for apps that benefit from it
+                type: app.type || 'app', // Pass the application type (e.g., 'game' vs 'app')
+                defaultSize: app.defaultSize // Pass the default size for this application
+            });
+            
 
-        openWindows[windowConfig.id] = winElem;
-        try {
-            switch (appId) {
-                case 'terminal':
-                    terminal = new Terminal(
-                        winElem.querySelector('#terminalInput input'),
-                        winElem.querySelector('#terminalOutput')
-                    );
-                    // Expose terminal globally for demoscene access
-                    window.terminalInstance = terminal;
-                    break;
-                case 'codex':
-                    console.log('Initializing codex...');
-                    const codexApp = new CodexApp();
-                    await codexApp.init();
-                    
-                    // Store reference to codex app
-                    window.codexInstance = codexApp;
-                    
-                    // Attach the Codex app to the window element
-                    codexApp.attachToWindow(winElem);
-                    
-                    console.log('Codex initialized:', codexApp);
-                    
-                    console.log('Codex initialized:', codexApp);
-                    break;
+            openWindows[windowConfig.id] = winElem;
+            try {
+                switch (appId) {
+                    case 'terminal':
+                        terminal = new Terminal(
+                            winElem.querySelector('#terminalInput input'),
+                            winElem.querySelector('#terminalOutput')
+                        );
+                        // Expose terminal globally for demoscene access
+                        window.neuOS.terminalInstance = terminal;
+                        break;
+                    case 'codex':
+                        console.log('Initializing codex...');
+                        const codexApp = new CodexApp();
+                        await codexApp.init();
+                        
+                        // Store reference to codex app
+                        window.neuOS.codexInstance = codexApp;
+                        
+                        // Attach the Codex app to the window element
+                        codexApp.attachToWindow(winElem);
+                        
+                        console.log('Codex initialized:', codexApp);
+                        break;
+                    default:
+                        console.warn(`neuOS: No specific initialization for app: ${appId}`);
+                        break;
+                }
+            } catch (error) {
+                console.error(`Error initializing application ${appId}:`, error);
+                // Show user-friendly error instead of alert
+                const errorContent = `
+                    <div class="error-content" style="padding: 20px; text-align: center; color: #ff6b6b;">
+                        <h3>⚠️ Application Error</h3>
+                        <p>Failed to initialize ${app.name}</p>
+                        <p style="font-size: 0.9em; opacity: 0.8;">${error.message}</p>
+                        <button onclick="this.closest('.window').querySelector('.close').click()" 
+                                style="margin-top: 10px; padding: 5px 15px; background: #ff6b6b; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            Close
+                        </button>
+                    </div>
+                `;
+                winElem.querySelector('.window-content').innerHTML = errorContent;
             }
-        } catch (error) {
-            console.error(`Error initializing application ${appId}:`, error);
-            // Show user-friendly error instead of alert
-            const errorContent = `
-                <div class="error-content" style="padding: 20px; text-align: center; color: #ff6b6b;">
-                    <h3>⚠️ Application Error</h3>
-                    <p>Failed to initialize ${app.name}</p>
-                    <p style="font-size: 0.9em; opacity: 0.8;">${error.message}</p>
-                    <button onclick="this.closest('.window').querySelector('.close').click()" 
-                            style="margin-top: 10px; padding: 5px 15px; background: #ff6b6b; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                        Close
-                    </button>
-                </div>
-            `;
-            winElem.querySelector('.window-content').innerHTML = errorContent;
         }
-    });
     } catch (error) {
         console.error('neuOS: Application launch error:', error);
-        // Show user-friendly error message
-        const errorMessage = document.createElement('div');
-        errorMessage.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(255, 107, 107, 0.9);
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
-            z-index: 10000;
-            font-family: 'Segoe UI', sans-serif;
-            text-align: center;
-        `;
-        errorMessage.innerHTML = `
-            <h3>⚠️ Application Error</h3>
-            <p>Failed to launch application: ${appId}</p>
-            <p style="font-size: 0.9em; opacity: 0.8;">${error.message}</p>
-        `;
-        document.body.appendChild(errorMessage);
-        
-        // Remove error message after 5 seconds
-        setTimeout(() => {
-            if (errorMessage.parentNode) {
-                errorMessage.remove();
-            }
-        }, 5000);
+        showErrorNotification('Application Error', `Failed to launch application: ${appId}`, error.message);
     }
 }
 
@@ -456,7 +461,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 desktopIcons.offsetHeight; // Force reflow
                 desktopIcons.style.display = 'grid';
                 
-                        // Responsive desktop icons updated
+                // Responsive desktop icons updated
             }
         }, 150));
 
@@ -484,36 +489,38 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         // Show widget only after login completion
-        const loginObserver = new MutationObserver(() => {
-            const loginScreen = document.getElementById('loginScreen');
-            if (loginScreen && loginScreen.style.display === 'none' && !document.getElementById('neuosWidget')) {
-                // Ensure desktop is visible
-                const desktop = document.getElementById('desktop');
-                if (desktop) {
-                    desktop.style.opacity = '1';
-                    desktop.style.visibility = 'visible';
-                    console.log('neuOS: Desktop made visible via login observer');
+        const loginScreen = document.getElementById('loginScreen');
+        if (loginScreen) {
+            const loginObserver = new MutationObserver(() => {
+                if (loginScreen.style.display === 'none' && !document.getElementById('neuosWidget')) {
+                    // Ensure desktop is visible
+                    const desktop = document.getElementById('desktop');
+                    if (desktop) {
+                        desktop.style.opacity = '1';
+                        desktop.style.visibility = 'visible';
+                        console.log('neuOS: Desktop made visible via login observer');
+                    }
+                    
+                    addNeuOSWidget();
+                    // Refresh desktop icon handlers after login
+                    refreshDesktopIconHandlers();
+                    // Refresh draggable system to ensure all widgets are draggable
+                    if (window.neuOS.draggableSystem) {
+                        window.neuOS.draggableSystem.refresh();
+                        // Specifically refresh neuOS widget to ensure it's draggable
+                        setTimeout(() => {
+                            window.neuOS.draggableSystem.refreshNeuOSWidget();
+                        }, 100);
+                    }
+                    // Also refresh glass effects for the new widget
+                    if (window.neuOS.glassMorphismSystem) {
+                        window.neuOS.glassMorphismSystem.enhanceAllGlassElements();
+                    }
+                    loginObserver.disconnect();
                 }
-                
-                addNeuOSWidget();
-                // Refresh desktop icon handlers after login
-                refreshDesktopIconHandlers();
-                // Refresh draggable system to ensure all widgets are draggable
-                if (window.draggableSystem) {
-                    window.draggableSystem.refresh();
-                    // Specifically refresh neuOS widget to ensure it's draggable
-                    setTimeout(() => {
-                        window.draggableSystem.refreshNeuOSWidget();
-                    }, 100);
-                }
-                // Also refresh glass effects for the new widget
-                if (window.glassMorphismSystem) {
-                    window.glassMorphismSystem.enhanceAllGlassElements();
-                }
-                loginObserver.disconnect();
-            }
-        });
-        loginObserver.observe(document.body, { subtree: true, attributes: true, attributeFilter: ['style'] });
+            });
+            loginObserver.observe(loginScreen, { attributes: true, attributeFilter: ['style'] });
+        }
         
     } catch (error) {
         console.error('Failed to initialize application:', error);
@@ -532,4 +539,4 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
         `;
     }
-}); 
+});

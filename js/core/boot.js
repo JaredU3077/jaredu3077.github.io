@@ -1,9 +1,3 @@
-/**
- * @file Boot System Module - Main orchestrator for system boot sequence, login, audio, and particle effects
- * @author Jared U.
- * @tags neu-os
- */
-
 import { AudioSystem } from './audioSystem.js';
 import { BackgroundMusic } from './backgroundMusic.js';
 import { ParticleSystem } from './particleSystem.js';
@@ -11,78 +5,53 @@ import { BootSequence } from './bootSequence.js';
 
 export class BootSystem {
     constructor() {
-        // Initialize all subsystems
         this.audioSystem = new AudioSystem();
         this.backgroundMusic = new BackgroundMusic();
         this.particleSystem = new ParticleSystem();
         this.bootSequence = new BootSequence();
-        
-        // Store instances globally for other components to access
+
         window.audioSystemInstance = this.audioSystem;
         window.backgroundMusicInstance = this.backgroundMusic;
         window.particleSystemInstance = this.particleSystem;
         window.bootSequenceInstance = this.bootSequence;
-        
-            // Expose mechvibes player through boot system for terminal access
-    this.mechvibesPlayer = null;
-    
-    // Expose background music player for terminal access
-    this.audioPlayer = null;
-    
-    this.init();
+
+        this.mechvibesPlayer = null;
+        this.audioPlayer = null;
+
+        this.init();
     }
 
     async init() {
         try {
-    
-            
-            // Initialize all subsystems
             this.audioSystem.init();
             this.backgroundMusic.init();
             this.particleSystem.init();
-            
-            // Initialize Mechvibes player if audio is available
+
             await this.audioSystem.initMechvibes();
-            
-            // Expose mechvibes player for terminal access
+
             this.mechvibesPlayer = this.audioSystem.mechvibesPlayer;
-            
-            // Expose background music player for terminal access
             this.audioPlayer = this.backgroundMusic;
-            
-            // Setup event listeners
+
             this.setupEventListeners();
-            
 
             await this.bootSequence.startBootSequence();
-        } catch (error) {
-            console.error('neuOS: System initialization failed:', error);
-            // Fallback: show login screen directly
+        } catch {
             this.bootSequence.showLoginScreen();
         }
     }
 
     setupEventListeners() {
-        // Audio toggle button
         const audioToggle = document.getElementById('audioToggle');
-        if (audioToggle) {
-            audioToggle.addEventListener('click', () => this.backgroundMusic.toggleBackgroundMusic());
-        }
+        audioToggle?.addEventListener('click', () => this.backgroundMusic.toggleBackgroundMusic());
 
-        // Guest login button
         const guestLoginBtn = document.getElementById('guestLoginBtn');
-        if (guestLoginBtn) {
-            guestLoginBtn.addEventListener('click', () => this.bootSequence.handleLogin());
-        }
+        guestLoginBtn?.addEventListener('click', () => this.bootSequence.handleLogin());
 
-        // Keyboard controls for background effects
         document.addEventListener('keydown', (e) => {
-            // Only handle keyboard controls if no input is focused
-            if (document.activeElement.tagName !== 'INPUT' && 
+            if (document.activeElement.tagName !== 'INPUT' &&
                 document.activeElement.tagName !== 'TEXTAREA' &&
                 !e.ctrlKey && !e.altKey && !e.metaKey) {
-                
-                switch(e.key.toLowerCase()) {
+                switch (e.key.toLowerCase()) {
                     case 'space':
                         e.preventDefault();
                         this.particleSystem.toggleParticleAnimation();
@@ -103,94 +72,48 @@ export class BootSystem {
                 }
             }
         });
-
-        // Typing sound effects - removed global listener to prevent conflicts
     }
 
-    // Expose audio methods from AudioSystem
     playUIClickSound() {
-        if (this.audioSystem) {
-            this.audioSystem.playUIClickSound();
-        } else {
-            console.warn('Audio system not available for UI click sound');
-        }
+        this.audioSystem?.playUIClickSound();
     }
 
     playWindowOpenSound() {
-        if (this.audioSystem) {
-            this.audioSystem.playWindowOpenSound();
-        } else {
-            console.warn('Audio system not available for window open sound');
-        }
+        this.audioSystem?.playWindowOpenSound();
     }
 
     playWindowCloseSound() {
-        if (this.audioSystem) {
-            this.audioSystem.playWindowCloseSound();
-        } else {
-            console.warn('Audio system not available for window close sound');
-        }
+        this.audioSystem?.playWindowCloseSound();
     }
 
     playBootSound() {
-        if (this.audioSystem) {
-            this.audioSystem.playBootSound();
-        } else {
-            console.warn('Audio system not available for boot sound');
-        }
+        this.audioSystem?.playBootSound();
     }
 
     playLoginSound() {
-        if (this.audioSystem) {
-            this.audioSystem.playLoginSound();
-        } else {
-            console.warn('Audio system not available for login sound');
-        }
+        this.audioSystem?.playLoginSound();
     }
 
     playClickSound() {
-        if (this.audioSystem) {
-            this.audioSystem.playClickSound();
-        } else {
-            console.warn('Audio system not available for click sound');
-        }
+        this.audioSystem?.playClickSound();
     }
 
     playDesktopReadySound() {
-        if (this.audioSystem) {
-            this.audioSystem.playDesktopReadySound();
-        } else {
-            console.warn('Audio system not available for desktop ready sound');
-        }
+        this.audioSystem?.playDesktopReadySound();
     }
 
-    // Expose boot sequence methods
     showLoginScreen() {
-        if (this.bootSequence) {
-            this.bootSequence.showLoginScreen();
-        } else {
-            console.warn('Boot sequence not available for showLoginScreen');
-        }
+        this.bootSequence?.showLoginScreen();
     }
 
     skipBoot() {
-        if (this.bootSequence) {
-            this.bootSequence.skipBoot();
-        } else {
-            console.warn('Boot sequence not available for skipBoot');
-        }
+        this.bootSequence?.skipBoot();
     }
 
-    handleLogin() {
-        if (this.bootSequence) {
-            return this.bootSequence.handleLogin();
-        } else {
-            console.warn('Boot sequence not available for handleLogin');
-            return Promise.resolve();
-        }
+    async handleLogin() {
+        return this.bootSequence?.handleLogin() || Promise.resolve();
     }
 
-    // Expose methods globally for other components
     static getInstance() {
         if (!window.bootSystemInstance) {
             window.bootSystemInstance = new BootSystem();
@@ -199,7 +122,6 @@ export class BootSystem {
     }
 }
 
-// Additional CSS for fade animations
 const additionalStyles = `
 @keyframes fadeOut {
     0% { opacity: 1; transform: scale(1); }
@@ -216,7 +138,6 @@ const additionalStyles = `
 }
 `;
 
-// Inject additional styles
 const styleSheet = document.createElement('style');
 styleSheet.textContent = additionalStyles;
-document.head.appendChild(styleSheet); 
+document.head.appendChild(styleSheet);

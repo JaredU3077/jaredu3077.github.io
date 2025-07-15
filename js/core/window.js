@@ -1,5 +1,9 @@
 import { CONFIG } from '../config.js';
 import { debounce, throttle } from '../utils/utils.js';
+import { DragHandler } from './dragHandler.js';
+import { ResizeHandler } from './resizeHandler.js';
+import { SnapHandler } from './snapHandler.js';
+import { AutoScrollHandler } from './autoScrollHandler.js';
 
 /**
  * Manages windows in the OS-like interface.
@@ -19,20 +23,53 @@ export class WindowManager {
         /** @type {number} */
         this.zIndexCounter = CONFIG.window?.zIndex || 1000;
         /** @type {number} */
-        this.snapThreshold = 15; // Much more conservative threshold
-        /** @type {Map<string, object>} */
-        this.snapZones = new Map();
+        this.taskbarHeight = 54; // Assumed taskbar height; consider moving to CONFIG if variable
         /** @type {?HTMLElement} */
         this.contextMenu = null;
         /** @type {Array<object>} */
         this.windowStack = [];
         /** @type {Set<Function>} */
         this.stateChangeCallbacks = new Set();
-        /** @type {boolean} */
-        this.isSnappingEnabled = true;
         /** @type {Map<string, object>} */
         this.interactInstances = new Map();
+
+        this.dragHandler = new DragHandler(this);
+        this.resizeHandler = new ResizeHandler(this);
+        this.snapHandler = new SnapHandler(this);
+        this.autoScrollHandler = new AutoScrollHandler(this);
+
+        this.setupGlobalObservers();
         this.setupEventListeners();
+    }
+
+    /**
+     * Sets up global observers for resize and position changes.
+     * @private
+     * @memberof WindowManager
+     */
+    setupGlobalObservers() {
+        // Resize observer for window size changes
+        this.resizeObserver = new ResizeObserver(entries => {
+            for (const entry of entries) {
+                const windowObj = this.windows.get(entry.target.id);
+                if (windowObj) {
+                    console.log('Resize observer triggered for window:', windowObj.id, { newWidth: entry.contentRect.width, newHeight: entry.contentRect.height });
+                    this.updateWindowSize(windowObj);
+                }
+            }
+        });
+
+        // Mutation observer for position changes via style attributes
+        this.moveObserver = new MutationObserver(mutations => {
+            for (const mutation of mutations) {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                    const windowObj = this.windows.get(mutation.target.id);
+                    if (windowObj) {
+                        this.updateWindowPosition(windowObj);
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -45,29 +82,28 @@ export class WindowManager {
      * @param {number} [options.height=CONFIG.window.defaultHeight] - The height of the window.
      * @param {string} [options.icon] - The icon for the window header.
      * @param {boolean} [options.autoScroll=false] - Whether to enable auto-scroll to bottom on content updates.
+     * @param {string} [options.type='app'] - The type of window (e.g., 'app' or 'game').
+     * @param {object} [options.defaultSize=null] - Default size override.
      * @returns {HTMLElement} The created window element.
      * @memberof WindowManager
      */
     createWindow({ id, title, content, width = CONFIG.window.defaultWidth, height = CONFIG.window.defaultHeight, icon, autoScroll = false, type = 'app', defaultSize = null }) {
-        // Use defaultSize if provided, otherwise use the passed width/height
         if (defaultSize) {
             width = defaultSize.width;
             height = defaultSize.height;
         }
-        
-        // Mobile-specific window sizing
+
         const isMobile = window.innerWidth <= 768;
         if (isMobile) {
             width = window.innerWidth - 40;
-            height = window.innerHeight - 100;
+            height = window.innerHeight - 100 - this.taskbarHeight;
         }
-        
-        // Ensure window dimensions are within bounds with proper fallbacks
+
         const minWidth = isMobile ? 300 : (CONFIG.window?.minWidth || 300);
         const maxWidth = isMobile ? window.innerWidth : (CONFIG.window?.maxWidth || 1200);
         const minHeight = isMobile ? 200 : (CONFIG.window?.minHeight || 200);
         const maxHeight = isMobile ? window.innerHeight : (CONFIG.window?.maxHeight || 800);
-        
+
         width = Math.min(Math.max(width, minWidth), maxWidth);
         height = Math.min(Math.max(height, minHeight), maxHeight);
 
@@ -75,18 +111,16 @@ export class WindowManager {
         if (!desktop) {
             throw new Error('Desktop element not found! Cannot create window.');
         }
-        // Use desktop clientWidth/clientHeight for centering
+
         let left = (desktop.clientWidth - width) / 2;
         let top = (desktop.clientHeight - height) / 2;
-        
-        // Mobile-specific positioning
+
         if (isMobile) {
             left = 0;
             top = 0;
         } else {
-            // Clamp to desktop
             left = Math.max(0, Math.min(left, desktop.clientWidth - width));
-            top = Math.max(0, Math.min(top, desktop.clientHeight - height));
+            top = Math.max(0, Math.min(top, desktop.clientHeight - height - this.taskbarHeight));
         }
 
         const windowElement = document.createElement('div');
@@ -94,7 +128,7 @@ export class WindowManager {
         windowElement.id = id;
         windowElement.setAttribute('role', 'dialog');
         windowElement.setAttribute('aria-label', title);
-        windowElement.style.position = 'absolute'; // Ensure absolute positioning
+        windowElement.style.position = 'absolute';
         windowElement.style.width = `${width}px`;
         windowElement.style.height = `${height}px`;
         windowElement.style.left = `${left}px`;
@@ -128,7 +162,6 @@ export class WindowManager {
             <div class="window-resize sw" title="Resize window"></div>
         `;
         desktop.appendChild(windowElement);
-        window.scrollTo(0, 0);
 
         const windowObj = {
             element: windowElement,
@@ -142,752 +175,239 @@ export class WindowManager {
             isMaximized: false,
             isMinimized: false,
             originalPosition: { left, top, width, height },
-            autoScroll: autoScroll,
-            type: type, // Store window type (e.g., 'game' vs 'app')
-            _hasBeenResized: false // New windows start as not manually resized
+            autoScroll,
+            type,
+            _hasBeenResized: false,
+            _isSnapped: false,
+            _isDragging: false,
+            _isResizing: false
         };
 
         this.windows.set(id, windowObj);
         this.windowStack.push(windowObj);
-        
-        // Window created successfully
-        console.log('Window created successfully:', {
-            id: windowObj.id,
-            title: windowObj.title,
-            element: !!windowObj.element,
-            header: !!windowObj.element.querySelector('.window-header'),
-            controls: !!windowObj.element.querySelector('.window-controls')
-        });
-        
+
+        console.log('Window created:', { id: windowObj.id, title: windowObj.title });
+
         this.setupWindowEvents(windowObj);
         this.focusWindow(windowObj);
 
-        // Set up auto-scroll functionality if enabled
         if (autoScroll) {
-            this.setupAutoScroll(windowObj);
+            this.autoScrollHandler.setupAutoScroll(windowObj);
         }
+
+        // Attach observers
+        this.resizeObserver.observe(windowElement);
+        this.moveObserver.observe(windowElement, { attributes: true });
 
         return windowElement;
     }
 
     /**
      * Sets up event listeners for a window (drag, resize, controls).
-     * @param {object} window - The window object to set up events for.
+     * @param {object} windowObj - The window object to set up events for.
      * @private
      * @memberof WindowManager
      */
-    setupWindowEvents(window) {
-        const header = window.element.querySelector('.window-header');
-        const controls = window.element.querySelector('.window-controls');
-        const resizeHandles = window.element.querySelectorAll('.window-resize');
-
-        console.log('Setting up window events for:', window.id, {
-            header: !!header,
-            controls: !!controls,
-            resizeHandles: resizeHandles.length
-        });
+    setupWindowEvents(windowObj) {
+        const header = windowObj.element.querySelector('.window-header');
+        const controls = windowObj.element.querySelector('.window-controls');
 
         if (!header || !controls) {
-            console.error('Window header or controls not found');
+            console.error('Window header or controls not found for:', windowObj.id);
             return;
         }
 
-        // Make window draggable - check if interact.js is available
-        if (typeof interact !== 'undefined') {
-            try {
-                const dragInstance = interact(header)
-                    .draggable({
-                        inertia: false,
-                        modifiers: [
-                            interact.modifiers.restrictRect({
-                                restriction: () => {
-                                    const desktop = document.getElementById('desktop');
-                                    return {
-                                        top: 0,
-                                        left: 0,
-                                        right: desktop.clientWidth,
-                                        bottom: desktop.clientHeight
-                                    };
-                                },
-                                endOnly: true
-                            })
-                        ],
-                        autoScroll: false, // Disable autoscroll to prevent conflicts
-                        // Performance optimizations
-                        allowFrom: '.window-header',
-                        ignoreFrom: '.window-controls',
-                        listeners: {
-                            start: (event) => {
-                                // Mark window as being dragged to prevent resize conflicts
-                                const windowObj = this.windows.get(event.target.closest('.window').id);
-                                if (windowObj) {
-                                    windowObj._isDragging = true;
-                                    windowObj._isResizing = false;
-                                    // Optimize for dragging - use transform for better performance
-                                    windowObj.element.style.willChange = 'transform';
-                                    // Bring to front on drag start
-                                    this.focusWindow(windowObj);
-                                }
-                            },
-                            move: (event) => {
-                                // Direct handling for maximum performance - no throttling
-                                this.handleDragMove(event);
-                            },
-                            end: this.handleDragEnd.bind(this)
-                        }
-                    });
+        // Initialize interactInstances entry for this window
+        this.interactInstances.set(windowObj.id, {});
 
-                const resizeInstance = interact(window.element)
-                    .resizable({
-                        edges: { left: true, right: true, bottom: true, top: true },
-                        margin: 10,
-                        inertia: false,
-                        listeners: {
-                            start: (event) => {
-                                // Mark window as being resized to prevent drag conflicts and disable snapping
-                                const windowObj = this.windows.get(event.target.id);
-                                if (windowObj) {
-                                    windowObj._isResizing = true;
-                                    windowObj._isDragging = false;
-                                    // Completely disable snapping system during resize
-                                    this.isSnappingEnabled = false;
-                                    // Add visual feedback
-                                    windowObj.element.classList.add('resizing');
-                                }
-                                // Resize started
-                            },
-                            move: throttle(this.handleResizeMove.bind(this), 16), // Throttle to ~60fps
-                            end: this.handleResizeEnd.bind(this)
-                        },
-                        modifiers: [
-                            interact.modifiers.restrictSize({
-                                min: { width: 200, height: 150 }
-                            })
-                        ]
-                    });
+        this.dragHandler.setupDrag(header, windowObj);
+        this.resizeHandler.setupResize(windowObj.element, windowObj);
 
-                // Store interact instances for potential cleanup/reset
-                this.interactInstances.set(window.id, { drag: dragInstance, resize: resizeInstance });
-            } catch (error) {
-                console.error('Failed to setup window interactions:', error);
-            }
-        } else {
-            console.warn('interact.js not loaded - window dragging/resizing will not work');
-        }
-
-        // Window control buttons with error handling
         try {
             const minimizeBtn = controls.querySelector('.minimize');
             const maximizeBtn = controls.querySelector('.maximize');
             const closeBtn = controls.querySelector('.close');
 
-            console.log('Setting up window controls for:', window.id, {
-                minimizeBtn: !!minimizeBtn,
-                maximizeBtn: !!maximizeBtn,
-                closeBtn: !!closeBtn
-            });
-
-            if (minimizeBtn) {
-                minimizeBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    console.log('Minimize clicked for window:', window.id);
-                    this.minimizeWindow(window);
-                });
-            }
-            if (maximizeBtn) {
-                maximizeBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    console.log('Maximize clicked for window:', window.id);
-                    this.toggleMaximize(window);
-                });
-            }
-            if (closeBtn) {
-                closeBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    console.log('Close clicked for window:', window.id);
-                    this.closeWindow(window);
-                });
-            }
+            if (minimizeBtn) minimizeBtn.addEventListener('click', (e) => { e.stopPropagation(); this.minimizeWindow(windowObj); });
+            if (maximizeBtn) maximizeBtn.addEventListener('click', (e) => { e.stopPropagation(); this.toggleMaximize(windowObj); });
+            if (closeBtn) closeBtn.addEventListener('click', (e) => { e.stopPropagation(); this.closeWindow(windowObj); });
         } catch (error) {
-            console.error('Failed to setup window controls:', error);
+            console.error('Failed to setup controls for window:', windowObj.id, error);
         }
 
-        // Focus window on click
-        window.element.addEventListener('mousedown', () => this.focusWindow(window));
-
-        // Context menu
-        window.element.addEventListener('contextmenu', (e) => {
+        windowObj.element.addEventListener('mousedown', () => this.focusWindow(windowObj));
+        windowObj.element.addEventListener('contextmenu', (e) => {
             e.preventDefault();
-            this.showContextMenu(e, window);
+            this.showContextMenu(e, windowObj);
         });
     }
 
     /**
-     * Handles the drag movement of a window.
-     * @param {object} event - The interact.js drag event.
+     * Placeholder for showing context menu.
+     * @param {Event} e - The event.
+     * @param {object} windowObj - The window.
      * @private
      * @memberof WindowManager
      */
-    handleDragMove(event) {
-        const windowElement = event.target.closest('.window');
-        if (!windowElement) return;
-        
-        const window = this.windows.get(windowElement.id);
-        if (!window) return;
-
-        // Get current position efficiently
-        const currentLeft = parseFloat(windowElement.style.left) || 0;
-        const currentTop = parseFloat(windowElement.style.top) || 0;
-        
-        // Calculate new position
-        const newLeft = currentLeft + event.dx;
-        const newTop = currentTop + event.dy;
-
-        // Apply position changes directly for maximum performance
-        windowElement.style.left = `${newLeft}px`;
-        windowElement.style.top = `${newTop}px`;
-        
-        // Update the window object with new position
-        window.left = newLeft;
-        window.top = newTop;
-    }
-
-    /**
-     * Handles the end of a window drag event.
-     * @param {object} event - The interact.js drag event.
-     * @private
-     * @memberof WindowManager
-     */
-    handleDragEnd(event) {
-        const windowElement = event.target.closest('.window');
-        if (!windowElement) return;
-        
-        const windowObj = this.windows.get(windowElement.id);
-        if (!windowObj) return;
-
-        // Clamp position to viewport
-        const width = windowElement.offsetWidth;
-        const height = windowElement.offsetHeight;
-        let left = parseFloat(windowElement.style.left) || 0;
-        let top = parseFloat(windowElement.style.top) || 0;
-        left = Math.max(0, Math.min(left, window.innerWidth - width));
-        top = Math.max(0, Math.min(top, window.innerHeight - height));
-        windowElement.style.left = `${left}px`;
-        windowElement.style.top = `${top}px`;
-        windowObj.left = left;
-        windowObj.top = top;
-
-        // Clear dragging flag and reset optimizations
-        windowObj._isDragging = false;
-        windowObj.element.style.willChange = 'auto';
-        windowObj.element.classList.remove('dragging');
-
-        // Clear throttle
-        if (this._dragThrottle) {
-            cancelAnimationFrame(this._dragThrottle);
-            this._dragThrottle = null;
-        }
-
-        // NEVER snap windows that have been manually resized to prevent resize interference
-        // Only check snap zones for brand new windows that haven't been resized
-        if (this.isSnappingEnabled && !windowObj._isResizing && !windowObj._hasBeenResized) {
-            // Only snap if window was dragged to very extreme edges (much more conservative)
-            const rect = windowObj.element.getBoundingClientRect();
-            const threshold = 3; // Extremely small threshold
-            
-            if (rect.left <= threshold || rect.right >= window.innerWidth - threshold || 
-                rect.top <= threshold || rect.bottom >= window.innerHeight - 54 - threshold) {
-                
-                // Use requestAnimationFrame for better performance instead of setTimeout
-                requestAnimationFrame(() => {
-                    this.checkSnapZones(windowObj);
-                });
-            }
-        }
-    }
-
-    /**
-     * Handles the end of a window resize event.
-     * @param {object} event - The interact.js resize event.
-     * @private
-     * @memberof WindowManager
-     */
-    handleResizeEnd(event) {
-        const windowObj = this.windows.get(event.target.id);
-        if (!windowObj) return;
-
-        // Clear resizing flag and visual feedback
-        windowObj._isResizing = false;
-        windowObj._hasBeenResized = true; // Mark that this window has been manually resized
-        windowObj.element.classList.remove('resizing');
-
-        // Get the actual current dimensions and position from the DOM
-        // This is more reliable than trying to calculate deltas
-        const rect = windowObj.element.getBoundingClientRect();
-        const computedStyle = window.getComputedStyle(windowObj.element);
-        
-        const finalWidth = parseInt(computedStyle.width);
-        const finalHeight = parseInt(computedStyle.height);
-        const finalLeft = parseInt(computedStyle.left) || rect.left;
-        const finalTop = parseInt(computedStyle.top) || rect.top;
-
-        // Apply size constraints manually since we removed the restrictSize modifier
-        const minWidth = CONFIG.window?.minWidth || 300;
-        const minHeight = CONFIG.window?.minHeight || 200;
-        const maxWidth = window.innerWidth * 0.9;
-        const maxHeight = (window.innerHeight - 54) * 0.9;
-        
-        const constrainedWidth = Math.max(minWidth, Math.min(finalWidth, maxWidth));
-        const constrainedHeight = Math.max(minHeight, Math.min(finalHeight, maxHeight));
-
-        // Only update if constraints were violated
-        if (constrainedWidth !== finalWidth || constrainedHeight !== finalHeight) {
-            windowObj.element.style.width = `${constrainedWidth}px`;
-            windowObj.element.style.height = `${constrainedHeight}px`;
-        }
-
-        // Update window object properties with final values
-        windowObj.width = constrainedWidth;
-        windowObj.height = constrainedHeight;
-        windowObj.left = finalLeft;
-        windowObj.top = finalTop;
-        
-        // Reset any snapped state since user manually resized
-        windowObj.isMaximized = false;
-        windowObj._isSnapped = false;
-        
-        // Store the new position as the original position for future operations
-        windowObj.originalPosition = {
-            left: finalLeft,
-            top: finalTop,
-            width: constrainedWidth,
-            height: constrainedHeight
-        };
-        
-        // Re-enable snapping but mark this window as having been manually resized
-        // This prevents future automatic snapping for this specific window
-        setTimeout(() => {
-            this.isSnappingEnabled = true;
-            console.log('🔄 Snapping re-enabled globally, but window marked as manually resized');
-        }, 1000);
-        
-        console.log('✅ Resize completed successfully - Window dimensions:', { 
-            id: windowObj.id,
-            width: constrainedWidth, 
-            height: constrainedHeight, 
-            left: finalLeft, 
-            top: finalTop 
-        });
-    }
-
-    /**
-     * Handles the resize event of a window.
-     * @param {object} event - The interact.js resize event.
-     * @private
-     * @memberof WindowManager
-     */
-    handleResizeMove(event) {
-        const windowObj = this.windows.get(event.target.id);
-        if (!windowObj) {
-            console.warn('⚠️ Window object not found during resize move:', event.target.id);
-            return;
-        }
-
-        // Ensure snapping is completely disabled during resize
-        this.isSnappingEnabled = false;
-        
-        // Apply the new dimensions and position from interact.js
-        // interact.js handles the complex resize calculations, we just apply them
-        event.target.style.width = event.rect.width + 'px';
-        event.target.style.height = event.rect.height + 'px';
-        
-        // Update position based on interact.js calculations
-        // This handles edge cases like resizing from top/left edges
-        event.target.style.left = event.rect.left + 'px';
-        event.target.style.top = event.rect.top + 'px';
-        
-        // Update our window object state to match the new dimensions
-        windowObj.width = event.rect.width;
-        windowObj.height = event.rect.height;
-        windowObj.left = event.rect.left;
-        windowObj.top = event.rect.top;
-        
-        // Mark that this window is no longer in a snapped/maximized state
-        windowObj.isMaximized = false;
-        windowObj._isSnapped = false;
-    }
-
-    /**
-     * Checks if a window is in a snap zone and snaps it if it is.
-     * @param {object} windowObj - The window to check.
-     * @private
-     * @memberof WindowManager
-     */
-    checkSnapZones(windowObj) {
-        // Don't snap if window is maximized, currently being resized, has been manually resized, or snapping is disabled
-        if (windowObj.isMaximized || windowObj._isResizing || windowObj._hasBeenResized || 
-            !this.isSnappingEnabled || windowObj._isSnapped) {
-            console.log('🚫 Snap check skipped:', {
-                isMaximized: windowObj.isMaximized,
-                isResizing: windowObj._isResizing,
-                hasBeenResized: windowObj._hasBeenResized,
-                snappingEnabled: this.isSnappingEnabled,
-                isSnapped: windowObj._isSnapped
-            });
-            return;
-        }
-
-        const rect = windowObj.element.getBoundingClientRect();
-        const snapZones = this.getSnapZones();
-
-        for (const [zone, bounds] of snapZones) {
-            if (this.isInSnapZone(rect, bounds)) {
-                console.log('📌 Snapping window to:', zone);
-                this.snapWindowToZone(windowObj, zone);
-                return;
-            }
-        }
-    }
-
-    /**
-     * Disables snapping temporarily
-     * @param {number} duration - How long to disable snapping in milliseconds
-     * @memberof WindowManager
-     */
-    disableSnapping(duration = 1000) {
-        this.isSnappingEnabled = false;
-        clearTimeout(this._snapTimeout);
-        this._snapTimeout = setTimeout(() => {
-            this.isSnappingEnabled = true;
-        }, duration);
-    }
-
-    /**
-     * Gets the defined screen snap zones.
-     * @returns {Map<string, object>} A map of snap zones.
-     * @private
-     * @memberof WindowManager
-     */
-    getSnapZones() {
-        const zones = new Map();
-        const screenWidth = window.innerWidth;
-        const screenHeight = window.innerHeight;
-
-        // Left half
-        zones.set('left', {
-            left: 0,
-            top: 0,
-            width: screenWidth / 2,
-            height: screenHeight
-        });
-
-        // Right half
-        zones.set('right', {
-            left: screenWidth / 2,
-            top: 0,
-            width: screenWidth / 2,
-            height: screenHeight
-        });
-
-        // Top half
-        zones.set('top', {
-            left: 0,
-            top: 0,
-            width: screenWidth,
-            height: screenHeight / 2
-        });
-
-        // Bottom half
-        zones.set('bottom', {
-            left: 0,
-            top: screenHeight / 2,
-            width: screenWidth,
-            height: screenHeight / 2
-        });
-
-        return zones;
-    }
-
-    /**
-     * Checks if a rectangle is within a snap zone.
-     * @param {DOMRect} rect - The rectangle to check.
-     * @param {object} zone - The snap zone to check against.
-     * @returns {boolean} True if the rectangle is in the snap zone.
-     * @private
-     * @memberof WindowManager
-     */
-    isInSnapZone(rect, zone) {
-        // Much more conservative snap detection - only at extreme edges
-        const threshold = this.snapThreshold;
-        
-        // Left zone - only when window is very close to left edge
-        if (zone.left === 0 && zone.width === window.innerWidth / 2) {
-            return rect.left <= threshold;
-        } 
-        // Right zone - only when window is very close to right edge
-        else if (zone.left === window.innerWidth / 2 && zone.width === window.innerWidth / 2) {
-            return rect.right >= window.innerWidth - threshold;
-        } 
-        // Top zone - only when window is very close to top edge
-        else if (zone.top === 0 && zone.height === (window.innerHeight - 54) / 2) {
-            return rect.top <= threshold;
-        } 
-        // Bottom zone - only when window is very close to bottom edge  
-        else if (zone.top === (window.innerHeight - 54) / 2) {
-            return rect.bottom >= window.innerHeight - 54 - threshold;
-        }
-        
-        return false;
-    }
-
-    /**
-     * Snaps a window to a specific zone.
-     * @param {object} windowObj - The window to snap.
-     * @param {string} zone - The name of the zone to snap to.
-     * @private
-     * @memberof WindowManager
-     */
-    snapWindowToZone(windowObj, zone) {
-        // Temporarily disable snapping to prevent recursive calls
-        this.isSnappingEnabled = false;
-
-        const screenWidth = window.innerWidth;
-        const screenHeight = window.innerHeight;
-
-        let newLeft, newTop, newWidth, newHeight;
-
-        switch (zone) {
-            case 'left':
-                newLeft = 0;
-                newTop = 0;
-                newWidth = Math.floor(screenWidth / 2);
-                newHeight = screenHeight;
-                break;
-            case 'right':
-                newLeft = Math.floor(screenWidth / 2);
-                newTop = 0;
-                newWidth = Math.floor(screenWidth / 2);
-                newHeight = screenHeight;
-                break;
-            case 'top':
-                newLeft = 0;
-                newTop = 0;
-                newWidth = screenWidth;
-                newHeight = Math.floor(screenHeight / 2);
-                break;
-            case 'bottom':
-                newLeft = 0;
-                newTop = Math.floor(screenHeight / 2);
-                newWidth = screenWidth;
-                newHeight = Math.floor(screenHeight / 2);
-                break;
-            default:
-                this.isSnappingEnabled = true;
-                return;
-        }
-
-        // Store original position before snapping
-        if (!windowObj.originalPosition || !windowObj._isSnapped) {
-            windowObj.originalPosition = {
-                left: windowObj.left,
-                top: windowObj.top,
-                width: windowObj.width,
-                height: windowObj.height
-            };
-        }
-
-        // Apply the new dimensions and position
-        windowObj.element.style.left = `${newLeft}px`;
-        windowObj.element.style.top = `${newTop}px`;
-        windowObj.element.style.width = `${newWidth}px`;
-        windowObj.element.style.height = `${newHeight}px`;
-
-        // Update the window object properties
-        windowObj.left = newLeft;
-        windowObj.top = newTop;
-        windowObj.width = newWidth;
-        windowObj.height = newHeight;
-        windowObj.isMaximized = false;
-        windowObj._isSnapped = true;
-
-        // DO NOT reset interact.js instances - this breaks resize functionality!
-        // Instead, just update the element properties and let interact.js handle the rest
-
-        // Re-enable snapping after a delay
-        setTimeout(() => {
-            this.isSnappingEnabled = true;
-        }, 100);
+    showContextMenu(e, windowObj) {
+        console.log('Context menu requested for window:', windowObj.id);
+        // Implement context menu logic here if needed
     }
 
     /**
      * Minimizes a window.
-     * @param {object} window - The window to minimize.
+     * @param {object} windowObj - The window to minimize.
      * @memberof WindowManager
      */
-    minimizeWindow(window) {
-        if (window.isMinimized) {
-            this.restoreWindow(window);
+    minimizeWindow(windowObj) {
+        if (windowObj.isMinimized) {
+            this.restoreWindow(windowObj);
         } else {
-            window.isMinimized = true;
-            window.element.classList.add('minimizing');
-            window.element.style.transform = 'translateY(100vh)';
+            windowObj.isMinimized = true;
+            windowObj.element.classList.add('minimizing');
+            windowObj.element.style.transform = 'translateY(100vh)';
             setTimeout(() => {
-                window.element.style.display = 'none';
-                window.element.classList.remove('minimizing');
+                windowObj.element.style.display = 'none';
+                windowObj.element.classList.remove('minimizing');
             }, 300);
         }
     }
 
     /**
-     * Restores a window from a minimized or maximized state.
-     * @param {object} window - The window to restore.
+     * Restores a window from minimized or maximized state.
+     * @param {object} windowObj - The window to restore.
      * @memberof WindowManager
      */
-    restoreWindow(window) {
-        window.isMinimized = false;
-        window.element.style.display = '';
-        window.element.classList.add('restoring');
-        window.element.style.transform = '';
-        window.element.style.left = window.originalPosition.left;
-        window.element.style.top = window.originalPosition.top;
-        window.element.style.width = window.originalPosition.width;
-        window.element.style.height = window.originalPosition.height;
+    restoreWindow(windowObj) {
+        windowObj.isMinimized = false;
+        windowObj.element.style.display = '';
+        windowObj.element.classList.add('restoring');
+        windowObj.element.style.transform = '';
+        windowObj.element.style.left = `${windowObj.originalPosition.left}px`;
+        windowObj.element.style.top = `${windowObj.originalPosition.top}px`;
+        windowObj.element.style.width = `${windowObj.originalPosition.width}px`;
+        windowObj.element.style.height = `${windowObj.originalPosition.height}px`;
         setTimeout(() => {
-            window.element.classList.remove('restoring');
+            windowObj.element.classList.remove('restoring');
         }, 300);
     }
 
     /**
      * Toggles the maximized state of a window.
-     * @param {object} window - The window to toggle.
+     * @param {object} windowObj - The window to toggle.
      * @memberof WindowManager
      */
-    toggleMaximize(window) {
-        if (window.isMaximized) {
-            this.unmaximizeWindow(window);
+    toggleMaximize(windowObj) {
+        if (windowObj.isMaximized) {
+            this.unmaximizeWindow(windowObj);
         } else {
-            this.maximizeWindow(window);
+            this.maximizeWindow(windowObj);
         }
     }
 
     /**
-     * Maximizes a window to fill the screen.
-     * @param {object} window - The window to maximize.
+     * Maximizes a window to fill the screen, accounting for taskbar.
+     * @param {object} windowObj - The window to maximize.
      * @private
      * @memberof WindowManager
      */
-    maximizeWindow(window) {
-        window.isMaximized = true;
-        window.originalPosition = {
-            left: window.element.style.left,
-            top: window.element.style.top,
-            width: window.element.style.width,
-            height: window.element.style.height
+    maximizeWindow(windowObj) {
+        windowObj.isMaximized = true;
+        windowObj.originalPosition = {
+            left: windowObj.element.style.left,
+            top: windowObj.element.style.top,
+            width: windowObj.element.style.width,
+            height: windowObj.element.style.height
         };
 
-        window.element.classList.add('maximizing');
-        window.element.classList.add('maximized');
-
-        // Fill the desktop exactly
-        window.element.style.left = '0px';
-        window.element.style.top = '0px';
-        window.element.style.width = '100vw';
-        window.element.style.height = '100vh';
+        windowObj.element.classList.add('maximizing', 'maximized');
+        windowObj.element.style.left = '0px';
+        windowObj.element.style.top = '0px';
+        windowObj.element.style.width = '100vw';
+        windowObj.element.style.height = `calc(100vh - ${this.taskbarHeight}px)`;
 
         setTimeout(() => {
-            window.element.classList.remove('maximizing');
+            windowObj.element.classList.remove('maximizing');
         }, 300);
 
-        console.log('🔍 Window maximized:', { 
-            id: window.id, 
-            width: '100vw', 
-            height: '100vh'
-        });
+        console.log('Window maximized:', { id: windowObj.id });
     }
 
     /**
-     * Restores a window from the maximized state.
-     * @param {object} window - The window to unmaximize.
+     * Restores a window from maximized state.
+     * @param {object} windowObj - The window to unmaximize.
      * @private
      * @memberof WindowManager
      */
-    unmaximizeWindow(window) {
-        window.isMaximized = false;
-        window.element.classList.add('unmaximizing');
-        window.element.classList.remove('maximized');
-        
-        window.element.style.left = window.originalPosition.left;
-        window.element.style.top = window.originalPosition.top;
-        window.element.style.width = window.originalPosition.width;
-        window.element.style.height = window.originalPosition.height;
-        
+    unmaximizeWindow(windowObj) {
+        windowObj.isMaximized = false;
+        windowObj.element.classList.add('unmaximizing');
+        windowObj.element.classList.remove('maximized');
+
+        windowObj.element.style.left = `${windowObj.originalPosition.left}px`;
+        windowObj.element.style.top = `${windowObj.originalPosition.top}px`;
+        windowObj.element.style.width = `${windowObj.originalPosition.width}px`;
+        windowObj.element.style.height = `${windowObj.originalPosition.height}px`;
+
         setTimeout(() => {
-            window.element.classList.remove('unmaximizing');
+            windowObj.element.classList.remove('unmaximizing');
         }, 300);
-        
-        console.log('🔍 Window unmaximized:', { 
-            id: window.id, 
-            restored: window.originalPosition 
-        });
+
+        console.log('Window unmaximized:', { id: windowObj.id });
     }
 
     /**
      * Closes a window and removes it from the desktop.
-     * @param {object} window - The window object to close.
+     * @param {object} windowObj - The window to close.
      * @memberof WindowManager
      */
-    closeWindow(window) {
-        if (!window || !window.element) return;
+    closeWindow(windowObj) {
+        if (!windowObj || !windowObj.element) return;
 
-        // Play window closing sound
-        if (window.bootSystemInstance) {
-            window.bootSystemInstance.playWindowCloseSound();
+        // Play closing sound using global namespace if available
+        if (window.neuOS && window.neuOS.bootSystemInstance) {
+            window.neuOS.bootSystemInstance.playWindowCloseSound();
         }
 
-        // Remove from DOM
-        window.element.remove();
-        
-        // Remove from windows map
-        this.windows.delete(window.id);
-        
-        // Remove from window stack
-        this.windowStack = this.windowStack.filter(w => w.id !== window.id);
-        
-        // Clean up interact instances
-        if (this.interactInstances.has(window.id)) {
-            const instances = this.interactInstances.get(window.id);
-            try {
-                if (instances.drag) instances.drag.unset();
-                if (instances.resize) instances.resize.unset();
-            } catch (error) {
-                console.warn('Failed to cleanup interact instances:', error);
-            }
-            this.interactInstances.delete(window.id);
+        windowObj.element.remove();
+
+        // Disconnect observers and auto-scroll
+        this.resizeObserver.unobserve(windowObj.element);
+        this.moveObserver.unobserve(windowObj.element);
+        this.autoScrollHandler.disableAutoScroll(windowObj.id);
+
+        this.windows.delete(windowObj.id);
+        this.windowStack = this.windowStack.filter(w => w.id !== windowObj.id);
+
+        if (this.interactInstances.has(windowObj.id)) {
+            const instances = this.interactInstances.get(windowObj.id);
+            if (instances.drag) instances.drag.unset();
+            if (instances.resize) instances.resize.unset();
+            this.interactInstances.delete(windowObj.id);
         }
-        
-        // Focus the next window in stack if available
+
         if (this.windowStack.length > 0) {
             this.focusWindow(this.windowStack[this.windowStack.length - 1]);
         } else {
             this.activeWindow = null;
         }
-        
+
         this.notifyStateChange();
     }
 
     /**
-     * Brings a window to the front and sets it as the active window.
-     * @param {object} window - The window to focus.
+     * Brings a window to the front and sets it as active.
+     * @param {object} windowObj - The window to focus.
      * @memberof WindowManager
      */
-    focusWindow(window) {
+    focusWindow(windowObj) {
         if (this.activeWindow) {
             this.activeWindow.element.classList.remove('focused');
         }
-        window.element.classList.add('focused');
-        this.activeWindow = window;
-        this.windowStack = this.windowStack.filter(w => w.id !== window.id);
-        this.windowStack.push(window);
+        windowObj.element.classList.add('focused');
+        this.activeWindow = windowObj;
+        this.windowStack = this.windowStack.filter(w => w.id !== windowObj.id);
+        this.windowStack.push(windowObj);
         this.notifyStateChange();
     }
 
@@ -898,88 +418,68 @@ export class WindowManager {
      * @memberof WindowManager
      */
     getNextZIndex() {
-        this.zIndexCounter += 10; // Use larger increments to avoid conflicts
-        console.log('🔢 Assigning z-index:', this.zIndexCounter);
+        this.zIndexCounter += 10;
         return this.zIndexCounter;
     }
 
     /**
-     * Sets up global event listeners for the window manager.
+     * Sets up global event listeners for the window manager (placeholder for future expansions).
      * @private
      * @memberof WindowManager
      */
     setupEventListeners() {
-        // Add window resize observer
-        const resizeObserver = new ResizeObserver(entries => {
-            for (const entry of entries) {
-                const window = this.windows.get(entry.target.id);
-                if (window) {
-                    this.updateWindowSize(window, entry.contentRect.width, entry.contentRect.height);
-                }
-            }
-        });
-
-        // Add window move observer
-        const moveObserver = new MutationObserver(mutations => {
-            for (const mutation of mutations) {
-                if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-                    const window = this.windows.get(mutation.target.id);
-                    if (window) {
-                        this.updateWindowPosition(window);
-                    }
-                }
-            }
-        });
-
-        // Observe all windows
-        this.windows.forEach(window => {
-            resizeObserver.observe(window.element);
-            moveObserver.observe(window.element, { attributes: true });
-        });
+        // Currently empty; add global listeners (e.g., keyboard shortcuts) here if needed
     }
 
     /**
-     * Updates the size of a window.
-     * @param {object} window - The window to update.
-     * @param {number} width - The new width.
-     * @param {number} height - The new height.
-     * @memberof WindowManager
-     */
-    updateWindowSize(window, width, height) {
-        // Ensure window stays within bounds
-        const safeWidth = CONFIG.window?.minWidth || 300;
-        const safeMaxWidth = CONFIG.window?.maxWidth || 1200;
-        const safeHeight = CONFIG.window?.minHeight || 200;
-        const safeMaxHeight = CONFIG.window?.maxHeight || 800;
-        
-        width = Math.min(Math.max(width, safeWidth), safeMaxWidth);
-        height = Math.min(Math.max(height, safeHeight), safeMaxHeight);
-        
-        window.element.style.width = `${width}px`;
-        window.element.style.height = `${height}px`;
-    }
-
-    /**
-     * Updates the position of a window.
-     * @param {object} window - The window to update.
+     * Updates the size of a window, enforcing bounds based on outer dimensions.
+     * @param {object} windowObj - The window to update.
      * @private
      * @memberof WindowManager
      */
-    updateWindowPosition(window) {
-        // Ensure window stays within viewport
-        const rect = window.element.getBoundingClientRect();
+    updateWindowSize(windowObj) {
+        const currentWidth = windowObj.element.offsetWidth;
+        const currentHeight = windowObj.element.offsetHeight;
+
+        const minWidth = CONFIG.window?.minWidth || 300;
+        const maxWidth = CONFIG.window?.maxWidth || 1200;
+        const minHeight = CONFIG.window?.minHeight || 200;
+        const maxHeight = CONFIG.window?.maxHeight || 800;
+
+        const clampedWidth = Math.min(Math.max(currentWidth, minWidth), maxWidth);
+        const clampedHeight = Math.min(Math.max(currentHeight, minHeight), maxHeight);
+
+        if (clampedWidth !== currentWidth || clampedHeight !== currentHeight) {
+            console.log('Clamping window size:', windowObj.id, { from: {width: currentWidth, height: currentHeight}, to: {width: clampedWidth, height: clampedHeight} });
+            windowObj.element.style.width = `${clampedWidth}px`;
+            windowObj.element.style.height = `${clampedHeight}px`;
+            windowObj.width = clampedWidth;
+            windowObj.height = clampedHeight;
+        }
+    }
+
+    /**
+     * Updates the position of a window, enforcing viewport bounds.
+     * @param {object} windowObj - The window to update.
+     * @private
+     * @memberof WindowManager
+     */
+    updateWindowPosition(windowObj) {
+        const rect = windowObj.element.getBoundingClientRect();
         const maxX = window.innerWidth - rect.width;
-        const maxY = window.innerHeight - rect.height;
+        const maxY = window.innerHeight - rect.height - this.taskbarHeight;
 
         let left = Math.max(0, Math.min(rect.left, maxX));
         let top = Math.max(0, Math.min(rect.top, maxY));
 
-        window.element.style.left = `${left}px`;
-        window.element.style.top = `${top}px`;
+        windowObj.element.style.left = `${left}px`;
+        windowObj.element.style.top = `${top}px`;
+        windowObj.left = left;
+        windowObj.top = top;
     }
 
     /**
-     * Notifies all registered callbacks that the window state has changed.
+     * Notifies registered callbacks of state changes.
      * @private
      * @memberof WindowManager
      */
@@ -988,137 +488,13 @@ export class WindowManager {
     }
 
     /**
-     * Registers a callback to be called when the window state changes.
-     * @param {Function} callback - The callback function.
+     * Registers a callback for window state changes.
+     * @param {Function} callback - The callback.
+     * @returns {Function} Unsubscribe function.
      * @memberof WindowManager
      */
     onStateChange(callback) {
         this.stateChangeCallbacks.add(callback);
         return () => this.stateChangeCallbacks.delete(callback);
-    }
-
-    /**
-     * Sets up auto-scroll functionality for a window.
-     * @param {object} window - The window object to set up auto-scroll for.
-     * @private
-     * @memberof WindowManager
-     */
-    setupAutoScroll(window) {
-        const windowContent = window.element.querySelector('.window-content');
-        
-        // Create a mutation observer to watch for content changes
-        const observer = new MutationObserver((mutations) => {
-            // Check if we should scroll to top instead of bottom
-            let shouldScrollToTop = false;
-            
-            mutations.forEach(mutation => {
-                if (mutation.type === 'childList') {
-                    mutation.addedNodes.forEach(node => {
-                        if (node.nodeType === Node.ELEMENT_NODE) {
-                            const content = node.textContent || node.innerHTML || '';
-                            if (this.shouldScrollToTop(window, content)) {
-                                shouldScrollToTop = true;
-                            }
-                        }
-                    });
-                }
-            });
-            
-            if (shouldScrollToTop) {
-                // Use setTimeout to ensure this happens after the content is fully rendered
-                setTimeout(() => this.scrollToTop(window), 10);
-            } else {
-                this.scrollToBottom(window);
-            }
-        });
-
-        // Observe changes to the window content
-        observer.observe(windowContent, {
-            childList: true,
-            subtree: true,
-            characterData: true
-        });
-
-        // Store the observer so we can disconnect it when the window is closed
-        window.scrollObserver = observer;
-    }
-
-    /**
-     * Scrolls a window's content to the bottom.
-     * @param {object} window - The window object to scroll.
-     * @memberof WindowManager
-     */
-    scrollToBottom(window) {
-        const windowContent = window.element.querySelector('.window-content');
-        if (windowContent) {
-            // Check if there's a specific scroll container (like terminal output)
-            const scrollContainer = windowContent.querySelector('[data-scroll-container]') || windowContent;
-            scrollContainer.scrollTop = scrollContainer.scrollHeight;
-        }
-    }
-
-    /**
-     * Scrolls a window's content to the top.
-     * @param {object} window - The window object to scroll.
-     * @memberof WindowManager
-     */
-    scrollToTop(window) {
-        const windowContent = window.element.querySelector('.window-content');
-        if (windowContent) {
-            // Check if there's a specific scroll container (like terminal output)
-            const scrollContainer = windowContent.querySelector('[data-scroll-container]') || windowContent;
-            scrollContainer.scrollTop = 0;
-        }
-    }
-
-    /**
-     * Determines if content should scroll to top (for document-like content).
-     * @param {object} window - The window object.
-     * @param {string} content - The content being added.
-     * @returns {boolean} True if should scroll to top.
-     * @memberof WindowManager
-     */
-    shouldScrollToTop(window, content) {
-        // Check if it's document-like content (contains headings, structured text)
-        if (typeof content === 'string' && (
-            content.includes('terminal-heading') ||
-            content.includes('<h1>') ||
-            content.includes('<h2>') ||
-            content.includes('<h3>') ||
-            content.includes('resume') ||
-            content.includes('document')
-        )) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Enables auto-scroll for an existing window.
-     * @param {string} windowId - The ID of the window to enable auto-scroll for.
-     * @memberof WindowManager
-     */
-    enableAutoScroll(windowId) {
-        const window = this.windows.get(windowId);
-        if (window && !window.autoScroll) {
-            window.autoScroll = true;
-            this.setupAutoScroll(window);
-        }
-    }
-
-    /**
-     * Disables auto-scroll for an existing window.
-     * @param {string} windowId - The ID of the window to disable auto-scroll for.
-     * @memberof WindowManager
-     */
-    disableAutoScroll(windowId) {
-        const window = this.windows.get(windowId);
-        if (window && window.autoScroll) {
-            window.autoScroll = false;
-            if (window.scrollObserver) {
-                window.scrollObserver.disconnect();
-                delete window.scrollObserver;
-            }
-        }
     }
 }
