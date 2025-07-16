@@ -43,11 +43,11 @@ body:not(.boot-active):not(.login-active) {
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--spacing-lg);
-    max-width: 80px;
-    width: 80px;
+    max-width: 100px;
+    width: 100px;
     padding: var(--spacing-lg);
     transition: all var(--transition);
-    --icon-min-width: 48px;
+    --icon-min-width: 60px;
     --icon-gap: var(--spacing-lg);
     z-index: 10;
 }
@@ -72,7 +72,7 @@ body:not(.boot-active):not(.login-active) {
 }
 
 .desktop-icon .icon {
-    font-size: 48px;
+    font-size: 60px;
     color: var(--text-color);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
@@ -80,8 +80,8 @@ body:not(.boot-active):not(.login-active) {
 }
 
 .desktop-icon .icon svg {
-    width: 48px;
-    height: 48px;
+    width: 60px;
+    height: 60px;
 }
 
 .desktop-icon .label {
@@ -109,10 +109,10 @@ body:not(.boot-active):not(.login-active) {
     #desktop-icons {
         grid-template-columns: 1fr;
         gap: var(--spacing-lg);
-        max-width: 80px;
-        width: 80px;
+        max-width: 100px;
+        width: 100px;
         padding: var(--spacing-md);
-        --icon-min-width: 48px;
+        --icon-min-width: 60px;
         --icon-gap: var(--spacing-lg);
     }
     .desktop-icon {
@@ -121,11 +121,11 @@ body:not(.boot-active):not(.login-active) {
         padding: 0;
     }
     .desktop-icon .icon {
-        font-size: 48px;
+        font-size: 60px;
     }
     .desktop-icon .icon svg {
-        width: 48px;
-        height: 48px;
+        width: 60px;
+        height: 60px;
     }
 }
 @media (max-width: 768px) {
@@ -134,10 +134,10 @@ body:not(.boot-active):not(.login-active) {
         left: var(--spacing-md);
         grid-template-columns: 1fr;
         gap: var(--spacing-md);
-        max-width: 60px;
-        width: 60px;
+        max-width: 75px;
+        width: 75px;
         padding: var(--spacing-sm);
-        --icon-min-width: 36px;
+        --icon-min-width: 45px;
         --icon-gap: var(--spacing-md);
     }
     .desktop-icon {
@@ -146,21 +146,21 @@ body:not(.boot-active):not(.login-active) {
         padding: 0;
     }
     .desktop-icon .icon {
-        font-size: 36px;
+        font-size: 45px;
     }
     .desktop-icon .icon svg {
-        width: 36px;
-        height: 36px;
+        width: 45px;
+        height: 45px;
     }
 }
 @media (min-width: 769px) and (max-width: 1199px) {
     #desktop-icons {
         grid-template-columns: 1fr;
         gap: var(--spacing-md);
-        max-width: 70px;
-        width: 70px;
+        max-width: 88px;
+        width: 88px;
         padding: var(--spacing-sm);
-        --icon-min-width: 42px;
+        --icon-min-width: 52px;
         --icon-gap: var(--spacing-md);
     }
     .desktop-icon {
@@ -169,11 +169,11 @@ body:not(.boot-active):not(.login-active) {
         padding: 0;
     }
     .desktop-icon .icon {
-        font-size: 42px;
+        font-size: 52px;
     }
     .desktop-icon .icon svg {
-        width: 42px;
-        height: 42px;
+        width: 52px;
+        height: 52px;
     }
 }
 @media (max-width: 480px) {
@@ -182,10 +182,10 @@ body:not(.boot-active):not(.login-active) {
         left: var(--spacing-sm);
         grid-template-columns: 1fr;
         gap: var(--spacing-sm);
-        max-width: 50px;
-        width: 50px;
+        max-width: 63px;
+        width: 63px;
         padding: var(--spacing-xs);
-        --icon-min-width: 30px;
+        --icon-min-width: 38px;
         --icon-gap: var(--spacing-sm);
     }
     .desktop-icon {
@@ -194,11 +194,11 @@ body:not(.boot-active):not(.login-active) {
         padding: 0;
     }
     .desktop-icon .icon {
-        font-size: 30px;
+        font-size: 38px;
     }
     .desktop-icon .icon svg {
-        width: 30px;
-        height: 30px;
+        width: 38px;
+        height: 38px;
     }
 }
 /* Prevent desktop icon SVG from inheriting color property */

@@ -52,7 +52,6 @@ export class WindowManager {
             for (const entry of entries) {
                 const windowObj = this.windows.get(entry.target.id);
                 if (windowObj) {
-                    console.log('Resize observer triggered for window:', windowObj.id, { newWidth: entry.contentRect.width, newHeight: entry.contentRect.height });
                     this.updateWindowSize(windowObj);
                 }
             }
@@ -179,8 +178,6 @@ export class WindowManager {
         this.windows.set(id, windowObj);
         this.windowStack.push(windowObj);
 
-        console.log('Window created:', { id: windowObj.id, title: windowObj.title });
-
         this.setupWindowEvents(windowObj);
         this.focusWindow(windowObj);
 
@@ -221,30 +218,21 @@ export class WindowManager {
             const maximizeBtn = controls.querySelector('.maximize');
             const closeBtn = controls.querySelector('.close');
 
-            console.log('Window controls found for', windowObj.id, ':', {
-                minimize: !!minimizeBtn,
-                maximize: !!maximizeBtn,
-                close: !!closeBtn
-            });
-
             if (minimizeBtn) {
                 minimizeBtn.addEventListener('click', (e) => { 
                     e.stopPropagation(); 
-                    console.log('Minimize button clicked for window:', windowObj.id);
                     this.minimizeWindow(windowObj); 
                 });
             }
             if (maximizeBtn) {
                 maximizeBtn.addEventListener('click', (e) => { 
                     e.stopPropagation(); 
-                    console.log('Maximize button clicked for window:', windowObj.id);
                     this.toggleMaximize(windowObj); 
                 });
             }
             if (closeBtn) {
                 closeBtn.addEventListener('click', (e) => { 
                     e.stopPropagation(); 
-                    console.log('Close button clicked for window:', windowObj.id);
                     this.closeWindow(windowObj); 
                 });
             }
@@ -267,7 +255,6 @@ export class WindowManager {
      * @memberof WindowManager
      */
     showContextMenu(e, windowObj) {
-        console.log('Context menu requested for window:', windowObj.id);
         // Implement context menu logic here if needed
     }
 
@@ -277,12 +264,9 @@ export class WindowManager {
      * @memberof WindowManager
      */
     minimizeWindow(windowObj) {
-        console.log('minimizeWindow called for:', windowObj.id, 'isMinimized:', windowObj.isMinimized);
         if (windowObj.isMinimized) {
-            console.log('Restoring window:', windowObj.id);
             this.restoreWindow(windowObj);
         } else {
-            console.log('Minimizing window:', windowObj.id);
             windowObj.isMinimized = true;
             windowObj.element.classList.add('minimizing');
             windowObj.element.style.transform = 'translateY(100vh)';
@@ -318,12 +302,9 @@ export class WindowManager {
      * @memberof WindowManager
      */
     toggleMaximize(windowObj) {
-        console.log('toggleMaximize called for:', windowObj.id, 'isMaximized:', windowObj.isMaximized);
         if (windowObj.isMaximized) {
-            console.log('Unmaximizing window:', windowObj.id);
             this.unmaximizeWindow(windowObj);
         } else {
-            console.log('Maximizing window:', windowObj.id);
             this.maximizeWindow(windowObj);
         }
     }
@@ -352,8 +333,6 @@ export class WindowManager {
         setTimeout(() => {
             windowObj.element.classList.remove('maximizing');
         }, 300);
-
-        console.log('Window maximized:', { id: windowObj.id });
     }
 
     /**
@@ -381,8 +360,6 @@ export class WindowManager {
         setTimeout(() => {
             windowObj.element.classList.remove('unmaximizing');
         }, 300);
-
-        console.log('Window unmaximized:', { id: windowObj.id });
     }
 
     /**
@@ -494,7 +471,6 @@ export class WindowManager {
         const clampedHeight = Math.min(Math.max(currentHeight, minHeight), maxHeight);
 
         if (clampedWidth !== currentWidth || clampedHeight !== currentHeight) {
-            console.log('Clamping window size:', windowObj.id, { from: {width: currentWidth, height: currentHeight}, to: {width: clampedWidth, height: clampedHeight} });
             windowObj.element.style.width = `${clampedWidth}px`;
             windowObj.element.style.height = `${clampedHeight}px`;
             windowObj.width = clampedWidth;

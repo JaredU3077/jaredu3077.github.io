@@ -386,7 +386,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         setTimeout(() => {
             const desktop = document.getElementById('desktop');
             if (desktop && !document.body.classList.contains('boot-active') && !document.body.classList.contains('login-active')) {
-                console.log('neuOS: Ensuring desktop is visible...');
                 desktop.style.opacity = '1';
                 desktop.style.visibility = 'visible';
             }
@@ -399,7 +398,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // GitHub Pages specific optimizations
         if (window.location.hostname.includes('github.io')) {
-            console.log('neuOS: Applying GitHub Pages optimizations');
             // Disable heavy features on GitHub Pages to improve performance
             if (window.particleSystemInstance) {
                 window.particleSystemInstance.maxParticles = 50; // Reduce particle count
@@ -472,7 +470,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (desktop) {
                         desktop.style.opacity = '1';
                         desktop.style.visibility = 'visible';
-                        console.log('neuOS: Desktop made visible via login observer');
                     }
                     
                     addNeuOSWidget();

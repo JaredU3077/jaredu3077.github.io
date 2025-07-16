@@ -56,8 +56,6 @@ export const modeMixin = {
             
             // Regenerate particles with new settings
             this.regenerateParticles();
-            
-            console.log(`Particle mode changed to: ${modeConfig.name}`);
         }
     },
 

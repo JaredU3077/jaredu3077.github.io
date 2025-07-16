@@ -44,14 +44,13 @@ export class AudioSystem {
                     // Audio context will be resumed on first user interaction
                     const resumeAudio = () => {
                         if (this.audioContext && this.audioContext.state === 'suspended') {
-                            this.audioContext.resume().then(() => {
-                                console.log('🎵 Audio context resumed successfully');
-                                this.setupAudioNodes();
-                                // Play a subtle sound to indicate audio is ready
-                                this.queuePostInteractionSounds();
-                            }).catch(err => {
-                                console.warn('Failed to resume audio context:', err);
-                            });
+                                                    this.audioContext.resume().then(() => {
+                            this.setupAudioNodes();
+                            // Play a subtle sound to indicate audio is ready
+                            this.queuePostInteractionSounds();
+                        }).catch(err => {
+                            console.warn('Failed to resume audio context:', err);
+                        });
                         }
                         // Remove listeners after first interaction
                         document.removeEventListener('click', resumeAudio);
@@ -103,7 +102,7 @@ export class AudioSystem {
         const resumeHowlerAudio = () => {
             if (window.Howler && window.Howler.ctx && window.Howler.ctx.state === 'suspended') {
                 window.Howler.ctx.resume().then(() => {
-                    console.log('🎵 Howler.js audio context resumed successfully');
+                    // Howler.js audio context resumed successfully
                 }).catch(err => {
                     console.warn('Failed to resume Howler.js audio context:', err);
                 });
@@ -280,7 +279,6 @@ export class AudioSystem {
         
         // Don't play boot sounds if audio context is suspended (no user interaction yet)
         if (this.audioContext.state === 'suspended') {
-            console.log('🎵 Skipping boot sound - waiting for user interaction');
             return;
         }
         
@@ -294,7 +292,6 @@ export class AudioSystem {
         
         // Don't play login sounds if audio context is suspended (no user interaction yet)
         if (this.audioContext.state === 'suspended') {
-            console.log('🎵 Skipping login sound - waiting for user interaction');
             return;
         }
         
@@ -480,8 +477,6 @@ export class AudioSystem {
         
         // Add mobile-specific audio event handlers
         this.setupMobileAudioEventHandlers();
-        
-        console.log('🎹 AudioSystem: Mobile audio optimizations applied');
     }
 
     /**
@@ -509,7 +504,7 @@ export class AudioSystem {
         // Handle mobile audio context state changes
         if (this.audioContext) {
             this.audioContext.addEventListener('statechange', () => {
-                console.log('🎹 AudioSystem: Audio context state changed to:', this.audioContext.state);
+                // Audio context state changed
             });
         }
     }
@@ -520,7 +515,7 @@ export class AudioSystem {
     pauseMobileAudio() {
         if (this.audioContext && this.audioContext.state === 'running') {
             this.audioContext.suspend().then(() => {
-                console.log('🎹 AudioSystem: Audio paused for mobile optimization');
+                // Audio paused for mobile optimization
             }).catch(err => {
                 console.warn('Failed to pause audio context:', err);
             });
@@ -533,7 +528,7 @@ export class AudioSystem {
     resumeMobileAudio() {
         if (this.audioContext && this.audioContext.state === 'suspended') {
             this.audioContext.resume().then(() => {
-                console.log('🎹 AudioSystem: Audio resumed for mobile optimization');
+                // Audio resumed for mobile optimization
             }).catch(err => {
                 console.warn('Failed to resume audio context:', err);
             });

@@ -26,7 +26,6 @@ class DraggableSystem {
         // Handle neuOS widget specifically with enhanced interaction
         const neuosWidget = document.getElementById('neuosWidget');
         if (neuosWidget) {
-            console.log('neuOS: Setting up draggable neuOS widget');
             this.dragElement(neuosWidget);
             this.addInteractiveEffects(neuosWidget);
         }
@@ -160,7 +159,6 @@ class DraggableSystem {
     refreshNeuOSWidget() {
         const neuosWidget = document.getElementById('neuosWidget');
         if (neuosWidget) {
-            console.log('neuOS: Refreshing neuOS widget draggability');
             this.dragElement(neuosWidget);
             this.addInteractiveEffects(neuosWidget);
         }

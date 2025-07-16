@@ -169,7 +169,8 @@ function getEffectsCommands(terminal) {
         { name: 'brightness', handler: args => terminal.handleBrightness(args) },
         { name: 'contrast', handler: args => terminal.handleContrast(args) },
         { name: 'blur', handler: args => terminal.handleBlur(args) },
-        { name: 'saturation', handler: args => terminal.handleSaturation(args) }
+        { name: 'saturation', handler: args => terminal.handleSaturation(args) },
+
     ];
 }
 

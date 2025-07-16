@@ -251,7 +251,6 @@ export class BackgroundMusic {
     play() {
         if (this.backgroundMusic && this.musicEnabled) {
             this.backgroundMusic.play().then(() => {
-                console.log('Background music started via terminal command');
                 this.showMusicIndicator();
             }).catch(error => {
                 console.warn('Could not start background music via terminal:', error);
@@ -264,7 +263,6 @@ export class BackgroundMusic {
     pause() {
         if (this.backgroundMusic) {
             this.backgroundMusic.pause();
-            console.log('Background music paused via terminal command');
             
             // Remove music indicator
             const indicator = document.querySelector('div[style*="musicPulse"]');

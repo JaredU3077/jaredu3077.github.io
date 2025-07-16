@@ -793,6 +793,13 @@ Audio Commands:
   play-music              - Start background music
   pause-music             - Pause background music
 
+Visual Effects:
+  particles <mode>        - Control particle system
+  solar                   - Solar system control
+  planets                 - Solar system control (alias)
+  sun                     - Solar system control (alias)
+  effects                 - Visual effects control
+
 Network Commands:
   ping <host>             - Ping a host
   tracert <host>          - Trace route
@@ -1551,6 +1558,20 @@ Type 'help' for more information.`;
             return 'Current saturation: 140%';
         }
         return `Saturation set to ${level}%`;
+    }
+
+    handleSolarSystem(args) {
+        return `🌌 Solar System Background
+
+The solar system is running as a beautiful background animation with:
+- Enhanced 120px sun with realistic pulsing glow
+- 8 planets with realistic characteristics and orbital mechanics
+- Atmospheric effects for planets with atmospheres
+- Ring systems for gas giants (Jupiter, Saturn, Uranus, Neptune)
+- Multiple moons for larger planets
+- Dynamic animations with enhanced visual effects
+
+This is a background feature that enhances the visual appeal of neuOS.`;
     }
 
     // App control commands

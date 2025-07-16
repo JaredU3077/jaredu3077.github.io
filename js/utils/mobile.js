@@ -38,12 +38,10 @@ class MobileUtils {
         if (this.isMobile) {
             document.body.classList.add('mobile-device');
             document.body.classList.add('touch-device');
-            console.log('Mobile device detected, applying mobile CSS classes');
         } else {
             // Remove mobile classes if not mobile
             document.body.classList.remove('mobile-device');
             document.body.classList.remove('touch-device');
-            console.log('Desktop device detected, removing mobile CSS classes');
         }
     }
 
@@ -269,7 +267,6 @@ class MobileUtils {
     cleanupEventListeners() {
         // This would be implemented based on your event listener management
         // For now, we'll just log that cleanup is happening
-        console.log('Mobile: Cleaning up event listeners');
     }
 
     /**
@@ -369,7 +366,7 @@ class MobileUtils {
                 }
             });
         } catch (error) {
-            console.log('Battery API not available');
+            // Battery API not available
         }
     }
 
@@ -450,7 +447,6 @@ class MobileUtils {
             • Enable low power mode for longer battery life
         `;
         
-        console.log(helpText);
         return helpText;
     }
 }

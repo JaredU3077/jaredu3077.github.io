@@ -210,7 +210,6 @@ export class BootSequence {
                 if (!document.body.classList.contains('boot-active') && !document.body.classList.contains('login-active')) {
                     desktop.style.opacity = '1';
                     desktop.style.visibility = 'visible';
-                    console.log('neuOS: Desktop made visible after login');
                 }
             }, 100);
         }
