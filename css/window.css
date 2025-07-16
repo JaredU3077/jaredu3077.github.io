@@ -1,0 +1,788 @@
+/* Window and Window Header Styles - Theme-aware Glass */
+.window {
+    position: absolute;
+    background: var(--window-bg, rgba(255, 255, 255, 0.001)) !important;
+    backdrop-filter: var(--window-backdrop, blur(8px) saturate(140%) brightness(110%)) !important;
+    -webkit-backdrop-filter: var(--window-backdrop, blur(8px) saturate(140%) brightness(110%)) !important;
+    color: var(--text-color);
+    border-radius: 12px !important;
+    box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.08), 0 0 8px rgba(255, 255, 255, 0.05) !important;
+    min-width: 340px;
+    min-height: 220px;
+    border: 1px solid var(--window-border, rgba(255,255,255,0.05)) !important;
+    /* Smooth transitions for non-drag operations */
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    overflow: hidden;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    /* Optimize for dragging performance */
+    will-change: auto;
+    /* Performance optimizations for dragging */
+    contain: layout style;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    /* Enhanced glass positioning */
+    isolation: isolate;
+}
+
+/* Theme 5 Ultra Transparent - No extra glass effects */
+
+.window.focused {
+    background: var(--window-bg-focused, rgba(255, 255, 255, 0.012)) !important;
+}
+
+/* Optimized dragging state */
+.window.dragging {
+    /* Disable all transitions during drag for maximum performance */
+    transition: none !important;
+    /* Optimize for position changes */
+    will-change: left, top;
+    /* Performance optimizations */
+    contain: layout style;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    /* Enhanced visual feedback */
+    box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.15), 0 0 16px rgba(255, 255, 255, 0.1) !important;
+    border-color: var(--primary-color) !important;
+}
+
+/* Optimized resizing state */
+.window.resizing {
+    /* Disable all transitions during resize for maximum performance */
+    transition: none !important;
+    /* Optimize for transform changes */
+    will-change: transform, width, height;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    -moz-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    /* Performance optimizations */
+    contain: layout style;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    /* Enhanced visual feedback */
+    box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.12), 0 0 12px rgba(255, 255, 255, 0.08) !important;
+    border-color: var(--primary-color) !important;
+}
+
+/* Window minimize/maximize animations */
+.window.minimizing {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.window.restoring {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.window.maximizing {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.window.unmaximizing {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.window-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background: var(--window-header-bg, rgba(255, 255, 255, 0.0005)) !important;
+    backdrop-filter: var(--window-header-backdrop, blur(4px) saturate(130%) brightness(105%)) !important;
+    -webkit-backdrop-filter: var(--window-header-backdrop, blur(4px) saturate(130%) brightness(105%)) !important;
+    border-bottom: 1px solid var(--window-border, rgba(255,255,255,0.05)) !important;
+    border-radius: 12px 12px 0 0 !important;
+    user-select: none;
+    position: relative;
+    z-index: 3;
+    /* Enhanced drag feedback */
+    cursor: grab;
+}
+
+.window-header:active {
+    cursor: grabbing;
+}
+
+.window-title {
+    font-size: var(--text-lg);
+    color: var(--text-color);
+    font-family: var(--font-family);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: lowercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    z-index: 4;
+    cursor: grab;
+    user-select: none;
+}
+
+.window-title .icon {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    transition: filter var(--transition-fast);
+}
+
+.window-title .icon svg {
+    width: 100%;
+    height: 100%;
+    stroke: var(--primary-color);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    transition: filter var(--transition-fast);
+}
+
+.window.focused .window-title .icon,
+.window.focused .window-title .icon svg {
+    filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.6));
+}
+
+.window-controls {
+    display: flex;
+    gap: 8px;
+    position: relative;
+    z-index: 10;
+    pointer-events: auto;
+    cursor: default;
+}
+
+.window-control {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--window-control-bg, rgba(255, 255, 255, 0.05)) !important;
+    backdrop-filter: var(--window-control-backdrop, blur(2px) saturate(130%) brightness(105%)) !important;
+    -webkit-backdrop-filter: var(--window-control-backdrop, blur(2px) saturate(130%) brightness(105%)) !important;
+    border: 1px solid var(--window-control-border, rgba(255, 255, 255, 0.1)) !important;
+    cursor: pointer;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: var(--text-color);
+    user-select: none;
+    position: relative;
+    z-index: 11;
+    pointer-events: auto;
+    overflow: hidden;
+}
+
+.window-control:hover {
+    background: var(--primary-color) !important;
+    border-color: var(--primary-light) !important;
+    transform: scale(1.1);
+}
+
+.window-control:active {
+    transform: scale(0.95);
+}
+
+.window-content {
+    flex: 1 1 auto;
+    padding: 24px;
+    background: rgba(255, 255, 255, 0.0005) !important;
+    backdrop-filter: blur(4px) saturate(130%) brightness(105%) !important;
+    -webkit-backdrop-filter: blur(4px) saturate(130%) brightness(105%) !important;
+    color: var(--text-color);
+    font-family: var(--font-family);
+    font-size: var(--text-base);
+    overflow-y: auto;
+    position: relative;
+    z-index: 3;
+}
+
+/* Enhanced scrollbar for window content */
+[data-scroll-container] {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+}
+
+[data-scroll-container]::-webkit-scrollbar {
+    width: 8px;
+}
+
+[data-scroll-container]::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+[data-scroll-container]::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    transition: background var(--transition-fast);
+    backdrop-filter: blur(2px) saturate(150%) brightness(110%);
+    -webkit-backdrop-filter: blur(2px) saturate(150%) brightness(110%);
+}
+
+[data-scroll-container]::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color);
+    box-shadow: 0 0 8px rgba(99, 102, 241, 0.4);
+}
+
+/* Terminal-specific scrollbar overrides */
+.window-content [data-scroll-container] {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+#terminalOutput,
+#terminalInput {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+#terminalOutput::-webkit-scrollbar,
+#terminalInput::-webkit-scrollbar {
+    display: none;
+}
+
+/* Welcome content styling */
+.welcome-content {
+    padding: 20px;
+}
+
+/* Terminal Window - Modern Theme System */
+#terminalWindow {
+    background: var(--terminal-bg, rgba(255, 255, 255, 0.001)) !important;
+    backdrop-filter: var(--terminal-backdrop, blur(8px) saturate(140%) brightness(110%)) !important;
+    -webkit-backdrop-filter: var(--terminal-backdrop, blur(8px) saturate(140%) brightness(110%)) !important;
+    border: 1px solid var(--terminal-border, rgba(255,255,255,0.05)) !important;
+    border-radius: 16px !important;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.15), 0 0 12px rgba(255, 255, 255, 0.08) !important;
+    /* Ensure proper z-index for terminal windows */
+    z-index: 1001 !important;
+}
+
+#terminalWindow:focus-within {
+    border-color: var(--terminal-prompt, var(--primary-color)) !important;
+    box-shadow: 0px 6px 25px rgba(0, 0, 0, 0.2), 0 0 20px rgba(255, 255, 255, 0.12), 0 0 0 1px var(--terminal-prompt, var(--primary-color)) !important;
+    transition: none !important;
+}
+
+/* Ensure terminal window follows dragging rules */
+#terminalWindow.dragging {
+    transition: none !important;
+    will-change: transform;
+}
+
+/* Override general window border-radius for terminal */
+#terminalWindow.window {
+    border-radius: 16px !important;
+}
+
+/* Terminal window header border-radius */
+#terminalWindow .window-header {
+    border-radius: 16px 16px 0 0 !important;
+}
+
+#terminalWindow .window-header:active {
+    cursor: grabbing;
+}
+
+#terminalWindow .window-content {
+    border-radius: 0 0 16px 16px !important;
+    background: var(--terminal-bg, rgba(255, 255, 255, 0.001)) !important;
+    backdrop-filter: var(--terminal-backdrop, blur(8px) saturate(140%) brightness(110%)) !important;
+    -webkit-backdrop-filter: var(--terminal-backdrop, blur(8px) saturate(140%) brightness(110%)) !important;
+    color: var(--terminal-text, var(--text-color));
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 20px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scrollbar-color: var(--terminal-border, rgba(255,255,255,0.1)) transparent;
+}
+
+#terminalWindow #terminalOutput {
+    background: transparent !important;
+    color: var(--terminal-text, var(--text-color));
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 0;
+    margin: 0;
+    border: none;
+    outline: none;
+    resize: none;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+#terminalWindow #terminalInput {
+    background: transparent !important;
+    color: var(--terminal-text, var(--text-color));
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 0;
+    margin: 0;
+    border: none;
+    outline: none;
+    resize: none;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Codex Window - Enhanced Styling */
+#codexWindow {
+    background: var(--codex-bg, rgba(255, 255, 255, 0.001)) !important;
+    backdrop-filter: var(--codex-backdrop, blur(8px) saturate(140%) brightness(110%)) !important;
+    -webkit-backdrop-filter: var(--codex-backdrop, blur(8px) saturate(140%) brightness(110%)) !important;
+    border: 1px solid var(--codex-border, rgba(255,255,255,0.05)) !important;
+}
+
+#codexWindow.window {
+    border-radius: 16px !important;
+}
+
+#codexWindow .window-header {
+    border-radius: 16px 16px 0 0 !important;
+}
+
+#codexWindow .window-content {
+    border-radius: 0 0 16px 16px !important;
+    background: var(--codex-bg, rgba(255, 255, 255, 0.001)) !important;
+    backdrop-filter: var(--codex-backdrop, blur(8px) saturate(140%) brightness(110%)) !important;
+    -webkit-backdrop-filter: var(--codex-backdrop, blur(8px) saturate(140%) brightness(110%)) !important;
+}
+
+/* Terminal Output - Completely transparent */
+#terminalOutput {
+    background: transparent !important;
+    color: var(--terminal-text, var(--text-color));
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 0;
+    margin: 0;
+    border: none;
+    outline: none;
+    resize: none;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    scrollbar-color: var(--terminal-border, rgba(255,255,255,0.1)) transparent;
+}
+
+#terminalOutput::-webkit-scrollbar {
+    display: none;
+}
+
+#terminalOutput::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#terminalOutput::-webkit-scrollbar-thumb {
+    background: var(--terminal-border, rgba(255,255,255,0.1));
+    border-radius: 4px;
+}
+
+#terminalOutput::-webkit-scrollbar-thumb:hover {
+    background: var(--terminal-prompt, var(--primary-color));
+}
+
+/* Terminal Input - Completely transparent */
+#terminalInput {
+    background: transparent !important;
+    color: var(--terminal-text, var(--text-color));
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 0;
+    margin: 0;
+    border: none;
+    outline: none;
+    resize: none;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+#terminalInput .prompt {
+    color: var(--terminal-prompt, var(--primary-color));
+    font-weight: 600;
+    margin-right: 8px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+#terminalInput input {
+    background: transparent !important;
+    color: var(--terminal-text, var(--text-color));
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 0;
+    margin: 0;
+    border: none;
+    outline: none;
+    resize: none;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    caret-color: var(--terminal-prompt, var(--primary-color));
+}
+
+#terminalInput input::placeholder {
+    color: var(--terminal-text, var(--text-color));
+    opacity: 0.5;
+}
+
+/* Terminal Command Styling */
+.terminal-command {
+    margin: 8px 0;
+    animation: fadeInUp 0.3s ease-out;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.terminal-command .prompt {
+    color: var(--terminal-prompt, var(--primary-color));
+    font-weight: 600;
+}
+
+.terminal-result {
+    margin: 8px 0 16px 0;
+    color: var(--terminal-text, var(--text-color));
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+    white-space: pre-wrap;
+}
+
+.terminal-error {
+    color: var(--terminal-error, #ef4444);
+    font-weight: 600;
+}
+
+.terminal-success {
+    color: var(--terminal-success, #10b981);
+}
+
+.terminal-warning {
+    color: var(--terminal-warning, #f59e0b);
+}
+
+.terminal-heading {
+    color: var(--terminal-prompt, var(--primary-color));
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--terminal-border, rgba(255,255,255,0.1));
+    padding-bottom: 8px;
+}
+
+.terminal-section {
+    margin: 16px 0;
+    padding-left: 16px;
+    border-left: 3px solid var(--terminal-prompt, var(--primary-color));
+}
+
+.terminal-subheading {
+    color: var(--terminal-text, var(--text-color));
+    font-size: 16px;
+    font-weight: 600;
+    margin: 12px 0 8px 0;
+    text-transform: lowercase;
+}
+
+.terminal-subheading2 {
+    color: var(--terminal-text, var(--text-color));
+    font-size: 14px;
+    font-weight: 500;
+    margin: 8px 0 4px 0;
+    text-transform: lowercase;
+}
+
+.terminal-detail {
+    color: var(--terminal-text, var(--text-secondary));
+    font-size: 13px;
+    margin: 4px 0;
+    line-height: 1.4;
+}
+
+/* Terminal completion styling */
+.terminal-completion {
+    color: var(--terminal-prompt, var(--primary-color));
+    font-weight: 600;
+    margin: 8px 0 4px 0;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+}
+
+.terminal-completion-item {
+    color: var(--terminal-text, var(--text-color));
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+    font-size: 13px;
+    margin: 2px 0;
+    padding-left: 16px;
+}
+
+.terminal-output-line {
+    margin: 2px 0;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+}
+
+.terminal-prompt {
+    margin: 8px 0;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+}
+
+/* Search container styling */
+.search-container {
+    margin: 16px 0;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(4px) saturate(130%) brightness(105%) !important;
+    -webkit-backdrop-filter: blur(4px) saturate(130%) brightness(105%) !important;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-color);
+    font-family: var(--font-family);
+    font-size: var(--text-base);
+    transition: all var(--transition-fast);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.search-results {
+    margin-top: 12px;
+}
+
+.search-result {
+    padding: 8px 12px;
+    margin: 4px 0;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    border: 1px solid transparent;
+}
+
+.search-result:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--primary-color);
+}
+
+.no-results {
+    padding: 16px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-style: italic;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    border: 1px dashed var(--border-color);
+}
+
+.loading-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: var(--text-secondary);
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-color);
+    border-top: 2px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.help-content-container {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.help-section {
+    margin: 16px 0;
+}
+
+.help-section h3 {
+    color: var(--primary-color);
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    text-transform: lowercase;
+}
+
+.help-commands, .help-shortcuts, .help-controls {
+    display: grid;
+    gap: 8px;
+}
+
+.help-command, .help-shortcut, .help-control {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 6px;
+    border: 1px solid transparent;
+    transition: all var(--transition-fast);
+}
+
+.command-name, .shortcut-key, .control-name {
+    font-weight: 600;
+    color: var(--primary-color);
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+}
+
+.command-desc, .shortcut-desc, .control-desc {
+    color: var(--text-secondary);
+    font-size: 13px;
+    text-align: right;
+}
+
+.error-content {
+    padding: 20px;
+    text-align: center;
+    color: var(--text-color);
+    background: rgba(239, 68, 68, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.error-content h3 {
+    color: #ef4444;
+    margin-bottom: 12px;
+}
+
+.error-content button {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: var(--font-family);
+    font-size: var(--text-sm);
+    transition: all var(--transition-fast);
+    margin-top: 12px;
+}
+
+.error-content button:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+}
+
+.window:focus-within {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.15), 0 0 12px rgba(255, 255, 255, 0.08), 0 0 0 1px var(--primary-color) !important;
+}
+
+/* Skip link for accessibility */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: var(--primary-color);
+    color: white;
+    padding: 8px;
+    text-decoration: none;
+    border-radius: 4px;
+    z-index: 10000;
+    transition: top 0.3s;
+}
+
+.skip-link:focus {
+    top: 6px;
+}
+
+/* Global styles */
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+img, video {
+    max-width: 100%;
+    height: auto;
+}
+
+.window-content {
+    word-wrap: break-word;
+}
+
+.terminal-output {
+    white-space: pre-wrap;
+}
+
+:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+::selection {
+    background: var(--primary-color);
+    color: white;
+}
+
+::-moz-selection {
+    background: var(--primary-color);
+    color: white;
+}
+
+@media print {
+    .boot-sequence,
+    .window-controls,
+    .resize-handle {
+        display: none !important;
+    }
+    
+    body {
+        background: white !important;
+        color: black !important;
+    }
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+} 

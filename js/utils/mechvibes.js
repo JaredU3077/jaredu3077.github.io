@@ -21,6 +21,9 @@ export class MechvibesPlayer {
     async init(audioContext) {
         // Howler.js handles its own audio context, so we don't need the passed one
         await this.loadPack('./');
+        
+        // Mark as loaded for the audio system
+        this.isLoaded = true;
     }
 
     /**
@@ -32,15 +35,15 @@ export class MechvibesPlayer {
         
         try {
             // Load the sound configuration
-            const configResponse = await fetch(folder + 'config.json');
-            if (!configResponse.ok) {
-                throw new Error(`Failed to load config.json: ${configResponse.status}`);
-            }
+                    const configResponse = await fetch(folder + 'config/config.json');
+        if (!configResponse.ok) {
+            throw new Error(`Failed to load config.json: ${configResponse.status}`);
+        }
             
             const packData = await configResponse.json();
             
             if (typeof packData === 'object') {
-                const sound = packData.sound || 'sound.ogg';  // Fallback to sound.ogg
+                const sound = packData.sound || 'assets/audio/sound.ogg';  // Fallback to sound.ogg
                 const keyDefineType = packData.key_define_type || 'single';
                 const defines = packData.defines;
 
@@ -74,7 +77,7 @@ export class MechvibesPlayer {
                     throw new Error('This implementation assumes a single-file pack');
                 }
             } else {
-                throw new Error('Failed to load config.json');
+                throw new Error('Failed to load config/config.json');
             }
         } catch (error) {
             console.error('Failed to load Mechvibes sound pack:', error);
@@ -117,6 +120,11 @@ export class MechvibesPlayer {
         }
 
         try {
+            // Ensure Howler.js audio context is resumed if needed
+            if (Howler.ctx && Howler.ctx.state === 'suspended') {
+                await Howler.ctx.resume();
+            }
+            
             let keyCode = this.getKeyCode(key);
             let soundId = `${keyCode}`;
             // WORKAROUND: Force 'b' to use 'a' soundId

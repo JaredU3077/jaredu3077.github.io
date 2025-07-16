@@ -42,8 +42,8 @@ export class GlassMorphismSystem {
      * Setup interactive 3D tilt effects for glass containers from test1
      */
     setupInteractiveElements() {
-        // Apply tilting to desktop icons and glass containers, but NOT to application windows
-        const glassContainers = document.querySelectorAll('.glass-container, .boot-container, .login-container, .neuos-glass-box, .neuos-widget, .desktop-icon');
+        // Apply tilting to glass containers, but NOT to application windows or desktop icons
+        const glassContainers = document.querySelectorAll('.glass-container, .boot-container, .login-container, .neuos-glass-box, .neuos-widget');
         
         glassContainers.forEach(container => {
             this.makeInteractive(container);
@@ -197,8 +197,8 @@ export class GlassMorphismSystem {
      * Setup enhanced reflection effects
      */
     setupEnhancedReflections() {
-        // Add reflection layers to glass elements - EXCLUDE application windows to prevent interference
-        const glassElements = document.querySelectorAll('.glass-container, .neuos-glass-box, .neuos-widget, .glass-login-btn, .desktop-icon');
+        // Add reflection layers to glass elements - EXCLUDE application windows and desktop icons to prevent interference
+        const glassElements = document.querySelectorAll('.glass-container, .neuos-glass-box, .neuos-widget, .glass-login-btn');
         
         glassElements.forEach(element => {
             this.addReflectionLayer(element);
@@ -250,7 +250,7 @@ export class GlassMorphismSystem {
      * Enhance existing elements with glass effects
      */
     enhanceExistingElements() {
-        const elementsToEnhance = document.querySelectorAll('.glass-container, .neuos-glass-box, .neuos-widget, .glass-login-btn, .desktop-icon, .glass-title, .boot-title, .login-title');
+        const elementsToEnhance = document.querySelectorAll('.glass-container, .neuos-glass-box, .neuos-widget, .glass-login-btn, .glass-title, .boot-title, .login-title');
         
         elementsToEnhance.forEach(element => {
             this.enhanceElement(element);
@@ -264,18 +264,17 @@ export class GlassMorphismSystem {
         if (!element || this.glassElements.has(element)) return;
 
         // Check if element should have glass effects - EXCLUDE application windows
-        const glassClasses = ['glass-container', 'neuos-glass-box', 'neuos-widget', 'glass-login-btn', 'desktop-icon'];
+        const glassClasses = ['glass-container', 'neuos-glass-box', 'neuos-widget', 'glass-login-btn'];
         const hasGlassClass = glassClasses.some(className => element.classList.contains(className));
         
         if (hasGlassClass) {
             this.addReflectionLayer(element);
             
-            // Only apply interactive effects to desktop icons and glass containers, NOT application windows
-            const shouldBeInteractive = element.classList.contains('desktop-icon') || 
-                                      element.classList.contains('glass-container') || 
-                                      element.classList.contains('neuos-glass-box') || 
-                                      element.classList.contains('neuos-widget') ||
-                                      element.classList.contains('glass-login-btn');
+                    // Only apply interactive effects to glass containers, NOT application windows or desktop icons
+        const shouldBeInteractive = element.classList.contains('glass-container') ||
+                                   element.classList.contains('neuos-glass-box') ||
+                                   element.classList.contains('neuos-widget') ||
+                                   element.classList.contains('glass-login-btn');
             
             if (shouldBeInteractive) {
                 this.makeInteractive(element);

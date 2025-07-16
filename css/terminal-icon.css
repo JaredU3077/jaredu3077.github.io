@@ -1,0 +1,58 @@
+/* Terminal Icon Styles - Clean Theme-aware Icon (25% larger) */
+.desktop-icon .icon svg {
+    width: 60px;
+    height: 60px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--text-color);
+}
+
+.desktop-icon:hover .icon svg {
+    transform: scale(1.1);
+}
+
+.desktop-icon:active .icon svg {
+    transform: scale(0.95);
+}
+
+/* Ensure proper sizing and positioning */
+.desktop-icon .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+    .desktop-icon .icon svg {
+        width: 45px;
+        height: 45px;
+    }
+    .desktop-icon .icon {
+        width: 45px;
+        height: 45px;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1199px) {
+    .desktop-icon .icon svg {
+        width: 52px;
+        height: 52px;
+    }
+    .desktop-icon .icon {
+        width: 52px;
+        height: 52px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .desktop-icon .icon svg {
+        width: 60px;
+        height: 60px;
+    }
+    .desktop-icon .icon {
+        width: 60px;
+        height: 60px;
+    }
+} 

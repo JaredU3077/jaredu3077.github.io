@@ -7,7 +7,6 @@
 import { Terminal } from './apps/terminal.js';
 import { WindowManager } from './core/window.js';
 import { HelpManager } from './utils/help.js';
-import { SearchManager } from './utils/search.js';
 import { BootSystem } from './core/boot.js';
 import { CONFIG, createAppButton } from './config.js';
 import { debounce } from './utils/utils.js';
@@ -32,8 +31,7 @@ window.neuOS = window.neuOS || {};
 let windowManager = null;
 /** @type {HelpManager} */
 let helpManager = null;
-/** @type {SearchManager} */
-let searchManager = null;
+
 
 /** @type {?Terminal} */
 let terminal = null;
@@ -62,11 +60,7 @@ try {
     console.error('neuOS: Failed to initialize HelpManager:', error);
 }
 
-try {
-    searchManager = new SearchManager();
-} catch (error) {
-    console.error('neuOS: Failed to initialize SearchManager:', error);
-}
+
 
 try {
     glassMorphismSystem = new GlassMorphismSystem();
@@ -260,19 +254,6 @@ async function handleAppClick(appId) {
                         // Expose terminal globally for demoscene access
                         window.neuOS.terminalInstance = terminal;
                         break;
-                    case 'codex':
-                        console.log('Initializing codex...');
-                        const codexApp = new CodexApp();
-                        await codexApp.init();
-                        
-                        // Store reference to codex app
-                        window.neuOS.codexInstance = codexApp;
-                        
-                        // Attach the Codex app to the window element
-                        codexApp.attachToWindow(winElem);
-                        
-                        console.log('Codex initialized:', codexApp);
-                        break;
                     default:
                         console.warn(`neuOS: No specific initialization for app: ${appId}`);
                         break;
@@ -370,14 +351,7 @@ function handleGlobalKeydown(e) {
 
 // --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', async () => {
-    // GitHub Pages debugging
-    console.log('neuOS: Environment check:', {
-        hostname: window.location.hostname,
-        protocol: window.location.protocol,
-        isLocalhost: window.location.hostname === 'localhost',
-        isGitHubPages: window.location.hostname.includes('github.io'),
-        userAgent: navigator.userAgent
-    });
+
     
     try {
         // Initialize core systems

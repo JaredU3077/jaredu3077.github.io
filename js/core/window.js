@@ -30,8 +30,7 @@ export class WindowManager {
         this.windowStack = [];
         /** @type {Set<Function>} */
         this.stateChangeCallbacks = new Set();
-        /** @type {Map<string, object>} */
-        this.interactInstances = new Map();
+        // Removed interactInstances - no longer using interact.js
 
         this.dragHandler = new DragHandler(this);
         this.resizeHandler = new ResizeHandler(this);
@@ -70,6 +69,9 @@ export class WindowManager {
                 }
             }
         });
+        
+        // Store observed elements for proper cleanup
+        this.observedElements = new Set();
     }
 
     /**
@@ -134,8 +136,6 @@ export class WindowManager {
         windowElement.style.left = `${left}px`;
         windowElement.style.top = `${top}px`;
         windowElement.style.zIndex = this.getNextZIndex();
-        windowElement.style.transform = 'translateZ(0)';
-        windowElement.style.willChange = 'transform';
 
         windowElement.innerHTML = `
             <div class="window-header" role="banner" aria-label="${title} window header">
@@ -152,14 +152,7 @@ export class WindowManager {
             <div class="window-content" tabindex="0" data-scroll-container>
                 ${content}
             </div>
-            <div class="window-resize n" title="Resize window"></div>
-            <div class="window-resize e" title="Resize window"></div>
-            <div class="window-resize s" title="Resize window"></div>
-            <div class="window-resize w" title="Resize window"></div>
-            <div class="window-resize ne" title="Resize window"></div>
-            <div class="window-resize nw" title="Resize window"></div>
-            <div class="window-resize se" title="Resize window"></div>
-            <div class="window-resize sw" title="Resize window"></div>
+            <!-- Resize handles will be created by ResizeHandler -->
         `;
         desktop.appendChild(windowElement);
 
@@ -198,6 +191,7 @@ export class WindowManager {
         // Attach observers
         this.resizeObserver.observe(windowElement);
         this.moveObserver.observe(windowElement, { attributes: true });
+        this.observedElements.add(windowElement);
 
         return windowElement;
     }
@@ -217,8 +211,7 @@ export class WindowManager {
             return;
         }
 
-        // Initialize interactInstances entry for this window
-        this.interactInstances.set(windowObj.id, {});
+        // Initialize window events (no longer using interact.js)
 
         this.dragHandler.setupDrag(header, windowObj);
         this.resizeHandler.setupResize(windowObj.element, windowObj);
@@ -228,9 +221,33 @@ export class WindowManager {
             const maximizeBtn = controls.querySelector('.maximize');
             const closeBtn = controls.querySelector('.close');
 
-            if (minimizeBtn) minimizeBtn.addEventListener('click', (e) => { e.stopPropagation(); this.minimizeWindow(windowObj); });
-            if (maximizeBtn) maximizeBtn.addEventListener('click', (e) => { e.stopPropagation(); this.toggleMaximize(windowObj); });
-            if (closeBtn) closeBtn.addEventListener('click', (e) => { e.stopPropagation(); this.closeWindow(windowObj); });
+            console.log('Window controls found for', windowObj.id, ':', {
+                minimize: !!minimizeBtn,
+                maximize: !!maximizeBtn,
+                close: !!closeBtn
+            });
+
+            if (minimizeBtn) {
+                minimizeBtn.addEventListener('click', (e) => { 
+                    e.stopPropagation(); 
+                    console.log('Minimize button clicked for window:', windowObj.id);
+                    this.minimizeWindow(windowObj); 
+                });
+            }
+            if (maximizeBtn) {
+                maximizeBtn.addEventListener('click', (e) => { 
+                    e.stopPropagation(); 
+                    console.log('Maximize button clicked for window:', windowObj.id);
+                    this.toggleMaximize(windowObj); 
+                });
+            }
+            if (closeBtn) {
+                closeBtn.addEventListener('click', (e) => { 
+                    e.stopPropagation(); 
+                    console.log('Close button clicked for window:', windowObj.id);
+                    this.closeWindow(windowObj); 
+                });
+            }
         } catch (error) {
             console.error('Failed to setup controls for window:', windowObj.id, error);
         }
@@ -260,9 +277,12 @@ export class WindowManager {
      * @memberof WindowManager
      */
     minimizeWindow(windowObj) {
+        console.log('minimizeWindow called for:', windowObj.id, 'isMinimized:', windowObj.isMinimized);
         if (windowObj.isMinimized) {
+            console.log('Restoring window:', windowObj.id);
             this.restoreWindow(windowObj);
         } else {
+            console.log('Minimizing window:', windowObj.id);
             windowObj.isMinimized = true;
             windowObj.element.classList.add('minimizing');
             windowObj.element.style.transform = 'translateY(100vh)';
@@ -298,9 +318,12 @@ export class WindowManager {
      * @memberof WindowManager
      */
     toggleMaximize(windowObj) {
+        console.log('toggleMaximize called for:', windowObj.id, 'isMaximized:', windowObj.isMaximized);
         if (windowObj.isMaximized) {
+            console.log('Unmaximizing window:', windowObj.id);
             this.unmaximizeWindow(windowObj);
         } else {
+            console.log('Maximizing window:', windowObj.id);
             this.maximizeWindow(windowObj);
         }
     }
@@ -314,10 +337,10 @@ export class WindowManager {
     maximizeWindow(windowObj) {
         windowObj.isMaximized = true;
         windowObj.originalPosition = {
-            left: windowObj.element.style.left,
-            top: windowObj.element.style.top,
-            width: windowObj.element.style.width,
-            height: windowObj.element.style.height
+            left: windowObj.left,
+            top: windowObj.top,
+            width: windowObj.width,
+            height: windowObj.height
         };
 
         windowObj.element.classList.add('maximizing', 'maximized');
@@ -348,6 +371,12 @@ export class WindowManager {
         windowObj.element.style.top = `${windowObj.originalPosition.top}px`;
         windowObj.element.style.width = `${windowObj.originalPosition.width}px`;
         windowObj.element.style.height = `${windowObj.originalPosition.height}px`;
+        
+        // Update window object properties
+        windowObj.left = windowObj.originalPosition.left;
+        windowObj.top = windowObj.originalPosition.top;
+        windowObj.width = windowObj.originalPosition.width;
+        windowObj.height = windowObj.originalPosition.height;
 
         setTimeout(() => {
             windowObj.element.classList.remove('unmaximizing');
@@ -369,22 +398,37 @@ export class WindowManager {
             window.neuOS.bootSystemInstance.playWindowCloseSound();
         }
 
-        windowObj.element.remove();
-
-        // Disconnect observers and auto-scroll
-        this.resizeObserver.unobserve(windowObj.element);
-        this.moveObserver.unobserve(windowObj.element);
+        // Disconnect observers and auto-scroll BEFORE removing the element
+        try {
+            this.resizeObserver.unobserve(windowObj.element);
+        } catch (e) {
+            console.warn('ResizeObserver unobserve failed:', e);
+        }
+        
+        try {
+            // For MutationObserver, we need to disconnect and reconnect to remove specific elements
+            if (this.observedElements.has(windowObj.element)) {
+                this.moveObserver.disconnect();
+                this.observedElements.delete(windowObj.element);
+                
+                // Reconnect to remaining elements
+                this.observedElements.forEach(element => {
+                    this.moveObserver.observe(element, { attributes: true });
+                });
+            }
+        } catch (e) {
+            console.warn('MoveObserver cleanup failed:', e);
+        }
+        
         this.autoScrollHandler.disableAutoScroll(windowObj.id);
+
+        // Remove the element after disconnecting observers
+        windowObj.element.remove();
 
         this.windows.delete(windowObj.id);
         this.windowStack = this.windowStack.filter(w => w.id !== windowObj.id);
 
-        if (this.interactInstances.has(windowObj.id)) {
-            const instances = this.interactInstances.get(windowObj.id);
-            if (instances.drag) instances.drag.unset();
-            if (instances.resize) instances.resize.unset();
-            this.interactInstances.delete(windowObj.id);
-        }
+        // Cleanup for pure JS drag/resize handlers (no interact.js)
 
         if (this.windowStack.length > 0) {
             this.focusWindow(this.windowStack[this.windowStack.length - 1]);
@@ -465,12 +509,13 @@ export class WindowManager {
      * @memberof WindowManager
      */
     updateWindowPosition(windowObj) {
-        const rect = windowObj.element.getBoundingClientRect();
-        const maxX = window.innerWidth - rect.width;
-        const maxY = window.innerHeight - rect.height - this.taskbarHeight;
+        const currentLeft = parseFloat(windowObj.element.style.left) || 0;
+        const currentTop = parseFloat(windowObj.element.style.top) || 0;
+        const maxX = window.innerWidth - windowObj.element.offsetWidth;
+        const maxY = window.innerHeight - windowObj.element.offsetHeight - this.taskbarHeight;
 
-        let left = Math.max(0, Math.min(rect.left, maxX));
-        let top = Math.max(0, Math.min(rect.top, maxY));
+        let left = Math.max(0, Math.min(currentLeft, maxX));
+        let top = Math.max(0, Math.min(currentTop, maxY));
 
         windowObj.element.style.left = `${left}px`;
         windowObj.element.style.top = `${top}px`;

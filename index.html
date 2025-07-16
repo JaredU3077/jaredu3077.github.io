@@ -33,7 +33,7 @@
     <meta property="twitter:image" content="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'><rect width='400' height='400' fill='%23181f2a'/><circle cx='200' cy='200' r='60' fill='none' stroke='%234a90e2' stroke-width='4'/><path d='M200 140v60M200 260v60M140 200h60M260 200h60' stroke='%234a90e2' stroke-width='4'/><text x='200' y='340' text-anchor='middle' fill='%23eaf1fb' font-family='Arial' font-size='24'>neuOS</text></svg>">
     
     <!-- Security Headers -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: https://images.unsplash.com; font-src 'self' https://cdnjs.cloudflare.com; connect-src 'self' https://unpkg.com https://cdnjs.cloudflare.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self';">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <!-- X-Frame-Options should be set via HTTP headers, not meta tags -->
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
@@ -43,23 +43,19 @@
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🖥️</text></svg>">
     
     <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="config/manifest.json">
     
-    <link rel="stylesheet" href="variables.css">
-    <link rel="stylesheet" href="glass.css">
-    <link rel="stylesheet" href="window.css">
-    <link rel="stylesheet" href="desktop.css">
-    <link rel="stylesheet" href="animations.css">
-    <link rel="stylesheet" href="responsive.css">
-    <link rel="stylesheet" href="mobile.css">
-    <link rel="stylesheet" href="apps.css">
-    <link rel="stylesheet" href="theme.css">
-    <!-- Include Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Include vis.js for network topology map -->
-    <script src="https://unpkg.com/vis-network@9.1.2/dist/vis-network.min.js"></script>
-    <!-- Include interact.js for draggable and resizable windows -->
-    <script src="https://unpkg.com/interactjs@1.10.27/dist/interact.min.js"></script>
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/glass.css">
+    <link rel="stylesheet" href="css/window.css">
+    <link rel="stylesheet" href="css/desktop.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    <link rel="stylesheet" href="css/apps.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/terminal-icon.css">
+
     <!-- Include Howler.js for Mechvibes audio -->
     <script src="js/howler.min.js"></script>
     
@@ -160,7 +156,7 @@
 
     <!-- Background Music -->
     <audio id="backgroundMusic" loop preload="none">
-        <source src="mp3.mp3" type="audio/mpeg">
+        <source src="assets/audio/mp3.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
 
@@ -195,7 +191,6 @@
     <div id="announcements" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
     <!-- Scripts -->
-    <script type="module" src="js/apps/codex.js"></script>
     <script type="module" src="js/main.js"></script>
     
     <!-- Fallback for module loading issues -->

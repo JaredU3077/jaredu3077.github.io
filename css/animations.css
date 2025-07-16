@@ -314,6 +314,46 @@
     }
 }
 
+/* Sun Pulse Animation */
+@keyframes sunPulse {
+    0%, 100% { 
+        transform: translate(-50%, -50%) scale(1);
+        box-shadow: 
+            0 0 30px #ffd700,
+            0 0 60px #ff8c00,
+            0 0 90px #ff4500,
+            inset 0 0 20px rgba(255, 215, 0, 0.3);
+    }
+    50% { 
+        transform: translate(-50%, -50%) scale(1.1);
+        box-shadow: 
+            0 0 40px #ffd700,
+            0 0 80px #ff8c00,
+            0 0 120px #ff4500,
+            inset 0 0 30px rgba(255, 215, 0, 0.5);
+    }
+}
+
+/* Planet Ring Rotation */
+@keyframes planetRingRotate {
+    0% { 
+        transform: translate(-50%, -50%) rotate(0deg); 
+    }
+    100% { 
+        transform: translate(-50%, -50%) rotate(360deg); 
+    }
+}
+
+/* Moon Orbit Animation */
+@keyframes moonOrbit {
+    0% { 
+        transform: translate(-50%, -50%) rotate(calc(var(--moon-offset, 0deg) + 0deg)) translateX(var(--orbit-radius)) rotate(calc(var(--moon-offset, 0deg) * -1 + 0deg)); 
+    }
+    100% { 
+        transform: translate(-50%, -50%) rotate(calc(var(--moon-offset, 0deg) + 360deg)) translateX(var(--orbit-radius)) rotate(calc(var(--moon-offset, 0deg) * -1 + 360deg)); 
+    }
+}
+
 /* Scan Line Animation */
 @keyframes scanMove {
     0% { transform: translateY(-100%); }

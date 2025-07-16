@@ -25,7 +25,7 @@ export class BackgroundMusic {
     setupBackgroundMusic() {
         this.backgroundMusic = document.getElementById('backgroundMusic');
         if (!this.backgroundMusic) {
-            console.warn('Background music element not found');
+            console.error('Background music element not found - check if audio element exists in HTML');
             return;
         }
 
@@ -36,7 +36,12 @@ export class BackgroundMusic {
         
         // Add error handling for missing audio file
         this.backgroundMusic.addEventListener('error', (e) => {
-            console.warn('Background music file not found or cannot be loaded:', e);
+            console.error('Background music file not found or cannot be loaded:', e);
+            console.error('Audio error details:', {
+                error: this.backgroundMusic.error,
+                networkState: this.backgroundMusic.networkState,
+                readyState: this.backgroundMusic.readyState
+            });
             // Hide audio controls if music file is not available
             const audioControls = document.getElementById('audioControls');
             if (audioControls) {
@@ -51,7 +56,6 @@ export class BackgroundMusic {
         
         // Add play event listener
         this.backgroundMusic.addEventListener('play', () => {
-    
             // Ensure audio context is resumed when music plays
             if (window.audioSystemInstance && window.audioSystemInstance.audioContext && 
                 window.audioSystemInstance.audioContext.state === 'suspended') {
@@ -67,6 +71,13 @@ export class BackgroundMusic {
         this.backgroundMusic.addEventListener('pause', () => {
             // Background music paused
         });
+        
+        // Add canplay event to check if audio can be played
+        this.backgroundMusic.addEventListener('canplay', () => {
+            // Background music can be played
+        });
+        
+
         
         // Update audio controls to reflect music state
         this.updateAudioControls();
@@ -100,7 +111,7 @@ export class BackgroundMusic {
         // Try to play immediately, if it fails, wait for user interaction
         playMusic();
         
-        // Only set up auto-restart if music is enabled and we haven't already set it up
+        // Set up auto-restart for music on user interaction
         if (this.musicEnabled && !this.autoRestartSetup) {
             const startOnInteraction = () => {
                 // Only restart if music is enabled, paused, and user hasn't manually disabled it
@@ -272,4 +283,6 @@ export class BackgroundMusic {
         }
         return window.backgroundMusicInstance;
     }
+    
+
 } 

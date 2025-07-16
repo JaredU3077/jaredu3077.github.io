@@ -21,19 +21,15 @@ export class BootSequence {
     }
 
     async startBootSequence() {
-        console.log('BootSequence: Starting boot sequence...');
-        
         try {
             document.body.classList.add('boot-active');
             
-            if (window.audioSystemInstance && window.audioSystemInstance.audioEnabled) {
-                window.audioSystemInstance.playBootSound();
-            }
+            // Don't play boot sounds automatically - wait for user interaction
+            // The audio system will handle this properly when the user interacts
 
             // Wait for progress animation to complete
             await this.startProgressAnimation();
             
-            console.log('BootSequence: Boot sequence complete, showing login screen...');
             this.showLoginScreen();
         } catch (error) {
             console.error('BootSequence: Boot sequence failed:', error);
@@ -44,8 +40,6 @@ export class BootSequence {
 
     startProgressAnimation() {
         return new Promise((resolve) => {
-            console.log('Starting progress animation...');
-            
             const progressFill = document.querySelector('.progress-fill');
             
             if (!progressFill) {
@@ -70,14 +64,6 @@ export class BootSequence {
             const updateInterval = 16; // 60fps
             const totalUpdates = activeDuration / updateInterval;
             const progressPerUpdate = targetProgress / totalUpdates;
-
-            console.log('Progress animation parameters:', {
-                totalDuration,
-                activeDuration,
-                updateInterval,
-                totalUpdates,
-                progressPerUpdate
-            });
 
             const updateProgress = () => {
                 // Handle pause at 85%
@@ -170,9 +156,8 @@ export class BootSequence {
                 if (loginScreen) {
                     loginScreen.style.display = 'flex';
                     
-                    if (window.audioSystemInstance && window.audioSystemInstance.audioEnabled) {
-                        window.audioSystemInstance.playLoginSound();
-                    }
+                    // Don't play login sounds automatically - wait for user interaction
+                    // The audio system will handle this properly when the user interacts
                 }
             }, 300);
         }

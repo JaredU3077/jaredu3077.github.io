@@ -22,6 +22,9 @@ export class AudioSystem {
     init() {
         this.setupAudioSystem();
         
+        // Setup global audio context resumption for Howler.js
+        this.setupGlobalAudioResumption();
+        
         // Mobile-specific audio optimizations
         if (window.innerWidth <= 768) {
             this.setupMobileAudioOptimizations();
@@ -42,8 +45,10 @@ export class AudioSystem {
                     const resumeAudio = () => {
                         if (this.audioContext && this.audioContext.state === 'suspended') {
                             this.audioContext.resume().then(() => {
-                    
+                                console.log('🎵 Audio context resumed successfully');
                                 this.setupAudioNodes();
+                                // Play a subtle sound to indicate audio is ready
+                                this.queuePostInteractionSounds();
                             }).catch(err => {
                                 console.warn('Failed to resume audio context:', err);
                             });
@@ -51,10 +56,12 @@ export class AudioSystem {
                         // Remove listeners after first interaction
                         document.removeEventListener('click', resumeAudio);
                         document.removeEventListener('keydown', resumeAudio);
+                        document.removeEventListener('touchstart', resumeAudio);
                     };
                     
                     document.addEventListener('click', resumeAudio, { once: true });
                     document.addEventListener('keydown', resumeAudio, { once: true });
+                    document.addEventListener('touchstart', resumeAudio, { once: true });
                 } else {
                     // Audio context is already active
                     this.setupAudioNodes();
@@ -89,6 +96,34 @@ export class AudioSystem {
         } catch (error) {
             console.warn('Failed to setup audio nodes:', error);
         }
+    }
+
+    setupGlobalAudioResumption() {
+        // Global event listener to resume Howler.js audio context
+        const resumeHowlerAudio = () => {
+            if (window.Howler && window.Howler.ctx && window.Howler.ctx.state === 'suspended') {
+                window.Howler.ctx.resume().then(() => {
+                    console.log('🎵 Howler.js audio context resumed successfully');
+                }).catch(err => {
+                    console.warn('Failed to resume Howler.js audio context:', err);
+                });
+            }
+        };
+
+        // Add event listeners for user interactions
+        document.addEventListener('click', resumeHowlerAudio, { once: true });
+        document.addEventListener('keydown', resumeHowlerAudio, { once: true });
+        document.addEventListener('touchstart', resumeHowlerAudio, { once: true });
+    }
+
+    // Queue for sounds that should play after first user interaction
+    queuePostInteractionSounds() {
+        // Play a subtle "ready" sound after user interaction
+        setTimeout(() => {
+            if (this.audioEnabled && this.audioContext && this.audioContext.state === 'running') {
+                this.createTone(523, 0.1, 'sine', 0.05); // High C - very subtle
+            }
+        }, 100);
     }
 
     async initMechvibes() {
@@ -243,6 +278,12 @@ export class AudioSystem {
     playBootSound() {
         if (!this.audioContext) return;
         
+        // Don't play boot sounds if audio context is suspended (no user interaction yet)
+        if (this.audioContext.state === 'suspended') {
+            console.log('🎵 Skipping boot sound - waiting for user interaction');
+            return;
+        }
+        
         this.createTone(220, 0.1, 'sine', 0.3);
         setTimeout(() => this.createTone(330, 0.1, 'sine', 0.2), 200);
         setTimeout(() => this.createTone(440, 0.2, 'sine', 0.1), 400);
@@ -250,6 +291,12 @@ export class AudioSystem {
 
     playLoginSound() {
         if (!this.audioContext) return;
+        
+        // Don't play login sounds if audio context is suspended (no user interaction yet)
+        if (this.audioContext.state === 'suspended') {
+            console.log('🎵 Skipping login sound - waiting for user interaction');
+            return;
+        }
         
         this.createTone(440, 0.1, 'sine', 0.2);
         setTimeout(() => this.createTone(554, 0.1, 'sine', 0.15), 100);

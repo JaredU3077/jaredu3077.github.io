@@ -110,8 +110,8 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 
     // File paths
     PATHS: {
-        RESUME: 'resume.txt',
-        CODEX: 'codex.txt'
+        RESUME: 'assets/content/resume.txt',
+
     },
 
     // Network visualization
@@ -181,13 +181,73 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
             id: 'terminal',
             name: 'Terminal',
             description: 'Command line interface',
-            icon: `<svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <!-- Terminal window - white -->
-                <rect x="3" y="6" width="26" height="20" rx="3" stroke="white" fill="none"/>
-                <!-- Terminal lines - purple -->
-                <path d="M10 12h12" stroke="#8b5cf6" stroke-width="2"/>
-                <path d="M10 18h12" stroke="#8b5cf6" stroke-width="2"/>
-                <path d="M10 24h8" stroke="#8b5cf6" stroke-width="2"/>
+            icon: `<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Modern Terminal Icon with 3D effect -->
+                <defs>
+                    <linearGradient id="terminalGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:var(--primary-color);stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:var(--primary-light);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:var(--primary-dark);stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="screenGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:var(--background-dark);stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:var(--background-medium);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:var(--background-light);stop-opacity:1" />
+                    </linearGradient>
+                    <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feDropShadow dx="2" dy="4" stdDeviation="3" flood-color="rgba(0,0,0,0.3)"/>
+                    </filter>
+                </defs>
+                
+                <!-- Terminal body with 3D effect -->
+                <g filter="url(#dropShadow)">
+                    <!-- Terminal base (bottom face) -->
+                    <rect x="4" y="42" width="40" height="4" rx="2" fill="var(--primary-dark)" opacity="0.8"/>
+                    
+                    <!-- Terminal back (right face) -->
+                    <rect x="42" y="6" width="4" height="36" rx="2" fill="var(--primary-dark)" opacity="0.6"/>
+                    
+                    <!-- Terminal main body -->
+                    <rect x="6" y="6" width="36" height="36" rx="4" fill="url(#terminalGradient)" stroke="var(--primary-color)" stroke-width="1"/>
+                    
+                    <!-- Screen area -->
+                    <rect x="10" y="10" width="28" height="20" rx="2" fill="url(#screenGradient)" stroke="var(--border-color)" stroke-width="0.5"/>
+                    
+                    <!-- Terminal text lines -->
+                    <g fill="var(--text-color)">
+                        <!-- Command prompt line -->
+                        <rect x="12" y="12" width="2" height="2" rx="0.5"/>
+                        <rect x="15" y="12" width="1" height="2" rx="0.5"/>
+                        <rect x="17" y="12" width="8" height="2" rx="0.5"/>
+                        
+                        <!-- Output lines -->
+                        <rect x="12" y="16" width="20" height="1" rx="0.5"/>
+                        <rect x="12" y="18" width="16" height="1" rx="0.5"/>
+                        <rect x="12" y="20" width="18" height="1" rx="0.5"/>
+                        <rect x="12" y="22" width="14" height="1" rx="0.5"/>
+                        <rect x="12" y="24" width="12" height="1" rx="0.5"/>
+                    </g>
+                    
+                    <!-- Cursor blink effect -->
+                    <rect x="12" y="28" width="2" height="2" rx="0.5" fill="var(--accent-green)" opacity="0.8">
+                        <animate attributeName="opacity" values="0.8;0.2;0.8" dur="1s" repeatCount="indefinite"/>
+                    </rect>
+                    
+                    <!-- Terminal buttons -->
+                    <circle cx="16" cy="34" r="1.5" fill="var(--accent-red)" opacity="0.8"/>
+                    <circle cx="20" cy="34" r="1.5" fill="var(--accent-yellow)" opacity="0.8"/>
+                    <circle cx="24" cy="34" r="1.5" fill="var(--accent-green)" opacity="0.8"/>
+                    
+                    <!-- High-tech details -->
+                    <rect x="28" y="32" width="6" height="4" rx="1" fill="var(--primary-color)" opacity="0.3"/>
+                    <rect x="29" y="33" width="4" height="2" rx="0.5" fill="var(--text-color)" opacity="0.6"/>
+                    
+                    <!-- Corner accent -->
+                    <path d="M 6 6 L 10 6 L 10 10 L 6 10 Z" fill="var(--accent-cyan)" opacity="0.6"/>
+                </g>
+                
+                <!-- Glow effect -->
+                <rect x="6" y="6" width="36" height="36" rx="4" fill="none" stroke="var(--primary-glow)" stroke-width="2" opacity="0.5"/>
             </svg>`,
             defaultSize: { width: 700, height: 500 },
             windows: [{
@@ -202,47 +262,6 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
                 `,
                 width: 700,
                 height: 500
-            }]
-        },
-        'codex': {
-            id: 'codex',
-            name: 'Codex',
-            description: '200 Layers of Financial Control',
-            icon: `<svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
-                <!-- Jail cell - white -->
-                <rect x="3" y="3" width="26" height="26" stroke="white" fill="none" stroke-width="1.5"/>
-                <!-- Two vertical bars - white -->
-                <line x1="11" y1="3" x2="11" y2="29" stroke="white" fill="none" stroke-width="2.5"/>
-                <line x1="21" y1="3" x2="21" y2="29" stroke="white" fill="none" stroke-width="2.5"/>
-                <!-- Dollar sign - purple, perfectly centered -->
-                <text x="16" y="18" font-size="24" text-anchor="middle" dominant-baseline="middle" fill="#8b5cf6" stroke="none" font-family="Arial, sans-serif" font-weight="bold">$</text>
-            </svg>`,
-            category: 'knowledge',
-            defaultSize: { width: 1000, height: 700 },
-            windows: [{
-                id: 'codexWindow',
-                title: 'Codex - 200 Layers of Financial Control',
-                content: `
-                    <div class="codex-container">
-                        <div class="codex-header">
-                            <div class="search-container">
-                                <input type="text" class="search-input" placeholder="Search layers, instruments, concepts...">
-                                <button class="search-btn">🔍</button>
-                            </div>
-                            <div class="layer-navigation">
-                                <button class="nav-btn prev-btn">◀</button>
-                                <span class="layer-info">Layer <span class="current-layer">1</span> of <span class="total-layers">200</span></span>
-                                <button class="nav-btn next-btn">▶</button>
-                            </div>
-                        </div>
-                        <div class="codex-content">
-                            <div class="layers-container"></div>
-                            <div class="loading-indicator">Loading knowledge base...</div>
-                        </div>
-                    </div>
-                `,
-                width: 1000,
-                height: 700
             }]
         }
     },

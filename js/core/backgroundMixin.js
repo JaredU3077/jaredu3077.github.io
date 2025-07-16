@@ -13,80 +13,158 @@ export const backgroundMixin = {
     },
 
     /**
-     * Creates eight persistent, different-sized, centered rings with solar system orbs
+     * Creates enhanced solar system with sun and planets
      */
     createBackgroundSpinnerRings() {
-        // Remove any existing rings and orbs to avoid duplicates
-        document.querySelectorAll('.background-spinner, .solar-orb').forEach(element => element.remove());
+        // Remove any existing solar system elements
+        document.querySelectorAll('.background-spinner, .solar-orb, .solar-sun, .solar-planet').forEach(element => element.remove());
         
-        // Create eight rings with different sizes and speeds - all with same visibility and style
-        const rings = [
-            { size: 200, animation: 40, borderWidth: 1, orbSize: 8 },
-            { size: 280, animation: 50, borderWidth: 1, orbSize: 6 },
-            { size: 360, animation: 60, borderWidth: 1, orbSize: 10 },
-            { size: 440, animation: 70, borderWidth: 1, orbSize: 7 },
-            { size: 520, animation: 80, borderWidth: 1, orbSize: 12 },
-            { size: 600, animation: 90, borderWidth: 1, orbSize: 9 },
-            { size: 680, animation: 100, borderWidth: 1, orbSize: 11 },
-            { size: 760, animation: 110, borderWidth: 1, orbSize: 8 }
+        // Create the central sun
+        const sun = document.createElement('div');
+        sun.className = 'solar-sun';
+        sun.style.cssText = `
+            position: fixed !important;
+            top: 50% !important;
+            left: 50% !important;
+            width: 80px !important;
+            height: 80px !important;
+            transform: translate(-50%, -50%) !important;
+            background: radial-gradient(circle, #ffd700 0%, #ff8c00 30%, #ff4500 70%, #8b0000 100%) !important;
+            border-radius: 50% !important;
+            pointer-events: none !important;
+            z-index: 99 !important;
+            box-shadow: 
+                0 0 30px #ffd700,
+                0 0 60px #ff8c00,
+                0 0 90px #ff4500,
+                inset 0 0 20px rgba(255, 215, 0, 0.3) !important;
+            animation: sunPulse 4s ease-in-out infinite !important;
+        `;
+        document.body.appendChild(sun);
+
+        // Create solar system planets with realistic characteristics
+        const planets = [
+            { name: 'Mercury', size: 6, distance: 120, speed: 25, color: '#8c7853', ring: false },
+            { name: 'Venus', size: 8, distance: 180, speed: 35, color: '#e6be8a', ring: false },
+            { name: 'Earth', size: 9, distance: 240, speed: 45, color: '#4a90e2', ring: false },
+            { name: 'Mars', size: 7, distance: 300, speed: 55, color: '#c1440e', ring: false },
+            { name: 'Jupiter', size: 16, distance: 380, speed: 65, color: '#d4af37', ring: true },
+            { name: 'Saturn', size: 14, distance: 460, speed: 75, color: '#f4d03f', ring: true },
+            { name: 'Uranus', size: 11, distance: 540, speed: 85, color: '#85c1e9', ring: true },
+            { name: 'Neptune', size: 10, distance: 620, speed: 95, color: '#5dade2', ring: false }
         ];
-        const orbColors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff', '#5f27cd'];
         
-        rings.forEach((ringConfig, index) => {
-            // Create the ring
-            const ring = document.createElement('div');
-            ring.className = 'background-spinner';
+        planets.forEach((planet, index) => {
+            // Create planet
+            const planetElement = document.createElement('div');
+            planetElement.className = 'solar-planet';
+            planetElement.setAttribute('data-planet', planet.name);
             
-            // Set ALL styles inline to override any CSS
+            planetElement.style.cssText = `
+                position: fixed !important;
+                top: 50% !important;
+                left: 50% !important;
+                width: ${planet.size}px !important;
+                height: ${planet.size}px !important;
+                background: radial-gradient(circle, ${planet.color} 0%, ${this.darkenColor(planet.color, 0.3)} 100%) !important;
+                border-radius: 50% !important;
+                --orbit-radius: ${planet.distance}px !important;
+                animation: solarOrbit ${planet.speed}s linear infinite !important;
+                pointer-events: none !important;
+                z-index: 101 !important;
+                box-shadow: 
+                    0 0 8px ${planet.color},
+                    inset 0 0 4px rgba(255, 255, 255, 0.2) !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            `;
+            document.body.appendChild(planetElement);
+
+            // Create orbital ring
+            const ring = document.createElement('div');
+            ring.className = 'solar-orbit-ring';
             ring.style.cssText = `
                 position: fixed !important;
                 top: 50% !important;
                 left: 50% !important;
-                width: ${ringConfig.size}px !important;
-                height: ${ringConfig.size}px !important;
+                width: ${planet.distance * 2}px !important;
+                height: ${planet.distance * 2}px !important;
                 transform: translate(-50%, -50%) !important;
-                border: ${ringConfig.borderWidth}px solid rgba(74, 144, 226, 0.13) !important;
+                border: 1px solid rgba(255, 255, 255, 0.05) !important;
                 border-radius: 50% !important;
-                animation: backgroundSpin ${ringConfig.animation}s linear infinite !important;
                 pointer-events: none !important;
                 z-index: 100 !important;
-                opacity: 1 !important;
+                opacity: 0.3 !important;
                 margin: 0 !important;
                 padding: 0 !important;
                 background: none !important;
-                box-shadow: 0 0 12px 2px rgba(74,144,226,0.06);
-                filter: blur(1px);
             `;
             document.body.appendChild(ring);
 
-            // Create the orb for this ring
-            const orb = document.createElement('div');
-            orb.className = 'solar-orb';
-            const orbRadius = ringConfig.size / 2;
-            // Increase orb size by 10%
-            const orbSize = Math.round(ringConfig.orbSize * 1.1);
-            orb.style.cssText = `
-                position: fixed !important;
-                top: 50% !important;
-                left: 50% !important;
-                width: ${orbSize}px !important;
-                height: ${orbSize}px !important;
-                background: ${orbColors[index]} !important;
-                border-radius: 50% !important;
-                --orbit-radius: ${orbRadius}px !important;
-                animation: solarOrbit ${ringConfig.animation}s linear infinite !important;
-                pointer-events: none !important;
-                z-index: 101 !important;
-                box-shadow: 0 0 10px ${orbColors[index]} !important;
-                margin: 0 !important;
-                padding: 0 !important;
-            `;
-            document.body.appendChild(orb);
+            // Create planet rings for gas giants
+            if (planet.ring) {
+                const planetRing = document.createElement('div');
+                planetRing.className = 'solar-planet-ring';
+                planetRing.style.cssText = `
+                    position: fixed !important;
+                    top: 50% !important;
+                    left: 50% !important;
+                    width: ${planet.size * 2.5}px !important;
+                    height: ${planet.size * 0.8}px !important;
+                    transform: translate(-50%, -50%) !important;
+                    background: linear-gradient(90deg, transparent 0%, ${planet.color}40 20%, ${planet.color}80 50%, ${planet.color}40 80%, transparent 100%) !important;
+                    border-radius: 50% !important;
+                    pointer-events: none !important;
+                    z-index: 102 !important;
+                    animation: planetRingRotate ${planet.speed * 0.8}s linear infinite !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                `;
+                document.body.appendChild(planetRing);
+            }
+
+            // Add moons for some planets
+            if (['Earth', 'Mars', 'Jupiter', 'Saturn'].includes(planet.name)) {
+                const moonCount = planet.name === 'Jupiter' ? 3 : planet.name === 'Saturn' ? 2 : 1;
+                for (let i = 0; i < moonCount; i++) {
+                    const moon = document.createElement('div');
+                    moon.className = 'solar-moon';
+                    moon.style.cssText = `
+                        position: fixed !important;
+                        top: 50% !important;
+                        left: 50% !important;
+                        width: ${Math.max(2, planet.size * 0.3)}px !important;
+                        height: ${Math.max(2, planet.size * 0.3)}px !important;
+                        background: #c0c0c0 !important;
+                        border-radius: 50% !important;
+                        --orbit-radius: ${planet.size * 0.8}px !important;
+                        --moon-offset: ${i * 120}deg !important;
+                        animation: moonOrbit ${planet.speed * 0.5}s linear infinite !important;
+                        pointer-events: none !important;
+                        z-index: 103 !important;
+                        box-shadow: 0 0 4px #c0c0c0 !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                    `;
+                    document.body.appendChild(moon);
+                }
+            }
         });
 
         // Hide ambient glow overlay if it exists
         const glow = document.querySelector('.ambient-glow');
         if (glow) glow.style.display = 'none';
+    },
+
+    /**
+     * Helper function to darken colors
+     */
+    darkenColor(color, factor) {
+        const hex = color.replace('#', '');
+        const r = Math.max(0, parseInt(hex.substr(0, 2), 16) * (1 - factor));
+        const g = Math.max(0, parseInt(hex.substr(2, 2), 16) * (1 - factor));
+        const b = Math.max(0, parseInt(hex.substr(4, 2), 16) * (1 - factor));
+        return `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
     },
 
     /**

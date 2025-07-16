@@ -2,6 +2,7 @@ import { AudioSystem } from './audioSystem.js';
 import { BackgroundMusic } from './backgroundMusic.js';
 import { ParticleSystem } from './particleSystem.js';
 import { BootSequence } from './bootSequence.js';
+import { ThemeManager } from './themeManager.js';
 
 export class BootSystem {
     constructor() {
@@ -9,11 +10,13 @@ export class BootSystem {
         this.backgroundMusic = new BackgroundMusic();
         this.particleSystem = new ParticleSystem();
         this.bootSequence = new BootSequence();
+        this.themeManager = ThemeManager.getInstance();
 
         window.audioSystemInstance = this.audioSystem;
         window.backgroundMusicInstance = this.backgroundMusic;
         window.particleSystemInstance = this.particleSystem;
         window.bootSequenceInstance = this.bootSequence;
+        window.themeManagerInstance = this.themeManager;
 
         this.mechvibesPlayer = null;
         this.audioPlayer = null;
