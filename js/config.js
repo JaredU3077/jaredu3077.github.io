@@ -259,6 +259,21 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
                         <span class="prompt">$</span>
                         <input type="text" autofocus aria-label="Terminal input">
                     </div>
+                    <div class="terminal-status">
+                        <div class="status-item">
+                            <span class="status-indicator"></span>
+                            <span class="status-text">ready</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-text">theme: default</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-text">history: 0</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-text">uptime: 00:00:00</span>
+                        </div>
+                    </div>
                 `,
                 width: 700,
                 height: 500

@@ -121,7 +121,7 @@ export class DragHandler {
             const minLeft = 0;
             const maxLeft = desktopRect.width - windowRect.width;
             const minTop = 0;
-            const maxTop = desktopRect.height - windowRect.height - this.manager.taskbarHeight;
+            const maxTop = desktopRect.height - windowRect.height;
             
             // Clamp to desktop bounds
             newLeft = Math.max(minLeft, Math.min(newLeft, maxLeft));

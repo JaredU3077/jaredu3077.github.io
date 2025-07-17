@@ -54,7 +54,7 @@ export class SnapHandler {
     getSnapZones() {
         const zones = new Map();
         const screenWidth = window.innerWidth;
-        const effectiveHeight = window.innerHeight - this.manager.taskbarHeight;
+        const effectiveHeight = window.innerHeight;
 
         zones.set('left', { left: 0, top: 0, width: screenWidth / 2, height: effectiveHeight });
         zones.set('right', { left: screenWidth / 2, top: 0, width: screenWidth / 2, height: effectiveHeight });
@@ -72,12 +72,12 @@ export class SnapHandler {
      */
     isInSnapZone(rect, zone) {
         const threshold = this.snapThreshold;
-        const effectiveHeight = window.innerHeight - this.manager.taskbarHeight;
+        const effectiveHeight = window.innerHeight;
 
         if (zone.left === 0 && zone.width === window.innerWidth / 2) return rect.left <= threshold;
         if (zone.left === window.innerWidth / 2 && zone.width === window.innerWidth / 2) return rect.right >= window.innerWidth - threshold;
         if (zone.top === 0 && zone.height === effectiveHeight / 2) return rect.top <= threshold;
-        if (zone.top === effectiveHeight / 2) return rect.bottom >= window.innerHeight - this.manager.taskbarHeight - threshold;
+        if (zone.top === effectiveHeight / 2) return rect.bottom >= window.innerHeight - threshold;
 
         return false;
     }
@@ -91,7 +91,7 @@ export class SnapHandler {
         this.isSnappingEnabled = false;
 
         const screenWidth = window.innerWidth;
-        const effectiveHeight = window.innerHeight - this.manager.taskbarHeight;
+        const effectiveHeight = window.innerHeight;
 
         let newLeft, newTop, newWidth, newHeight;
 

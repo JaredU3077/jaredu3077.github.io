@@ -92,19 +92,69 @@ export class Terminal {
         this.setupEventListeners();
         this.loadHistory();
         this.applyTheme(this.currentTheme);
+        this.initializeStatusBar();
 
         // Show welcome message with theme info
         setTimeout(() => {
-            this.writeOutput(`<div class="terminal-heading">neuOS terminal v2.1</div>
-<div class="terminal-detail">welcome to the enhanced terminal interface</div>
-<div class="terminal-detail">current theme: <span style="color: var(--terminal-prompt);">${this.currentTheme}</span></div>
-<div class="terminal-detail">available themes: default, dracula, sunset, cyberpunk</div>
-<div class="terminal-detail">use 'theme <name>' to switch themes</div>
-<div class="terminal-detail">type 'help' for available commands</div>
-<div class="terminal-detail">working directory: ${this.workingDirectory}</div>
-<div style="margin-top: 16px;"></div>`);
+            this.writeOutput(`<div class="terminal-welcome">
+                <h3>neuOS terminal v2.1</h3>
+                <p>welcome to the enhanced terminal interface</p>
+                <p>current theme: <span style="color: var(--terminal-prompt);">${this.currentTheme}</span></p>
+                <p>available themes: default, dracula, sunset, cyberpunk</p>
+                <p>use 'theme <name>' to switch themes</p>
+                <p>type 'help' for available commands</p>
+                <p>working directory: ${this.workingDirectory}</p>
+            </div>`);
             this.inputElement.focus();
         }, 100);
+    }
+
+    initializeStatusBar() {
+        this.statusBar = document.querySelector('.terminal-status');
+        if (this.statusBar) {
+            this.updateStatusBar();
+            // Update status bar every 5 seconds instead of every second for better performance
+            setInterval(() => this.updateStatusBar(), 5000);
+        }
+    }
+
+    updateStatusBar() {
+        if (!this.statusBar || this._statusBarDisabled) return;
+        
+        const statusItems = this.statusBar.querySelectorAll('.status-item');
+        if (statusItems.length >= 4) {
+            // Update status indicator
+            const statusIndicator = statusItems[0].querySelector('.status-indicator');
+            const statusText = statusItems[0].querySelector('.status-text');
+            
+            if (this.isProcessing) {
+                statusIndicator.style.background = '#f59e0b';
+                statusText.textContent = 'processing...';
+            } else {
+                statusIndicator.style.background = '#10b981';
+                statusText.textContent = 'ready';
+            }
+            
+            // Update theme
+            statusItems[1].querySelector('.status-text').textContent = `theme: ${this.currentTheme}`;
+            
+            // Update history count
+            statusItems[2].querySelector('.status-text').textContent = `history: ${this.history.length}`;
+            
+            // Update uptime
+            const uptime = this.calculateUptime();
+            statusItems[3].querySelector('.status-text').textContent = `uptime: ${uptime}`;
+        }
+    }
+
+    calculateUptime() {
+        const now = Date.now();
+        const uptimeMs = now - this.commandStartTime;
+        const hours = Math.floor(uptimeMs / (1000 * 60 * 60));
+        const minutes = Math.floor((uptimeMs % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((uptimeMs % (1000 * 60)) / 1000);
+        
+        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
 
     setupEventListeners() {
@@ -113,8 +163,70 @@ export class Terminal {
         this.inputElement.addEventListener('paste', e => this.handlePaste(e), { passive: true });
         this.inputElement.addEventListener('compositionstart', () => this.isComposing = true, { passive: true });
         this.inputElement.addEventListener('compositionend', () => this.isComposing = false, { passive: true });
-        window.addEventListener('resize', () => this.scrollToBottom(), { passive: true });
+        
+        // Optimized resize handling
+        this.setupOptimizedResizeHandler();
+        
         if (window.innerWidth <= 768) this.setupMobileEventListeners();
+    }
+
+    setupOptimizedResizeHandler() {
+        let resizeTimeout;
+        let isResizing = false;
+        let resizeStartTime = 0;
+        
+        // Listen for window resize events
+        window.addEventListener('resize', () => {
+            if (!isResizing) {
+                isResizing = true;
+                resizeStartTime = performance.now();
+                
+                // Disable all non-essential operations during resize
+                this.outputElement.style.pointerEvents = 'none';
+                this.outputElement.style.overflow = 'hidden';
+                this.inputElement.style.pointerEvents = 'none';
+                
+                // Disable status bar updates during resize
+                this._statusBarDisabled = true;
+            }
+            
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                this.scrollToBottom();
+                this.outputElement.style.pointerEvents = '';
+                this.outputElement.style.overflow = '';
+                this.inputElement.style.pointerEvents = '';
+                this._statusBarDisabled = false;
+                isResizing = false;
+                
+                // Update status bar after resize
+                this.updateStatusBar();
+            }, 150);
+        }, { passive: true });
+        
+        // Listen for terminal window resize events with ultra-fast handling
+        window.addEventListener('windowResizeUpdate', (e) => {
+            if (e.detail.window.id === 'terminalWindow') {
+                // Only handle resize if it's been going on for a while
+                if (isResizing && performance.now() - resizeStartTime > 100) {
+                    clearTimeout(resizeTimeout);
+                    resizeTimeout = setTimeout(() => {
+                        this.handleTerminalResize(e.detail.size);
+                    }, 100);
+                }
+            }
+        }, { passive: true });
+    }
+
+    handleTerminalResize(size) {
+        // Ultra-minimal resize handling for maximum performance
+        if (this.outputElement.children.length > 50) {
+            // Only trim if there's a lot of content
+            this.trimOutput();
+        }
+        
+        // Update scroll position
+        this.scrollToBottom();
     }
 
     setupMobileEventListeners() {
@@ -407,9 +519,18 @@ export class Terminal {
             }
             
             this.addToHistory(command);
-            this.displayCommand(command);
+            
+            // Determine command category for styling
+            const category = this.getCommandCategory(command);
+            this.displayCommand(command, category);
+            
             this.lastCommand = command;
             this.commandStartTime = Date.now();
+            
+            // Show loading state for longer operations
+            if (this.isLongRunningCommand(command)) {
+                this.showLoading('executing command...');
+            }
             
             // Handle command chaining with && and ||
             const chainCommands = this.parseCommandChain(command);
@@ -426,7 +547,18 @@ export class Terminal {
                     try {
                         const result = await this.commands.get(sanitizedCmd)(args);
                         lastResult = result;
-                        await this.handleCommandResult(result, chainCommandObj.command);
+                        
+                        // Hide loading state
+                        this.hideLoading();
+                        
+                        // Handle result with enhanced formatting
+                        if (result instanceof Error) {
+                            this.handleCommandError(result);
+                        } else if (typeof result === 'string' && result.includes('success')) {
+                            this.handleCommandSuccess(result);
+                        } else {
+                            await this.handleCommandResult(result, chainCommandObj.command);
+                        }
                         
                         // Check if we should continue based on chain operator
                         const isSuccess = !(result instanceof Error);
@@ -437,11 +569,13 @@ export class Terminal {
                         }
                     } catch (error) {
                         lastResult = error;
+                        this.hideLoading();
                         this.handleCommandError(error);
                         shouldContinue = false;
                     }
                 } else {
-                    throw new AppError(`Command not found: ${cmd}`, ErrorTypes.VALIDATION);
+                    this.hideLoading();
+                    throw new AppError(`command not found: ${cmd}`, ErrorTypes.VALIDATION);
                 }
             }
             
@@ -449,9 +583,12 @@ export class Terminal {
             this.updateEnvironment();
             
         } catch (error) {
+            this.hideLoading();
             this.handleCommandError(error);
         } finally {
             this.isProcessing = false;
+            this.clearInput();
+            
             if (this.commandQueue.length) {
                 this.inputElement.value = this.commandQueue.shift();
                 setTimeout(() => this.executeCommand(), 100);
@@ -486,12 +623,24 @@ export class Terminal {
         this.environment.USER = 'jared';
     }
 
-    displayCommand(command) {
-        const commandElement = document.createElement('div');
-        commandElement.className = 'terminal-command';
-        commandElement.innerHTML = `<span class="prompt">${this.getPrompt()}</span> ${command}`;
-        this.outputElement.appendChild(commandElement);
-        this.clearInput();
+    // Enhanced command display with categories
+    displayCommand(command, category = '') {
+        const commandDiv = document.createElement('div');
+        commandDiv.className = `terminal-command ${category}`;
+        
+        const prompt = document.createElement('span');
+        prompt.className = 'prompt';
+        prompt.textContent = this.getPrompt();
+        
+        const commandText = document.createElement('span');
+        commandText.className = 'command-text';
+        commandText.textContent = command;
+        
+        commandDiv.appendChild(prompt);
+        commandDiv.appendChild(commandText);
+        
+        this.outputElement.appendChild(commandDiv);
+        this.scrollToBottom();
     }
 
     getPrompt() {
@@ -517,13 +666,46 @@ export class Terminal {
         this.isDocumentContent(command, output) ? this.scrollToTop() : this.scrollToBottom();
     }
 
+    // Enhanced error handling with better formatting
     handleCommandError(error) {
-        const errorElement = document.createElement('div');
-        errorElement.className = 'terminal-error';
-        errorElement.textContent = `Error: ${error.message}`;
-        this.outputElement.appendChild(errorElement);
+        const errorMessage = error instanceof AppError ? error.message : error.toString();
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'terminal-error';
+        errorDiv.innerHTML = `<span class="error">error:</span> ${this.formatOutputWithSyntaxHighlighting(errorMessage)}`;
+        errorDiv.style.animation = 'errorShake 0.5s ease-in-out';
+        
+        this.outputElement.appendChild(errorDiv);
         this.scrollToBottom();
         eventEmitter.emit('terminalError', { error });
+    }
+
+    // Enhanced success handling
+    handleCommandSuccess(message) {
+        const successDiv = document.createElement('div');
+        successDiv.className = 'terminal-success';
+        successDiv.innerHTML = `<span class="success">success:</span> ${this.formatOutputWithSyntaxHighlighting(message)}`;
+        successDiv.style.animation = 'successBounce 0.6s ease-out';
+        
+        this.outputElement.appendChild(successDiv);
+        this.scrollToBottom();
+    }
+
+    // Enhanced loading state
+    showLoading(message = 'processing...') {
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'terminal-loading';
+        loadingDiv.textContent = message;
+        loadingDiv.id = 'terminal-loading';
+        
+        this.outputElement.appendChild(loadingDiv);
+        this.scrollToBottom();
+    }
+
+    hideLoading() {
+        const loadingDiv = document.getElementById('terminal-loading');
+        if (loadingDiv) {
+            loadingDiv.remove();
+        }
     }
 
     formatOutput(output, element) {
@@ -572,12 +754,102 @@ export class Terminal {
     }
 
     writeOutput(content) {
-        const outputElement = document.createElement('div');
-        outputElement.className = 'terminal-output-line';
-        outputElement.innerHTML = content;
-        this.outputElement.appendChild(outputElement);
+        if (!content || typeof content !== 'string') return;
+        
+        // For HTML content, don't apply syntax highlighting
+        const isHtmlContent = content.includes('<div') || content.includes('<span') || content.includes('<h3') || content.includes('<p>');
+        const formattedContent = isHtmlContent ? content : this.formatOutputWithSyntaxHighlighting(content);
+        
+        const outputDiv = document.createElement('div');
+        outputDiv.className = 'terminal-result';
+        outputDiv.innerHTML = formattedContent;
+        outputDiv.style.animation = 'resultSlideIn 0.3s ease-out';
+        
+        this.outputElement.appendChild(outputDiv);
         this.trimOutput();
         this.scrollToBottom();
+        
+        // Only add interactive elements for non-HTML content to avoid conflicts
+        if (!isHtmlContent) {
+            this.addInteractiveElements(outputDiv);
+        }
+    }
+
+    formatOutputWithSyntaxHighlighting(content) {
+        // Don't apply syntax highlighting to HTML content
+        if (content.includes('<div') || content.includes('<span') || content.includes('<h3') || content.includes('<p>')) {
+            return content;
+        }
+        
+        // Apply syntax highlighting to plain text content only
+        return content
+            // Highlight keywords
+            .replace(/\b(if|else|for|while|function|return|const|let|var|import|export|class|extends|super|this|new|delete|typeof|instanceof|in|of|try|catch|finally|throw|break|continue|switch|case|default|do|with|debugger|yield|async|await|static|enum|interface|type|namespace|module|require|define|use|strict)\b/g, '<span class="keyword">$1</span>')
+            // Highlight strings
+            .replace(/(["'`])((?:\\.|(?!\1)[^\\])*?)\1/g, '<span class="string">$1$2$1</span>')
+            // Highlight numbers
+            .replace(/\b(\d+(?:\.\d+)?)\b/g, '<span class="number">$1</span>')
+            // Highlight comments
+            .replace(/(\/\/.*$|\/\*[\s\S]*?\*\/)/gm, '<span class="comment">$1</span>')
+            // Highlight error messages
+            .replace(/\b(error|Error|ERROR|failed|Failed|FAILED|exception|Exception|EXCEPTION)\b/g, '<span class="error">$1</span>')
+            // Highlight success messages
+            .replace(/\b(success|Success|SUCCESS|completed|Completed|COMPLETED|ok|OK|done|Done|DONE)\b/g, '<span class="success">$1</span>')
+            // Highlight warning messages
+            .replace(/\b(warning|Warning|WARNING|warn|Warn|WARN|caution|Caution|CAUTION)\b/g, '<span class="warning">$1</span>')
+            // Highlight info messages
+            .replace(/\b(info|Info|INFO|information|Information|INFORMATION|note|Note|NOTE)\b/g, '<span class="info">$1</span>')
+            // Highlight file paths (but not URLs that are already links)
+            .replace(/(\/[^\s]+)(?![^<]*<\/a>)/g, '<span class="string">$1</span>')
+            // Highlight URLs (only if not already in HTML)
+            .replace(/(https?:\/\/[^\s]+)(?![^<]*<\/a>)/g, '<a href="$1" target="_blank" class="string">$1</a>')
+            // Highlight command names
+            .replace(/\b(ls|cd|pwd|cat|grep|find|chmod|chown|cp|mv|rm|mkdir|rmdir|touch|echo|printf|read|source|exec|eval|shift|getopts|trap|ulimit|umask|env|set|unset|export|alias|unalias|type|which|whereis|man|info|whatis|apropos|head|tail|more|less|sort|uniq|cut|paste|join|split|tr|sed|awk|wc|stat|file|du|df|ps|top|kill|nice|renice|bg|fg|jobs|wait|sleep|date|time|uptime|whoami|who|w|hostname|uname|ping|traceroute|nslookup|arp|route|ssh|telnet|ftp|sftp|scp|rsync|wget|curl|nc|netstat|ss|lsof|tcpdump|nmap|host|whois|ifconfig|ip|iptables|ufw|firewall-cmd|speedtest|netsh)\b/g, '<span class="keyword">$1</span>');
+    }
+
+    addInteractiveElements(outputDiv) {
+        // Only add interactive elements for specific content types
+        const content = outputDiv.textContent || '';
+        
+        // Add click handlers for file paths only if they exist
+        const filePaths = outputDiv.querySelectorAll('.string');
+        if (filePaths.length > 0) {
+            filePaths.forEach(path => {
+                if (path.textContent && path.textContent.startsWith('/')) {
+                    path.style.cursor = 'pointer';
+                    path.title = 'Click to navigate';
+                    path.addEventListener('click', () => {
+                        this.handlePathClick(path.textContent);
+                    });
+                }
+            });
+        }
+
+        // Add copy functionality for code blocks only if they exist
+        const codeBlocks = outputDiv.querySelectorAll('pre, code');
+        if (codeBlocks.length > 0) {
+            codeBlocks.forEach(block => {
+                block.style.cursor = 'pointer';
+                block.title = 'Click to copy';
+                block.addEventListener('click', () => {
+                    this.copyToClipboard(block.textContent);
+                });
+            });
+        }
+    }
+
+    handlePathClick(path) {
+        this.writeOutput(`<div class="terminal-info">navigating to: ${path}</div>`);
+        // Here you could implement actual navigation logic
+    }
+
+    async copyToClipboard(text) {
+        try {
+            await navigator.clipboard.writeText(text);
+            this.writeOutput('<div class="terminal-success">copied to clipboard</div>');
+        } catch (err) {
+            this.writeOutput('<div class="terminal-error">failed to copy to clipboard</div>');
+        }
     }
 
     trimOutput() {
@@ -776,42 +1048,169 @@ export class Terminal {
     }
 
     showHelp() {
-        return `neuOS Terminal Commands:
+        return `<div class="terminal-help-section">
+            <h4>core commands</h4>
+            <div class="help-command">
+                <span class="command-name">help</span>
+                <span class="command-desc">show this help</span>
+            </div>
+            <div class="help-command">
+                <span class="command-name">clear</span>
+                <span class="command-desc">clear terminal</span>
+            </div>
+            <div class="help-command">
+                <span class="command-name">themes</span>
+                <span class="command-desc">list available themes</span>
+            </div>
+            <div class="help-command">
+                <span class="command-name">theme &lt;name&gt;</span>
+                <span class="command-desc">switch theme</span>
+            </div>
+            <div class="help-command">
+                <span class="command-name">version</span>
+                <span class="command-desc">show version</span>
+            </div>
+        </div>
 
-Core Commands:
-  help                    - Show this help
-  clear                   - Clear terminal
-  themes                  - List available themes
-  theme <name>            - Switch theme
-  version                 - Show version
+        <div class="terminal-help-section">
+            <h4>audio commands</h4>
+            <div class="help-command">
+                <span class="command-name">mechvibes</span>
+                <span class="command-desc">toggle mechvibes keyboard sounds</span>
+            </div>
+            <div class="help-command">
+                <span class="command-name">mechvibes-status</span>
+                <span class="command-desc">show mechvibes status</span>
+            </div>
+            <div class="help-command">
+                <span class="command-name">test-audio</span>
+                <span class="command-desc">test audio system</span>
+            </div>
+            <div class="help-command">
+                <span class="command-name">audio</span>
+                <span class="command-desc">toggle audio system</span>
+            </div>
+            <div class="help-command">
+                <span class="command-name">play-music</span>
+                <span class="command-desc">start background music</span>
+            </div>
+            <div class="help-command">
+                <span class="command-name">pause-music</span>
+                <span class="command-desc">pause background music</span>
+            </div>
+        </div>
 
-Audio Commands:
-  mechvibes               - Toggle mechvibes keyboard sounds
-  mechvibes-status        - Show mechvibes status
-  test-audio              - Test audio system
-  audio                   - Toggle audio system
-  play-music              - Start background music
-  pause-music             - Pause background music
+        <div class="terminal-help-section">
+            <h4>visual effects</h4>
+            <div class="help-command">
+                <span class="command-name">particles &lt;mode&gt;</span>
+                <span class="command-desc">control particle system</span>
+            </div>
+            <div class="help-command">
+                <span class="command-name">solar</span>
+                <span class="command-desc">solar system control</span>
+            </div>
+            <div class="help-command">
+                <span class="command-name">planets</span>
+                <span class="command-desc">solar system control (alias)</span>
+            </div>
+            <div class="help-command">
+                <span class="command-name">sun</span>
+                <span class="command-desc">solar system control (alias)</span>
+            </div>
+            <div class="help-command">
+                <span class="command-name">effects</span>
+                <span class="command-desc">visual effects control</span>
+            </div>
+        </div>
 
-Visual Effects:
-  particles <mode>        - Control particle system
-  solar                   - Solar system control
-  planets                 - Solar system control (alias)
-  sun                     - Solar system control (alias)
-  effects                 - Visual effects control
+        <div class="terminal-help-section">
+            <h4>network commands</h4>
+            <div class="help-command">
+                <span class="command-name">ping &lt;host&gt;</span>
+                <span class="command-desc">ping a host</span>
+            </div>
+            <div class="help-command">
+                <span class="command-name">tracert &lt;host&gt;</span>
+                <span class="command-desc">trace route</span>
+            </div>
+            <div class="help-command">
+                <span class="command-name">nslookup &lt;domain&gt;</span>
+                <span class="command-desc">dns lookup</span>
+            </div>
+            <div class="help-command">
+                <span class="command-name">show &lt;section&gt;</span>
+                <span class="command-desc">show content (resume, jared, demoscene)</span>
+            </div>
+        </div>
 
-Network Commands:
-  ping <host>             - Ping a host
-  tracert <host>          - Trace route
-  nslookup <domain>       - DNS lookup
-  show <section>          - Show content (resume, jared, demoscene)
+        <div class="terminal-help-section">
+            <h4>system commands</h4>
+            <div class="help-command">
+                <span class="command-name">system</span>
+                <span class="command-desc">system control</span>
+            </div>
+            <div class="help-command">
+                <span class="command-name">performance</span>
+                <span class="command-desc">performance control</span>
+            </div>
+            <div class="help-command">
+                <span class="command-name">screensaver</span>
+                <span class="command-desc">screensaver control</span>
+            </div>
+        </div>
 
-System Commands:
-  system                  - System control
-  performance             - Performance control
-  screensaver             - Screensaver control
+        <div class="terminal-help-section">
+            <h4>file system commands</h4>
+            <div class="help-command">
+                <span class="command-name">ls [path]</span>
+                <span class="command-desc">list directory contents</span>
+            </div>
+            <div class="help-command">
+                <span class="command-name">cd [path]</span>
+                <span class="command-desc">change directory</span>
+            </div>
+            <div class="help-command">
+                <span class="command-name">pwd</span>
+                <span class="command-desc">print working directory</span>
+            </div>
+            <div class="help-command">
+                <span class="command-name">cat [file]</span>
+                <span class="command-desc">concatenate and display files</span>
+            </div>
+            <div class="help-command">
+                <span class="command-name">grep [pattern] [file]</span>
+                <span class="command-desc">search for patterns in files</span>
+            </div>
+        </div>
 
-Type 'help' for more information.`;
+        <div class="terminal-help-section">
+            <h4>information commands</h4>
+            <div class="help-command">
+                <span class="command-name">whoami</span>
+                <span class="command-desc">display current user</span>
+            </div>
+            <div class="help-command">
+                <span class="command-name">date</span>
+                <span class="command-desc">display current date</span>
+            </div>
+            <div class="help-command">
+                <span class="command-name">time</span>
+                <span class="command-desc">display current time</span>
+            </div>
+            <div class="help-command">
+                <span class="command-name">uptime</span>
+                <span class="command-desc">display system uptime</span>
+            </div>
+            <div class="help-command">
+                <span class="command-name">history</span>
+                <span class="command-desc">display command history</span>
+            </div>
+        </div>
+
+        <div style="margin-top: 16px; padding: 12px; background: rgba(99, 102, 241, 0.1); border-radius: 8px; border-left: 3px solid #6366f1;">
+            <strong>tip:</strong> use tab for command completion, arrow keys for history navigation, and ctrl+l to clear the terminal.
+        </div>`;
     }
 
     // Network command handlers
@@ -1845,5 +2244,51 @@ This is a background feature that enhances the visual appeal of neuOS.`;
             return 'umask: current umask is 022';
         }
         return `umask: set umask to ${mask}`;
+    }
+
+    getCommandCategory(command) {
+        const cmd = command.toLowerCase().split(' ')[0];
+        
+        // Network commands
+        if (['ping', 'traceroute', 'nslookup', 'arp', 'route', 'ssh', 'telnet', 'ftp', 'sftp', 'scp', 'rsync', 'wget', 'curl', 'nc', 'netstat', 'ss', 'lsof', 'tcpdump', 'nmap', 'host', 'whois', 'ifconfig', 'ip', 'iptables', 'ufw', 'firewall-cmd', 'speedtest', 'netsh'].includes(cmd)) {
+            return 'network';
+        }
+        
+        // System commands
+        if (['ps', 'top', 'kill', 'nice', 'renice', 'bg', 'fg', 'jobs', 'wait', 'sleep', 'date', 'time', 'uptime', 'whoami', 'who', 'w', 'hostname', 'uname', 'shutdown', 'reboot', 'logout', 'exit', 'suspend', 'hibernate', 'lock'].includes(cmd)) {
+            return 'system';
+        }
+        
+        // File system commands
+        if (['ls', 'cd', 'pwd', 'cat', 'head', 'tail', 'more', 'less', 'grep', 'find', 'locate', 'touch', 'mkdir', 'rmdir', 'rm', 'cp', 'mv', 'ln', 'chmod', 'chown', 'du', 'df', 'stat', 'file', 'wc', 'sort', 'uniq', 'cut', 'paste', 'join', 'split', 'tr', 'sed', 'awk'].includes(cmd)) {
+            return 'filesystem';
+        }
+        
+        // Effects and visual commands
+        if (['theme', 'color', 'brightness', 'contrast', 'blur', 'saturation', 'solarsystem', 'minimize', 'maximize', 'restore'].includes(cmd)) {
+            return 'effects';
+        }
+        
+        // App and window commands
+        if (['launch', 'close', 'focus', 'desktop', 'show', 'demoscene'].includes(cmd)) {
+            return 'apps';
+        }
+        
+        // Audio commands
+        if (['mechvibes', 'play', 'pause', 'stop', 'next', 'prev', 'volume', 'mute', 'unmute'].includes(cmd)) {
+            return 'audio';
+        }
+        
+        // Help and info commands
+        if (['help', 'man', 'info', 'whatis', 'apropos', 'type', 'which', 'whereis', 'alias', 'unalias', 'history', 'env', 'set', 'unset', 'export', 'echo', 'printf'].includes(cmd)) {
+            return 'help';
+        }
+        
+        return '';
+    }
+
+    isLongRunningCommand(command) {
+        const cmd = command.toLowerCase().split(' ')[0];
+        return ['ping', 'traceroute', 'nslookup', 'whois', 'speedtest', 'top', 'find', 'grep', 'nmap', 'tcpdump'].includes(cmd);
     }
 }

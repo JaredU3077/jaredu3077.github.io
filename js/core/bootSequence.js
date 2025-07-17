@@ -24,6 +24,13 @@ export class BootSequence {
         try {
             document.body.classList.add('boot-active');
             
+            // Refresh draggable system to ensure boot container is draggable
+            if (window.neuOS && window.neuOS.draggableSystem) {
+                setTimeout(() => {
+                    window.neuOS.draggableSystem.refreshBootAndLogin();
+                }, 100);
+            }
+            
             // Don't play boot sounds automatically - wait for user interaction
             // The audio system will handle this properly when the user interacts
 
@@ -155,6 +162,13 @@ export class BootSequence {
                 
                 if (loginScreen) {
                     loginScreen.style.display = 'flex';
+                    
+                    // Refresh draggable system to ensure login container is draggable
+                    if (window.neuOS && window.neuOS.draggableSystem) {
+                        setTimeout(() => {
+                            window.neuOS.draggableSystem.refreshBootAndLogin();
+                        }, 100);
+                    }
                     
                     // Don't play login sounds automatically - wait for user interaction
                     // The audio system will handle this properly when the user interacts

@@ -8,19 +8,65 @@ class DraggableSystem {
 
     init() {
         this.setupDraggableElements();
+        this.setupWindowResizeHandler();
+        
+        // Ensure boot and login containers are properly positioned immediately
+        this.refreshBootAndLogin();
+    }
+
+    setupWindowResizeHandler() {
+        // Reset positions when window is resized to prevent elements from being outside viewport
+        window.addEventListener('resize', () => {
+            // Debounce the resize event
+            clearTimeout(this.resizeTimeout);
+            this.resizeTimeout = setTimeout(() => {
+                this.resetAllPositions();
+            }, 250);
+        });
+
+        // Add keyboard shortcut to reset positions (Ctrl+R)
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'r' && !e.shiftKey) {
+                e.preventDefault();
+                this.resetAllPositions();
+                console.log('neuOS: Reset draggable element positions');
+            }
+        });
     }
 
     setupDraggableElements() {
-        // Make boot and login boxes draggable using test1 method
-        const bootSequence = document.getElementById('bootSequence');
-        const loginScreen = document.getElementById('loginScreen');
+        // Make only the actual orb containers draggable, not the full-screen backgrounds
+        const bootContainer = document.querySelector('#bootSequence .boot-container');
+        const loginContainer = document.querySelector('#loginScreen .login-container');
         
-        if (bootSequence) {
-            this.dragElement(bootSequence);
+        if (bootContainer) {
+            // Start with absolute pixel positioning to avoid any center magnetism
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            const centerX = (viewportWidth - 400) / 2; // 400px is the orb width
+            const centerY = (viewportHeight - 400) / 2; // 400px is the orb height
+            
+            bootContainer.style.setProperty('position', 'fixed', 'important');
+            bootContainer.style.setProperty('left', centerX + 'px', 'important');
+            bootContainer.style.setProperty('top', centerY + 'px', 'important');
+            bootContainer.style.setProperty('transform', 'none', 'important'); // No transform
+            bootContainer.style.setProperty('z-index', '1000', 'important');
+            this.dragElement(bootContainer);
         }
         
-        if (loginScreen) {
-            this.dragElement(loginScreen);
+        if (loginContainer) {
+            // Start with absolute pixel positioning to avoid any center magnetism
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            const centerX = (viewportWidth - 400) / 2; // 400px is the orb width
+            const centerY = (viewportHeight - 400) / 2; // 400px is the orb height
+            
+            loginContainer.style.setProperty('position', 'fixed', 'important');
+            loginContainer.style.setProperty('left', centerX + 'px', 'important');
+            loginContainer.style.setProperty('top', centerY + 'px', 'important');
+            loginContainer.style.setProperty('transform', 'none', 'important'); // No transform
+            loginContainer.style.setProperty('z-index', '1000', 'important');
+            this.dragElement(loginContainer);
         }
         
         // Handle neuOS widget specifically with enhanced interaction
@@ -30,11 +76,10 @@ class DraggableSystem {
             this.addInteractiveEffects(neuosWidget);
         }
         
-        // Note: Removed glass containers dragging to prevent conflicts
-        // Only the main containers (bootSequence, loginScreen, neuosWidget) should be draggable
+        // Note: Only the actual orb containers are draggable, not the full-screen backgrounds
     }
 
-    // Fixed 1:1 dragging implementation
+    // Fixed 1:1 dragging implementation with free movement like terminal window
     dragElement(elmnt) {
         if (!elmnt) {
             return;
@@ -46,23 +91,28 @@ class DraggableSystem {
 
         const onPointerDown = e => {
             e.preventDefault();
+            e.stopPropagation();
             
-            // Get current position
+            // Get current position relative to the viewport
             const rect = elmnt.getBoundingClientRect();
-            elmnt.style.setProperty('position', 'absolute', 'important');
-            elmnt.style.setProperty('top', rect.top + 'px', 'important');
-            elmnt.style.setProperty('left', rect.left + 'px', 'important');
             
-            // Clear any existing transform and set to none
-            elmnt.style.setProperty('transform', 'none', 'important');
+            // Calculate position relative to viewport (not parent center)
+            const viewportLeft = rect.left;
+            const viewportTop = rect.top;
+            
+            // Override CSS positioning completely for free movement
+            elmnt.style.setProperty('position', 'fixed', 'important');
+            elmnt.style.setProperty('left', viewportLeft + 'px', 'important');
+            elmnt.style.setProperty('top', viewportTop + 'px', 'important');
+            elmnt.style.setProperty('transform', 'none', 'important'); // Remove any transform
             elmnt.style.setProperty('transition', 'none', 'important'); // Disable transitions during drag
             elmnt.style.setProperty('cursor', 'grabbing', 'important'); // Show grabbing cursor
 
             // Store initial positions
             initialX = e.clientX;
             initialY = e.clientY;
-            initialLeft = rect.left;
-            initialTop = rect.top;
+            initialLeft = viewportLeft;
+            initialTop = viewportTop;
             
             isDragging = true;
             document.addEventListener('pointermove', onPointerMove);
@@ -79,9 +129,21 @@ class DraggableSystem {
             const deltaY = e.clientY - initialY;
             
             // Apply the delta to the initial position for 1:1 tracking
-            const newLeft = initialLeft + deltaX;
-            const newTop = initialTop + deltaY;
+            let newLeft = initialLeft + deltaX;
+            let newTop = initialTop + deltaY;
             
+            // Apply boundary constraints to keep element within viewport
+            const elementWidth = elmnt.offsetWidth;
+            const elementHeight = elmnt.offsetHeight;
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            
+            // Constrain to viewport boundaries with some padding
+            const padding = 20;
+            newLeft = Math.max(-elementWidth + padding, Math.min(newLeft, viewportWidth - padding));
+            newTop = Math.max(-elementHeight + padding, Math.min(newTop, viewportHeight - padding));
+            
+            // Apply the new position directly
             elmnt.style.setProperty('left', newLeft + 'px', 'important');
             elmnt.style.setProperty('top', newTop + 'px', 'important');
             
@@ -90,6 +152,8 @@ class DraggableSystem {
         };
 
         const onPointerUp = () => {
+            if (!isDragging) return;
+            
             isDragging = false;
             document.removeEventListener('pointermove', onPointerMove);
             
@@ -155,6 +219,42 @@ class DraggableSystem {
         this.setupDraggableElements();
     }
     
+    // Method to specifically refresh boot and login containers
+    refreshBootAndLogin() {
+        const bootContainer = document.querySelector('#bootSequence .boot-container');
+        const loginContainer = document.querySelector('#loginScreen .login-container');
+        
+        if (bootContainer) {
+            // Start with absolute pixel positioning to avoid any center magnetism
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            const centerX = (viewportWidth - 400) / 2; // 400px is the orb width
+            const centerY = (viewportHeight - 400) / 2; // 400px is the orb height
+            
+            bootContainer.style.setProperty('position', 'fixed', 'important');
+            bootContainer.style.setProperty('left', centerX + 'px', 'important');
+            bootContainer.style.setProperty('top', centerY + 'px', 'important');
+            bootContainer.style.setProperty('transform', 'none', 'important'); // No transform
+            bootContainer.style.setProperty('z-index', '1000', 'important');
+            this.dragElement(bootContainer);
+        }
+        
+        if (loginContainer) {
+            // Start with absolute pixel positioning to avoid any center magnetism
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            const centerX = (viewportWidth - 400) / 2; // 400px is the orb width
+            const centerY = (viewportHeight - 400) / 2; // 400px is the orb height
+            
+            loginContainer.style.setProperty('position', 'fixed', 'important');
+            loginContainer.style.setProperty('left', centerX + 'px', 'important');
+            loginContainer.style.setProperty('top', centerY + 'px', 'important');
+            loginContainer.style.setProperty('transform', 'none', 'important'); // No transform
+            loginContainer.style.setProperty('z-index', '1000', 'important');
+            this.dragElement(loginContainer);
+        }
+    }
+    
     // Method to specifically refresh neuOS widget
     refreshNeuOSWidget() {
         const neuosWidget = document.getElementById('neuosWidget');
@@ -166,28 +266,73 @@ class DraggableSystem {
     
     // Method to enable boot box dragging specifically
     enableBootBoxDragging() {
-        const bootSequence = document.getElementById('bootSequence');
-        if (bootSequence) {
-            this.dragElement(bootSequence);
+        const bootContainer = document.querySelector('#bootSequence .boot-container');
+        if (bootContainer) {
+            // Start with absolute pixel positioning to avoid any center magnetism
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            const centerX = (viewportWidth - 400) / 2; // 400px is the orb width
+            const centerY = (viewportHeight - 400) / 2; // 400px is the orb height
+            
+            bootContainer.style.setProperty('position', 'fixed', 'important');
+            bootContainer.style.setProperty('left', centerX + 'px', 'important');
+            bootContainer.style.setProperty('top', centerY + 'px', 'important');
+            bootContainer.style.setProperty('transform', 'none', 'important'); // No transform
+            bootContainer.style.setProperty('z-index', '1000', 'important');
+            this.dragElement(bootContainer);
         }
+    }
+
+    // Method to reset position of draggable elements if they're outside viewport
+    resetElementPosition(element) {
+        if (!element) return;
+        
+        const rect = element.getBoundingClientRect();
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        
+        // Check if element is outside viewport
+        if (rect.right < 0 || rect.bottom < 0 || 
+            rect.left > viewportWidth || rect.top > viewportHeight) {
+            // Reset to center of viewport using absolute positioning
+            const centerX = (viewportWidth - 400) / 2; // 400px is the orb width
+            const centerY = (viewportHeight - 400) / 2; // 400px is the orb height
+            
+            element.style.setProperty('position', 'fixed', 'important');
+            element.style.setProperty('left', centerX + 'px', 'important');
+            element.style.setProperty('top', centerY + 'px', 'important');
+            element.style.setProperty('transform', 'none', 'important'); // No transform
+            element.style.setProperty('transition', 'all 0.5s ease-in-out', 'important');
+        }
+    }
+
+    // Method to reset all draggable elements
+    resetAllPositions() {
+        const bootContainer = document.querySelector('#bootSequence .boot-container');
+        const loginContainer = document.querySelector('#loginScreen .login-container');
+        const neuosWidget = document.getElementById('neuosWidget');
+        
+        this.resetElementPosition(bootContainer);
+        this.resetElementPosition(loginContainer);
+        this.resetElementPosition(neuosWidget);
     }
 
     // Cleanup method
     destroy() {
-        const bootSequence = document.getElementById('bootSequence');
-        const loginScreen = document.getElementById('loginScreen');
+        const bootContainer = document.querySelector('#bootSequence .boot-container');
+        const loginContainer = document.querySelector('#loginScreen .login-container');
         const neuosWidget = document.getElementById('neuosWidget');
         
-        // Clean up boot sequence
-        if (bootSequence && bootSequence._draggableHandlers) {
-            bootSequence.removeEventListener('pointerdown', bootSequence._draggableHandlers.pointerdown);
-            delete bootSequence._draggableHandlers;
+        // Clean up boot container
+        if (bootContainer && bootContainer._draggableHandlers) {
+            bootContainer.removeEventListener('pointerdown', bootContainer._draggableHandlers.pointerdown);
+            delete bootContainer._draggableHandlers;
         }
         
-        // Clean up login screen
-        if (loginScreen && loginScreen._draggableHandlers) {
-            loginScreen.removeEventListener('pointerdown', loginScreen._draggableHandlers.pointerdown);
-            delete loginScreen._draggableHandlers;
+        // Clean up login container
+        if (loginContainer && loginContainer._draggableHandlers) {
+            loginContainer.removeEventListener('pointerdown', loginContainer._draggableHandlers.pointerdown);
+            delete loginContainer._draggableHandlers;
         }
         
         // Clean up neuOS widget
@@ -212,6 +357,13 @@ class DraggableSystem {
 // Initialize draggable system when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.draggableSystem = new DraggableSystem();
+    
+    // Immediately position boot and login containers to prevent visual jumps
+    setTimeout(() => {
+        if (window.draggableSystem) {
+            window.draggableSystem.refreshBootAndLogin();
+        }
+    }, 10);
 });
 
 // Also initialize after a short delay to ensure all elements are ready

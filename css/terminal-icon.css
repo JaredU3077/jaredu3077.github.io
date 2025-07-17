@@ -1,58 +1,60 @@
-/* Terminal Icon Styles - Clean Theme-aware Icon (25% larger) */
-.desktop-icon .icon svg {
-    width: 60px;
-    height: 60px;
+/* Terminal Icon Styles - Clean Theme-aware Icon (50% larger) */
+.desktop-icon[data-app="terminal"] .icon svg {
+    width: 90px;
+    height: 90px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     color: var(--text-color);
+    filter: drop-shadow(0 0 10px var(--primary-color));
+    animation: terminalIconPulse 3s ease-in-out infinite;
 }
 
-.desktop-icon:hover .icon svg {
-    transform: scale(1.1);
-}
-
-.desktop-icon:active .icon svg {
-    transform: scale(0.95);
-}
-
-/* Ensure proper sizing and positioning */
-.desktop-icon .icon {
+.desktop-icon[data-app="terminal"] .icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 60px;
-    height: 60px;
+    width: 90px;
+    height: 90px;
 }
 
-/* Mobile responsive adjustments */
-@media (max-width: 768px) {
-    .desktop-icon .icon svg {
-        width: 45px;
-        height: 45px;
+.desktop-icon[data-app="terminal"]:hover .icon svg {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 20px var(--primary-color));
+}
+
+.desktop-icon[data-app="terminal"]:active .icon svg {
+    transform: scale(0.95);
+}
+
+/* Terminal icon pulse animation */
+@keyframes terminalIconPulse {
+    0%, 100% { 
+        filter: drop-shadow(0 0 10px var(--primary-color));
     }
-    .desktop-icon .icon {
-        width: 45px;
-        height: 45px;
+    50% { 
+        filter: drop-shadow(0 0 20px var(--primary-color));
     }
 }
 
+/* Medium screens */
 @media (min-width: 769px) and (max-width: 1199px) {
-    .desktop-icon .icon svg {
-        width: 52px;
-        height: 52px;
+    .desktop-icon[data-app="terminal"] .icon svg {
+        width: 78px;
+        height: 78px;
     }
-    .desktop-icon .icon {
-        width: 52px;
-        height: 52px;
+    .desktop-icon[data-app="terminal"] .icon {
+        width: 78px;
+        height: 78px;
     }
 }
 
-@media (min-width: 1200px) {
-    .desktop-icon .icon svg {
-        width: 60px;
-        height: 60px;
+/* Mobile screens */
+@media (max-width: 768px) {
+    .desktop-icon[data-app="terminal"] .icon svg {
+        width: 68px;
+        height: 68px;
     }
-    .desktop-icon .icon {
-        width: 60px;
-        height: 60px;
+    .desktop-icon[data-app="terminal"] .icon {
+        width: 68px;
+        height: 68px;
     }
 } 

@@ -346,9 +346,7 @@
 .neuos-glass-box {
     /* Force identical positioning and sizing */
     position: absolute !important;
-    left: 50% !important;
-    top: 50% !important;
-    transform: translate(-50%, -50%) !important;
+    /* Initial positioning will be set by JavaScript for proper centering */
     width: 400px !important;
     height: 400px !important;
     border-radius: 50% !important;
@@ -372,6 +370,11 @@
     align-items: center !important;
     /* Enhanced border for definition */
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* When glass box is being dragged, allow positioning override */
+.neuos-glass-box[style*="left:"] {
+    transform: none !important;
 }
 
 /* Enhanced neuOS Glass Title */

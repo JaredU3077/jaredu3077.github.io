@@ -97,7 +97,7 @@ export class WindowManager {
         const isMobile = window.innerWidth <= 768;
         if (isMobile) {
             width = window.innerWidth - 40;
-            height = window.innerHeight - 100 - this.taskbarHeight;
+            height = window.innerHeight - 100;
         }
 
         const minWidth = isMobile ? 300 : (CONFIG.window?.minWidth || 300);
@@ -121,7 +121,7 @@ export class WindowManager {
             top = 0;
         } else {
             left = Math.max(0, Math.min(left, desktop.clientWidth - width));
-            top = Math.max(0, Math.min(top, desktop.clientHeight - height - this.taskbarHeight));
+            top = Math.max(0, Math.min(top, desktop.clientHeight - height));
         }
 
         const windowElement = document.createElement('div');
@@ -310,7 +310,7 @@ export class WindowManager {
     }
 
     /**
-     * Maximizes a window to fill the screen, accounting for taskbar.
+     * Maximizes a window to fill the screen.
      * @param {object} windowObj - The window to maximize.
      * @private
      * @memberof WindowManager
@@ -324,11 +324,22 @@ export class WindowManager {
             height: windowObj.height
         };
 
+        // Move window to body to break out of desktop container constraints
+        const desktop = document.getElementById('desktop');
+        if (desktop && windowObj.element.parentNode === desktop) {
+            document.body.appendChild(windowObj.element);
+        }
+
         windowObj.element.classList.add('maximizing', 'maximized');
+        windowObj.element.style.position = 'fixed';
         windowObj.element.style.left = '0px';
         windowObj.element.style.top = '0px';
+        windowObj.element.style.right = '0px';
+        windowObj.element.style.bottom = '0px';
         windowObj.element.style.width = '100vw';
-        windowObj.element.style.height = `calc(100vh - ${this.taskbarHeight}px)`;
+        windowObj.element.style.height = '100vh';
+        windowObj.element.style.margin = '0px';
+        windowObj.element.style.padding = '0px';
 
         setTimeout(() => {
             windowObj.element.classList.remove('maximizing');
@@ -346,10 +357,22 @@ export class WindowManager {
         windowObj.element.classList.add('unmaximizing');
         windowObj.element.classList.remove('maximized');
 
+        // Move window back to desktop if it was moved to body
+        const desktop = document.getElementById('desktop');
+        if (desktop && windowObj.element.parentNode === document.body) {
+            desktop.appendChild(windowObj.element);
+        }
+
+        // Reset positioning to absolute for normal window behavior
+        windowObj.element.style.position = 'absolute';
         windowObj.element.style.left = `${windowObj.originalPosition.left}px`;
         windowObj.element.style.top = `${windowObj.originalPosition.top}px`;
+        windowObj.element.style.right = '';
+        windowObj.element.style.bottom = '';
         windowObj.element.style.width = `${windowObj.originalPosition.width}px`;
         windowObj.element.style.height = `${windowObj.originalPosition.height}px`;
+        windowObj.element.style.margin = '';
+        windowObj.element.style.padding = '';
         
         // Update window object properties
         windowObj.left = windowObj.originalPosition.left;
@@ -488,7 +511,7 @@ export class WindowManager {
         const currentLeft = parseFloat(windowObj.element.style.left) || 0;
         const currentTop = parseFloat(windowObj.element.style.top) || 0;
         const maxX = window.innerWidth - windowObj.element.offsetWidth;
-        const maxY = window.innerHeight - windowObj.element.offsetHeight - this.taskbarHeight;
+        const maxY = window.innerHeight - windowObj.element.offsetHeight;
 
         let left = Math.max(0, Math.min(currentLeft, maxX));
         let top = Math.max(0, Math.min(currentTop, maxY));

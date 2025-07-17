@@ -16,9 +16,11 @@
     opacity: 1;
     transition: opacity 0.5s ease-in-out;
     overflow: hidden;
-    cursor: move;
     user-select: none;
     touch-action: none;
+    /* Ensure it stays within viewport bounds */
+    max-width: 100vw;
+    max-height: 100vh;
 }
 
 .boot-background {
@@ -40,6 +42,13 @@
 
 .boot-container {
     /* All styling now handled by .neuos-glass-box */
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+}
+
+.boot-container:active {
+    cursor: grabbing;
 }
 
 .boot-header {
@@ -116,9 +125,11 @@
     /* Remove animation to prevent blur differences */
     /* animation: loginFadeIn 1.2s ease-out forwards; */
     overflow: hidden;
-    cursor: move;
     user-select: none;
     touch-action: none;
+    /* Ensure it stays within viewport bounds */
+    max-width: 100vw;
+    max-height: 100vh;
 }
 
 .login-background {
@@ -140,6 +151,13 @@
 
 .login-container {
     /* All styling now handled by .neuos-glass-box */
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+}
+
+.login-container:active {
+    cursor: grabbing;
 }
 
 .login-header {

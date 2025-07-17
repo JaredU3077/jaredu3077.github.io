@@ -1,5 +1,27 @@
 import { CONFIG } from '../config.js';
-import { throttle } from '../utils/utils.js';
+
+/**
+ * Ultra-optimized throttle function for resize operations
+ */
+function throttleResize(func, limit) {
+    let rafId = null;
+    let lastExecTime = 0;
+    
+    return function executedFunction(...args) {
+        const currentTime = performance.now();
+        
+        if (currentTime - lastExecTime > limit) {
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+            }
+            rafId = requestAnimationFrame(() => {
+                func(...args);
+                lastExecTime = currentTime;
+                rafId = null;
+            });
+        }
+    };
+}
 
 /**
  * Handles resize-related functionality for windows using pure JavaScript.
@@ -13,7 +35,7 @@ export class ResizeHandler {
     constructor(manager) {
         this.manager = manager;
         this.activeResize = null;
-        this.resizeThreshold = 3; // Minimum distance to start resizing
+        this.resizeThreshold = 2; // Reduced threshold
         this.isResizing = false;
         this.resizeStartX = 0;
         this.resizeStartY = 0;
@@ -22,6 +44,31 @@ export class ResizeHandler {
         this.originalLeft = 0;
         this.originalTop = 0;
         this.currentDirection = null;
+        
+        // Pre-cache values for maximum performance
+        this.desktopBounds = null;
+        this.constraints = null;
+        this.taskbarHeight = 0;
+        
+        // Cache desktop bounds immediately
+        this.updateCachedValues();
+        
+        // Update cache on window resize
+        window.addEventListener('resize', () => {
+            this.updateCachedValues();
+        }, { passive: true });
+    }
+
+    /**
+     * Updates cached values for better performance
+     */
+    updateCachedValues() {
+        const desktop = document.getElementById('desktop');
+        if (desktop) {
+            this.desktopBounds = desktop.getBoundingClientRect();
+        }
+        this.constraints = this.getResizeConstraints();
+        this.taskbarHeight = this.manager.taskbarHeight || 0;
     }
 
     /**
@@ -55,6 +102,9 @@ export class ResizeHandler {
                 z-index: 1000;
                 transition: background-color 0.15s ease;
                 border-radius: 2px;
+                transform: translateZ(0);
+                will-change: background-color;
+                pointer-events: auto;
             `;
             
             // Position handles
@@ -73,69 +123,65 @@ export class ResizeHandler {
      * @param {string} direction - The resize direction.
      */
     positionHandle(handle, direction) {
-        const size = 12; // Increased from 8 for better visibility
-        const halfSize = size / 2;
+        const size = 8; // Smaller size for better precision
+        const edgeSize = 4; // Size for edge handles
         
         switch (direction) {
             case 'n':
-                handle.style.top = '0';
-                handle.style.left = '50%';
-                handle.style.transform = 'translateX(-50%)';
-                handle.style.width = '100%';
-                handle.style.height = `${size}px`;
-                handle.style.cursor = 'n-resize';
+                handle.style.cssText += `
+                    top: -${edgeSize}px; left: 0; transform: translateZ(0);
+                    width: 100%; height: ${size + edgeSize}px; cursor: n-resize;
+                    border-radius: 0;
+                `;
                 break;
             case 's':
-                handle.style.bottom = '0';
-                handle.style.left = '50%';
-                handle.style.transform = 'translateX(-50%)';
-                handle.style.width = '100%';
-                handle.style.height = `${size}px`;
-                handle.style.cursor = 's-resize';
+                handle.style.cssText += `
+                    bottom: -${edgeSize}px; left: 0; transform: translateZ(0);
+                    width: 100%; height: ${size + edgeSize}px; cursor: s-resize;
+                    border-radius: 0;
+                `;
                 break;
             case 'e':
-                handle.style.right = '0';
-                handle.style.top = '50%';
-                handle.style.transform = 'translateY(-50%)';
-                handle.style.width = `${size}px`;
-                handle.style.height = '100%';
-                handle.style.cursor = 'e-resize';
+                handle.style.cssText += `
+                    right: -${edgeSize}px; top: 0; transform: translateZ(0);
+                    width: ${size + edgeSize}px; height: 100%; cursor: e-resize;
+                    border-radius: 0;
+                `;
                 break;
             case 'w':
-                handle.style.left = '0';
-                handle.style.top = '50%';
-                handle.style.transform = 'translateY(-50%)';
-                handle.style.width = `${size}px`;
-                handle.style.height = '100%';
-                handle.style.cursor = 'w-resize';
+                handle.style.cssText += `
+                    left: -${edgeSize}px; top: 0; transform: translateZ(0);
+                    width: ${size + edgeSize}px; height: 100%; cursor: w-resize;
+                    border-radius: 0;
+                `;
                 break;
             case 'ne':
-                handle.style.top = '0';
-                handle.style.right = '0';
-                handle.style.width = `${size}px`;
-                handle.style.height = `${size}px`;
-                handle.style.cursor = 'ne-resize';
+                handle.style.cssText += `
+                    top: -${edgeSize}px; right: -${edgeSize}px; transform: translateZ(0);
+                    width: ${size + edgeSize}px; height: ${size + edgeSize}px; cursor: ne-resize;
+                    border-radius: 0;
+                `;
                 break;
             case 'nw':
-                handle.style.top = '0';
-                handle.style.left = '0';
-                handle.style.width = `${size}px`;
-                handle.style.height = `${size}px`;
-                handle.style.cursor = 'nw-resize';
+                handle.style.cssText += `
+                    top: -${edgeSize}px; left: -${edgeSize}px; transform: translateZ(0);
+                    width: ${size + edgeSize}px; height: ${size + edgeSize}px; cursor: nw-resize;
+                    border-radius: 0;
+                `;
                 break;
             case 'se':
-                handle.style.bottom = '0';
-                handle.style.right = '0';
-                handle.style.width = `${size}px`;
-                handle.style.height = `${size}px`;
-                handle.style.cursor = 'se-resize';
+                handle.style.cssText += `
+                    bottom: -${edgeSize}px; right: -${edgeSize}px; transform: translateZ(0);
+                    width: ${size + edgeSize}px; height: ${size + edgeSize}px; cursor: se-resize;
+                    border-radius: 0;
+                `;
                 break;
             case 'sw':
-                handle.style.bottom = '0';
-                handle.style.left = '0';
-                handle.style.width = `${size}px`;
-                handle.style.height = `${size}px`;
-                handle.style.cursor = 'sw-resize';
+                handle.style.cssText += `
+                    bottom: -${edgeSize}px; left: -${edgeSize}px; transform: translateZ(0);
+                    width: ${size + edgeSize}px; height: ${size + edgeSize}px; cursor: sw-resize;
+                    border-radius: 0;
+                `;
                 break;
         }
     }
@@ -152,6 +198,9 @@ export class ResizeHandler {
             e.preventDefault();
             e.stopPropagation();
             
+            // Update cached values before starting resize
+            this.updateCachedValues();
+            
             this.resizeStartX = e.clientX;
             this.resizeStartY = e.clientY;
             this.originalWidth = windowElement.offsetWidth;
@@ -159,17 +208,28 @@ export class ResizeHandler {
             this.originalLeft = windowElement.offsetLeft;
             this.originalTop = windowElement.offsetTop;
             this.currentDirection = direction;
+            
+            // Special handling for terminal window
+            if (windowElement.id === 'terminalWindow') {
+                windowElement.classList.add('resizing');
+                // Disable terminal interactions during resize
+                const terminalOutput = windowElement.querySelector('#terminalOutput');
+                const terminalInput = windowElement.querySelector('#terminalInput');
+                if (terminalOutput) terminalOutput.style.pointerEvents = 'none';
+                if (terminalInput) terminalInput.style.pointerEvents = 'none';
+            }
             this.activeResize = { handle, windowElement, windowObj, direction };
             
-            // Add event listeners
+            // Add event listeners with passive option
             document.addEventListener('mousemove', handleResize, { passive: true });
-            document.addEventListener('mouseup', stopResize, { once: true });
+            document.addEventListener('mouseup', stopResize, { once: true, passive: true });
             
             // Prevent text selection during resize
             e.preventDefault();
         };
 
-        const handleResize = throttle((e) => {
+        // Ultra-optimized resize handler
+        const handleResize = throttleResize((e) => {
             const deltaX = e.clientX - this.resizeStartX;
             const deltaY = e.clientY - this.resizeStartY;
             
@@ -183,7 +243,7 @@ export class ResizeHandler {
             }
             
             this.updateResizePosition(e.clientX, e.clientY);
-        }, 16);
+        }, 4); // Ultra-fast throttle for maximum responsiveness
 
         const stopResize = () => {
             if (this.isResizing) {
@@ -195,7 +255,7 @@ export class ResizeHandler {
             this.activeResize = null;
         };
 
-        handle.addEventListener('mousedown', startResize);
+        handle.addEventListener('mousedown', startResize, { passive: false });
         
         // Store handler for cleanup if needed
         handle._resizeHandler = startResize;
@@ -277,19 +337,14 @@ export class ResizeHandler {
                 break;
         }
         
-        // Apply constraints
-        const constraints = this.getResizeConstraints();
-        newWidth = Math.max(constraints.minWidth, Math.min(newWidth, constraints.maxWidth));
-        newHeight = Math.max(constraints.minHeight, Math.min(newHeight, constraints.maxHeight));
+        // Apply constraints using cached values
+        newWidth = Math.max(this.constraints.minWidth, Math.min(newWidth, this.constraints.maxWidth));
+        newHeight = Math.max(this.constraints.minHeight, Math.min(newHeight, this.constraints.maxHeight));
         
-        // Get desktop bounds for position constraints
-        const desktop = document.getElementById('desktop');
-        if (desktop) {
-            const desktopRect = desktop.getBoundingClientRect();
-            
-            // Ensure window doesn't go off-screen
-            const maxLeft = desktopRect.width - newWidth;
-            const maxTop = desktopRect.height - newHeight - this.manager.taskbarHeight;
+        // Apply position constraints using cached desktop bounds
+        if (this.desktopBounds) {
+            const maxLeft = this.desktopBounds.width - newWidth;
+            const maxTop = this.desktopBounds.height - newHeight;
             
             newLeft = Math.max(0, Math.min(newLeft, maxLeft));
             newTop = Math.max(0, Math.min(newTop, maxTop));
@@ -303,35 +358,41 @@ export class ResizeHandler {
             newTop = this.originalTop + (this.originalHeight - newHeight);
         }
         
-        // Apply changes with transform for better performance
-        // Calculate transform relative to original position
+        // Use CSS transform for maximum performance during resize
         const transformX = newLeft - this.originalLeft;
         const transformY = newTop - this.originalTop;
         
-
+        // Apply all changes in one operation for maximum performance
+        const element = this.activeResize.windowElement;
+        element.style.cssText += `
+            transform: translate(${transformX}px, ${transformY}px) translateZ(0) !important;
+            width: ${newWidth}px !important;
+            height: ${newHeight}px !important;
+        `;
         
-        this.activeResize.windowElement.style.transform = `translate(${transformX}px, ${transformY}px)`;
-        this.activeResize.windowElement.style.width = `${newWidth}px`;
-        this.activeResize.windowElement.style.height = `${newHeight}px`;
+        // Update window object properties (minimal DOM access)
+        const windowObj = this.activeResize.windowObj;
+        windowObj.width = newWidth;
+        windowObj.height = newHeight;
+        windowObj.left = newLeft;
+        windowObj.top = newTop;
+        windowObj.isMaximized = false;
+        windowObj._isSnapped = false;
         
-        // Update window object
-        this.activeResize.windowObj.width = newWidth;
-        this.activeResize.windowObj.height = newHeight;
-        this.activeResize.windowObj.left = newLeft;
-        this.activeResize.windowObj.top = newTop;
-        
-        // Mark as not maximized
-        this.activeResize.windowObj.isMaximized = false;
-        this.activeResize.windowObj._isSnapped = false;
-        
-        // Emit resize update event
-        window.dispatchEvent(new CustomEvent('windowResizeUpdate', {
-            detail: { 
-                window: this.activeResize.windowObj,
-                size: { width: newWidth, height: newHeight },
-                position: { left: newLeft, top: newTop }
+        // Only emit events very occasionally to reduce overhead
+        if (!this._lastEventTime || performance.now() - this._lastEventTime > 100) {
+            this._lastEventTime = performance.now();
+            // Use a more efficient event dispatch
+            if (window.dispatchEvent) {
+                window.dispatchEvent(new CustomEvent('windowResizeUpdate', {
+                    detail: { 
+                        window: windowObj,
+                        size: { width: newWidth, height: newHeight },
+                        position: { left: newLeft, top: newTop }
+                    }
+                }));
             }
-        }));
+        }
     }
 
     stopResizing() {
@@ -354,6 +415,14 @@ export class ResizeHandler {
         
         // Remove resizing class
         this.activeResize.windowElement.classList.remove('resizing');
+        
+        // Special cleanup for terminal window
+        if (this.activeResize.windowElement.id === 'terminalWindow') {
+            const terminalOutput = this.activeResize.windowElement.querySelector('#terminalOutput');
+            const terminalInput = this.activeResize.windowElement.querySelector('#terminalInput');
+            if (terminalOutput) terminalOutput.style.pointerEvents = '';
+            if (terminalInput) terminalInput.style.pointerEvents = '';
+        }
         
         // Re-enable snapping
         this.manager.snapHandler.isSnappingEnabled = true;

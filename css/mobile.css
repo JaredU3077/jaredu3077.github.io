@@ -146,30 +146,119 @@
         min-height: 100% !important;
         max-width: 100% !important;
         max-height: 100% !important;
-        background: rgba(255, 255, 255, 0.05) !important;
+        background: linear-gradient(135deg, 
+            rgba(15, 23, 42, 0.98) 0%, 
+            rgba(30, 41, 59, 0.95) 100%) !important;
         backdrop-filter: blur(12px) saturate(160%) brightness(120%) !important;
         -webkit-backdrop-filter: blur(12px) saturate(160%) brightness(120%) !important;
+        border-radius: 0 !important;
+        border: none !important;
     }
 
-    .terminal-input {
-        font-size: 16px !important;
-        padding: 12px !important;
-        min-height: 44px !important;
-        background: rgba(255, 255, 255, 0.1) !important;
+    #terminalWindow .window-header {
+        background: linear-gradient(135deg, 
+            rgba(99, 102, 241, 0.15) 0%, 
+            rgba(99, 102, 241, 0.08) 50%, 
+            rgba(15, 23, 42, 0.9) 100%) !important;
         backdrop-filter: blur(8px) saturate(160%) brightness(120%) !important;
         -webkit-backdrop-filter: blur(8px) saturate(160%) brightness(120%) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        border-radius: 8px !important;
-        color: var(--primary-color) !important;
-        box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.2), 0 0 20px rgba(255, 255, 255, 0.15) !important;
+        border-bottom: 1px solid rgba(99, 102, 241, 0.3) !important;
+        padding: 12px 16px !important;
+        min-height: 56px !important;
     }
 
-    .terminal-output {
+    #terminalWindow .window-content {
+        background: linear-gradient(135deg, 
+            rgba(15, 23, 42, 0.98) 0%, 
+            rgba(30, 41, 59, 0.95) 100%) !important;
+        backdrop-filter: blur(8px) saturate(160%) brightness(120%) !important;
+        -webkit-backdrop-filter: blur(8px) saturate(160%) brightness(120%) !important;
+        padding: 16px !important;
+        font-size: 13px !important;
+        line-height: 1.5 !important;
+    }
+
+    #terminalWindow #terminalOutput {
+        font-size: 13px !important;
+        line-height: 1.5 !important;
+        padding: 0 !important;
+        margin: 0 0 12px 0 !important;
+        max-height: calc(100vh - 180px) !important;
+    }
+
+    #terminalWindow #terminalInput {
+        font-size: 13px !important;
+        line-height: 1.5 !important;
+        padding: 12px 16px !important;
+        border-radius: 10px !important;
+        background: rgba(15, 23, 42, 0.7) !important;
+        border: 1px solid rgba(99, 102, 241, 0.4) !important;
+        box-shadow: 
+            0 4px 12px rgba(0, 0, 0, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+        gap: 8px !important;
+    }
+
+    #terminalWindow #terminalInput:focus-within {
+        border-color: var(--terminal-prompt, #10b981) !important;
+        box-shadow: 
+            0 6px 20px rgba(0, 0, 0, 0.4),
+            0 0 0 1px var(--terminal-prompt, #10b981),
+            inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+        background: rgba(15, 23, 42, 0.9) !important;
+    }
+
+    #terminalInput .prompt {
         font-size: 14px !important;
-        line-height: 1.4 !important;
-        padding: 12px !important;
-        color: var(--primary-color) !important;
-        text-shadow: 0 0 5px rgba(255, 255, 255, 0.2) !important;
+        text-shadow: 0 0 6px rgba(16, 185, 129, 0.6) !important;
+    }
+
+    .terminal-command {
+        margin: 8px 0 !important;
+        padding: 6px 10px !important;
+        background: rgba(99, 102, 241, 0.08) !important;
+        border-radius: 6px !important;
+        border-left: 2px solid var(--terminal-prompt, #10b981) !important;
+    }
+
+    .terminal-result {
+        margin: 6px 0 12px 0 !important;
+        padding: 10px 12px !important;
+        background: rgba(15, 23, 42, 0.5) !important;
+        border-radius: 6px !important;
+        border: 1px solid rgba(99, 102, 241, 0.15) !important;
+        line-height: 1.5 !important;
+        font-size: 13px !important;
+    }
+
+    #terminalWindow .window-title {
+        font-size: 14px !important;
+        text-shadow: 0 0 6px rgba(99, 102, 241, 0.4) !important;
+    }
+
+    #terminalWindow .window-title .icon {
+        width: 20px !important;
+        height: 20px !important;
+        filter: drop-shadow(0 0 6px rgba(99, 102, 241, 0.6)) !important;
+    }
+
+    #terminalWindow .window-control {
+        width: 18px !important;
+        height: 18px !important;
+        font-size: 9px !important;
+        background: rgba(99, 102, 241, 0.15) !important;
+        border: 1px solid rgba(99, 102, 241, 0.3) !important;
+    }
+
+    #terminalWindow .window-control:hover {
+        background: rgba(99, 102, 241, 0.25) !important;
+        border-color: rgba(99, 102, 241, 0.5) !important;
+        transform: scale(1.05) !important;
+    }
+
+    #terminalWindow .window-control.close:hover {
+        background: rgba(239, 68, 68, 0.25) !important;
+        border-color: rgba(239, 68, 68, 0.5) !important;
     }
 
     /* Mobile Codex Optimization - Glass Theme */

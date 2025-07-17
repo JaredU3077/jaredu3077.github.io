@@ -396,6 +396,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Initialize starfield background globally
         new window.StarfieldBackground();
         
+        // Ensure draggable system is properly initialized for boot and login
+        if (window.neuOS && window.neuOS.draggableSystem) {
+            setTimeout(() => {
+                window.neuOS.draggableSystem.refreshBootAndLogin();
+            }, 200);
+        }
+        
         // GitHub Pages specific optimizations
         if (window.location.hostname.includes('github.io')) {
             // Disable heavy features on GitHub Pages to improve performance
