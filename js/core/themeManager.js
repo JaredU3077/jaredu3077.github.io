@@ -102,14 +102,14 @@ export class ThemeManager {
             },
             sunset: {
                 name: 'sunset',
-                // Primary colors
+                // Primary colors - Warm sunset palette
                 primary: '#ff6347',
                 primaryHover: '#dc2626',
                 primaryLight: '#f87171',
                 primaryDark: '#b91c1c',
                 primaryGlow: 'rgba(255, 99, 71, 0.15)',
                 
-                // Background colors
+                // Background colors - Deep warm tones
                 backgroundDark: '#1a0f0f',
                 backgroundLight: '#2d1b1b',
                 backgroundMedium: '#4a2c2c',
@@ -117,7 +117,7 @@ export class ThemeManager {
                 backgroundGlass: 'rgba(74, 44, 44, 0.8)',
                 backgroundGlassStrong: 'rgba(74, 44, 44, 0.95)',
                 
-                // UI colors
+                // UI colors - Warm, readable palette
                 windowBg: 'rgba(255, 69, 0, 0.1)',
                 windowBackdrop: 'blur(10px) saturate(150%) brightness(120%)',
                 windowBorder: 'rgba(255, 140, 0, 0.4)',
@@ -127,7 +127,7 @@ export class ThemeManager {
                 borderColor: '#cd853f',
                 borderLight: '#daa520',
                 
-                // Accent colors
+                // Accent colors - Complementary warm tones
                 accentGreen: '#32cd32',
                 accentOrange: '#ffd700',
                 accentPurple: '#9370db',
@@ -136,7 +136,7 @@ export class ThemeManager {
                 accentYellow: '#ffd700',
                 accentBlue: '#4169e1',
                 
-                // Terminal specific
+                // Terminal specific - Complete sunset experience
                 terminalBg: 'rgba(255, 69, 0, 0.1)',
                 terminalBackdrop: 'blur(10px) saturate(150%) brightness(120%)',
                 terminalBorder: 'rgba(255, 140, 0, 0.4)',
@@ -237,40 +237,96 @@ export class ThemeManager {
     applyCSSVariables(theme) {
         const root = document.documentElement;
         
-        // Primary colors
+        // Primary colors - Use new standardized names
+        root.style.setProperty('--color-primary', theme.primary);
+        root.style.setProperty('--color-primary-hover', theme.primaryHover);
+        root.style.setProperty('--color-primary-light', theme.primaryLight);
+        root.style.setProperty('--color-primary-dark', theme.primaryDark);
+        root.style.setProperty('--color-primary-glow', theme.primaryGlow);
+        
+        // Background colors - Use new standardized names
+        root.style.setProperty('--color-background-dark', theme.backgroundDark);
+        root.style.setProperty('--color-background-light', theme.backgroundLight);
+        root.style.setProperty('--color-background-medium', theme.backgroundMedium);
+        root.style.setProperty('--color-background-elevated', theme.backgroundElevated);
+        root.style.setProperty('--color-background-glass', theme.backgroundGlass);
+        root.style.setProperty('--color-background-glass-strong', theme.backgroundGlassStrong);
+        
+        // UI colors - Use new standardized names
+        root.style.setProperty('--color-text-primary', theme.textColor);
+        root.style.setProperty('--color-text-secondary', theme.textSecondary);
+        root.style.setProperty('--color-text-muted', theme.textMuted);
+        root.style.setProperty('--color-border-primary', theme.borderColor);
+        root.style.setProperty('--color-border-light', theme.borderLight);
+        
+        // Window system - Use new standardized names
+        root.style.setProperty('--window-background', theme.windowBg);
+        root.style.setProperty('--window-background-focused', theme.windowBg);
+        root.style.setProperty('--window-background-header', theme.windowBg);
+        root.style.setProperty('--window-background-control', theme.windowBg);
+        root.style.setProperty('--window-background-content', theme.windowBg);
+        root.style.setProperty('--window-backdrop', theme.windowBackdrop);
+        root.style.setProperty('--window-backdrop-header', theme.windowBackdrop);
+        root.style.setProperty('--window-backdrop-control', theme.windowBackdrop);
+        root.style.setProperty('--window-backdrop-content', theme.windowBackdrop);
+        root.style.setProperty('--window-border', theme.windowBorder);
+        
+        // Terminal system - Use new standardized names
+        root.style.setProperty('--terminal-background', theme.terminalBg);
+        root.style.setProperty('--terminal-backdrop', theme.terminalBackdrop);
+        root.style.setProperty('--terminal-border', theme.terminalBorder);
+        root.style.setProperty('--terminal-text', theme.terminalText);
+        root.style.setProperty('--terminal-prompt', theme.terminalPrompt);
+        root.style.setProperty('--terminal-error', theme.terminalError);
+        root.style.setProperty('--terminal-success', theme.terminalSuccess);
+        root.style.setProperty('--terminal-warning', theme.terminalWarning);
+        
+        // Accent colors - Use new standardized names
+        root.style.setProperty('--color-accent-green', theme.accentGreen);
+        root.style.setProperty('--color-accent-orange', theme.accentOrange);
+        root.style.setProperty('--color-accent-purple', theme.accentPurple);
+        root.style.setProperty('--color-accent-red', theme.accentRed);
+        root.style.setProperty('--color-accent-cyan', theme.accentCyan);
+        root.style.setProperty('--color-accent-yellow', theme.accentYellow);
+        root.style.setProperty('--color-accent-blue', theme.accentBlue);
+        
+        // Glass morphism system - Keep original glass effects for orbs
+        // Don't override glass backgrounds with theme colors to preserve orb appearance
+        // root.style.setProperty('--glass-background', theme.windowBg);
+        // root.style.setProperty('--glass-background-light', theme.windowBg);
+        // root.style.setProperty('--glass-background-medium', theme.windowBg);
+        // root.style.setProperty('--glass-background-heavy', theme.windowBg);
+        // root.style.setProperty('--glass-background-ultra', theme.windowBg);
+        
+        // Shadow system - Theme-aware shadows
+        const shadowColor = theme.primaryGlow || theme.primary;
+        root.style.setProperty('--shadow-glow', `0 0 20px ${shadowColor}`);
+        root.style.setProperty('--shadow-glow-strong', `0 0 40px ${shadowColor}`);
+        
+        // Border system - Theme-aware borders
+        root.style.setProperty('--color-border-subtle', theme.windowBorder);
+        root.style.setProperty('--color-border-strong', theme.windowBorder);
+        
+        // Text accent colors
+        root.style.setProperty('--color-text-accent', theme.textSecondary);
+        
+        // Legacy compatibility variables
         root.style.setProperty('--primary-color', theme.primary);
         root.style.setProperty('--primary-hover', theme.primaryHover);
         root.style.setProperty('--primary-light', theme.primaryLight);
         root.style.setProperty('--primary-dark', theme.primaryDark);
         root.style.setProperty('--primary-glow', theme.primaryGlow);
-        
-        // Background colors
         root.style.setProperty('--background-dark', theme.backgroundDark);
         root.style.setProperty('--background-light', theme.backgroundLight);
         root.style.setProperty('--background-medium', theme.backgroundMedium);
         root.style.setProperty('--background-elevated', theme.backgroundElevated);
         root.style.setProperty('--background-glass', theme.backgroundGlass);
         root.style.setProperty('--background-glass-strong', theme.backgroundGlassStrong);
-        
-        // UI colors
-        root.style.setProperty('--window-bg', theme.windowBg);
         root.style.setProperty('--text-color', theme.textColor);
         root.style.setProperty('--text-secondary', theme.textSecondary);
         root.style.setProperty('--text-muted', theme.textMuted);
         root.style.setProperty('--border-color', theme.borderColor);
         root.style.setProperty('--border-light', theme.borderLight);
-        
-        // Window-specific variables
-        root.style.setProperty('--window-backdrop', theme.windowBackdrop);
-        root.style.setProperty('--window-border', theme.windowBorder);
-        root.style.setProperty('--window-bg-focused', theme.windowBg);
-        root.style.setProperty('--window-header-bg', theme.windowBg);
-        root.style.setProperty('--window-header-backdrop', theme.windowBackdrop);
-        root.style.setProperty('--window-control-bg', theme.windowBg);
-        root.style.setProperty('--window-control-backdrop', theme.windowBackdrop);
-        root.style.setProperty('--window-control-border', theme.windowBorder);
-        
-        // Accent colors
         root.style.setProperty('--accent-green', theme.accentGreen);
         root.style.setProperty('--accent-orange', theme.accentOrange);
         root.style.setProperty('--accent-purple', theme.accentPurple);
@@ -278,68 +334,43 @@ export class ThemeManager {
         root.style.setProperty('--accent-cyan', theme.accentCyan);
         root.style.setProperty('--accent-yellow', theme.accentYellow);
         root.style.setProperty('--accent-blue', theme.accentBlue);
+        root.style.setProperty('--window-bg', theme.windowBg);
+        root.style.setProperty('--window-bg-focused', theme.windowBg);
+        root.style.setProperty('--window-header-bg', theme.windowBg);
+        root.style.setProperty('--window-control-bg', theme.windowBg);
+        root.style.setProperty('--window-backdrop', theme.windowBackdrop);
+        root.style.setProperty('--window-header-backdrop', theme.windowBackdrop);
+        root.style.setProperty('--window-control-backdrop', theme.windowBackdrop);
+        root.style.setProperty('--window-border', theme.windowBorder);
+        root.style.setProperty('--window-control-border', theme.windowBorder);
+        root.style.setProperty('--terminal-bg', theme.terminalBg);
+        root.style.setProperty('--terminal-backdrop', theme.terminalBackdrop);
+        root.style.setProperty('--terminal-border', theme.terminalBorder);
+        root.style.setProperty('--terminal-text', theme.terminalText);
+        root.style.setProperty('--terminal-prompt', theme.terminalPrompt);
+        root.style.setProperty('--terminal-error', theme.terminalError);
+        root.style.setProperty('--terminal-success', theme.terminalSuccess);
+        root.style.setProperty('--terminal-warning', theme.terminalWarning);
     }
 
     applyWindowThemes(theme) {
-        // Apply to all windows
-        const windows = document.querySelectorAll('.window');
-        windows.forEach(window => {
-            window.style.setProperty('--window-bg', theme.windowBg);
-            window.style.setProperty('--window-backdrop', theme.windowBackdrop);
-            window.style.setProperty('--window-border', theme.windowBorder);
-            window.style.setProperty('--text-color', theme.textColor);
-        });
-
-        // Apply to window headers
-        const windowHeaders = document.querySelectorAll('.window-header');
-        windowHeaders.forEach(header => {
-            header.style.setProperty('--window-bg', theme.windowBg);
-            header.style.setProperty('--window-backdrop', theme.windowBackdrop);
-            header.style.setProperty('--window-border', theme.windowBorder);
-        });
-
-        // Apply to window controls
-        const windowControls = document.querySelectorAll('.window-control');
-        windowControls.forEach(control => {
-            control.style.setProperty('--primary-color', theme.primary);
-            control.style.setProperty('--text-color', theme.textColor);
-        });
+        // Windows now inherit from CSS variables - no direct manipulation needed
+        // The CSS variables are applied at the root level and cascade down
     }
 
     applyTerminalTheme(theme) {
-        const terminalWindow = document.getElementById('terminalWindow');
-        if (terminalWindow) {
-            terminalWindow.style.setProperty('--terminal-bg', theme.terminalBg);
-            terminalWindow.style.setProperty('--terminal-backdrop', theme.terminalBackdrop);
-            terminalWindow.style.setProperty('--terminal-border', theme.terminalBorder);
-            terminalWindow.style.setProperty('--terminal-text', theme.terminalText);
-            terminalWindow.style.setProperty('--terminal-prompt', theme.terminalPrompt);
-            terminalWindow.style.setProperty('--terminal-error', theme.terminalError);
-            terminalWindow.style.setProperty('--terminal-success', theme.terminalSuccess);
-            terminalWindow.style.setProperty('--terminal-warning', theme.terminalWarning);
-        }
+        // Terminal now inherits from CSS variables - no direct manipulation needed
+        // The CSS variables are applied at the root level and cascade down
     }
 
     applyDesktopTheme(theme) {
-        // Apply to desktop icons
-        const desktopIcons = document.querySelectorAll('.desktop-icon');
-        desktopIcons.forEach(icon => {
-            const iconElement = icon.querySelector('.icon');
-            if (iconElement) {
-                iconElement.style.setProperty('--text-color', theme.textColor);
-                iconElement.style.setProperty('--primary-color', theme.primary);
-            }
-        });
+        // Desktop icons now inherit from CSS variables - no direct manipulation needed
+        // The CSS variables are applied at the root level and cascade down
     }
 
     applyWidgetTheme(theme) {
-        // Apply to neuOS widget
-        const neuOSWidget = document.querySelector('.neuos-widget');
-        if (neuOSWidget) {
-            neuOSWidget.style.setProperty('--primary-color', theme.primary);
-            neuOSWidget.style.setProperty('--text-color', theme.textColor);
-            neuOSWidget.style.setProperty('--background-glass', theme.backgroundGlass);
-        }
+        // Widget now inherits from CSS variables - no direct manipulation needed
+        // The CSS variables are applied at the root level and cascade down
     }
 
     getCurrentTheme() {

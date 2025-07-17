@@ -287,8 +287,8 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
         defaultHeight: 400,
         minWidth: 300,
         minHeight: 200,
-        maxWidth: 1200,
-        maxHeight: 800,
+        maxWidth: 2000,
+        maxHeight: 1500,
         zIndex: 1000
     },
 

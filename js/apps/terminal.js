@@ -38,60 +38,19 @@ export class Terminal {
         this.lastCommand = '';
         this.commandStartTime = Date.now();
         
-        // Theme system
-        this.currentTheme = localStorage.getItem('terminalTheme') || 'default';
-        this.themes = {
-            default: {
-                name: 'default',
-                background: 'rgba(255, 255, 255, 0.001)',
-                backdropFilter: 'blur(8px) saturate(140%) brightness(110%)',
-                border: 'rgba(255,255,255,0.05)',
-                textColor: 'var(--text-color)',
-                promptColor: 'var(--primary-color)',
-                errorColor: '#ef4444',
-                successColor: '#10b981',
-                warningColor: '#f59e0b'
-            },
-            dracula: {
-                name: 'dracula',
-                background: 'rgba(40, 42, 54, 0.95)',
-                backdropFilter: 'blur(12px) saturate(120%)',
-                border: 'rgba(189, 147, 249, 0.3)',
-                textColor: '#f8f8f2',
-                promptColor: '#bd93f9',
-                errorColor: '#ff5555',
-                successColor: '#50fa7b',
-                warningColor: '#ffb86c'
-            },
-            sunset: {
-                name: 'sunset',
-                background: 'rgba(255, 69, 0, 0.1)',
-                backdropFilter: 'blur(10px) saturate(150%) brightness(120%)',
-                border: 'rgba(255, 140, 0, 0.4)',
-                textColor: '#fff8dc',
-                promptColor: '#ff6347',
-                errorColor: '#ff4500',
-                successColor: '#32cd32',
-                warningColor: '#ffd700'
-            },
-            cyberpunk: {
-                name: 'cyberpunk',
-                background: 'rgba(0, 255, 255, 0.05)',
-                backdropFilter: 'blur(15px) saturate(200%) brightness(130%)',
-                border: 'rgba(0, 255, 255, 0.3)',
-                textColor: '#00ffff',
-                promptColor: '#ff00ff',
-                errorColor: '#ff0000',
-                successColor: '#00ff00',
-                warningColor: '#ffff00'
-            }
-        };
+        // Theme system - Use global theme manager
+        this.currentTheme = localStorage.getItem('neuos-theme') || 'default';
 
         registerCommands(this.commands, this);
 
         this.setupEventListeners();
         this.loadHistory();
-        this.applyTheme(this.currentTheme);
+        
+        // Apply current theme from global manager
+        const themeManager = window.themeManagerInstance;
+        if (themeManager) {
+            this.currentTheme = themeManager.getCurrentTheme();
+        }
         this.initializeStatusBar();
 
         // Show welcome message with theme info
@@ -914,46 +873,26 @@ export class Terminal {
     }
 
     applyTheme(themeName) {
-        // Emit theme change event for global theme manager
-        window.dispatchEvent(new CustomEvent('themeChanged', { 
-            detail: { theme: themeName } 
-        }));
-        
-        // Also apply local theme for backward compatibility
-        const theme = this.themes[themeName];
-        if (!theme) return;
-
-        this.currentTheme = themeName;
-        localStorage.setItem('terminalTheme', themeName);
-
-        const terminalWindow = document.getElementById('terminalWindow');
-        if (terminalWindow) {
-            terminalWindow.style.setProperty('--terminal-bg', theme.background);
-            terminalWindow.style.setProperty('--terminal-backdrop', theme.backdropFilter);
-            terminalWindow.style.setProperty('--terminal-border', theme.border);
-            terminalWindow.style.setProperty('--terminal-text', theme.textColor);
-            terminalWindow.style.setProperty('--terminal-prompt', theme.promptColor);
-            terminalWindow.style.setProperty('--terminal-error', theme.errorColor);
-            terminalWindow.style.setProperty('--terminal-success', theme.successColor);
-            terminalWindow.style.setProperty('--terminal-warning', theme.warningColor);
+        // Use the global theme manager for consistency
+        const themeManager = window.themeManagerInstance;
+        if (themeManager) {
+            themeManager.applyTheme(themeName);
+            this.currentTheme = themeName;
+            localStorage.setItem('neuos-theme', themeName);
+        } else {
+            // Fallback - create a basic theme manager if none exists
+            console.warn('Global theme manager not found, creating fallback');
+            this.currentTheme = themeName;
+            localStorage.setItem('neuos-theme', themeName);
         }
-
-        // Update CSS custom properties
-        document.documentElement.style.setProperty('--terminal-bg', theme.background);
-        document.documentElement.style.setProperty('--terminal-backdrop', theme.backdropFilter);
-        document.documentElement.style.setProperty('--terminal-border', theme.border);
-        document.documentElement.style.setProperty('--terminal-text', theme.textColor);
-        document.documentElement.style.setProperty('--terminal-prompt', theme.promptColor);
-        document.documentElement.style.setProperty('--terminal-error', theme.errorColor);
-        document.documentElement.style.setProperty('--terminal-success', theme.successColor);
-        document.documentElement.style.setProperty('--terminal-warning', theme.warningColor);
     }
 
     handleThemeSwitch(args) {
         const [themeName] = args;
         if (!themeName) {
             const availableThemes = ['default', 'dracula', 'sunset', 'cyberpunk'].join(', ');
-            return `Available themes: ${availableThemes}\nCurrent theme: ${this.currentTheme}\nUsage: theme <theme-name>`;
+            const currentTheme = this.getCurrentTheme();
+            return `Available themes: ${availableThemes}\nCurrent theme: ${currentTheme}\nUsage: theme <theme-name>`;
         }
 
         const availableThemes = ['default', 'dracula', 'sunset', 'cyberpunk'];
@@ -973,6 +912,15 @@ export class Terminal {
             const availableThemes = ['default', 'dracula', 'sunset', 'cyberpunk'].join(', ');
             return `Unknown theme: ${themeName}\nAvailable themes: ${availableThemes}`;
         }
+    }
+
+    getCurrentTheme() {
+        // Get theme from global theme manager if available
+        const themeManager = window.themeManagerInstance;
+        if (themeManager) {
+            return themeManager.getCurrentTheme();
+        }
+        return this.currentTheme;
     }
 
     handleThemes() {

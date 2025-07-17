@@ -101,9 +101,9 @@ export class WindowManager {
         }
 
         const minWidth = isMobile ? 300 : (CONFIG.window?.minWidth || 300);
-        const maxWidth = isMobile ? window.innerWidth : (CONFIG.window?.maxWidth || 1200);
+        const maxWidth = isMobile ? window.innerWidth : (CONFIG.window?.maxWidth || 2000);
         const minHeight = isMobile ? 200 : (CONFIG.window?.minHeight || 200);
-        const maxHeight = isMobile ? window.innerHeight : (CONFIG.window?.maxHeight || 800);
+        const maxHeight = isMobile ? window.innerHeight : (CONFIG.window?.maxHeight || 1500);
 
         width = Math.min(Math.max(width, minWidth), maxWidth);
         height = Math.min(Math.max(height, minHeight), maxHeight);
@@ -486,9 +486,9 @@ export class WindowManager {
         const currentHeight = windowObj.element.offsetHeight;
 
         const minWidth = CONFIG.window?.minWidth || 300;
-        const maxWidth = CONFIG.window?.maxWidth || 1200;
+        const maxWidth = CONFIG.window?.maxWidth || 2000;
         const minHeight = CONFIG.window?.minHeight || 200;
-        const maxHeight = CONFIG.window?.maxHeight || 800;
+        const maxHeight = CONFIG.window?.maxHeight || 1500;
 
         const clampedWidth = Math.min(Math.max(currentWidth, minWidth), maxWidth);
         const clampedHeight = Math.min(Math.max(currentHeight, minHeight), maxHeight);

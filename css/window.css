@@ -1,15 +1,15 @@
 /* Window and Window Header Styles - Theme-aware Glass */
 .window {
     position: absolute;
-    background: var(--window-bg, rgba(255, 255, 255, 0.001)) !important;
-    backdrop-filter: var(--window-backdrop, blur(8px) saturate(140%) brightness(110%)) !important;
-    -webkit-backdrop-filter: var(--window-backdrop, blur(8px) saturate(140%) brightness(110%)) !important;
-    color: var(--text-color);
-    border-radius: 12px !important;
-    box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.08), 0 0 8px rgba(255, 255, 255, 0.05) !important;
+    background: var(--window-background) !important;
+    backdrop-filter: var(--window-backdrop) !important;
+    -webkit-backdrop-filter: var(--window-backdrop) !important;
+    color: var(--color-text-primary);
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--shadow-medium) !important;
     min-width: 340px;
     min-height: 220px;
-    border: 1px solid var(--window-border, rgba(255,255,255,0.05)) !important;
+    border: 1px solid var(--window-border) !important;
     /* Smooth transitions for non-drag operations */
     transition: box-shadow 0.2s ease, border-color 0.2s ease;
     overflow: hidden;
@@ -29,7 +29,7 @@
 /* Theme 5 Ultra Transparent - No extra glass effects */
 
 .window.focused {
-    background: var(--window-bg-focused, rgba(255, 255, 255, 0.012)) !important;
+    background: var(--window-background-focused) !important;
 }
 
 /* Optimized dragging state */
@@ -43,8 +43,8 @@
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
     /* Enhanced visual feedback */
-    box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.15), 0 0 16px rgba(255, 255, 255, 0.1) !important;
-    border-color: var(--primary-color) !important;
+    box-shadow: var(--shadow-strong) !important;
+    border-color: var(--color-primary) !important;
 }
 
 /* Optimized resizing state */
@@ -62,8 +62,8 @@
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
     /* Enhanced visual feedback */
-    box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.12), 0 0 12px rgba(255, 255, 255, 0.08) !important;
-    border-color: var(--primary-color) !important;
+    box-shadow: var(--shadow-medium) !important;
+    border-color: var(--color-primary) !important;
 }
 
 /* Window minimize/maximize animations */
@@ -87,12 +87,12 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 20px;
-    background: var(--window-header-bg, rgba(255, 255, 255, 0.0005)) !important;
-    backdrop-filter: var(--window-header-backdrop, blur(4px) saturate(130%) brightness(105%)) !important;
-    -webkit-backdrop-filter: var(--window-header-backdrop, blur(4px) saturate(130%) brightness(105%)) !important;
-    border-bottom: 1px solid var(--window-border, rgba(255,255,255,0.05)) !important;
-    border-radius: 12px 12px 0 0 !important;
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: var(--window-background-header) !important;
+    backdrop-filter: var(--window-backdrop-header) !important;
+    -webkit-backdrop-filter: var(--window-backdrop-header) !important;
+    border-bottom: 1px solid var(--window-border) !important;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
     user-select: none;
     position: relative;
     z-index: 3;
@@ -105,15 +105,15 @@
 }
 
 .window-title {
-    font-size: var(--text-lg);
-    color: var(--text-color);
-    font-family: var(--font-family);
+    font-size: var(--font-size-lg);
+    color: var(--color-text-primary);
+    font-family: var(--font-family-primary);
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: lowercase;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--spacing-sm);
     position: relative;
     z-index: 4;
     cursor: grab;
@@ -133,7 +133,7 @@
 .window-title .icon svg {
     width: 100%;
     height: 100%;
-    stroke: var(--primary-color);
+    stroke: var(--color-primary);
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
     transition: filter var(--transition-fast);
 }
@@ -145,7 +145,7 @@
 
 .window-controls {
     display: flex;
-    gap: 8px;
+    gap: var(--spacing-sm);
     position: relative;
     z-index: 10;
     pointer-events: auto;
@@ -155,18 +155,18 @@
 .window-control {
     width: 18px;
     height: 18px;
-    border-radius: 50%;
-    background: var(--window-control-bg, rgba(255, 255, 255, 0.05)) !important;
-    backdrop-filter: var(--window-control-backdrop, blur(2px) saturate(130%) brightness(105%)) !important;
-    -webkit-backdrop-filter: var(--window-control-backdrop, blur(2px) saturate(130%) brightness(105%)) !important;
-    border: 1px solid var(--window-control-border, rgba(255, 255, 255, 0.1)) !important;
+    border-radius: var(--radius-full);
+    background: var(--window-background-control) !important;
+    backdrop-filter: var(--window-backdrop-control) !important;
+    -webkit-backdrop-filter: var(--window-backdrop-control) !important;
+    border: 1px solid var(--window-border) !important;
     cursor: pointer;
-    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all var(--transition-fast);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 10px;
-    color: var(--text-color);
+    color: var(--color-text-primary);
     user-select: none;
     position: relative;
     z-index: 11;
@@ -175,8 +175,8 @@
 }
 
 .window-control:hover {
-    background: var(--primary-color) !important;
-    border-color: var(--primary-light) !important;
+    background: var(--color-primary) !important;
+    border-color: var(--color-primary-light) !important;
     transform: scale(1.1);
 }
 
@@ -186,13 +186,13 @@
 
 .window-content {
     flex: 1 1 auto;
-    padding: 24px;
-    background: rgba(255, 255, 255, 0.0005) !important;
-    backdrop-filter: blur(4px) saturate(130%) brightness(105%) !important;
-    -webkit-backdrop-filter: blur(4px) saturate(130%) brightness(105%) !important;
-    color: var(--text-color);
-    font-family: var(--font-family);
-    font-size: var(--text-base);
+    padding: var(--spacing-xl);
+    background: var(--window-background-content) !important;
+    backdrop-filter: var(--window-backdrop-content) !important;
+    -webkit-backdrop-filter: var(--window-backdrop-content) !important;
+    color: var(--color-text-primary);
+    font-family: var(--font-family-primary);
+    font-size: var(--font-size-base);
     overflow-y: auto;
     position: relative;
     z-index: 3;
@@ -249,14 +249,14 @@
 
 /* Terminal Window - Enhanced Design */
 #terminalWindow {
-    background: var(--terminal-bg, rgba(15, 23, 42, 0.95)) !important;
-    backdrop-filter: var(--terminal-backdrop, blur(12px) saturate(140%) brightness(110%)) !important;
-    -webkit-backdrop-filter: var(--terminal-backdrop, blur(12px) saturate(140%) brightness(110%)) !important;
-    border: 1px solid var(--terminal-border, rgba(99, 102, 241, 0.2)) !important;
+    background: var(--terminal-background) !important;
+    backdrop-filter: var(--terminal-backdrop) !important;
+    -webkit-backdrop-filter: var(--terminal-backdrop) !important;
+    border: 1px solid var(--terminal-border) !important;
     border-radius: 20px !important;
     box-shadow: 
         0px 8px 32px rgba(0, 0, 0, 0.3), 
-        0 0 20px rgba(99, 102, 241, 0.1),
+        0 0 20px var(--color-primary-glow),
         inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
     /* Ensure proper z-index for terminal windows */
     z-index: 1001 !important;
@@ -303,11 +303,11 @@
 }
 
 #terminalWindow:focus-within {
-    border-color: var(--terminal-prompt, var(--primary-color)) !important;
+    border-color: var(--terminal-prompt) !important;
     box-shadow: 
         0px 12px 40px rgba(0, 0, 0, 0.4), 
-        0 0 30px rgba(99, 102, 241, 0.2),
-        0 0 0 1px var(--terminal-prompt, var(--primary-color)),
+        0 0 30px var(--color-primary-glow),
+        0 0 0 1px var(--terminal-prompt),
         inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
@@ -327,12 +327,12 @@
 #terminalWindow .window-header {
     border-radius: 20px 20px 0 0 !important;
     background: linear-gradient(135deg, 
-        rgba(99, 102, 241, 0.1) 0%, 
-        rgba(99, 102, 241, 0.05) 50%, 
-        rgba(15, 23, 42, 0.8) 100%) !important;
-    backdrop-filter: blur(8px) saturate(140%) brightness(110%) !important;
-    -webkit-backdrop-filter: blur(8px) saturate(140%) brightness(110%) !important;
-    border-bottom: 1px solid rgba(99, 102, 241, 0.2) !important;
+        var(--color-primary-glow) 0%, 
+        var(--color-primary-glow) 50%, 
+        var(--color-background-dark) 100%) !important;
+    backdrop-filter: var(--window-backdrop-header) !important;
+    -webkit-backdrop-filter: var(--window-backdrop-header) !important;
+    border-bottom: 1px solid var(--terminal-border) !important;
     padding: 16px 20px !important;
     min-height: 60px !important;
 }
@@ -344,19 +344,17 @@
 /* Terminal window content - Enhanced Design */
 #terminalWindow .window-content {
     border-radius: 0 0 20px 20px !important;
-    background: linear-gradient(135deg, 
-        rgba(15, 23, 42, 0.98) 0%, 
-        rgba(30, 41, 59, 0.95) 100%) !important;
-    backdrop-filter: var(--terminal-backdrop, blur(8px) saturate(140%) brightness(110%)) !important;
-    -webkit-backdrop-filter: var(--terminal-backdrop, blur(8px) saturate(140%) brightness(110%)) !important;
-    color: var(--terminal-text, #e2e8f0);
+    background: var(--window-background-content) !important;
+    backdrop-filter: var(--window-backdrop-content) !important;
+    -webkit-backdrop-filter: var(--window-backdrop-content) !important;
+    color: var(--terminal-text);
     font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Cascadia Code', monospace;
     font-size: 14px;
     line-height: 1.6;
     padding: 24px;
     scrollbar-width: thin;
     -ms-overflow-style: none;
-    scrollbar-color: rgba(99, 102, 241, 0.3) transparent;
+    scrollbar-color: var(--color-primary) transparent;
     position: relative;
     /* Ensure proper layout for terminal content */
     display: flex;
@@ -368,7 +366,7 @@
 /* Terminal Output - Enhanced Design */
 #terminalWindow #terminalOutput {
     background: transparent !important;
-    color: var(--terminal-text, #e2e8f0);
+    color: var(--terminal-text);
     font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Cascadia Code', monospace;
     font-size: 14px;
     line-height: 1.6;
@@ -383,7 +381,7 @@
     background: transparent !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    scrollbar-color: rgba(99, 102, 241, 0.3) transparent;
+    scrollbar-color: var(--color-primary) transparent;
     flex: 1;
     min-height: 0;
     /* Ensure proper scrolling */
@@ -394,20 +392,19 @@
 
 /* Terminal Input - Enhanced Design */
 #terminalWindow #terminalInput {
-    background: rgba(15, 23, 42, 0.6) !important;
-    color: var(--terminal-text, #e2e8f0);
+    background: var(--window-background-control) !important;
+    color: var(--terminal-text);
     font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Cascadia Code', monospace;
     font-size: 14px;
     line-height: 1.6;
     padding: 16px 20px;
     margin: 0;
-    border: 1px solid rgba(99, 102, 241, 0.3);
+    border: 1px solid var(--terminal-border);
     border-radius: 12px;
     outline: none;
     resize: none;
-    background: rgba(15, 23, 42, 0.6) !important;
-    backdrop-filter: blur(8px) saturate(140%) brightness(110%) !important;
-    -webkit-backdrop-filter: blur(8px) saturate(140%) brightness(110%) !important;
+    backdrop-filter: var(--window-backdrop-control) !important;
+    -webkit-backdrop-filter: var(--window-backdrop-control) !important;
     box-shadow: 
         0 4px 12px rgba(0, 0, 0, 0.2),
         inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
@@ -421,22 +418,22 @@
 }
 
 #terminalWindow #terminalInput:focus-within {
-    border-color: var(--terminal-prompt, var(--primary-color)) !important;
+    border-color: var(--terminal-prompt) !important;
     box-shadow: 
         0 8px 24px rgba(0, 0, 0, 0.3),
-        0 0 0 1px var(--terminal-prompt, var(--primary-color)),
+        0 0 0 1px var(--terminal-prompt),
         inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
-    background: rgba(15, 23, 42, 0.8) !important;
+    background: var(--window-background-focused) !important;
 }
 
 /* Terminal Prompt - Enhanced Design */
 #terminalInput .prompt {
-    color: var(--terminal-prompt, #10b981);
+    color: var(--terminal-prompt);
     font-weight: 700;
     font-size: 16px;
     margin-right: 0;
     animation: terminalPulse 2s infinite;
-    text-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+    text-shadow: 0 0 8px var(--terminal-prompt);
     user-select: none;
     display: flex;
     align-items: center;
@@ -451,7 +448,7 @@
     transform: translateY(-50%);
     width: 2px;
     height: 16px;
-    background: #10b981;
+    background: var(--terminal-prompt);
     border-radius: 1px;
     animation: cursorBlink 1s infinite;
 }
@@ -464,7 +461,7 @@
 /* Terminal Input Field - Enhanced Design */
 #terminalInput input {
     background: transparent !important;
-    color: var(--terminal-text, #e2e8f0);
+    color: var(--terminal-text);
     font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Cascadia Code', monospace;
     font-size: 14px;
     line-height: 1.6;
@@ -476,10 +473,10 @@
     background: transparent !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    caret-color: var(--terminal-prompt, #10b981);
+    caret-color: var(--terminal-prompt);
     flex: 1;
     min-width: 0;
-    text-shadow: 0 0 2px rgba(226, 232, 240, 0.1);
+    text-shadow: 0 0 2px var(--terminal-text);
 }
 
 #terminalInput input::placeholder {
@@ -495,10 +492,10 @@
     font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Cascadia Code', monospace;
     padding: 12px 16px;
     background: linear-gradient(135deg, 
-        rgba(99, 102, 241, 0.08) 0%, 
+        var(--color-primary-glow) 0%, 
         rgba(99, 102, 241, 0.05) 100%);
     border-radius: 12px;
-    border-left: 4px solid var(--terminal-prompt, #10b981);
+    border-left: 4px solid var(--terminal-prompt);
     box-shadow: 
         0 2px 8px rgba(0, 0, 0, 0.1),
         inset 0 1px 0 rgba(255, 255, 255, 0.05);
@@ -515,36 +512,34 @@
     height: 1px;
     background: linear-gradient(90deg, 
         transparent 0%, 
-        rgba(99, 102, 241, 0.3) 50%, 
+        var(--color-primary-glow) 50%, 
         transparent 100%);
 }
 
 .terminal-command .prompt {
-    color: var(--terminal-prompt, #10b981);
+    color: var(--terminal-prompt);
     font-weight: 700;
     margin-right: 8px;
-    text-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+    text-shadow: 0 0 8px var(--terminal-prompt);
     position: relative;
 }
 
 .terminal-command .command-text {
-    color: #e2e8f0;
+    color: var(--terminal-text);
     font-weight: 500;
-    text-shadow: 0 0 4px rgba(226, 232, 240, 0.2);
+    text-shadow: 0 0 4px var(--terminal-text);
 }
 
 /* Terminal Result Styling - Enhanced Design */
 .terminal-result {
     margin: 8px 0 20px 0;
-    color: var(--terminal-text, #e2e8f0);
+    color: var(--terminal-text);
     font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Cascadia Code', monospace;
     white-space: pre-wrap;
     padding: 16px 20px;
-    background: linear-gradient(135deg, 
-        rgba(15, 23, 42, 0.6) 0%, 
-        rgba(30, 41, 59, 0.4) 100%);
+    background: var(--window-background-control);
     border-radius: 12px;
-    border: 1px solid rgba(99, 102, 241, 0.15);
+    border: 1px solid var(--terminal-border);
     line-height: 1.6;
     box-shadow: 
         0 4px 12px rgba(0, 0, 0, 0.1),
@@ -562,104 +557,107 @@
     height: 1px;
     background: linear-gradient(90deg, 
         transparent 0%, 
-        rgba(99, 102, 241, 0.2) 50%, 
+        var(--color-primary-glow) 50%, 
         transparent 100%);
 }
 
 /* Syntax Highlighting for Terminal Output */
 .terminal-result .keyword {
-    color: #f59e0b;
+    color: var(--terminal-warning);
     font-weight: 600;
-    text-shadow: 0 0 4px rgba(245, 158, 11, 0.3);
+    text-shadow: 0 0 4px var(--terminal-warning);
 }
 
 .terminal-result .string {
-    color: #10b981;
+    color: var(--terminal-success);
     font-weight: 500;
-    text-shadow: 0 0 4px rgba(16, 185, 129, 0.3);
+    text-shadow: 0 0 4px var(--terminal-success);
 }
 
 .terminal-result .number {
-    color: #8b5cf6;
+    color: var(--color-accent-purple);
     font-weight: 600;
-    text-shadow: 0 0 4px rgba(139, 92, 246, 0.3);
+    text-shadow: 0 0 4px var(--color-accent-purple);
 }
 
 .terminal-result .comment {
-    color: #6b7280;
+    color: var(--color-text-muted);
     font-style: italic;
     opacity: 0.8;
 }
 
 .terminal-result .error {
-    color: #ef4444;
+    color: var(--terminal-error);
     font-weight: 600;
-    text-shadow: 0 0 4px rgba(239, 68, 68, 0.3);
+    text-shadow: 0 0 4px var(--terminal-error);
 }
 
 .terminal-result .success {
-    color: #10b981;
+    color: var(--terminal-success);
     font-weight: 600;
-    text-shadow: 0 0 4px rgba(16, 185, 129, 0.3);
+    text-shadow: 0 0 4px var(--terminal-success);
 }
 
 .terminal-result .warning {
-    color: #f59e0b;
+    color: var(--terminal-warning);
     font-weight: 600;
-    text-shadow: 0 0 4px rgba(245, 158, 11, 0.3);
+    text-shadow: 0 0 4px var(--terminal-warning);
 }
 
 .terminal-result .info {
-    color: #3b82f6;
+    color: var(--color-accent-blue);
     font-weight: 600;
-    text-shadow: 0 0 4px rgba(59, 130, 246, 0.3);
+    text-shadow: 0 0 4px var(--color-accent-blue);
 }
 
 /* Command Categories Styling */
 .terminal-command.network {
-    border-left-color: #3b82f6;
+    border-left-color: var(--color-accent-blue);
     background: linear-gradient(135deg, 
-        rgba(59, 130, 246, 0.08) 0%, 
-        rgba(59, 130, 246, 0.05) 100%);
+        var(--color-accent-blue) 0%, 
+        var(--color-accent-blue) 100%);
+    opacity: 0.08;
 }
 
 .terminal-command.system {
-    border-left-color: #8b5cf6;
+    border-left-color: var(--color-accent-purple);
     background: linear-gradient(135deg, 
-        rgba(139, 92, 246, 0.08) 0%, 
-        rgba(139, 92, 246, 0.05) 100%);
+        var(--color-accent-purple) 0%, 
+        var(--color-accent-purple) 100%);
+    opacity: 0.08;
 }
 
 .terminal-command.effects {
-    border-left-color: #f59e0b;
+    border-left-color: var(--terminal-warning);
     background: linear-gradient(135deg, 
-        rgba(245, 158, 11, 0.08) 0%, 
-        rgba(245, 158, 11, 0.05) 100%);
+        var(--terminal-warning) 0%, 
+        var(--terminal-warning) 100%);
+    opacity: 0.08;
 }
 
 .terminal-command.apps {
-    border-left-color: #10b981;
+    border-left-color: var(--terminal-success);
     background: linear-gradient(135deg, 
-        rgba(16, 185, 129, 0.08) 0%, 
-        rgba(16, 185, 129, 0.05) 100%);
+        var(--terminal-success) 0%, 
+        var(--terminal-success) 100%);
+    opacity: 0.08;
 }
 
 /* Enhanced Terminal Input with Command History */
 #terminalWindow #terminalInput {
-    background: rgba(15, 23, 42, 0.6) !important;
-    color: var(--terminal-text, #e2e8f0);
+    background: var(--window-background-control) !important;
+    color: var(--terminal-text);
     font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Cascadia Code', monospace;
     font-size: 14px;
     line-height: 1.6;
     padding: 16px 20px;
     margin: 0;
-    border: 1px solid rgba(99, 102, 241, 0.3);
+    border: 1px solid var(--terminal-border);
     border-radius: 12px;
     outline: none;
     resize: none;
-    background: rgba(15, 23, 42, 0.6) !important;
-    backdrop-filter: blur(8px) saturate(140%) brightness(110%) !important;
-    -webkit-backdrop-filter: blur(8px) saturate(140%) brightness(110%) !important;
+    backdrop-filter: var(--window-backdrop-control) !important;
+    -webkit-backdrop-filter: var(--window-backdrop-control) !important;
     box-shadow: 
         0 4px 12px rgba(0, 0, 0, 0.2),
         inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
@@ -679,29 +677,29 @@
     height: 1px;
     background: linear-gradient(90deg, 
         transparent 0%, 
-        rgba(99, 102, 241, 0.2) 50%, 
+        var(--color-primary-glow) 50%, 
         transparent 100%);
     border-radius: 12px 12px 0 0;
 }
 
 #terminalWindow #terminalInput:focus-within {
-    border-color: var(--terminal-prompt, var(--primary-color)) !important;
+    border-color: var(--terminal-prompt) !important;
     box-shadow: 
         0 8px 24px rgba(0, 0, 0, 0.3),
-        0 0 0 1px var(--terminal-prompt, var(--primary-color)),
+        0 0 0 1px var(--terminal-prompt),
         inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
-    background: rgba(15, 23, 42, 0.8) !important;
+    background: var(--window-background-focused) !important;
     transform: translateY(-1px);
 }
 
 /* Terminal Prompt - Enhanced Design */
 #terminalInput .prompt {
-    color: var(--terminal-prompt, #10b981);
+    color: var(--terminal-prompt);
     font-weight: 700;
     font-size: 16px;
     margin-right: 0;
     animation: terminalPulse 2s infinite;
-    text-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+    text-shadow: 0 0 8px var(--terminal-prompt);
     user-select: none;
     display: flex;
     align-items: center;
@@ -716,7 +714,7 @@
     transform: translateY(-50%);
     width: 2px;
     height: 16px;
-    background: #10b981;
+    background: var(--terminal-prompt);
     border-radius: 1px;
     animation: cursorBlink 1s infinite;
 }
@@ -729,7 +727,7 @@
 /* Terminal Input Field - Enhanced Design */
 #terminalInput input {
     background: transparent !important;
-    color: var(--terminal-text, #e2e8f0);
+    color: var(--terminal-text);
     font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Cascadia Code', monospace;
     font-size: 14px;
     line-height: 1.6;
@@ -741,14 +739,14 @@
     background: transparent !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    caret-color: var(--terminal-prompt, #10b981);
+    caret-color: var(--terminal-prompt);
     flex: 1;
     min-width: 0;
-    text-shadow: 0 0 2px rgba(226, 232, 240, 0.1);
+    text-shadow: 0 0 2px var(--terminal-text);
 }
 
 #terminalInput input::placeholder {
-    color: rgba(226, 232, 240, 0.4);
+    color: var(--color-text-muted);
     font-style: italic;
     text-shadow: none;
 }
@@ -759,10 +757,10 @@
     align-items: center;
     justify-content: space-between;
     padding: 8px 16px;
-    background: rgba(15, 23, 42, 0.4);
-    border-top: 1px solid rgba(99, 102, 241, 0.1);
+    background: var(--window-background-control);
+    border-top: 1px solid var(--terminal-border);
     font-size: 12px;
-    color: rgba(226, 232, 240, 0.7);
+    color: var(--color-text-muted);
     border-radius: 0 0 12px 12px;
     /* Ensure status bar stays at bottom */
     flex-shrink: 0;
@@ -779,7 +777,7 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #10b981;
+    background: var(--terminal-success);
     animation: statusPulse 2s infinite;
 }
 
@@ -793,23 +791,23 @@
     padding: 20px;
     margin: 16px 0;
     background: linear-gradient(135deg, 
-        rgba(99, 102, 241, 0.1) 0%, 
-        rgba(99, 102, 241, 0.05) 100%);
+        var(--color-primary-glow) 0%, 
+        var(--color-primary-glow) 100%);
     border-radius: 12px;
-    border: 1px solid rgba(99, 102, 241, 0.2);
+    border: 1px solid var(--terminal-border);
     text-align: center;
 }
 
 .terminal-welcome h3 {
-    color: #e2e8f0;
+    color: var(--terminal-text);
     font-size: 18px;
     font-weight: 600;
     margin: 0 0 8px 0;
-    text-shadow: 0 0 8px rgba(226, 232, 240, 0.3);
+    text-shadow: 0 0 8px var(--terminal-text);
 }
 
 .terminal-welcome p {
-    color: rgba(226, 232, 240, 0.8);
+    color: var(--color-text-secondary);
     font-size: 14px;
     margin: 0;
     line-height: 1.5;
@@ -819,13 +817,13 @@
 .terminal-help-section {
     margin: 16px 0;
     padding: 16px;
-    background: rgba(15, 23, 42, 0.3);
+    background: var(--window-background-control);
     border-radius: 8px;
-    border-left: 3px solid rgba(99, 102, 241, 0.3);
+    border-left: 3px solid var(--terminal-border);
 }
 
 .terminal-help-section h4 {
-    color: #e2e8f0;
+    color: var(--terminal-text);
     font-size: 14px;
     font-weight: 600;
     margin: 0 0 8px 0;
@@ -844,17 +842,17 @@
 }
 
 .terminal-help-section .help-command:hover {
-    background: rgba(99, 102, 241, 0.1);
+    background: var(--color-primary-glow);
 }
 
 .terminal-help-section .command-name {
-    color: #10b981;
+    color: var(--terminal-success);
     font-weight: 600;
     min-width: 120px;
 }
 
 .terminal-help-section .command-desc {
-    color: rgba(226, 232, 240, 0.8);
+    color: var(--color-text-secondary);
     font-size: 13px;
 }
 
@@ -864,7 +862,7 @@
     align-items: center;
     gap: 8px;
     padding: 8px 12px;
-    color: rgba(226, 232, 240, 0.7);
+    color: var(--color-text-muted);
     font-style: italic;
 }
 
@@ -872,8 +870,8 @@
     content: '';
     width: 12px;
     height: 12px;
-    border: 2px solid rgba(99, 102, 241, 0.3);
-    border-top: 2px solid #6366f1;
+    border: 2px solid var(--color-primary-glow);
+    border-top: 2px solid var(--color-primary);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -882,10 +880,12 @@
 .terminal-error {
     padding: 12px 16px;
     margin: 8px 0;
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: var(--color-accent-red);
+    opacity: 0.1;
+    border: 1px solid var(--color-accent-red);
+    opacity: 0.3;
     border-radius: 8px;
-    color: #ef4444;
+    color: var(--terminal-error);
     font-weight: 500;
     display: flex;
     align-items: center;
@@ -901,10 +901,12 @@
 .terminal-success {
     padding: 12px 16px;
     margin: 8px 0;
-    background: rgba(16, 185, 129, 0.1);
-    border: 1px solid rgba(16, 185, 129, 0.3);
+    background: var(--color-accent-green);
+    opacity: 0.1;
+    border: 1px solid var(--color-accent-green);
+    opacity: 0.3;
     border-radius: 8px;
-    color: #10b981;
+    color: var(--terminal-success);
     font-weight: 500;
     display: flex;
     align-items: center;
@@ -923,26 +925,29 @@
 }
 
 #terminalWindow #terminalOutput::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.3);
+    background: var(--color-background-dark);
+    opacity: 0.3;
     border-radius: 4px;
 }
 
 #terminalWindow #terminalOutput::-webkit-scrollbar-thumb {
-    background: rgba(99, 102, 241, 0.3);
+    background: var(--color-primary);
+    opacity: 0.3;
     border-radius: 4px;
-    border: 1px solid rgba(99, 102, 241, 0.1);
+    border: 1px solid var(--color-primary);
+    opacity: 0.1;
 }
 
 #terminalWindow #terminalOutput::-webkit-scrollbar-thumb:hover {
-    background: var(--terminal-prompt, #10b981);
+    background: var(--terminal-prompt);
 }
 
 /* Terminal Window Title - Enhanced Design */
 #terminalWindow .window-title {
-    color: #e2e8f0;
+    color: var(--terminal-text);
     font-weight: 600;
     font-size: 16px;
-    text-shadow: 0 0 8px rgba(99, 102, 241, 0.3);
+    text-shadow: 0 0 8px var(--color-primary-glow);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -951,7 +956,7 @@
 #terminalWindow .window-title .icon {
     width: 24px;
     height: 24px;
-    filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.5));
+    filter: drop-shadow(0 0 8px var(--color-primary-glow));
 }
 
 /* Terminal Window Controls - Enhanced Design */
@@ -963,22 +968,22 @@
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: rgba(99, 102, 241, 0.1) !important;
-    border: 1px solid rgba(99, 102, 241, 0.2) !important;
-    color: #e2e8f0;
+    background: var(--color-primary-glow) !important;
+    border: 1px solid var(--color-primary-glow) !important;
+    color: var(--terminal-text);
     font-size: 10px;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 #terminalWindow .window-control:hover {
-    background: rgba(99, 102, 241, 0.2) !important;
-    border-color: rgba(99, 102, 241, 0.4) !important;
+    background: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
     transform: scale(1.1);
 }
 
 #terminalWindow .window-control.close:hover {
-    background: rgba(239, 68, 68, 0.2) !important;
-    border-color: rgba(239, 68, 68, 0.4) !important;
+    background: var(--color-accent-red) !important;
+    border-color: var(--color-accent-red) !important;
 }
 
 /* Terminal Content Area - Enhanced Spacing */

@@ -30,14 +30,14 @@ export class ParticleSystem {
             repulsion: 0.02
         };
         
-        // Enhanced color schemes for chillhouse vibes
+        // Enhanced color schemes using standardized design tokens
         this.colorSchemes = {
-            chillhouse: ['#4a90e2', '#87ceeb', '#4682b4', '#5f9ea0', '#20b2aa'],
-            sunset: ['#ff6b35', '#ff8c42', '#ffa07a', '#ffb347', '#ffd700'],
-            neon: ['#ff6b9d', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'],
-            cosmic: ['#8a2be2', '#9370db', '#ba55d3', '#da70d6', '#ee82ee'],
-            ocean: ['#00ced1', '#40e0d0', '#48d1cc', '#20b2aa', '#008b8b'],
-            forest: ['#228b22', '#32cd32', '#90ee90', '#98fb98', '#00ff7f']
+            chillhouse: ['var(--color-accent-blue)', 'var(--color-accent-cyan)', '#4682b4', '#5f9ea0', '#20b2aa'],
+            sunset: ['var(--color-accent-orange)', '#ff8c42', '#ffa07a', '#ffb347', 'var(--color-accent-yellow)'],
+            neon: ['#ff6b9d', 'var(--color-accent-cyan)', '#45b7d1', '#96ceb4', '#feca57'],
+            cosmic: ['var(--color-accent-purple)', '#9370db', '#ba55d3', '#da70d6', '#ee82ee'],
+            ocean: ['#00ced1', 'var(--color-accent-cyan)', '#48d1cc', '#20b2aa', '#008b8b'],
+            forest: ['#228b22', 'var(--color-accent-green)', '#90ee90', '#98fb98', '#00ff7f']
         };
         
         this.currentColorScheme = 'chillhouse';

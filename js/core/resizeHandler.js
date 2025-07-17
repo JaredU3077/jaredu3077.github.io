@@ -443,9 +443,9 @@ export class ResizeHandler {
     getResizeConstraints() {
         const isMobile = window.innerWidth <= 768;
         const minWidth = isMobile ? 300 : (CONFIG.window?.minWidth || 300);
-        const maxWidth = isMobile ? window.innerWidth : (CONFIG.window?.maxWidth || 1200);
+        const maxWidth = isMobile ? window.innerWidth : (CONFIG.window?.maxWidth || 2000);
         const minHeight = isMobile ? 200 : (CONFIG.window?.minHeight || 200);
-        const maxHeight = isMobile ? window.innerHeight : (CONFIG.window?.maxHeight || 800);
+        const maxHeight = isMobile ? window.innerHeight : (CONFIG.window?.maxHeight || 1500);
         
         return {
             minWidth,

@@ -1,0 +1,279 @@
+/* neuOS Design Tokens - Single Source of Truth */
+/* All theme variables consolidated and standardized */
+
+:root {
+    /* ===== COLOR SYSTEM ===== */
+    
+    /* Primary Colors - Consistent across all themes */
+    --color-primary: #6366f1;
+    --color-primary-hover: #4f46e5;
+    --color-primary-light: #818cf8;
+    --color-primary-dark: #4338ca;
+    --color-primary-glow: rgba(99, 102, 241, 0.15);
+    
+    /* Background Colors - Ultra Dark Theme */
+    --color-background-dark: #030712;
+    --color-background-light: #0a0f1a;
+    --color-background-medium: #1a1f2e;
+    --color-background-elevated: #2a2f3e;
+    --color-background-glass: rgba(26, 31, 46, 0.8);
+    --color-background-glass-strong: rgba(26, 31, 46, 0.95);
+    
+    /* UI Colors - Apple-inspired Contrast */
+    --color-text-primary: #f8fafc;
+    --color-text-secondary: #cbd5e1;
+    --color-text-muted: #94a3b8;
+    --color-text-accent: #e2e8f0;
+    
+    /* Border Colors */
+    --color-border-primary: #475569;
+    --color-border-light: #64748b;
+    --color-border-subtle: rgba(255, 255, 255, 0.08);
+    --color-border-strong: rgba(255, 255, 255, 0.12);
+    
+    /* Accent Colors - Vibrant but Calm */
+    --color-accent-green: #10b981;
+    --color-accent-orange: #f59e0b;
+    --color-accent-purple: #8b5cf6;
+    --color-accent-red: #ef4444;
+    --color-accent-cyan: #06b6d4;
+    --color-accent-yellow: #fbbf24;
+    --color-accent-blue: #3b82f6;
+    
+    /* ===== GLASS MORPHISM SYSTEM ===== */
+    
+    /* Glass Background - Proper Glass Effects */
+    --glass-background: rgba(255, 255, 255, 0.1);
+    --glass-background-light: rgba(255, 255, 255, 0.05);
+    --glass-background-medium: rgba(255, 255, 255, 0.15);
+    --glass-background-heavy: rgba(255, 255, 255, 0.2);
+    --glass-background-ultra: rgba(255, 255, 255, 0.25);
+    
+    /* Glass Effects - Consistent Blur and Saturation */
+    --glass-backdrop-blur: 8px;
+    --glass-backdrop-blur-light: 2px;
+    --glass-backdrop-blur-medium: 4px;
+    --glass-backdrop-blur-heavy: 8px;
+    --glass-backdrop-blur-ultra: 12px;
+    --glass-saturation: 140%;
+    --glass-brightness: 110%;
+    --glass-reflection-opacity: 0.2;
+    
+    /* Glass Shadows */
+    --glass-shadow-blur: 32px;
+    --glass-outer-shadow-blur: var(--glass-shadow-blur);
+    --outer-shadow-blur: var(--glass-shadow-blur);
+    --glass-edge-glow: 0 0 8px rgba(255, 255, 255, 0.05);
+    
+    /* ===== WINDOW SYSTEM ===== */
+    
+    /* Window Backgrounds */
+    --window-background: var(--glass-background);
+    --window-background-focused: rgba(255, 255, 255, 0.012);
+    --window-background-header: rgba(255, 255, 255, 0.0005);
+    --window-background-control: rgba(255, 255, 255, 0.05);
+    --window-background-content: rgba(255, 255, 255, 0.0005);
+    
+    /* Window Effects */
+    --window-backdrop: blur(8px) saturate(140%) brightness(110%);
+    --window-backdrop-header: blur(4px) saturate(130%) brightness(105%);
+    --window-backdrop-control: blur(2px) saturate(130%) brightness(105%);
+    --window-backdrop-content: blur(4px) saturate(130%) brightness(105%);
+    
+    /* Window Borders */
+    --window-border: rgba(255, 255, 255, 0.05);
+    --window-border-focused: var(--color-primary);
+    
+    /* ===== TERMINAL SYSTEM ===== */
+    
+    /* Terminal Colors - Inherit from window system */
+    --terminal-background: var(--window-background);
+    --terminal-backdrop: var(--window-backdrop);
+    --terminal-border: var(--window-border);
+    --terminal-text: var(--color-text-primary);
+    --terminal-prompt: var(--color-primary);
+    --terminal-error: var(--color-accent-red);
+    --terminal-success: var(--color-accent-green);
+    --terminal-warning: var(--color-accent-orange);
+    
+    /* ===== SHADOW SYSTEM ===== */
+    
+    /* Elevation Shadows - Apple-style depth */
+    --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+    --shadow-strong: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.1);
+    --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.3);
+    --shadow-glow-strong: 0 0 40px rgba(99, 102, 241, 0.4);
+    
+    /* ===== TYPOGRAPHY SYSTEM ===== */
+    
+    /* Font Families */
+    --font-family-primary: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+    --font-family-mono: 'SF Mono', 'JetBrains Mono', 'Fira Code', 'Monaco', 'Inconsolata', monospace;
+    
+    /* Font Sizes - Consistent Scale */
+    --font-size-xs: 0.75rem;    /* 12px */
+    --font-size-sm: 0.875rem;   /* 14px */
+    --font-size-base: 1rem;     /* 16px */
+    --font-size-lg: 1.125rem;   /* 18px */
+    --font-size-xl: 1.25rem;    /* 20px */
+    --font-size-2xl: 1.5rem;    /* 24px */
+    --font-size-3xl: 1.875rem;  /* 30px */
+    --font-size-4xl: 2.25rem;   /* 36px */
+    
+    /* Line Heights */
+    --line-height-tight: 1.25;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.75;
+    
+    /* ===== SPACING SYSTEM ===== */
+    
+    /* Spacing Scale - Consistent 4px base */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --spacing-2xl: 48px;
+    --spacing-3xl: 64px;
+    --spacing-4xl: 80px;
+    
+    /* ===== BORDER RADIUS SYSTEM ===== */
+    
+    /* Border Radius - Consistent Scale */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-2xl: 20px;
+    --radius-3xl: 24px;
+    --radius-full: 50%;
+    
+    /* ===== TRANSITION SYSTEM ===== */
+    
+    /* Transitions - Smooth and Responsive */
+    --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    
+    /* ===== Z-INDEX SYSTEM ===== */
+    
+    /* Z-index Scale - Consistent layering */
+    --z-dropdown: 1000;
+    --z-sticky: 1020;
+    --z-fixed: 1030;
+    --z-modal-backdrop: 1040;
+    --z-modal: 1050;
+    --z-popover: 1060;
+    --z-tooltip: 1070;
+    --z-toast: 1080;
+    --z-maximized: 9999;
+}
+
+/* ===== LEGACY COMPATIBILITY ===== */
+/* Maintain backward compatibility with existing variable names */
+
+:root {
+    /* Primary Colors - Legacy Names */
+    --primary-color: var(--color-primary);
+    --primary-hover: var(--color-primary-hover);
+    --primary-light: var(--color-primary-light);
+    --primary-dark: var(--color-primary-dark);
+    --primary-glow: var(--color-primary-glow);
+    
+    /* Background Colors - Legacy Names */
+    --background-dark: var(--color-background-dark);
+    --background-light: var(--color-background-light);
+    --background-medium: var(--color-background-medium);
+    --background-elevated: var(--color-background-elevated);
+    --background-glass: var(--color-background-glass);
+    --background-glass-strong: var(--color-background-glass-strong);
+    
+    /* Text Colors - Legacy Names */
+    --text-color: var(--color-text-primary);
+    --text-secondary: var(--color-text-secondary);
+    --text-muted: var(--color-text-muted);
+    --text-accent: var(--color-text-accent);
+    
+    /* Border Colors - Legacy Names */
+    --border-color: var(--color-border-primary);
+    --border-light: var(--color-border-light);
+    --border-subtle: var(--color-border-subtle);
+    --border-strong: var(--color-border-strong);
+    
+    /* Accent Colors - Legacy Names */
+    --accent-green: var(--color-accent-green);
+    --accent-orange: var(--color-accent-orange);
+    --accent-purple: var(--color-accent-purple);
+    --accent-red: var(--color-accent-red);
+    --accent-cyan: var(--color-accent-cyan);
+    --accent-yellow: var(--color-accent-yellow);
+    --accent-blue: var(--color-accent-blue);
+    
+    /* Window Variables - Legacy Names */
+    --window-bg: var(--window-background);
+    --window-bg-focused: var(--window-background-focused);
+    --window-header-bg: var(--window-background-header);
+    --window-control-bg: var(--window-background-control);
+    --window-backdrop: var(--window-backdrop);
+    --window-header-backdrop: var(--window-backdrop-header);
+    --window-control-backdrop: var(--window-backdrop-control);
+    --window-border: var(--window-border);
+    --window-control-border: var(--window-border);
+    
+    /* Terminal Variables - Legacy Names */
+    --terminal-bg: var(--terminal-background);
+    --terminal-backdrop: var(--terminal-backdrop);
+    --terminal-border: var(--terminal-border);
+    --terminal-text: var(--terminal-text);
+    --terminal-prompt: var(--terminal-prompt);
+    --terminal-error: var(--terminal-error);
+    --terminal-success: var(--terminal-success);
+    --terminal-warning: var(--terminal-warning);
+    
+    /* Typography - Legacy Names */
+    --font-family: var(--font-family-primary);
+    --font-family-mono: var(--font-family-mono);
+    --text-xs: var(--font-size-xs);
+    --text-sm: var(--font-size-sm);
+    --text-base: var(--font-size-base);
+    --text-md: var(--font-size-base);
+    --text-lg: var(--font-size-lg);
+    --text-xl: var(--font-size-xl);
+    --text-2xl: var(--font-size-2xl);
+    --text-3xl: var(--font-size-3xl);
+    --text-4xl: var(--font-size-4xl);
+    
+    /* Spacing - Legacy Names */
+    --spacing-xs: var(--spacing-xs);
+    --spacing-sm: var(--spacing-sm);
+    --spacing-md: var(--spacing-md);
+    --spacing-lg: var(--spacing-lg);
+    --spacing-xl: var(--spacing-xl);
+    --spacing-2xl: var(--spacing-2xl);
+    --spacing-3xl: var(--spacing-3xl);
+    --spacing-xxl: var(--spacing-4xl);
+    
+    /* Border Radius - Legacy Names */
+    --border-radius: var(--radius-lg);
+    --border-radius-small: var(--radius-md);
+    --border-radius-large: var(--radius-2xl);
+    --border-radius-xl: var(--radius-3xl);
+    
+    /* Transitions - Legacy Names */
+    --transition: var(--transition-normal);
+    --transition-fast: var(--transition-fast);
+    --transition-slow: var(--transition-slow);
+    --transition-bounce: var(--transition-bounce);
+    
+    /* Z-index - Legacy Names */
+    --z-dropdown: var(--z-dropdown);
+    --z-sticky: var(--z-sticky);
+    --z-fixed: var(--z-fixed);
+    --z-modal-backdrop: var(--z-modal-backdrop);
+    --z-modal: var(--z-modal);
+    --z-popover: var(--z-popover);
+    --z-tooltip: var(--z-tooltip);
+    --z-toast: var(--z-toast);
+} 
