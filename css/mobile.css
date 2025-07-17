@@ -328,19 +328,29 @@
 
     /* Mobile Audio Controls - Glass Theme */
     .audio-controls {
-        top: 15px !important;
+        bottom: 15px !important;
         right: 15px !important;
     }
 
-    /* Mobile Volume Slider */
-    .volume-slider-container {
-        width: 70px !important;
-        height: 70px !important;
+    /* Mobile Audio Orb */
+    .audio-orb-container {
+        width: 120px !important;
+        height: 120px !important;
+    }
+
+    .audio-orb-glass {
+        width: 120px !important;
+        height: 120px !important;
     }
 
     .volume-slider {
-        width: 70px !important;
-        height: 70px !important;
+        width: 100px !important;
+        height: 100px !important;
+    }
+
+    .audio-orb-button {
+        width: 66px !important;
+        height: 66px !important;
     }
 
     .audio-toggle {

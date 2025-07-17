@@ -72,6 +72,19 @@ class DraggableSystem {
         // Handle neuOS widget specifically with enhanced interaction
         const neuosWidget = document.getElementById('neuosWidget');
         if (neuosWidget) {
+            // Set initial centered position using absolute positioning instead of CSS transform
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            const widgetSize = 120; // neuOS widget size
+            const centerX = (viewportWidth - widgetSize) / 2;
+            const centerY = (viewportHeight - widgetSize) / 2;
+            
+            neuosWidget.style.setProperty('position', 'fixed', 'important');
+            neuosWidget.style.setProperty('left', centerX + 'px', 'important');
+            neuosWidget.style.setProperty('top', centerY + 'px', 'important');
+            neuosWidget.style.setProperty('transform', 'none', 'important'); // Remove CSS transform
+            neuosWidget.style.setProperty('z-index', '1000', 'important');
+            
             this.dragElement(neuosWidget);
             this.addInteractiveEffects(neuosWidget);
         }
@@ -259,6 +272,19 @@ class DraggableSystem {
     refreshNeuOSWidget() {
         const neuosWidget = document.getElementById('neuosWidget');
         if (neuosWidget) {
+            // Set initial centered position using absolute positioning instead of CSS transform
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            const widgetSize = 120; // neuOS widget size
+            const centerX = (viewportWidth - widgetSize) / 2;
+            const centerY = (viewportHeight - widgetSize) / 2;
+            
+            neuosWidget.style.setProperty('position', 'fixed', 'important');
+            neuosWidget.style.setProperty('left', centerX + 'px', 'important');
+            neuosWidget.style.setProperty('top', centerY + 'px', 'important');
+            neuosWidget.style.setProperty('transform', 'none', 'important'); // Remove CSS transform
+            neuosWidget.style.setProperty('z-index', '1000', 'important');
+            
             this.dragElement(neuosWidget);
             this.addInteractiveEffects(neuosWidget);
         }

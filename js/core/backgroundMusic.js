@@ -136,59 +136,13 @@ export class BackgroundMusic {
         }
     }
 
-    showMusicIndicator() {
-        // Create a subtle visual indicator that music is playing
-        const indicator = document.createElement('div');
-        indicator.style.cssText = `
-            position: fixed;
-            top: 60px;
-            right: 20px;
-            width: 8px;
-            height: 8px;
-            background: var(--primary-color);
-            border-radius: 50%;
-            opacity: 0.7;
-            animation: musicPulse 2s ease-in-out infinite;
-            pointer-events: none;
-            z-index: 7999;
-        `;
-        
-        // Add the pulse animation if it doesn't exist
-        if (!document.querySelector('style[data-music-animation]')) {
-            const style = document.createElement('style');
-            style.setAttribute('data-music-animation', 'true');
-            style.textContent = `
-                @keyframes musicPulse {
-                    0%, 100% { opacity: 0.3; transform: scale(1); }
-                    50% { opacity: 0.8; transform: scale(1.2); }
-                }
-            `;
-            document.head.appendChild(style);
-        }
-        
-        document.body.appendChild(indicator);
-        
-        // Remove indicator when music stops
-        this.backgroundMusic.addEventListener('pause', () => {
-            indicator.remove();
-        });
-        
-        this.backgroundMusic.addEventListener('ended', () => {
-            indicator.remove();
-        });
-    }
+
 
     stopBackgroundMusic() {
         if (this.backgroundMusic) {
             this.backgroundMusic.pause();
             this.backgroundMusic.currentTime = 0;
             // Background music stopped
-            
-            // Remove music indicator
-            const indicator = document.querySelector('div[style*="musicPulse"]');
-            if (indicator) {
-                indicator.remove();
-            }
         }
     }
 
@@ -209,12 +163,6 @@ export class BackgroundMusic {
             
             if (this.backgroundMusic) {
                 this.backgroundMusic.pause();
-                
-                // Remove music indicator
-                const indicator = document.querySelector('div[style*="musicPulse"]');
-                if (indicator) {
-                    indicator.remove();
-                }
             }
         } else {
             // Enable music
@@ -224,7 +172,7 @@ export class BackgroundMusic {
             
             if (this.backgroundMusic && this.backgroundMusic.paused) {
                 this.backgroundMusic.play().then(() => {
-                    this.showMusicIndicator();
+                    // Music resumed successfully
                 }).catch(error => {
                     console.warn('Could not resume background music:', error);
                 });
@@ -259,7 +207,7 @@ export class BackgroundMusic {
     play() {
         if (this.backgroundMusic && this.musicEnabled) {
             this.backgroundMusic.play().then(() => {
-                this.showMusicIndicator();
+                // Music started successfully
             }).catch(error => {
                 console.warn('Could not start background music via terminal:', error);
             });
@@ -271,12 +219,6 @@ export class BackgroundMusic {
     pause() {
         if (this.backgroundMusic) {
             this.backgroundMusic.pause();
-            
-            // Remove music indicator
-            const indicator = document.querySelector('div[style*="musicPulse"]');
-            if (indicator) {
-                indicator.remove();
-            }
         } else {
             console.warn('Background music not available');
         }
@@ -287,6 +229,7 @@ export class BackgroundMusic {
         this.volumeSlider = document.querySelector('.volume-slider');
         this.volumeProgress = document.querySelector('.volume-progress');
         this.volumeIndicator = document.querySelector('.volume-indicator');
+        this.audioToggle = document.getElementById('audioToggle');
         
         if (!this.volumeSlider || !this.volumeProgress || !this.volumeIndicator) {
             console.warn('Volume slider elements not found');
@@ -296,9 +239,15 @@ export class BackgroundMusic {
         // Initialize volume display
         this.updateVolumeDisplay();
         
-        // Add event listeners for drag functionality
+        // Add event listeners for drag functionality only on the volume slider
         this.volumeSlider.addEventListener('mousedown', (e) => this.startVolumeDrag(e));
         this.volumeSlider.addEventListener('touchstart', (e) => this.startVolumeDrag(e));
+        
+        // Prevent dragging on the audio toggle button
+        if (this.audioToggle) {
+            this.audioToggle.addEventListener('mousedown', (e) => e.stopPropagation());
+            this.audioToggle.addEventListener('touchstart', (e) => e.stopPropagation());
+        }
         
         // Prevent context menu on right click
         this.volumeSlider.addEventListener('contextmenu', (e) => e.preventDefault());
@@ -342,8 +291,8 @@ export class BackgroundMusic {
         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
         
         // Only respond if we're within a reasonable distance from the center (dial area)
-        const minRadius = 20; // Minimum distance from center
-        const maxRadius = 50; // Maximum distance from center
+        const minRadius = 30; // Minimum distance from center
+        const maxRadius = 75; // Maximum distance from center
         
         if (distance < minRadius || distance > maxRadius) {
             return;
@@ -401,8 +350,8 @@ export class BackgroundMusic {
     updateVolumeDisplay() {
         if (!this.volumeProgress || !this.volumeIndicator) return;
         
-        // Calculate circumference (2 * π * radius)
-        const circumference = 2 * Math.PI * 35;
+        // Calculate circumference (2 * π * radius) - updated for new size
+        const circumference = 2 * Math.PI * 50;
         
         // Calculate stroke-dasharray values with smooth interpolation
         const progressLength = this.volume * circumference;
@@ -413,20 +362,20 @@ export class BackgroundMusic {
         
         // Update indicator position with improved precision
         const angle = this.volume * 360 - 90; // Start from top (-90 degrees)
-        const radius = 35;
-        const x = 50 + radius * Math.cos(angle * Math.PI / 180);
-        const y = 50 + radius * Math.sin(angle * Math.PI / 180);
+        const radius = 50;
+        const x = 60 + radius * Math.cos(angle * Math.PI / 180);
+        const y = 60 + radius * Math.sin(angle * Math.PI / 180);
         
         this.volumeIndicator.setAttribute('cx', x.toFixed(2));
         this.volumeIndicator.setAttribute('cy', y.toFixed(2));
         
         // Add subtle visual feedback during dragging
         if (this.isDragging) {
-            this.volumeProgress.style.filter = 'drop-shadow(0 0 12px rgba(99, 102, 241, 0.8))';
-            this.volumeIndicator.style.filter = 'drop-shadow(0 0 8px rgba(99, 102, 241, 1))';
+            this.volumeProgress.style.filter = 'drop-shadow(0 0 16px var(--primary-color))';
+            this.volumeIndicator.style.filter = 'drop-shadow(0 0 12px var(--primary-color))';
         } else {
-            this.volumeProgress.style.filter = 'drop-shadow(0 0 8px rgba(99, 102, 241, 0.5))';
-            this.volumeIndicator.style.filter = 'drop-shadow(0 0 4px rgba(99, 102, 241, 0.8))';
+            this.volumeProgress.style.filter = 'drop-shadow(0 0 12px var(--primary-color))';
+            this.volumeIndicator.style.filter = 'drop-shadow(0 0 8px var(--primary-color))';
         }
     }
     

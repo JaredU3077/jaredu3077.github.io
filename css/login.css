@@ -380,106 +380,247 @@
 /* Enhanced Audio Controls */
 .audio-controls {
     position: fixed;
-    top: 15px;
+    bottom: 15px;
     right: 15px;
     z-index: 10000;
     opacity: 0;
     animation: audioControlsFadeIn 1s ease-out 2s forwards;
 }
 
-/* Circular Volume Slider Container */
-.volume-slider-container {
+/* Audio Orb Container - 4th Glass Orb */
+.audio-orb-container {
     position: relative;
-    width: 80px;
-    height: 80px;
+    width: 140px;
+    height: 140px;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/* Main Glass Orb */
+.audio-orb-glass {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    background: linear-gradient(135deg, 
+        var(--glass-background) 0%, 
+        rgba(255, 255, 255, 0.03) 50%, 
+        rgba(255, 255, 255, 0.01) 100%);
+    backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness));
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 50%;
+    box-shadow: 
+        0 16px 64px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        inset 0 2px 0 rgba(255, 255, 255, 0.2),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.2),
+        inset 0 0 20px rgba(255, 255, 255, 0.05);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.audio-orb-glass::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 30%, 
+        rgba(255, 255, 255, 0.1) 0%, 
+        transparent 50%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.audio-orb-glass::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, 
+        transparent 30%, 
+        rgba(255, 255, 255, 0.05) 50%, 
+        transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.audio-orb-glass:hover {
+    background: linear-gradient(135deg, 
+        var(--glass-background-heavy) 0%, 
+        rgba(255, 255, 255, 0.05) 50%, 
+        rgba(255, 255, 255, 0.02) 100%);
+    border-color: var(--color-border);
+    box-shadow: 
+        0 20px 80px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.15),
+        inset 0 2px 0 rgba(255, 255, 255, 0.25),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.25),
+        inset 0 0 30px rgba(255, 255, 255, 0.08);
 }
 
 /* Volume Slider SVG */
 .volume-slider {
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 10px;
+    left: 10px;
     cursor: pointer;
+    width: 120px;
+    height: 120px;
+    pointer-events: all;
+    z-index: 2;
 }
 
 /* Volume Track (background circle) */
 .volume-track {
     transition: stroke 0.3s ease;
+    stroke: var(--color-border-subtle);
+    stroke-width: 6;
+    filter: drop-shadow(0 0 4px var(--color-border-subtle));
 }
 
 /* Volume Progress (filled circle) */
 .volume-progress {
     transition: stroke-dasharray 0.3s ease;
-    filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.5));
+    stroke: url(#volumeGradient);
+    stroke-width: 6;
+    filter: drop-shadow(0 0 16px var(--primary-color));
 }
 
 /* Volume Indicator Dot */
 .volume-indicator {
     transition: all 0.3s ease;
-    filter: drop-shadow(0 0 4px rgba(99, 102, 241, 0.8));
+    fill: url(#indicatorGradient);
+    r: 6;
+    filter: drop-shadow(0 0 12px var(--primary-color));
 }
 
 
 
-/* Enhanced Audio Toggle */
-.audio-toggle {
-    width: 48px;
-    height: 48px;
-    border-radius: var(--radius-full);
-    background: var(--glass-background) !important;
+/* Audio Orb Button - Central Glass Orb */
+.audio-orb-button {
+    width: 78px;
+    height: 78px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, 
+        var(--glass-background) 0%, 
+        rgba(255, 255, 255, 0.05) 50%, 
+        rgba(255, 255, 255, 0.02) 100%) !important;
     backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
     -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
     border: 1px solid var(--color-border-subtle);
     color: var(--color-text-primary);
     cursor: pointer;
-    transition: all var(--transition-normal);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     align-items: center;
     justify-content: center;
     box-shadow: 
-        0 4px 16px rgba(0, 0, 0, 0.15), 
-        0 0 0 1px rgba(255, 255, 255, 0.05);
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+        0 8px 24px rgba(0, 0, 0, 0.3), 
+        0 0 0 1px rgba(255, 255, 255, 0.15),
+        inset 0 2px 0 rgba(255, 255, 255, 0.2),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.15),
+        inset 0 0 15px rgba(255, 255, 255, 0.05);
+    position: relative;
     overflow: hidden;
-    z-index: 2;
+    z-index: 3;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
-.audio-toggle::before {
+.audio-orb-button::before {
     content: '';
     position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.1) 0%, 
-        transparent 50%);
-    opacity: 0;
-    transition: opacity var(--transition-normal);
-    border-radius: var(--radius-full);
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 25% 25%, 
+        rgba(255, 255, 255, 0.15) 0%, 
+        transparent 60%);
+    border-radius: 50%;
+    pointer-events: none;
     z-index: 1;
 }
 
-
-
-.audio-toggle:active {
-    transform: translateY(0) scale(0.95);
+.audio-orb-button::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, 
+        transparent 20%, 
+        rgba(255, 255, 255, 0.08) 50%, 
+        transparent 80%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1;
 }
 
-.audio-toggle:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px var(--color-primary), 0 4px 16px rgba(0, 0, 0, 0.15);
+.audio-orb-button:hover {
+    background: linear-gradient(135deg, 
+        var(--glass-background-heavy) 0%, 
+        rgba(255, 255, 255, 0.08) 50%, 
+        rgba(255, 255, 255, 0.03) 100%) !important;
+    border-color: var(--color-border);
+    box-shadow: 
+        0 12px 32px rgba(0, 0, 0, 0.4), 
+        0 0 0 1px rgba(255, 255, 255, 0.2),
+        inset 0 2px 0 rgba(255, 255, 255, 0.25),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.2),
+        inset 0 0 20px rgba(255, 255, 255, 0.08);
 }
 
-.audio-toggle .audio-on,
-.audio-toggle .audio-off {
+.audio-orb-button:active {
+    transform: scale(0.98);
+    box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.2), 
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+}
+
+.audio-orb-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    transition: all 0.3s ease;
     position: relative;
     z-index: 2;
-    transition: all var(--transition-normal);
 }
+
+.audio-orb-button:hover .audio-orb-inner {
+    transform: scale(1.05);
+}
+
+.audio-orb-button .audio-on,
+.audio-orb-button .audio-off {
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.3));
+    transition: all 0.3s ease;
+}
+
+.audio-orb-button:hover .audio-on,
+.audio-orb-button:hover .audio-off {
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
+    transform: scale(1.1);
+}
+
+
 
 
 

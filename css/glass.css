@@ -563,11 +563,8 @@
 
 /* Enhanced neuOS Widget - RESTORED CIRCULAR DESIGN */
 .neuos-widget {
-    position: absolute !important;
-    /* Initial centered position - will be overridden by dragging system */
-    left: 50% !important;
-    top: 50% !important;
-    transform: translate(-50%, -50%) !important;
+    position: fixed !important;
+    /* Initial positioning handled by JavaScript */
     width: 120px !important;
     height: 120px !important;
     border-radius: 50% !important;
