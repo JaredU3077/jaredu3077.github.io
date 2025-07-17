@@ -328,8 +328,19 @@
 
     /* Mobile Audio Controls - Glass Theme */
     .audio-controls {
-        bottom: 20px !important;
-        right: 20px !important;
+        top: 15px !important;
+        right: 15px !important;
+    }
+
+    /* Mobile Volume Slider */
+    .volume-slider-container {
+        width: 70px !important;
+        height: 70px !important;
+    }
+
+    .volume-slider {
+        width: 70px !important;
+        height: 70px !important;
     }
 
     .audio-toggle {

@@ -88,21 +88,19 @@ body:not(.boot-active):not(.login-active) {
     display: none; /* Hide labels for icon-only design */
 }
 
-/* Simple Hover Effects */
+/* Simple Hover Effects - No movement */
 .desktop-icon:hover .icon,
 .desktop-icon:focus .icon {
     color: var(--primary-color);
-    transform: scale(1.1);
 }
 
 .desktop-icon:active .icon {
-    transform: scale(0.95);
+    color: var(--primary-color);
 }
 
 /* Reset states */
 .desktop-icon:not(:hover):not(:focus) .icon {
     color: var(--text-color);
-    transform: scale(1);
 }
 
 @media (min-width: 1200px) {

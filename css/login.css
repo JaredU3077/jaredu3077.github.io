@@ -72,6 +72,7 @@
     max-width: 400px;
 }
 
+/* Enhanced Progress Container */
 .progress-container {
     position: relative;
     margin-bottom: var(--spacing-lg);
@@ -82,31 +83,102 @@
     display: block;
 }
 
+/* Enhanced Progress Bar */
 .progress-bar {
     width: 100%;
-    height: 12px;
-    background: rgba(255,255,255,0.015) !important;
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: var(--border-radius-small);
+    height: 16px;
+    background: rgba(255,255,255,0.02) !important;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: var(--radius-lg);
     overflow: hidden;
     position: relative;
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+    box-shadow: 
+        0 0 20px rgba(99, 102, 241, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
     min-width: 300px;
-    /* Remove backdrop-filter to prevent double blur effect */
-    /* backdrop-filter: blur(6px) saturate(150%) brightness(120%); */
-    /* -webkit-backdrop-filter: blur(6px) saturate(150%) brightness(120%); */
+    backdrop-filter: blur(4px) saturate(150%) brightness(110%);
+    -webkit-backdrop-filter: blur(4px) saturate(150%) brightness(110%);
 }
 
+.progress-bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.05) 50%, 
+        transparent 100%);
+    animation: progressShimmer 2s ease-in-out infinite;
+    z-index: 1;
+}
+
+@keyframes progressShimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Enhanced Progress Fill */
 .progress-fill {
     height: 100%;
-    background: var(--primary-color);
-    border-radius: var(--border-radius-small);
+    background: linear-gradient(90deg, 
+        var(--primary-color) 0%, 
+        var(--primary-light) 50%, 
+        var(--primary-color) 100%);
+    border-radius: var(--radius-lg);
     width: 0%;
     position: relative;
     box-shadow: 
-        0 0 10px rgba(99, 102, 241, 0.5),
-        0 0 20px rgba(99, 102, 241, 0.3),
-        inset 0 0 10px rgba(255, 255, 255, 0.1);
+        0 0 15px rgba(99, 102, 241, 0.6),
+        0 0 30px rgba(99, 102, 241, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transition: width 0.3s ease-out;
+    z-index: 2;
+    overflow: hidden;
+}
+
+.progress-fill::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.3) 50%, 
+        transparent 100%);
+    animation: progressGlow 1.5s ease-in-out infinite;
+    z-index: 3;
+}
+
+@keyframes progressGlow {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.1) 30%, 
+        rgba(255, 255, 255, 0.2) 50%, 
+        rgba(255, 255, 255, 0.1) 70%, 
+        transparent 100%);
+    animation: progressFlow 2s ease-in-out infinite;
+    z-index: 4;
+}
+
+@keyframes progressFlow {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
 }
 
 /* Login Screen - Apple-inspired */
@@ -183,52 +255,104 @@
     align-items: center;
 }
 
+/* Enhanced Login Button */
 .login-btn {
     width: auto;
-    min-width: 200px;
-    padding: var(--spacing-md) var(--spacing-lg);
+    min-width: 220px;
+    padding: var(--spacing-lg) var(--spacing-2xl);
     color: var(--primary-color);
     border: 1px solid var(--primary-color);
-    border-radius: var(--border-radius);
-    font-size: var(--text-base);
-    font-weight: 600;
+    border-radius: var(--radius-lg);
+    font-size: var(--text-lg);
+    font-weight: 700;
     cursor: pointer;
-    transition: all var(--transition);
+    transition: all var(--transition-normal);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-md);
     position: relative;
     overflow: hidden;
     font-family: var(--font-family);
     margin: 0 auto;
+    letter-spacing: 0.5px;
+    text-transform: lowercase;
     /* Glass effect handled by _glass.css */
+    background: var(--glass-background-ultra) !important;
+    backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+    -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.2), 
+        0 0 0 1px rgba(255, 255, 255, 0.05),
+        0 0 20px rgba(99, 102, 241, 0.2);
+}
+
+.login-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.2) 0%, 
+        rgba(255, 255, 255, 0.05) 50%, 
+        transparent 100%);
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+    border-radius: var(--radius-lg);
+    z-index: 1;
+}
+
+.login-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-lg);
+    padding: 1px;
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.4), 
+        rgba(255, 255, 255, 0.1), 
+        transparent);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    z-index: 2;
 }
 
 .login-btn:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px) scale(1.05);
     border-color: var(--primary-light);
     color: var(--primary-light);
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+    box-shadow: 
+        0 12px 40px rgba(0, 0, 0, 0.25), 
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        0 0 30px rgba(99, 102, 241, 0.4);
+    background: var(--glass-background-heavy) !important;
+}
+
+.login-btn:hover::before {
+    opacity: 1;
 }
 
 .login-btn:active {
-    transform: translateY(0);
+    transform: translateY(-1px) scale(1.02);
+    transition: all var(--transition-fast);
 }
 
 .btn-text {
     position: relative;
-    z-index: 2;
+    z-index: 3;
+    font-weight: 700;
+    letter-spacing: 1px;
 }
 
 .btn-icon {
     position: relative;
-    z-index: 2;
-    transition: transform var(--transition-fast);
+    z-index: 3;
+    transition: transform var(--transition-normal);
 }
 
 .login-btn:hover .btn-icon {
-    transform: translateX(4px);
+    transform: translateX(8px) scale(1.1);
 }
 
 .btn-glow {
@@ -236,119 +360,143 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
-    border-radius: var(--border-radius);
+    width: 140%;
+    height: 140%;
+    background: radial-gradient(circle, 
+        rgba(99, 102, 241, 0.3) 0%, 
+        rgba(99, 102, 241, 0.15) 30%, 
+        transparent 70%);
+    border-radius: var(--radius-lg);
     opacity: 0;
-    transition: opacity var(--transition-fast);
+    transition: opacity var(--transition-normal);
+    z-index: 0;
+    filter: blur(12px);
 }
 
 .login-btn:hover .btn-glow {
     opacity: 1;
 }
 
-/* Audio Controls - neuOS Glass Theme */
+/* Enhanced Audio Controls */
 .audio-controls {
     position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 8000;
+    top: 15px;
+    right: 15px;
+    z-index: 10000;
     opacity: 0;
-    animation: audioControlsFadeIn 2s ease-out 1s forwards;
+    animation: audioControlsFadeIn 1s ease-out 2s forwards;
 }
 
-.audio-toggle {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: var(--glass-background);
-    backdrop-filter: blur(var(--glass-backdrop-blur)) 
-                    saturate(var(--glass-saturation)) 
-                    brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) 
-                             saturate(var(--glass-saturation)) 
-                             brightness(var(--glass-brightness));
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    color: var(--primary-color);
+/* Circular Volume Slider Container */
+.volume-slider-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
+}
+
+/* Volume Slider SVG */
+.volume-slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    cursor: pointer;
+}
+
+/* Volume Track (background circle) */
+.volume-track {
+    transition: stroke 0.3s ease;
+}
+
+/* Volume Progress (filled circle) */
+.volume-progress {
+    transition: stroke-dasharray 0.3s ease;
+    filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.5));
+}
+
+/* Volume Indicator Dot */
+.volume-indicator {
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 0 4px rgba(99, 102, 241, 0.8));
+}
+
+
+
+/* Enhanced Audio Toggle */
+.audio-toggle {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-full);
+    background: var(--glass-background) !important;
+    backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+    -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
+    border: 1px solid var(--color-border-subtle);
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.15), 
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     overflow: hidden;
+    z-index: 2;
 }
 
 .audio-toggle::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.1) 0%,
-        rgba(255, 255, 255, 0.05) 50%,
-        transparent 100%
-    );
-    pointer-events: none;
+    inset: 0;
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.1) 0%, 
+        transparent 50%);
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+    border-radius: var(--radius-full);
     z-index: 1;
 }
 
-.audio-toggle:hover {
-    transform: scale(1.05);
-    box-shadow: 0px 12px 35px rgba(0, 0, 0, 0.25), var(--glass-edge-glow);
-    border-color: var(--primary-color);
-}
+
 
 .audio-toggle:active {
-    transform: scale(0.95);
-    box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.3);
+    transform: translateY(0) scale(0.95);
 }
 
 .audio-toggle:focus {
-    outline: 2px solid var(--primary-color);
-    outline-offset: 2px;
+    outline: none;
+    box-shadow: 0 0 0 2px var(--color-primary), 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
 .audio-toggle .audio-on,
 .audio-toggle .audio-off {
-    width: 20px;
-    height: 20px;
-    stroke: currentColor;
-    stroke-width: 2;
-    fill: none;
-    transition: all 0.3s ease;
     position: relative;
     z-index: 2;
-}
-
-.audio-toggle:hover .audio-on,
-.audio-toggle:hover .audio-off {
-    stroke: var(--primary-color);
-    transform: scale(1.1);
+    transition: all var(--transition-normal);
 }
 
 
 
-/* Animations */
+/* Enhanced Animations */
 @keyframes bootBackground {
-    0% { background: #000; }
-    50% { background: linear-gradient(135deg, #0a0f16 0%, #1a1f2a 50%, #0a0f16 100%); }
-    100% { background: linear-gradient(135deg, #0a0f16 0%, #1a1f2a 50%, #0a0f16 100%); }
+    0% { opacity: 0; }
+    100% { opacity: 1; }
 }
 
 @keyframes bootLogoGlow {
-    0% { filter: drop-shadow(0 0 20px var(--primary-color)); }
-    100% { filter: drop-shadow(0 0 30px var(--primary-color)) drop-shadow(0 0 40px var(--primary-color)); }
+    0%, 100% { text-shadow: 0 0 30px rgba(99, 102, 241, 0.6); }
+    50% { text-shadow: 0 0 50px rgba(99, 102, 241, 0.8); }
 }
 
 @keyframes textGlow {
-    0% { text-shadow: 0 0 20px var(--primary-color); }
-    100% { text-shadow: 0 0 30px var(--primary-color), 0 0 40px var(--primary-color); }
+    0%, 100% { text-shadow: 0 0 20px rgba(255, 255, 255, 0.3); }
+    50% { text-shadow: 0 0 30px rgba(255, 255, 255, 0.5); }
 }
 
 @keyframes bootMessageFade {
@@ -357,82 +505,83 @@
 }
 
 @keyframes loginFadeIn {
-    0% { opacity: 0; transform: scale(0.95); }
+    0% { opacity: 0; transform: scale(0.9); }
     100% { opacity: 1; transform: scale(1); }
 }
 
 @keyframes loginLogoFloat {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-10px) rotate(180deg); }
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
 }
 
 @keyframes audioControlsFadeIn {
-    0% { opacity: 0; transform: translateY(-20px); }
+    0% { opacity: 0; transform: translateY(-10px); }
     100% { opacity: 1; transform: translateY(0); }
 }
 
-/* Modern Boot & Login Animations */
 @keyframes logoPulse {
-    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 30px rgba(74, 144, 226, 0.6)); }
-    50% { transform: scale(1.05); filter: drop-shadow(0 0 40px rgba(74, 144, 226, 0.8)); }
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
 }
 
 @keyframes logoGlow {
-    0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
-    50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.2); }
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.2); }
 }
 
 @keyframes titleGlow {
-    0% { text-shadow: 0 0 30px rgba(74, 144, 226, 0.8); }
-    100% { text-shadow: 0 0 40px rgba(74, 144, 226, 1), 0 0 60px rgba(74, 144, 226, 0.6); }
+    0%, 100% { text-shadow: 0 0 30px rgba(99, 102, 241, 0.6); }
+    50% { text-shadow: 0 0 50px rgba(99, 102, 241, 0.8); }
 }
 
 @keyframes progressGlow {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+    0%, 100% { box-shadow: 0 0 15px rgba(99, 102, 241, 0.6), 0 0 30px rgba(99, 102, 241, 0.4); }
+    50% { box-shadow: 0 0 25px rgba(99, 102, 241, 0.8), 0 0 50px rgba(99, 102, 241, 0.6); }
 }
 
 @keyframes messageIconPulse {
     0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.2); }
+    50% { transform: scale(1.1); }
 }
 
 @keyframes statusItemFade {
-    0% { opacity: 0; transform: translateY(10px); }
-    100% { opacity: 1; transform: translateY(0); }
+    0% { opacity: 0; transform: translateX(-10px); }
+    100% { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes statusIconPulse {
     0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
+    50% { transform: scale(1.05); }
 }
 
 @keyframes loginGlow {
-    0%, 100% { opacity: 0.1; transform: translate(-50%, -50%) scale(1); }
-    50% { opacity: 0.3; transform: translate(-50%, -50%) scale(1.1); }
+    0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
+    50% { box-shadow: 0 0 40px rgba(99, 102, 241, 0.5); }
 }
 
 @keyframes loginContainerSlide {
-    0% { opacity: 0; transform: translateY(20px) scale(0.98); }
-    100% { opacity: 1; transform: translateY(0) scale(1); }
+    0% { transform: translateY(20px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
 }
 
 @keyframes avatarFloat {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-3px); }
 }
 
 @keyframes statusPulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.2); opacity: 0.8; }
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
 }
 
 @keyframes statusDotPulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.3); opacity: 0.7; }
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
 }
 
-/* Hide desktop during boot/login */
+/* Enhanced Desktop State */
 .login-active #desktop {
-    display: none;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transition: opacity var(--transition-slow) ease-out !important;
 } 

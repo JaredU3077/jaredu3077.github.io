@@ -1,5 +1,121 @@
 /* Animations and Keyframes */
 
+/* Enhanced Glass Morphism Animations */
+@keyframes glassReflectionShift {
+    0%, 100% { 
+        background: linear-gradient(135deg, 
+            rgba(255, 255, 255, 0.4) 0%, 
+            rgba(255, 255, 255, 0.1) 25%, 
+            transparent 50%, 
+            rgba(255, 255, 255, 0.05) 75%, 
+            transparent 100%);
+    }
+    50% { 
+        background: linear-gradient(225deg, 
+            rgba(255, 255, 255, 0.3) 0%, 
+            rgba(255, 255, 255, 0.05) 30%, 
+            transparent 60%, 
+            rgba(255, 255, 255, 0.1) 80%, 
+            transparent 100%);
+    }
+}
+
+@keyframes glassFloat {
+    0%, 100% { 
+        transform: translateY(0px) rotate(0deg); 
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    }
+    50% { 
+        transform: translateY(-8px) rotate(1deg); 
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    }
+}
+
+@keyframes glassPulse {
+    0%, 100% { 
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 0 20px rgba(255, 255, 255, 0.1);
+        transform: scale(1);
+    }
+    50% { 
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2), 0 0 30px rgba(255, 255, 255, 0.2);
+        transform: scale(1.02);
+    }
+}
+
+@keyframes glassBreathe {
+    0%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 0 20px rgba(255, 255, 255, 0.1);
+    }
+    50% { 
+        transform: scale(1.02);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2), 0 0 30px rgba(255, 255, 255, 0.2);
+    }
+}
+
+@keyframes glassGlow {
+    0%, 100% { 
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), 0 0 20px rgba(99, 102, 241, 0.2);
+    }
+    50% { 
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25), 0 0 30px rgba(99, 102, 241, 0.4);
+    }
+}
+
+@keyframes titleFloat {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+}
+
+@keyframes textGlow {
+    0% { text-shadow: 0 0 20px var(--color-primary), 0 0 40px var(--color-primary); }
+    100% { text-shadow: 0 0 30px var(--color-primary), 0 0 60px var(--color-primary); }
+}
+
+@keyframes progressShimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+@keyframes progressGlow {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+@keyframes progressFlow {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+@keyframes buttonGlow {
+    0%, 100% { 
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), 0 0 20px rgba(99, 102, 241, 0.2);
+    }
+    50% { 
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25), 0 0 30px rgba(99, 102, 241, 0.4);
+    }
+}
+
+@keyframes glassRipple {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+@keyframes glassShimmer {
+    0% {
+        transform: translateX(-100%) skewX(-15deg);
+    }
+    100% {
+        transform: translateX(200%) skewX(-15deg);
+    }
+}
+
 /* Boot and Login Animations */
 @keyframes bootBackground { 
     0% { background: #000; } 

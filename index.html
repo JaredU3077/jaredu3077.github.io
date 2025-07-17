@@ -163,17 +163,28 @@
 
     <!-- Audio Controls -->
     <div id="audioControls" class="audio-controls">
-        <button id="audioToggle" class="audio-toggle" title="Toggle Background Music">
-            <svg class="audio-on" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.08"/>
+        <div class="volume-slider-container">
+            <svg class="volume-slider" viewBox="0 0 100 100" width="80" height="80">
+                <!-- Background circle -->
+                <circle class="volume-track" cx="50" cy="50" r="35" fill="none" stroke="rgba(255, 255, 255, 0.1)" stroke-width="4"/>
+                <!-- Volume progress circle -->
+                <circle class="volume-progress" cx="50" cy="50" r="35" fill="none" stroke="var(--primary-color)" stroke-width="4" 
+                        stroke-dasharray="0 220" stroke-linecap="round" transform="rotate(-90 50 50)"/>
+                <!-- Volume indicator dot -->
+                <circle class="volume-indicator" cx="50" cy="15" r="3" fill="var(--primary-color)" opacity="0.8"/>
             </svg>
-            <svg class="audio-off" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
-                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-                <line x1="23" y1="9" x2="17" y2="15"/>
-                <line x1="17" y1="9" x2="23" y2="15"/>
-            </svg>
-        </button>
+            <button id="audioToggle" class="audio-toggle" title="Toggle Background Music">
+                <svg class="audio-on" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.08"/>
+                </svg>
+                <svg class="audio-off" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                    <line x1="23" y1="9" x2="17" y2="15"/>
+                    <line x1="17" y1="9" x2="23" y2="15"/>
+                </svg>
+            </button>
+        </div>
     </div>
 
     <div id="desktop" role="main" aria-label="neuOS Desktop" style="opacity: 0; visibility: hidden;">

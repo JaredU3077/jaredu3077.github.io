@@ -50,31 +50,7 @@ export class BootSystem {
         const guestLoginBtn = document.getElementById('guestLoginBtn');
         guestLoginBtn?.addEventListener('click', () => this.bootSequence.handleLogin());
 
-        document.addEventListener('keydown', (e) => {
-            if (document.activeElement.tagName !== 'INPUT' &&
-                document.activeElement.tagName !== 'TEXTAREA' &&
-                !e.ctrlKey && !e.altKey && !e.metaKey) {
-                switch (e.key.toLowerCase()) {
-                    case 'space':
-                        e.preventDefault();
-                        this.particleSystem.toggleParticleAnimation();
-                        break;
-                    case 'r':
-                        this.particleSystem.rotateBackground();
-                        break;
-                    case '+':
-                    case '=':
-                        this.particleSystem.increaseParticles();
-                        break;
-                    case '-':
-                        this.particleSystem.decreaseParticles();
-                        break;
-                    case 'c':
-                        this.particleSystem.changeParticleColors();
-                        break;
-                }
-            }
-        });
+
     }
 
     playUIClickSound() {
