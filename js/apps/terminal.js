@@ -1908,17 +1908,21 @@ export class Terminal {
     }
 
     handleSolarSystem(args) {
-        return `🌌 Solar System Background
+        return `🌌 Enhanced Solar System Background
 
-The solar system is running as a beautiful background animation with:
-- Enhanced 120px sun with realistic pulsing glow
-- 8 planets with realistic characteristics and orbital mechanics
-- Atmospheric effects for planets with atmospheres
-- Ring systems for gas giants (Jupiter, Saturn, Uranus, Neptune)
-- Multiple moons for larger planets
-- Dynamic animations with enhanced visual effects
+The solar system is running as a stunning background animation with:
+- Enhanced 140px sun with realistic pulsing glow and corona effects
+- 8 planets with realistic characteristics, orbital mechanics, and physics
+- Atmospheric effects for planets with atmospheres (Venus, Earth, Mars, gas giants)
+- Ring systems for gas giants (Jupiter, Saturn, Uranus, Neptune) with realistic composition
+- Multiple moons for larger planets with individual orbital mechanics
+- Asteroid belt between Mars and Jupiter with 25+ asteroids
+- Kuiper belt beyond Neptune with icy objects
+- Comet with realistic trajectory and tail effects
+- Dynamic animations with enhanced visual effects and gravitational interactions
+- Realistic surface details and atmospheric compositions for each planet
 
-This is a background feature that enhances the visual appeal of neuOS.`;
+This is a background feature that creates a mesmerizing cosmic environment for neuOS.`;
     }
 
     // App control commands

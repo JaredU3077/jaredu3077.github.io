@@ -425,51 +425,195 @@
     }
 }
 
-/* Sun Pulse Animation */
+/* Enhanced Sun Pulse Animation */
 @keyframes sunPulse {
     0%, 100% { 
         transform: translate(-50%, -50%) scale(1);
-        box-shadow: 
-            0 0 50px #ffd700,
-            0 0 100px #ff8c00,
-            0 0 150px #ff4500,
-            0 0 200px rgba(255, 69, 0, 0.4),
-            0 0 250px rgba(255, 69, 0, 0.2),
-            inset 0 0 40px rgba(255, 215, 0, 0.5),
-            inset 0 0 20px rgba(255, 255, 255, 0.3);
-    }
-    25% {
-        transform: translate(-50%, -50%) scale(1.08);
-        box-shadow: 
-            0 0 55px #ffd700,
-            0 0 110px #ff8c00,
-            0 0 165px #ff4500,
-            0 0 220px rgba(255, 69, 0, 0.45),
-            0 0 270px rgba(255, 69, 0, 0.25),
-            inset 0 0 45px rgba(255, 215, 0, 0.6),
-            inset 0 0 25px rgba(255, 255, 255, 0.4);
-    }
-    50% { 
-        transform: translate(-50%, -50%) scale(1.15);
         box-shadow: 
             0 0 60px #ffd700,
             0 0 120px #ff8c00,
             0 0 180px #ff4500,
             0 0 240px rgba(255, 69, 0, 0.5),
             0 0 300px rgba(255, 69, 0, 0.3),
-            inset 0 0 50px rgba(255, 215, 0, 0.7),
+            0 0 360px rgba(255, 69, 0, 0.2),
+            inset 0 0 50px rgba(255, 215, 0, 0.6),
+            inset 0 0 25px rgba(255, 255, 255, 0.4);
+    }
+    25% {
+        transform: translate(-50%, -50%) scale(1.1);
+        box-shadow: 
+            0 0 65px #ffd700,
+            0 0 130px #ff8c00,
+            0 0 195px #ff4500,
+            0 0 260px rgba(255, 69, 0, 0.55),
+            0 0 325px rgba(255, 69, 0, 0.35),
+            0 0 390px rgba(255, 69, 0, 0.25),
+            inset 0 0 55px rgba(255, 215, 0, 0.7),
             inset 0 0 30px rgba(255, 255, 255, 0.5);
     }
-    75% {
-        transform: translate(-50%, -50%) scale(1.08);
+    50% { 
+        transform: translate(-50%, -50%) scale(1.2);
         box-shadow: 
-            0 0 55px #ffd700,
-            0 0 110px #ff8c00,
-            0 0 165px #ff4500,
-            0 0 220px rgba(255, 69, 0, 0.45),
-            0 0 270px rgba(255, 69, 0, 0.25),
-            inset 0 0 45px rgba(255, 215, 0, 0.6),
-            inset 0 0 25px rgba(255, 255, 255, 0.4);
+            0 0 70px #ffd700,
+            0 0 140px #ff8c00,
+            0 0 210px #ff4500,
+            0 0 280px rgba(255, 69, 0, 0.6),
+            0 0 350px rgba(255, 69, 0, 0.4),
+            0 0 420px rgba(255, 69, 0, 0.3),
+            inset 0 0 60px rgba(255, 215, 0, 0.8),
+            inset 0 0 35px rgba(255, 255, 255, 0.6);
+    }
+    75% {
+        transform: translate(-50%, -50%) scale(1.1);
+        box-shadow: 
+            0 0 65px #ffd700,
+            0 0 130px #ff8c00,
+            0 0 195px #ff4500,
+            0 0 260px rgba(255, 69, 0, 0.55),
+            0 0 325px rgba(255, 69, 0, 0.35),
+            0 0 390px rgba(255, 69, 0, 0.25),
+            inset 0 0 55px rgba(255, 215, 0, 0.7),
+            inset 0 0 30px rgba(255, 255, 255, 0.5);
+    }
+}
+
+/* Solar Corona Pulse Animation */
+@keyframes coronaPulse {
+    0%, 100% { 
+        opacity: 0.3;
+        transform: translate(-50%, -50%) scale(1);
+        filter: blur(2px);
+    }
+    25% {
+        opacity: 0.4;
+        transform: translate(-50%, -50%) scale(1.05);
+        filter: blur(2.5px);
+    }
+    50% { 
+        opacity: 0.5;
+        transform: translate(-50%, -50%) scale(1.1);
+        filter: blur(3px);
+    }
+    75% {
+        opacity: 0.4;
+        transform: translate(-50%, -50%) scale(1.05);
+        filter: blur(2.5px);
+    }
+}
+
+/* Orbit Glow Animation */
+@keyframes orbitGlow {
+    0%, 100% { 
+        opacity: 0.6;
+        box-shadow: 
+            0 0 15px rgba(255, 255, 255, 0.08),
+            inset 0 0 15px rgba(255, 255, 255, 0.02);
+    }
+    50% { 
+        opacity: 0.8;
+        box-shadow: 
+            0 0 20px rgba(255, 255, 255, 0.12),
+            inset 0 0 20px rgba(255, 255, 255, 0.04);
+    }
+}
+
+/* Asteroid Orbit Animation */
+@keyframes asteroidOrbit {
+    0% { 
+        transform: translate(-50%, -50%) rotate(calc(var(--asteroid-offset, 0deg) + 0deg)) translateX(var(--orbit-radius)) rotate(calc(var(--asteroid-offset, 0deg) * -1 + 0deg)) scale(1); 
+        opacity: 0.8;
+    }
+    50% { 
+        transform: translate(-50%, -50%) rotate(calc(var(--asteroid-offset, 0deg) + 180deg)) translateX(var(--orbit-radius)) rotate(calc(var(--asteroid-offset, 0deg) * -1 + 180deg)) scale(1.1);
+        opacity: 1;
+    }
+    100% { 
+        transform: translate(-50%, -50%) rotate(calc(var(--asteroid-offset, 0deg) + 360deg)) translateX(var(--orbit-radius)) rotate(calc(var(--asteroid-offset, 0deg) * -1 + 360deg)) scale(1); 
+        opacity: 0.8;
+    }
+}
+
+/* KBO Orbit Animation */
+@keyframes kboOrbit {
+    0% { 
+        transform: translate(-50%, -50%) rotate(calc(var(--kbo-offset, 0deg) + 0deg)) translateX(var(--orbit-radius)) rotate(calc(var(--kbo-offset, 0deg) * -1 + 0deg)) scale(1); 
+        opacity: 0.7;
+        filter: brightness(1);
+    }
+    25% {
+        transform: translate(-50%, -50%) rotate(calc(var(--kbo-offset, 0deg) + 90deg)) translateX(var(--orbit-radius)) rotate(calc(var(--kbo-offset, 0deg) * -1 + 90deg)) scale(1.05);
+        opacity: 0.8;
+        filter: brightness(1.1);
+    }
+    50% { 
+        transform: translate(-50%, -50%) rotate(calc(var(--kbo-offset, 0deg) + 180deg)) translateX(var(--orbit-radius)) rotate(calc(var(--kbo-offset, 0deg) * -1 + 180deg)) scale(1.1);
+        opacity: 0.9;
+        filter: brightness(1.2);
+    }
+    75% {
+        transform: translate(-50%, -50%) rotate(calc(var(--kbo-offset, 0deg) + 270deg)) translateX(var(--orbit-radius)) rotate(calc(var(--kbo-offset, 0deg) * -1 + 270deg)) scale(1.05);
+        opacity: 0.8;
+        filter: brightness(1.1);
+    }
+    100% { 
+        transform: translate(-50%, -50%) rotate(calc(var(--kbo-offset, 0deg) + 360deg)) translateX(var(--orbit-radius)) rotate(calc(var(--kbo-offset, 0deg) * -1 + 360deg)) scale(1); 
+        opacity: 0.7;
+        filter: brightness(1);
+    }
+}
+
+/* Comet Trajectory Animation */
+@keyframes cometTrajectory {
+    0% { 
+        transform: translate(-50%, -50%) translateX(-800px) translateY(-400px) scale(0.5);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+        transform: translate(-50%, -50%) translateX(-600px) translateY(-300px) scale(0.7);
+    }
+    50% { 
+        transform: translate(-50%, -50%) translateX(0px) translateY(0px) scale(1);
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+        transform: translate(-50%, -50%) translateX(600px) translateY(300px) scale(0.7);
+    }
+    100% { 
+        transform: translate(-50%, -50%) translateX(800px) translateY(400px) scale(0.5);
+        opacity: 0;
+    }
+}
+
+/* Particle Trail Fade Animation */
+@keyframes trailFade {
+    0% { 
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% { 
+        opacity: 0;
+        transform: scale(0.5);
+    }
+}
+
+/* Sparkle Fade Animation */
+@keyframes sparkleFade {
+    0% { 
+        opacity: 1;
+        transform: scale(1);
+        filter: brightness(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.5);
+        filter: brightness(2);
+    }
+    100% { 
+        opacity: 0;
+        transform: scale(0.5);
+        filter: brightness(1);
     }
 }
 

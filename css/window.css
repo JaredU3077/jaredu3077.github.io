@@ -1,4 +1,4 @@
-/* Window and Window Header Styles - Theme-aware Glass */
+/* Window and Window Header Styles - Unified Glass System */
 .window {
     position: absolute;
     background: var(--window-background) !important;
@@ -6,12 +6,12 @@
     -webkit-backdrop-filter: var(--window-backdrop) !important;
     color: var(--color-text-primary);
     border-radius: var(--radius-lg) !important;
-    box-shadow: var(--shadow-medium) !important;
+    box-shadow: var(--glass-outer-shadow) !important;
     min-width: 340px;
     min-height: 220px;
     border: 1px solid var(--window-border) !important;
     /* Smooth transitions for non-drag operations */
-    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    transition: all var(--transition-normal) !important;
     overflow: hidden;
     z-index: 1000;
     display: flex;
@@ -24,6 +24,34 @@
     -webkit-backface-visibility: hidden;
     /* Enhanced glass positioning */
     isolation: isolate;
+    /* Enhanced 3D transform */
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+
+.window::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.1) 0%, 
+        transparent 40%, 
+        rgba(255, 255, 255, 0.05) 60%, 
+        transparent 100%);
+    opacity: 0.3;
+    mix-blend-mode: screen;
+    z-index: 1;
+    border-radius: inherit;
+    pointer-events: none;
+    animation: glassReflectionShift 15s ease-in-out infinite;
+}
+
+.window:hover {
+    background: var(--window-background-focused) !important;
+    backdrop-filter: var(--glass-blur-heavy) !important;
+    -webkit-backdrop-filter: var(--glass-blur-heavy) !important;
+    box-shadow: var(--glass-hover-shadow) !important;
+    transform: translateZ(10px) !important;
 }
 
 /* Theme 5 Ultra Transparent - No extra glass effects */

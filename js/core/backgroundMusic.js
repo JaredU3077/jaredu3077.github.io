@@ -23,6 +23,15 @@ export class BackgroundMusic {
         this.volumeSlider = null;
         this.volumeProgress = null;
         this.volumeIndicator = null;
+        
+        // Performance optimization properties
+        this.dragAnimationFrame = null;
+        this.boundHandleVolumeDrag = null;
+        this.boundStopVolumeDrag = null;
+        this.sliderCenterX = null;
+        this.sliderCenterY = null;
+        this.sliderRadius = null;
+        this.lastDraggingState = false;
     }
 
     init() {
@@ -239,6 +248,10 @@ export class BackgroundMusic {
         // Initialize volume display
         this.updateVolumeDisplay();
         
+        // Cache bound event handlers to prevent memory leaks
+        this.boundHandleVolumeDrag = this.handleVolumeDrag.bind(this);
+        this.boundStopVolumeDrag = this.stopVolumeDrag.bind(this);
+        
         // Add event listeners for drag functionality only on the volume slider
         this.volumeSlider.addEventListener('mousedown', (e) => this.startVolumeDrag(e));
         this.volumeSlider.addEventListener('touchstart', (e) => this.startVolumeDrag(e));
@@ -257,16 +270,27 @@ export class BackgroundMusic {
         e.preventDefault();
         this.isDragging = true;
         
+        // Add dragging class for CSS optimizations
+        if (this.volumeSlider) {
+            this.volumeSlider.classList.add('dragging');
+        }
+        
+        // Cache slider rect to avoid repeated getBoundingClientRect calls
+        const rect = this.volumeSlider.getBoundingClientRect();
+        this.sliderCenterX = rect.left + rect.width / 2;
+        this.sliderCenterY = rect.top + rect.height / 2;
+        this.sliderRadius = 50; // Cache radius
+        
         // Add visual feedback for dragging
         if (this.volumeSlider) {
             this.volumeSlider.style.cursor = 'grabbing';
         }
         
-        // Add global event listeners
-        document.addEventListener('mousemove', this.handleVolumeDrag.bind(this));
-        document.addEventListener('mouseup', this.stopVolumeDrag.bind(this));
-        document.addEventListener('touchmove', this.handleVolumeDrag.bind(this));
-        document.addEventListener('touchend', this.stopVolumeDrag.bind(this));
+        // Add global event listeners with cached bound functions
+        document.addEventListener('mousemove', this.boundHandleVolumeDrag, { passive: false });
+        document.addEventListener('mouseup', this.boundStopVolumeDrag, { passive: false });
+        document.addEventListener('touchmove', this.boundHandleVolumeDrag, { passive: false });
+        document.addEventListener('touchend', this.boundStopVolumeDrag, { passive: false });
         
         // Handle initial click/touch
         this.handleVolumeDrag(e);
@@ -277,17 +301,23 @@ export class BackgroundMusic {
         
         e.preventDefault();
         
-        const rect = this.volumeSlider.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
+        // Throttle updates to 60fps max
+        if (this.dragAnimationFrame) return;
         
+        this.dragAnimationFrame = requestAnimationFrame(() => {
+            this.dragAnimationFrame = null;
+            this.processVolumeDrag(e);
+        });
+    }
+    
+    processVolumeDrag(e) {
         // Get mouse/touch position
         const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
         const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
         
-        // Calculate distance from center to determine if we're within the dial area
-        const deltaX = clientX - centerX;
-        const deltaY = clientY - centerY;
+        // Use cached center coordinates
+        const deltaX = clientX - this.sliderCenterX;
+        const deltaY = clientY - this.sliderCenterY;
         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
         
         // Only respond if we're within a reasonable distance from the center (dial area)
@@ -314,22 +344,43 @@ export class BackgroundMusic {
         // Apply smooth interpolation for better feel
         volume = Math.max(0, Math.min(1, volume));
         
-        this.setVolume(volume);
+        // Only update if volume actually changed (prevents unnecessary updates)
+        if (Math.abs(this.volume - volume) > 0.01) {
+            this.setVolume(volume);
+        }
     }
     
     stopVolumeDrag() {
+        if (!this.isDragging) return;
+        
         this.isDragging = false;
+        
+        // Remove dragging class for CSS optimizations
+        if (this.volumeSlider) {
+            this.volumeSlider.classList.remove('dragging');
+        }
+        
+        // Cancel any pending animation frame
+        if (this.dragAnimationFrame) {
+            cancelAnimationFrame(this.dragAnimationFrame);
+            this.dragAnimationFrame = null;
+        }
         
         // Reset cursor
         if (this.volumeSlider) {
             this.volumeSlider.style.cursor = 'pointer';
         }
         
-        // Remove global event listeners
-        document.removeEventListener('mousemove', this.handleVolumeDrag.bind(this));
-        document.removeEventListener('mouseup', this.stopVolumeDrag.bind(this));
-        document.removeEventListener('touchmove', this.handleVolumeDrag.bind(this));
-        document.removeEventListener('touchend', this.stopVolumeDrag.bind(this));
+        // Remove global event listeners with cached bound functions
+        document.removeEventListener('mousemove', this.boundHandleVolumeDrag);
+        document.removeEventListener('mouseup', this.boundStopVolumeDrag);
+        document.removeEventListener('touchmove', this.boundHandleVolumeDrag);
+        document.removeEventListener('touchend', this.boundStopVolumeDrag);
+        
+        // Clear cached values
+        this.sliderCenterX = null;
+        this.sliderCenterY = null;
+        this.sliderRadius = null;
     }
     
     setVolume(volume) {
@@ -350,15 +401,19 @@ export class BackgroundMusic {
     updateVolumeDisplay() {
         if (!this.volumeProgress || !this.volumeIndicator) return;
         
-        // Calculate circumference (2 * π * radius) - updated for new size
-        const circumference = 2 * Math.PI * 50;
-        
-        // Calculate stroke-dasharray values with smooth interpolation
+        // Cache calculations to avoid repeated math operations
+        const circumference = 314.159; // 2 * Math.PI * 50 (pre-calculated)
         const progressLength = this.volume * circumference;
         const remainingLength = circumference - progressLength;
         
+        // Batch DOM updates for better performance
+        const updates = [];
+        
         // Update progress circle with smooth transition
-        this.volumeProgress.style.strokeDasharray = `${progressLength.toFixed(2)} ${remainingLength.toFixed(2)}`;
+        const strokeDasharray = `${progressLength.toFixed(1)} ${remainingLength.toFixed(1)}`;
+        if (this.volumeProgress.style.strokeDasharray !== strokeDasharray) {
+            this.volumeProgress.style.strokeDasharray = strokeDasharray;
+        }
         
         // Update indicator position with improved precision
         const angle = this.volume * 360 - 90; // Start from top (-90 degrees)
@@ -366,16 +421,28 @@ export class BackgroundMusic {
         const x = 60 + radius * Math.cos(angle * Math.PI / 180);
         const y = 60 + radius * Math.sin(angle * Math.PI / 180);
         
-        this.volumeIndicator.setAttribute('cx', x.toFixed(2));
-        this.volumeIndicator.setAttribute('cy', y.toFixed(2));
+        const cx = x.toFixed(1);
+        const cy = y.toFixed(1);
         
-        // Add subtle visual feedback during dragging
-        if (this.isDragging) {
-            this.volumeProgress.style.filter = 'drop-shadow(0 0 16px var(--primary-color))';
-            this.volumeIndicator.style.filter = 'drop-shadow(0 0 12px var(--primary-color))';
-        } else {
-            this.volumeProgress.style.filter = 'drop-shadow(0 0 12px var(--primary-color))';
-            this.volumeIndicator.style.filter = 'drop-shadow(0 0 8px var(--primary-color))';
+        if (this.volumeIndicator.getAttribute('cx') !== cx) {
+            this.volumeIndicator.setAttribute('cx', cx);
+        }
+        if (this.volumeIndicator.getAttribute('cy') !== cy) {
+            this.volumeIndicator.setAttribute('cy', cy);
+        }
+        
+        // Only update filters if dragging state changed
+        const isDragging = this.isDragging;
+        if (this.lastDraggingState !== isDragging) {
+            this.lastDraggingState = isDragging;
+            
+            if (isDragging) {
+                this.volumeProgress.style.filter = 'drop-shadow(0 0 4px var(--primary-color))';
+                this.volumeIndicator.style.filter = 'drop-shadow(0 0 3px var(--primary-color))';
+            } else {
+                this.volumeProgress.style.filter = 'drop-shadow(0 0 8px var(--primary-color))';
+                this.volumeIndicator.style.filter = 'drop-shadow(0 0 6px var(--primary-color))';
+            }
         }
     }
     
