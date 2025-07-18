@@ -290,13 +290,45 @@ export class ThemeManager {
         root.style.setProperty('--color-accent-yellow', theme.accentYellow);
         root.style.setProperty('--color-accent-blue', theme.accentBlue);
         
-        // Glass morphism system - Keep original glass effects for orbs
-        // Don't override glass backgrounds with theme colors to preserve orb appearance
-        // root.style.setProperty('--glass-background', theme.windowBg);
-        // root.style.setProperty('--glass-background-light', theme.windowBg);
-        // root.style.setProperty('--glass-background-medium', theme.windowBg);
-        // root.style.setProperty('--glass-background-heavy', theme.windowBg);
-        // root.style.setProperty('--glass-background-ultra', theme.windowBg);
+        // Glass morphism system - Apply theme colors to glass effects
+        // Create theme-aware glass backgrounds that adapt to the current theme
+        const glassBaseColor = this.extractGlassColor(theme.windowBg);
+        const glassLight = this.createGlassBackground(glassBaseColor, 0.04);
+        const glassMedium = this.createGlassBackground(glassBaseColor, 0.08);
+        const glassHeavy = this.createGlassBackground(glassBaseColor, 0.12);
+        const glassUltra = this.createGlassBackground(glassBaseColor, 0.16);
+        
+        root.style.setProperty('--glass-background', glassMedium);
+        root.style.setProperty('--glass-background-light', glassLight);
+        root.style.setProperty('--glass-background-medium', glassMedium);
+        root.style.setProperty('--glass-background-heavy', glassHeavy);
+        root.style.setProperty('--glass-background-ultra', glassUltra);
+        
+        // Update glass shadows to use theme colors
+        const glassShadowColor = this.extractGlassColor(theme.primary);
+        root.style.setProperty('--glass-shadow-color', glassShadowColor);
+        root.style.setProperty('--glass-edge-glow', `0 0 8px ${glassShadowColor}`);
+        
+        // Update glass outer and hover shadows to use theme colors
+        const glassBorderColor = this.createGlassBackground(glassShadowColor, 0.08);
+        const glassHoverBorderColor = this.createGlassBackground(glassShadowColor, 0.12);
+        root.style.setProperty('--glass-outer-shadow', `0 12px 40px rgba(0, 0, 0, 0.25), 0 0 0 1px ${glassBorderColor}`);
+        root.style.setProperty('--glass-hover-shadow', `0 16px 50px rgba(0, 0, 0, 0.3), 0 0 0 1px ${glassHoverBorderColor}`);
+        
+        // Update glass inner shadow to use theme colors
+        const glassInnerColor = this.createGlassBackground(glassShadowColor, 0.15);
+        root.style.setProperty('--glass-inner-shadow', `inset 0 1px 0 ${glassInnerColor}`);
+        
+        // Update glass tint to use theme colors
+        const tintColor = this.extractRGB(theme.primary);
+        root.style.setProperty('--glass-tint-color', tintColor);
+        
+        // Update glass reflection colors to use theme colors
+        const reflectionBaseColor = this.extractRGB(theme.textColor);
+        root.style.setProperty('--glass-reflection-light', `rgba(${reflectionBaseColor}, 0.4)`);
+        root.style.setProperty('--glass-reflection-medium', `rgba(${reflectionBaseColor}, 0.2)`);
+        root.style.setProperty('--glass-reflection-subtle', `rgba(${reflectionBaseColor}, 0.1)`);
+        root.style.setProperty('--glass-reflection-faint', `rgba(${reflectionBaseColor}, 0.05)`);
         
         // Shadow system - Theme-aware shadows
         const shadowColor = theme.primaryGlow || theme.primary;
@@ -391,5 +423,65 @@ export class ThemeManager {
             window.themeManagerInstance = new ThemeManager();
         }
         return window.themeManagerInstance;
+    }
+    
+    // Helper methods for glass morphism theming
+    
+    /**
+     * Extract the base color from a CSS color value for glass effects
+     * @param {string} color - CSS color value (hex, rgb, rgba)
+     * @returns {string} - RGB color string
+     */
+    extractGlassColor(color) {
+        // Handle rgba values
+        if (color.startsWith('rgba')) {
+            const match = color.match(/rgba?\(([^)]+)\)/);
+            if (match) {
+                const parts = match[1].split(',').map(p => p.trim());
+                const r = parseInt(parts[0]);
+                const g = parseInt(parts[1]);
+                const b = parseInt(parts[2]);
+                return `${r}, ${g}, ${b}`;
+            }
+        }
+        
+        // Handle rgb values
+        if (color.startsWith('rgb')) {
+            const match = color.match(/rgb\(([^)]+)\)/);
+            if (match) {
+                return match[1];
+            }
+        }
+        
+        // Handle hex values
+        if (color.startsWith('#')) {
+            const hex = color.replace('#', '');
+            const r = parseInt(hex.substr(0, 2), 16);
+            const g = parseInt(hex.substr(2, 2), 16);
+            const b = parseInt(hex.substr(4, 2), 16);
+            return `${r}, ${g}, ${b}`;
+        }
+        
+        // Default fallback
+        return '255, 255, 255';
+    }
+    
+    /**
+     * Extract RGB values from a CSS color
+     * @param {string} color - CSS color value
+     * @returns {string} - RGB values as comma-separated string
+     */
+    extractRGB(color) {
+        return this.extractGlassColor(color);
+    }
+    
+    /**
+     * Create a glass background color with specified opacity
+     * @param {string} baseColor - RGB color string
+     * @param {number} opacity - Opacity value (0-1)
+     * @returns {string} - RGBA color string
+     */
+    createGlassBackground(baseColor, opacity) {
+        return `rgba(${baseColor}, ${opacity})`;
     }
 } 

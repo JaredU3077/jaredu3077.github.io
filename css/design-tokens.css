@@ -94,6 +94,12 @@
     --glass-reflection-intensity: 0.4;
     --glass-edge-glow-intensity: 0.2;
     
+    /* Theme-aware Glass Reflection Colors */
+    --glass-reflection-light: rgba(255, 255, 255, 0.4);
+    --glass-reflection-medium: rgba(255, 255, 255, 0.2);
+    --glass-reflection-subtle: rgba(255, 255, 255, 0.1);
+    --glass-reflection-faint: rgba(255, 255, 255, 0.05);
+    
     /* ===== WINDOW SYSTEM ===== */
     
     /* Window Backgrounds - Unified with glass system */

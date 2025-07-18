@@ -535,14 +535,40 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Show the audio controls with a fade-in effect
             setTimeout(() => {
                 audioControls.classList.add('show');
-            }, 50);
+            }, 100);
+            
+            // Try to setup volume slider immediately after DOM insertion
+            if (window.backgroundMusicInstance) {
+                window.backgroundMusicInstance.setupVolumeSlider();
+            }
             
             // Initialize audio controls after they're added to DOM
             setTimeout(() => {
-                if (window.neuOS && window.neuOS.backgroundMusicInstance) {
-                    window.neuOS.backgroundMusicInstance.setupVolumeSlider();
+                if (window.backgroundMusicInstance) {
+                    window.backgroundMusicInstance.setupVolumeSliderAfterLogin();
+                } else {
+                    console.error('Background music instance not found');
                 }
-            }, 100);
+            }, 200);
+            
+            // Additional retry mechanism to ensure volume slider is set up
+            const setupVolumeSliderWithRetry = () => {
+                if (window.backgroundMusicInstance) {
+                    window.backgroundMusicInstance.setupVolumeSlider();
+                    if (!window.backgroundMusicInstance.volumeSlider) {
+                        // If still not found, retry after a longer delay
+                        setTimeout(() => {
+                            if (window.backgroundMusicInstance) {
+                                window.backgroundMusicInstance.setupVolumeSlider();
+                            }
+                        }, 500);
+                    }
+                }
+            };
+            
+            // Try multiple times to ensure setup
+            setTimeout(setupVolumeSliderWithRetry, 300);
+            setTimeout(setupVolumeSliderWithRetry, 600);
         }
 
         // Show widget only after login completion

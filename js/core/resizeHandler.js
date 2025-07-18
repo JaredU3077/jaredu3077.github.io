@@ -407,14 +407,22 @@ export class ResizeHandler {
         const finalWidth = this.activeResize.windowObj.width;
         const finalHeight = this.activeResize.windowObj.height;
         
+        // Smoothly transition back to normal state
+        this.activeResize.windowElement.style.transition = 'all 0.1s ease-out';
         this.activeResize.windowElement.style.transform = '';
         this.activeResize.windowElement.style.left = `${finalLeft}px`;
         this.activeResize.windowElement.style.top = `${finalTop}px`;
         this.activeResize.windowElement.style.width = `${finalWidth}px`;
         this.activeResize.windowElement.style.height = `${finalHeight}px`;
         
-        // Remove resizing class
-        this.activeResize.windowElement.classList.remove('resizing');
+        // Remove resizing class after a short delay to allow smooth transition
+        setTimeout(() => {
+            this.activeResize.windowElement.classList.remove('resizing');
+            // Reset transition after removing resizing class
+            setTimeout(() => {
+                this.activeResize.windowElement.style.transition = '';
+            }, 100);
+        }, 50);
         
         // Special cleanup for terminal window
         if (this.activeResize.windowElement.id === 'terminalWindow') {

@@ -25,18 +25,19 @@ export class BackgroundMusic {
         this.volumeIndicator = null;
         
         // Performance optimization properties
-        this.dragAnimationFrame = null;
         this.boundHandleVolumeDrag = null;
         this.boundStopVolumeDrag = null;
+        this.boundToggleBackgroundMusic = null;
         this.sliderCenterX = null;
         this.sliderCenterY = null;
         this.sliderRadius = null;
         this.lastDraggingState = false;
+        this.animationFrameId = null;
     }
 
     init() {
         this.setupBackgroundMusic();
-        this.setupVolumeSlider();
+        // Don't setup volume slider here - it will be done after login when audio controls are added
     }
 
     setupBackgroundMusic() {
@@ -113,8 +114,8 @@ export class BackgroundMusic {
         // Modern browsers require user interaction before playing audio
         const playMusic = () => {
             this.backgroundMusic.play().then(() => {
-                // Add visual indicator that music is playing
-                this.showMusicIndicator();
+                // Music started successfully
+                console.log('Background music started successfully');
             }).catch(error => {
                 // Silently handle autoplay policy errors - this is expected
                 if (error.name === 'NotAllowedError') {
@@ -156,16 +157,32 @@ export class BackgroundMusic {
     }
 
     toggleBackgroundMusic() {
+        console.log('toggleBackgroundMusic called', { 
+            musicEnabled: this.musicEnabled, 
+            toggleInProgress: this.toggleInProgress 
+        });
+        
         // Prevent rapid clicking
         if (this.toggleInProgress) {
+            console.log('Toggle in progress, ignoring click');
             return;
         }
         
         this.toggleInProgress = true;
         
+        // Add animation class for visual feedback
+        if (this.audioToggle) {
+            this.audioToggle.classList.add('audio-state-changing');
+            // Remove animation class after animation completes
+            setTimeout(() => {
+                this.audioToggle.classList.remove('audio-state-changing');
+            }, 300);
+        }
+        
         // Simple toggle logic
         if (this.musicEnabled) {
             // Disable music
+            console.log('Disabling music');
             this.musicEnabled = false;
             this.userManuallyDisabled = true;
             localStorage.setItem('neuos-music', 'false');
@@ -175,13 +192,14 @@ export class BackgroundMusic {
             }
         } else {
             // Enable music
+            console.log('Enabling music');
             this.musicEnabled = true;
             this.userManuallyDisabled = false;
             localStorage.setItem('neuos-music', 'true');
             
             if (this.backgroundMusic && this.backgroundMusic.paused) {
                 this.backgroundMusic.play().then(() => {
-                    // Music resumed successfully
+                    console.log('Music resumed successfully');
                 }).catch(error => {
                     console.warn('Could not resume background music:', error);
                 });
@@ -198,10 +216,19 @@ export class BackgroundMusic {
 
     updateAudioControls() {
         const audioToggle = document.getElementById('audioToggle');
-        if (!audioToggle) return;
+        if (!audioToggle) {
+            console.warn('Audio toggle element not found in updateAudioControls');
+            return;
+        }
         
         const audioOn = audioToggle.querySelector('.audio-on');
         const audioOff = audioToggle.querySelector('.audio-off');
+        
+        console.log('updateAudioControls', { 
+            musicEnabled: this.musicEnabled,
+            audioOn: !!audioOn,
+            audioOff: !!audioOff
+        });
         
         if (this.musicEnabled) {
             audioOn.style.display = 'block';
@@ -240,8 +267,15 @@ export class BackgroundMusic {
         this.volumeIndicator = document.querySelector('.volume-indicator');
         this.audioToggle = document.getElementById('audioToggle');
         
+        console.log('setupVolumeSlider - Elements found:', {
+            volumeSlider: !!this.volumeSlider,
+            volumeProgress: !!this.volumeProgress,
+            volumeIndicator: !!this.volumeIndicator,
+            audioToggle: !!this.audioToggle
+        });
+        
         if (!this.volumeSlider || !this.volumeProgress || !this.volumeIndicator) {
-            console.warn('Volume slider elements not found');
+            console.warn('Volume slider elements not found - audio controls may not be loaded yet');
             return;
         }
         
@@ -251,19 +285,31 @@ export class BackgroundMusic {
         // Cache bound event handlers to prevent memory leaks
         this.boundHandleVolumeDrag = this.handleVolumeDrag.bind(this);
         this.boundStopVolumeDrag = this.stopVolumeDrag.bind(this);
+        this.boundToggleBackgroundMusic = this.toggleBackgroundMusic.bind(this);
         
-        // Add event listeners for drag functionality only on the volume slider
-        this.volumeSlider.addEventListener('mousedown', (e) => this.startVolumeDrag(e));
-        this.volumeSlider.addEventListener('touchstart', (e) => this.startVolumeDrag(e));
+        // Add event listeners for drag functionality using pointerdown for consistency
+        this.volumeSlider.addEventListener('pointerdown', (e) => {
+            console.log('Volume slider pointerdown event triggered');
+            this.startVolumeDrag(e);
+        });
         
-        // Prevent dragging on the audio toggle button
+        // Set up audio toggle button functionality
         if (this.audioToggle) {
-            this.audioToggle.addEventListener('mousedown', (e) => e.stopPropagation());
-            this.audioToggle.addEventListener('touchstart', (e) => e.stopPropagation());
+            // Remove any existing listeners to prevent duplicates
+            this.audioToggle.removeEventListener('click', this.boundToggleBackgroundMusic);
+            // Add the click listener for toggling music
+            this.audioToggle.addEventListener('click', () => {
+                console.log('Audio toggle clicked');
+                this.toggleBackgroundMusic();
+            });
+            // Prevent dragging on the audio toggle button
+            this.audioToggle.addEventListener('pointerdown', (e) => e.stopPropagation());
         }
         
         // Prevent context menu on right click
         this.volumeSlider.addEventListener('contextmenu', (e) => e.preventDefault());
+        
+        console.log('Volume slider setup complete - event listeners added');
     }
     
     startVolumeDrag(e) {
@@ -286,11 +332,9 @@ export class BackgroundMusic {
             this.volumeSlider.style.cursor = 'grabbing';
         }
         
-        // Add global event listeners with cached bound functions
-        document.addEventListener('mousemove', this.boundHandleVolumeDrag, { passive: false });
-        document.addEventListener('mouseup', this.boundStopVolumeDrag, { passive: false });
-        document.addEventListener('touchmove', this.boundHandleVolumeDrag, { passive: false });
-        document.addEventListener('touchend', this.boundStopVolumeDrag, { passive: false });
+        // Add global event listeners with cached bound functions using pointer events
+        document.addEventListener('pointermove', this.boundHandleVolumeDrag, { passive: false });
+        document.addEventListener('pointerup', this.boundStopVolumeDrag, { passive: false });
         
         // Handle initial click/touch
         this.handleVolumeDrag(e);
@@ -301,53 +345,54 @@ export class BackgroundMusic {
         
         e.preventDefault();
         
-        // Throttle updates to 60fps max
-        if (this.dragAnimationFrame) return;
-        
-        this.dragAnimationFrame = requestAnimationFrame(() => {
-            this.dragAnimationFrame = null;
-            this.processVolumeDrag(e);
-        });
+        // Use requestAnimationFrame for smoother updates
+        if (!this.animationFrameId) {
+            this.animationFrameId = requestAnimationFrame(() => {
+                this.processVolumeDrag(e);
+                this.animationFrameId = null;
+            });
+        }
     }
     
     processVolumeDrag(e) {
-        // Get mouse/touch position
-        const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
-        const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+        // Get pointer position (works for both mouse and touch)
+        const clientX = e.clientX;
+        const clientY = e.clientY;
         
         // Use cached center coordinates
         const deltaX = clientX - this.sliderCenterX;
         const deltaY = clientY - this.sliderCenterY;
         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
         
-        // Only respond if we're within a reasonable distance from the center (dial area)
-        const minRadius = 30; // Minimum distance from center
-        const maxRadius = 75; // Maximum distance from center
+        // Exclude the center area where the mute button is (39px radius for 78px button)
+        const muteButtonRadius = 39; // Half of 78px button size
+        const minRadius = 40; // Start volume control closer to center for better reach
+        const maxRadius = 90; // Allow further from center for better reach
         
+        // Don't process volume changes if clicking in the mute button area
+        if (distance < muteButtonRadius) {
+            return;
+        }
+        
+        // Only respond if we're within the volume control area
         if (distance < minRadius || distance > maxRadius) {
             return;
         }
         
-        // Calculate angle from center
+        // Calculate angle from center with improved precision
         let angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
         
         // Convert to 0-360 range starting from top (12 o'clock position)
         angle = (angle + 90 + 360) % 360;
         
-        // Convert angle to volume (0-1) with improved precision
-        let volume = angle / 360;
+        // Direct volume calculation for immediate response (no interpolation)
+        const volume = angle / 360;
         
-        // Add some resistance at the edges for better control
-        if (volume < 0.05) volume = 0;
-        if (volume > 0.95) volume = 1;
+        // Clamp to valid range and update immediately for responsive feel
+        const clampedVolume = Math.max(0, Math.min(1, volume));
         
-        // Apply smooth interpolation for better feel
-        volume = Math.max(0, Math.min(1, volume));
-        
-        // Only update if volume actually changed (prevents unnecessary updates)
-        if (Math.abs(this.volume - volume) > 0.01) {
-            this.setVolume(volume);
-        }
+        // Update volume immediately for responsive feel
+        this.setVolume(clampedVolume);
     }
     
     stopVolumeDrag() {
@@ -355,15 +400,15 @@ export class BackgroundMusic {
         
         this.isDragging = false;
         
+        // Cancel any pending animation frame
+        if (this.animationFrameId) {
+            cancelAnimationFrame(this.animationFrameId);
+            this.animationFrameId = null;
+        }
+        
         // Remove dragging class for CSS optimizations
         if (this.volumeSlider) {
             this.volumeSlider.classList.remove('dragging');
-        }
-        
-        // Cancel any pending animation frame
-        if (this.dragAnimationFrame) {
-            cancelAnimationFrame(this.dragAnimationFrame);
-            this.dragAnimationFrame = null;
         }
         
         // Reset cursor
@@ -372,10 +417,8 @@ export class BackgroundMusic {
         }
         
         // Remove global event listeners with cached bound functions
-        document.removeEventListener('mousemove', this.boundHandleVolumeDrag);
-        document.removeEventListener('mouseup', this.boundStopVolumeDrag);
-        document.removeEventListener('touchmove', this.boundHandleVolumeDrag);
-        document.removeEventListener('touchend', this.boundStopVolumeDrag);
+        document.removeEventListener('pointermove', this.boundHandleVolumeDrag);
+        document.removeEventListener('pointerup', this.boundStopVolumeDrag);
         
         // Clear cached values
         this.sliderCenterX = null;
@@ -406,10 +449,7 @@ export class BackgroundMusic {
         const progressLength = this.volume * circumference;
         const remainingLength = circumference - progressLength;
         
-        // Batch DOM updates for better performance
-        const updates = [];
-        
-        // Update progress circle with smooth transition
+        // Update progress circle with faster transition for better responsiveness
         const strokeDasharray = `${progressLength.toFixed(1)} ${remainingLength.toFixed(1)}`;
         if (this.volumeProgress.style.strokeDasharray !== strokeDasharray) {
             this.volumeProgress.style.strokeDasharray = strokeDasharray;
@@ -424,6 +464,7 @@ export class BackgroundMusic {
         const cx = x.toFixed(1);
         const cy = y.toFixed(1);
         
+        // Only update if position actually changed
         if (this.volumeIndicator.getAttribute('cx') !== cx) {
             this.volumeIndicator.setAttribute('cx', cx);
         }
@@ -437,15 +478,37 @@ export class BackgroundMusic {
             this.lastDraggingState = isDragging;
             
             if (isDragging) {
-                this.volumeProgress.style.filter = 'drop-shadow(0 0 4px var(--primary-color))';
-                this.volumeIndicator.style.filter = 'drop-shadow(0 0 3px var(--primary-color))';
+                // Enhanced visual feedback during dragging
+                this.volumeProgress.style.filter = 'drop-shadow(0 0 8px var(--primary-color)) brightness(1.2)';
+                this.volumeIndicator.style.filter = 'drop-shadow(0 0 6px var(--primary-color)) brightness(1.3)';
             } else {
-                this.volumeProgress.style.filter = 'drop-shadow(0 0 8px var(--primary-color))';
-                this.volumeIndicator.style.filter = 'drop-shadow(0 0 6px var(--primary-color))';
+                // Normal state with subtle glow
+                this.volumeProgress.style.filter = 'drop-shadow(0 0 12px var(--primary-color))';
+                this.volumeIndicator.style.filter = 'drop-shadow(0 0 8px var(--primary-color))';
             }
         }
     }
     
+    // Method to setup volume slider after audio controls are added to DOM
+    setupVolumeSliderAfterLogin() {
+        console.log('setupVolumeSliderAfterLogin called');
+        // Wait a bit for DOM to be ready
+        setTimeout(() => {
+            console.log('Attempting to setup volume slider...');
+            this.setupVolumeSlider();
+            
+            // If elements still not found, retry once more
+            if (!this.volumeSlider || !this.volumeProgress || !this.volumeIndicator) {
+                console.log('Elements not found, retrying...');
+                setTimeout(() => {
+                    this.setupVolumeSlider();
+                }, 200);
+            } else {
+                console.log('Volume slider setup successful');
+            }
+        }, 100);
+    }
+
     // Expose methods globally for other components
     static getInstance() {
         if (!window.backgroundMusicInstance) {

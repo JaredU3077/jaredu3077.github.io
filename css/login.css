@@ -384,7 +384,13 @@
     right: 15px;
     z-index: 10000;
     opacity: 0;
-    animation: audioControlsFadeIn 1s ease-out 2s forwards;
+    visibility: hidden;
+    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+}
+
+.audio-controls.show {
+    opacity: 1;
+    visibility: visible;
 }
 
 /* Audio Orb Container - 4th Glass Orb */
@@ -395,6 +401,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    pointer-events: all;
 }
 
 /* Main Glass Orb */
@@ -421,6 +428,7 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    pointer-events: all;
 }
 
 .audio-orb-glass::before {
@@ -477,7 +485,19 @@
     width: 120px;
     height: 120px;
     pointer-events: all;
-    z-index: 2;
+    z-index: 20;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    transition: all 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.volume-slider.dragging {
+    transform: scale(1.03);
+    filter: drop-shadow(0 0 15px rgba(99, 102, 241, 0.4));
+    transition: all 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 /* Volume Track (background circle) */
@@ -490,19 +510,33 @@
 
 /* Volume Progress (filled circle) */
 .volume-progress {
-    transition: stroke-dasharray 0.3s ease;
+    transition: stroke-dasharray 0.08s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     stroke: url(#volumeGradient);
     stroke-width: 6;
     filter: drop-shadow(0 0 16px var(--primary-color));
 }
 
+.volume-slider.dragging .volume-progress {
+    filter: drop-shadow(0 0 20px var(--primary-color)) brightness(1.1);
+    stroke-width: 7;
+    transition: stroke-dasharray 0.05s linear;
+}
+
 /* Volume Indicator Dot */
 .volume-indicator {
-    transition: all 0.3s ease;
+    transition: all 0.08s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     fill: url(#indicatorGradient);
     r: 6;
     filter: drop-shadow(0 0 12px var(--primary-color));
 }
+
+.volume-slider.dragging .volume-indicator {
+    r: 7;
+    filter: drop-shadow(0 0 16px var(--primary-color)) brightness(1.2);
+    transition: all 0.05s linear;
+}
+
+
 
 
 
@@ -520,7 +554,7 @@
     border: 1px solid var(--color-border-subtle);
     color: var(--color-text-primary);
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -532,11 +566,14 @@
         inset 0 0 15px rgba(255, 255, 255, 0.05);
     position: relative;
     overflow: hidden;
-    z-index: 3;
+    z-index: 30;
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+    pointer-events: all;
+    touch-action: none;
+    transform: scale(1);
 }
 
 .audio-orb-button::before {
@@ -582,15 +619,28 @@
         inset 0 2px 0 rgba(255, 255, 255, 0.25),
         inset 0 -2px 0 rgba(0, 0, 0, 0.2),
         inset 0 0 20px rgba(255, 255, 255, 0.08);
+    transform: scale(1.05);
 }
 
 .audio-orb-button:active {
-    transform: scale(0.98);
+    transform: scale(0.95);
+    transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 
         0 4px 16px rgba(0, 0, 0, 0.2), 
         0 0 0 1px rgba(255, 255, 255, 0.1),
         inset 0 1px 0 rgba(255, 255, 255, 0.1),
         inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+}
+
+.audio-orb-button:focus {
+    outline: none;
+    box-shadow: 
+        0 8px 24px rgba(0, 0, 0, 0.3), 
+        0 0 0 1px rgba(255, 255, 255, 0.15),
+        0 0 0 3px rgba(99, 102, 241, 0.3),
+        inset 0 2px 0 rgba(255, 255, 255, 0.2),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.15),
+        inset 0 0 15px rgba(255, 255, 255, 0.05);
 }
 
 .audio-orb-inner {
@@ -599,25 +649,39 @@
     justify-content: center;
     width: 100%;
     height: 100%;
-    transition: all 0.3s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     z-index: 2;
+    transform: scale(1);
 }
 
 .audio-orb-button:hover .audio-orb-inner {
-    transform: scale(1.05);
+    transform: scale(1.1);
+}
+
+.audio-orb-button:active .audio-orb-inner {
+    transform: scale(0.9);
+    transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .audio-orb-button .audio-on,
 .audio-orb-button .audio-off {
     filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.3));
-    transition: all 0.3s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: scale(1);
 }
 
 .audio-orb-button:hover .audio-on,
 .audio-orb-button:hover .audio-off {
     filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
-    transform: scale(1.1);
+    transform: scale(1.15);
+}
+
+.audio-orb-button:active .audio-on,
+.audio-orb-button:active .audio-off {
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.2));
+    transform: scale(0.95);
+    transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 
@@ -653,11 +717,6 @@
 @keyframes loginLogoFloat {
     0%, 100% { transform: translateY(0px); }
     50% { transform: translateY(-5px); }
-}
-
-@keyframes audioControlsFadeIn {
-    0% { opacity: 0; transform: translateY(-10px); }
-    100% { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes logoPulse {
@@ -725,4 +784,34 @@
     opacity: 1 !important;
     visibility: visible !important;
     transition: opacity var(--transition-slow) ease-out !important;
+} 
+
+/* Audio state change animation */
+@keyframes audioStateChange {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.audio-orb-button.audio-state-changing {
+    animation: audioStateChange 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Audio icon transition animation */
+@keyframes audioIconFade {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.audio-orb-button .audio-on,
+.audio-orb-button .audio-off {
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.3));
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: scale(1);
+}
+
+.audio-orb-button.audio-state-changing .audio-on,
+.audio-orb-button.audio-state-changing .audio-off {
+    animation: audioIconFade 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 } 

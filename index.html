@@ -161,53 +161,7 @@
         Your browser does not support the audio element.
     </audio>
 
-    <!-- Audio Controls - 4th Glass Orb -->
-    <div id="audioControls" class="audio-controls">
-        <div class="audio-orb-container">
-            <!-- Outer glass orb -->
-            <div class="audio-orb-glass">
-                <!-- Volume slider ring -->
-                <svg class="volume-slider" viewBox="0 0 120 120" width="120" height="120">
-                    <defs>
-                        <!-- Volume progress gradient -->
-                        <linearGradient id="volumeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:var(--primary-color);stop-opacity:1" />
-                            <stop offset="50%" style="stop-color:var(--primary-color);stop-opacity:0.8" />
-                            <stop offset="100%" style="stop-color:var(--primary-color);stop-opacity:1" />
-                        </linearGradient>
-                        <!-- Indicator gradient -->
-                        <radialGradient id="indicatorGradient" cx="50%" cy="50%" r="50%">
-                            <stop offset="0%" style="stop-color:var(--color-text-primary);stop-opacity:1" />
-                            <stop offset="70%" style="stop-color:var(--primary-color);stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:var(--primary-color);stop-opacity:0.8" />
-                        </radialGradient>
-                    </defs>
-                    <!-- Background track -->
-                    <circle class="volume-track" cx="60" cy="60" r="50" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="6"/>
-                    <!-- Volume progress -->
-                    <circle class="volume-progress" cx="60" cy="60" r="50" fill="none" stroke="url(#volumeGradient)" stroke-width="6" 
-                            stroke-dasharray="0 314" stroke-linecap="round" transform="rotate(-90 60 60)"/>
-                    <!-- Volume indicator -->
-                    <circle class="volume-indicator" cx="60" cy="10" r="6" fill="url(#indicatorGradient)" opacity="0.9"/>
-                </svg>
-                
-                <!-- Central audio button orb -->
-                <button id="audioToggle" class="audio-orb-button" title="Toggle Background Music">
-                    <div class="audio-orb-inner">
-                        <svg class="audio-on" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.08"/>
-                        </svg>
-                        <svg class="audio-off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
-                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-                            <line x1="23" y1="9" x2="17" y2="15"/>
-                            <line x1="17" y1="9" x2="23" y2="15"/>
-                        </svg>
-                    </div>
-                </button>
-            </div>
-        </div>
-    </div>
+
 
     <div id="desktop" role="main" aria-label="neuOS Desktop" style="opacity: 0; visibility: hidden;">
         <!-- Enhanced particle background system -->

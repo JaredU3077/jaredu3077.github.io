@@ -245,7 +245,8 @@ export class BootSequence {
         // Start background music when desktop is ready and user has interacted
         setTimeout(() => {
             if (window.backgroundMusicInstance) {
-                // Try to start music, but don't worry if it fails due to autoplay policy
+                window.backgroundMusicInstance.musicEnabled = true;
+                localStorage.setItem('neuos-music', 'true');
                 window.backgroundMusicInstance.startBackgroundMusic();
             }
         }, 1000);
