@@ -4,36 +4,39 @@
 :root {
     /* Glass effect variables - now use standardized tokens */
     --glass-shadow-offset: 0;
-    --glass-shadow-blur: 12px;
-    --glass-shadow-spread: -3px;
-    --glass-shadow-color: rgba(255, 255, 255, 0.8);
+    --glass-shadow-blur: 16px;
+    --glass-shadow-spread: -4px;
+    --glass-shadow-color: rgba(255, 255, 255, 0.9);
     
     /* Glass tint variables - Theme-aware */
     --glass-tint-color: 255, 255, 255;
-    --glass-tint-opacity: 0.015;
+    --glass-tint-opacity: 0.02;
     
     /* Glass frost variables */
-    --glass-frost-blur: 4px;
+    --glass-frost-blur: 6px;
     
     /* Glass noise/distortion variables */
-    --glass-noise-frequency: 0.008;
-    --glass-distortion-strength: 25;
+    --glass-noise-frequency: 0.01;
+    --glass-distortion-strength: 30;
     
     /* Glass shadow variables */
     --glass-outer-shadow-blur: var(--glass-shadow-blur);
     
     /* Enhanced glass effects - Theme-aware */
-    --glass-reflection-intensity: 0.3;
-    --glass-edge-glow-intensity: 0.15;
-    --glass-inner-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    --glass-outer-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.05);
-    --glass-hover-shadow: 0 12px 40px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    --glass-reflection-intensity: 0.4;
+    --glass-edge-glow-intensity: 0.2;
+    --glass-inner-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.15), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+    --glass-outer-shadow: 0 12px 40px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.08);
+    --glass-hover-shadow: 0 20px 60px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.12);
     
     /* Theme-aware glass reflection colors */
-    --glass-reflection-light: rgba(255, 255, 255, 0.4);
-    --glass-reflection-medium: rgba(255, 255, 255, 0.2);
-    --glass-reflection-subtle: rgba(255, 255, 255, 0.1);
-    --glass-reflection-faint: rgba(255, 255, 255, 0.05);
+    --glass-reflection-light: rgba(255, 255, 255, 0.5);
+    --glass-reflection-medium: rgba(255, 255, 255, 0.25);
+    --glass-reflection-subtle: rgba(255, 255, 255, 0.15);
+    --glass-reflection-faint: rgba(255, 255, 255, 0.08);
+    
+    /* Enhanced edge glow */
+    --glass-edge-glow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 0 20px rgba(99, 102, 241, 0.1);
 }
 
 /* Enhanced Glass Container - Premium Design */
@@ -110,13 +113,23 @@
 }
 
 @keyframes glassReflectionShift {
-    0%, 100% { 
+    0% { 
         background: linear-gradient(135deg, 
             var(--glass-reflection-light) 0%, 
             var(--glass-reflection-subtle) 25%, 
             transparent 50%, 
             var(--glass-reflection-faint) 75%, 
             transparent 100%);
+        opacity: 0.4;
+    }
+    25% { 
+        background: linear-gradient(180deg, 
+            var(--glass-reflection-medium) 0%, 
+            var(--glass-reflection-faint) 30%, 
+            transparent 60%, 
+            var(--glass-reflection-subtle) 80%, 
+            transparent 100%);
+        opacity: 0.35;
     }
     50% { 
         background: linear-gradient(225deg, 
@@ -125,6 +138,25 @@
             transparent 60%, 
             var(--glass-reflection-subtle) 80%, 
             transparent 100%);
+        opacity: 0.45;
+    }
+    75% { 
+        background: linear-gradient(270deg, 
+            var(--glass-reflection-subtle) 0%, 
+            transparent 40%, 
+            var(--glass-reflection-medium) 60%, 
+            var(--glass-reflection-faint) 85%, 
+            transparent 100%);
+        opacity: 0.3;
+    }
+    100% { 
+        background: linear-gradient(135deg, 
+            var(--glass-reflection-light) 0%, 
+            var(--glass-reflection-subtle) 25%, 
+            transparent 50%, 
+            var(--glass-reflection-faint) 75%, 
+            transparent 100%);
+        opacity: 0.4;
     }
 }
 
@@ -455,11 +487,19 @@
     cursor: grab !important;
     isolation: isolate !important;
     touch-action: none;
-    /* Enhanced shadow with more shine */
-    box-shadow: 0px 8px var(--glass-outer-shadow-blur) rgba(0, 0, 0, 0.15), var(--glass-edge-glow) !important;
+    /* Enhanced shadow with more shine and depth */
+    box-shadow: 
+        0 16px 48px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.12),
+        0 0 30px rgba(99, 102, 241, 0.15),
+        inset 0 2px 0 rgba(255, 255, 255, 0.2),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.1) !important;
     z-index: 1000 !important;
     /* Enhanced background and backdrop-filter for more transparency */
-    background: var(--glass-background) !important;
+    background: linear-gradient(135deg, 
+        var(--glass-background) 0%, 
+        rgba(255, 255, 255, 0.03) 50%, 
+        rgba(255, 255, 255, 0.01) 100%) !important;
     backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
     -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
     /* Force identical padding and layout */
@@ -472,7 +512,7 @@
     align-items: center !important;
     /* Enhanced border for definition */
     border: 1px solid var(--color-border-subtle) !important;
-    transition: all var(--transition-normal) !important;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
     overflow: hidden !important;
 }
 
@@ -494,16 +534,17 @@
     width: 100%;
     height: 100%;
     background: linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.1) 0%, 
-        transparent 40%, 
-        rgba(255, 255, 255, 0.05) 60%, 
-        transparent 100%);
-    opacity: 0.3;
+        rgba(255, 255, 255, 0.15) 0%, 
+        transparent 30%, 
+        rgba(255, 255, 255, 0.08) 50%, 
+        transparent 70%, 
+        rgba(255, 255, 255, 0.05) 100%);
+    opacity: 0.4;
     mix-blend-mode: screen;
     z-index: 2;
     border-radius: inherit;
     pointer-events: none;
-    animation: glassReflectionShift 10s ease-in-out infinite;
+    animation: glassReflectionShift 12s ease-in-out infinite;
 }
 
 /* When glass box is being dragged, allow positioning override */
@@ -513,13 +554,20 @@
 }
 
 .neuos-glass-box:hover {
-    box-shadow: var(--glass-hover-shadow), var(--glass-edge-glow) !important;
-    transform: scale(1.02) !important;
+    box-shadow: 
+        0 24px 72px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.18),
+        0 0 40px rgba(99, 102, 241, 0.2),
+        inset 0 2px 0 rgba(255, 255, 255, 0.25),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.15) !important;
+    transform: scale(1.03) !important;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
 }
 
 .neuos-glass-box:active {
     cursor: grabbing !important;
-    transform: scale(0.98) !important;
+    transform: scale(0.97) !important;
+    transition: all 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
 }
 
 /* Enhanced neuOS Glass Title */
@@ -531,16 +579,32 @@
     white-space: nowrap !important;
     position: relative !important;
     z-index: 2 !important;
-    text-shadow: 0 0 40px var(--color-primary-glow) !important;
+    text-shadow: 
+        0 0 40px var(--color-primary-glow),
+        0 0 80px rgba(99, 102, 241, 0.3),
+        0 2px 4px rgba(0, 0, 0, 0.1) !important;
     letter-spacing: -0.025em !important;
     font-family: var(--font-family-primary) !important;
     opacity: 1 !important;
-    animation: titleFloat 3s ease-in-out infinite !important;
+    animation: titleFloat 4s ease-in-out infinite !important;
+    filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.2)) !important;
 }
 
 @keyframes titleFloat {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-5px); }
+    0%, 100% { 
+        transform: translateY(0px) scale(1); 
+        text-shadow: 
+            0 0 40px var(--color-primary-glow),
+            0 0 80px rgba(99, 102, 241, 0.3),
+            0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    50% { 
+        transform: translateY(-8px) scale(1.02); 
+        text-shadow: 
+            0 0 50px var(--color-primary-glow),
+            0 0 100px rgba(99, 102, 241, 0.4),
+            0 4px 8px rgba(0, 0, 0, 0.15);
+    }
 }
 
 /* Enhanced Glass Container */
@@ -578,14 +642,22 @@
     isolation: isolate !important;
     touch-action: none;
     /* Enhanced background and backdrop-filter */
-    background: var(--glass-background) !important;
+    background: linear-gradient(135deg, 
+        var(--glass-background) 0%, 
+        rgba(255, 255, 255, 0.04) 50%, 
+        rgba(255, 255, 255, 0.01) 100%) !important;
     backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
     -webkit-backdrop-filter: blur(var(--glass-backdrop-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness)) !important;
-    /* Enhanced shadow */
-    box-shadow: 0px 8px var(--glass-outer-shadow-blur) rgba(0, 0, 0, 0.15), var(--glass-edge-glow) !important;
+    /* Enhanced shadow with more depth */
+    box-shadow: 
+        0 12px 36px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        0 0 20px rgba(99, 102, 241, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.08) !important;
     z-index: 1000 !important;
     /* Enhanced border */
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
     /* Layout */
     padding: 20px !important;
     margin: 0 !important;
@@ -594,7 +666,7 @@
     flex-direction: column !important;
     justify-content: center !important;
     align-items: center !important;
-    transition: all var(--transition-normal) !important;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
     overflow: hidden !important;
 }
 
@@ -616,16 +688,17 @@
     width: 100%;
     height: 100%;
     background: linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.1) 0%, 
-        transparent 40%, 
-        rgba(255, 255, 255, 0.05) 60%, 
-        transparent 100%);
-    opacity: 0.3;
+        rgba(255, 255, 255, 0.12) 0%, 
+        transparent 35%, 
+        rgba(255, 255, 255, 0.06) 55%, 
+        transparent 75%, 
+        rgba(255, 255, 255, 0.03) 100%);
+    opacity: 0.35;
     mix-blend-mode: screen;
     z-index: 2;
     border-radius: inherit;
     pointer-events: none;
-    animation: glassReflectionShift 12s ease-in-out infinite;
+    animation: glassReflectionShift 15s ease-in-out infinite;
 }
 
 /* When widget is being dragged, allow positioning override */
@@ -635,11 +708,18 @@
 }
 
 .neuos-widget:hover {
-    box-shadow: var(--glass-hover-shadow), var(--glass-edge-glow) !important;
-    transform: scale(1.05) !important;
+    box-shadow: 
+        0 16px 48px rgba(0, 0, 0, 0.35),
+        0 0 0 1px rgba(255, 255, 255, 0.15),
+        0 0 30px rgba(99, 102, 241, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.12) !important;
+    transform: scale(1.08) !important;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
 }
 
 .neuos-widget:active {
     cursor: grabbing !important;
-    transform: scale(0.95) !important;
+    transform: scale(0.92) !important;
+    transition: all 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
 } 
