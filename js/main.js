@@ -4,7 +4,7 @@
  * @author jared u.
  */
 
-import { Terminal } from './apps/terminal.js';
+import { Terminal } from './apps/terminal/terminal.js';
 import { WindowManager } from './core/window.js';
 import { HelpManager } from './utils/help.js';
 import { BootSystem } from './core/boot.js';
