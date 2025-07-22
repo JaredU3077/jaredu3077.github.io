@@ -1,13 +1,15 @@
 /* neuOS modern premium theme - Apple-inspired design system */
 /* Import modular sub-theme files */
-@import url('variables.css');
+@import url('design-tokens.css');
 @import url('window.css');
+@import url('terminal.css');
 @import url('desktop.css');
 @import url('login.css');
 @import url('apps.css');
 @import url('animations.css');
 @import url('responsive.css');
 @import url('glass.css');
+@import url('mobile.css');
 
 /* Space Screensaver Integration */
 #spaceScreensaver {
@@ -56,14 +58,11 @@ body {
     visibility: hidden;
 }
 
-/* Show desktop when neither boot nor login is active (user is using the system) */
+/* Show desktop when neither boot nor login is active (user is using the system */
 body:not(.boot-active):not(.login-active) #desktop {
     opacity: 1;
     visibility: visible;
 }
-
-/* Enhanced Background Animation - Handled by _glass.css */
-/* body::before is now handled by _glass.css for proper glass effects */
 
 /* Refined Scrollbar - Apple-style */
 ::-webkit-scrollbar {
@@ -134,56 +133,6 @@ body:not(.boot-active):not(.login-active) #desktop {
 
 /* Hide desktop during boot/login */
 .login-active #desktop {
-    display: none;
-}
-
-/* Network Data Flow Animations */
-.network-particles {
-    /* Network particles container disabled - no longer showing drifting blue dots */
-    display: none !important;
-}
-
-.data-packet {
-    /* Network data packets disabled - no longer showing drifting blue dots */
-    display: none !important;
-}
-
-/* Animated Data Flow Lines */
-@keyframes dataFlow {
-    0% { 
-        transform: translateX(-100px) translateZ(0); 
-        opacity: 0; 
-    }
-    10% { opacity: 0.8; }
-    90% { opacity: 0.8; }
-    100% { 
-        transform: translateX(calc(100vw + 100px)) translateZ(0); 
-        opacity: 0; 
-    }
-}
-
-.data-packet:nth-child(1) { animation: dataFlow 12s linear infinite; top: 10%; }
-.data-packet:nth-child(2) { animation: dataFlow 15s linear infinite 2s; top: 25%; }
-.data-packet:nth-child(3) { animation: dataFlow 18s linear infinite 4s; top: 40%; }
-.data-packet:nth-child(4) { animation: dataFlow 14s linear infinite 6s; top: 55%; }
-.data-packet:nth-child(5) { animation: dataFlow 16s linear infinite 8s; top: 70%; }
-.data-packet:nth-child(6) { animation: dataFlow 13s linear infinite 10s; top: 85%; }
-
-/* Network Nodes Removed - Green pulsing dots disabled */
-/* Keeping keyframes for potential future use */
-@keyframes networkPulse {
-    0%, 100% { 
-        transform: scale(1) translateZ(0); 
-        opacity: 0.4; 
-    }
-    50% { 
-        transform: scale(1.5) translateZ(0); 
-        opacity: 0.8; 
-    }
-}
-
-/* Network nodes disabled - no longer rendering green pulsing dots */
-.network-node {
     display: none;
 }
 
@@ -542,4 +491,4 @@ body:not(.boot-active):not(.login-active) #desktop {
     /* box-shadow: none !important; */
     /* backdrop-filter: none !important; */
     /* -webkit-backdrop-filter: none !important; */
-} 
+}

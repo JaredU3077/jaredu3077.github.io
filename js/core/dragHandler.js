@@ -94,7 +94,7 @@ export class DragHandler {
         
         // Disable snapping during drag
         if (this.manager.snapHandler) {
-            this.manager.snapHandler.isSnappingEnabled = false;
+        this.manager.snapHandler.isSnappingEnabled = false;
         }
         
         // Add dragging class for visual feedback
@@ -163,7 +163,7 @@ export class DragHandler {
         
         // Re-enable snapping
         if (this.manager.snapHandler) {
-            this.manager.snapHandler.isSnappingEnabled = true;
+        this.manager.snapHandler.isSnappingEnabled = true;
         }
         
         // Mark window as moved

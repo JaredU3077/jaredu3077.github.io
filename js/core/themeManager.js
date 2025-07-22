@@ -72,8 +72,8 @@ export class ThemeManager {
                 backgroundGlassStrong: 'rgba(68, 71, 90, 0.95)',
                 
                 // UI colors
-                windowBg: 'rgba(40, 42, 54, 0.95)',
-                windowBackdrop: 'blur(12px) saturate(120%)',
+                windowBg: 'rgba(40, 42, 54, 0.1)',
+                windowBackdrop: 'blur(12px) saturate(120%) brightness(110%)',
                 windowBorder: 'rgba(189, 147, 249, 0.3)',
                 textColor: '#f8f8f2',
                 textSecondary: '#f1fa8c',
@@ -90,9 +90,9 @@ export class ThemeManager {
                 accentYellow: '#f1fa8c',
                 accentBlue: '#6272a4',
                 
-                // Terminal specific
-                terminalBg: 'rgba(40, 42, 54, 0.95)',
-                terminalBackdrop: 'blur(12px) saturate(120%)',
+                // Terminal specific - Fixed to have proper glass effect
+                terminalBg: 'rgba(40, 42, 54, 0.1)',
+                terminalBackdrop: 'blur(12px) saturate(120%) brightness(110%)',
                 terminalBorder: 'rgba(189, 147, 249, 0.3)',
                 terminalText: '#f8f8f2',
                 terminalPrompt: '#bd93f9',
@@ -144,7 +144,7 @@ export class ThemeManager {
                 terminalPrompt: '#ff6347',
                 terminalError: '#ff4500',
                 terminalSuccess: '#32cd32',
-                terminalWarning: '#ffd700'
+                terminalWarning: '#ff8c00'
             },
             cyberpunk: {
                 name: 'cyberpunk',
@@ -190,7 +190,7 @@ export class ThemeManager {
                 terminalPrompt: '#ff00ff',
                 terminalError: '#ff0000',
                 terminalSuccess: '#00ff00',
-                terminalWarning: '#ffff00'
+                terminalWarning: '#ff8000'
             }
         };
         

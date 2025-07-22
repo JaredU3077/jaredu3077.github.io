@@ -212,11 +212,11 @@ export class ResizeHandler {
             // Special handling for terminal window
             if (windowElement.id === 'terminalWindow') {
                 windowElement.classList.add('resizing');
-                // Disable terminal interactions during resize
-                const terminalOutput = windowElement.querySelector('#terminalOutput');
-                const terminalInput = windowElement.querySelector('#terminalInput');
-                if (terminalOutput) terminalOutput.style.pointerEvents = 'none';
-                if (terminalInput) terminalInput.style.pointerEvents = 'none';
+                // Keep terminal functional during resize - don't disable interactions
+                // const terminalOutput = windowElement.querySelector('#terminalOutput');
+                // const terminalInput = windowElement.querySelector('#terminalInput');
+                // if (terminalOutput) terminalOutput.style.pointerEvents = 'none';
+                // if (terminalInput) terminalInput.style.pointerEvents = 'none';
             }
             this.activeResize = { handle, windowElement, windowObj, direction };
             
@@ -439,12 +439,14 @@ export class ResizeHandler {
         
         // Special cleanup for terminal window
         if (this.activeResize.windowElement.id === 'terminalWindow') {
-            const terminalOutput = this.activeResize.windowElement.querySelector('#terminalOutput');
-            const terminalInput = this.activeResize.windowElement.querySelector('#terminalInput');
-            if (terminalOutput) terminalOutput.style.pointerEvents = '';
-            if (terminalInput) terminalInput.style.pointerEvents = '';
+            // Keep terminal functional - don't disable pointer events
+            // const terminalOutput = this.activeResize.windowElement.querySelector('#terminalOutput');
+            // const terminalInput = this.activeResize.windowElement.querySelector('#terminalInput');
+            // if (terminalOutput) terminalOutput.style.pointerEvents = '';
+            // if (terminalInput) terminalInput.style.pointerEvents = '';
             
             // Ensure terminal input regains focus after resize
+            const terminalInput = this.activeResize.windowElement.querySelector('#terminalInput');
             const inputField = terminalInput?.querySelector('input');
             if (inputField) {
                 setTimeout(() => {
@@ -542,12 +544,14 @@ export class ResizeHandler {
                 
                 // Special cleanup for terminal window
                 if (this.activeResize.windowElement.id === 'terminalWindow') {
-                    const terminalOutput = this.activeResize.windowElement.querySelector('#terminalOutput');
-                    const terminalInput = this.activeResize.windowElement.querySelector('#terminalInput');
-                    if (terminalOutput) terminalOutput.style.pointerEvents = '';
-                    if (terminalInput) terminalInput.style.pointerEvents = '';
+                    // Keep terminal functional - don't disable pointer events
+                    // const terminalOutput = this.activeResize.windowElement.querySelector('#terminalOutput');
+                    // const terminalInput = this.activeResize.windowElement.querySelector('#terminalInput');
+                    // if (terminalOutput) terminalOutput.style.pointerEvents = '';
+                    // if (terminalInput) terminalInput.style.pointerEvents = '';
                     
                     // Restore terminal input focus
+                    const terminalInput = this.activeResize.windowElement.querySelector('#terminalInput');
                     const inputField = terminalInput?.querySelector('input');
                     if (inputField) {
                         setTimeout(() => {

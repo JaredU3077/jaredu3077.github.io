@@ -7,6 +7,17 @@ export function setupEventListeners(terminal) {
     terminal.inputElement.addEventListener('compositionstart', () => terminal.isComposing = true, { passive: true });
     terminal.inputElement.addEventListener('compositionend', () => terminal.isComposing = false, { passive: true });
     
+    // Add click handler to ensure input gets focus when clicked anywhere in the input area
+    terminal.inputElement.addEventListener('click', (e) => {
+        // If clicking on the input container but not directly on the input field, focus the input
+        if (e.target === terminal.inputElement || e.target.classList.contains('prompt')) {
+            const inputField = terminal.inputElement.querySelector('input');
+            if (inputField) {
+                inputField.focus();
+            }
+        }
+    }, { passive: true });
+    
     // Listen for window focus events to restore terminal input focus
     window.addEventListener('windowFocus', (e) => {
         if (e.detail.window.id === 'terminalWindow') {
@@ -67,14 +78,14 @@ export function setupOptimizedResizeHandler(terminal) {
             isResizing = true;
             resizeStartTime = performance.now();
             
-            // Disable all non-essential operations during resize
+            // Disable output scrolling during resize for performance
             if (terminal.outputElement) {
-                terminal.outputElement.style.pointerEvents = 'none';
                 terminal.outputElement.style.overflow = 'hidden';
             }
-            if (terminal.inputElement) {
-                terminal.inputElement.style.pointerEvents = 'none';
-            }
+            // Keep input functional - don't disable pointer events
+            // if (terminal.inputElement) {
+            //     terminal.inputElement.style.pointerEvents = 'none';
+            // }
             
             // Disable status bar updates during resize
             terminal._statusBarDisabled = true;
@@ -84,11 +95,11 @@ export function setupOptimizedResizeHandler(terminal) {
         resizeTimeout = setTimeout(() => {
             if (terminal.outputElement) {
                 terminal.scrollToBottom();
-                terminal.outputElement.style.pointerEvents = '';
                 terminal.outputElement.style.overflow = '';
             }
+            // Ensure input remains functional
             if (terminal.inputElement) {
-                terminal.inputElement.style.pointerEvents = '';
+                // terminal.inputElement.style.pointerEvents = '';
                 // Restore focus to terminal input
                 setTimeout(() => {
                     if (terminal.inputElement) {
@@ -126,12 +137,12 @@ export function setupOptimizedResizeHandler(terminal) {
                     terminal.inputElement.focus();
                 }
                 if (terminal.outputElement) {
-                    terminal.outputElement.style.pointerEvents = '';
                     terminal.outputElement.style.overflow = '';
                 }
-                if (terminal.inputElement) {
-                    terminal.inputElement.style.pointerEvents = '';
-                }
+                // Ensure input remains functional
+                // if (terminal.inputElement) {
+                //     terminal.inputElement.style.pointerEvents = '';
+                // }
             }, 200);
         }
     }, { passive: true });
