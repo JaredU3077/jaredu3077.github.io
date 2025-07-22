@@ -1,0 +1,166 @@
+export const planets = [
+    { 
+        name: 'Mercury', 
+        size: 10, 
+        distance: 150, 
+        speed: 15, 
+        color: '#8c7853', 
+        ring: false,
+        atmosphere: false,
+        surface: 'mercury',
+        moons: 0,
+        features: ['cratered', 'rocky'],
+        surfaceDetails: ['impact_craters', 'volcanic_plains', 'scarps'],
+        gravity: 0.38,
+        temperature: 167,
+        composition: ['iron', 'nickel', 'sulfur']
+    },
+    { 
+        name: 'Venus', 
+        size: 19, 
+        distance: 250, 
+        speed: 25, 
+        color: '#e6be8a', 
+        ring: false,
+        atmosphere: true,
+        atmosphereColor: 'rgba(255, 193, 7, 0.5)',
+        surface: 'venus',
+        moons: 0,
+        features: ['cloudy', 'volcanic'],
+        surfaceDetails: ['sulfuric_clouds', 'volcanic_highlands', 'impact_craters'],
+        gravity: 0.91,
+        temperature: 464,
+        composition: ['carbon_dioxide', 'nitrogen', 'sulfuric_acid']
+    },
+    { 
+        name: 'Earth', 
+        size: 20, 
+        distance: 320, 
+        speed: 35, 
+        color: '#4a90e2', 
+        ring: false,
+        atmosphere: true,
+        atmosphereColor: 'rgba(74, 144, 226, 0.3)',
+        surface: 'earth',
+        moons: 1,
+        features: ['oceans', 'continents'],
+        surfaceDetails: ['ocean_blue', 'continental_green', 'polar_ice'],
+        gravity: 1.0,
+        temperature: 15,
+        composition: ['nitrogen', 'oxygen', 'water']
+    },
+    { 
+        name: 'Mars', 
+        size: 11, 
+        distance: 400, 
+        speed: 45, 
+        color: '#c1440e', 
+        ring: false,
+        atmosphere: true,
+        atmosphereColor: 'rgba(193, 68, 14, 0.3)',
+        surface: 'mars',
+        moons: 2,
+        features: ['red', 'dusty'],
+        surfaceDetails: ['red_plains', 'dust_storms', 'polar_caps'],
+        gravity: 0.38,
+        temperature: -65,
+        composition: ['carbon_dioxide', 'nitrogen', 'argon']
+    },
+    { 
+        name: 'Jupiter', 
+        size: 50, 
+        distance: 600, 
+        speed: 70, 
+        color: '#d4af37', 
+        ring: true,
+        ringColor: 'rgba(212, 175, 55, 0.3)',
+        atmosphere: true,
+        atmosphereColor: 'rgba(212, 175, 55, 0.4)',
+        surface: 'jupiter',
+        moons: 95,
+        features: ['striped', 'stormy'],
+        surfaceDetails: ['cloud_bands', 'great_red_spot', 'storm_systems'],
+        gravity: 2.34,
+        temperature: -110,
+        composition: ['hydrogen', 'helium', 'methane']
+    },
+    { 
+        name: 'Saturn', 
+        size: 42, 
+        distance: 800, 
+        speed: 100, 
+        color: '#f4d03f', 
+        ring: true,
+        ringColor: 'rgba(244, 208, 63, 0.8)',
+        ringSize: 4.5,
+        atmosphere: true,
+        atmosphereColor: 'rgba(244, 208, 63, 0.4)',
+        surface: 'saturn',
+        moons: 146,
+        features: ['ringed', 'golden'],
+        surfaceDetails: ['cloud_bands', 'hexagonal_storm', 'ring_shadows'],
+        gravity: 0.93,
+        temperature: -140,
+        composition: ['hydrogen', 'helium', 'ammonia']
+    },
+    { 
+        name: 'Uranus', 
+        size: 32, 
+        distance: 1000, 
+        speed: 150, 
+        color: '#85c1e9', 
+        ring: true,
+        ringColor: 'rgba(133, 193, 233, 0.5)',
+        atmosphere: true,
+        atmosphereColor: 'rgba(133, 193, 233, 0.4)',
+        surface: 'uranus',
+        moons: 28,
+        features: ['icy', 'tilted'],
+        surfaceDetails: ['icy_surface', 'cloud_layers', 'tilted_axis'],
+        gravity: 0.89,
+        temperature: -195,
+        composition: ['hydrogen', 'helium', 'methane']
+    },
+    { 
+        name: 'Neptune', 
+        size: 30, 
+        distance: 1200, 
+        speed: 200, 
+        color: '#5dade2', 
+        ring: true,
+        ringColor: 'rgba(93, 173, 226, 0.5)',
+        atmosphere: true,
+        atmosphereColor: 'rgba(93, 173, 226, 0.4)',
+        surface: 'neptune',
+        moons: 16,
+        features: ['windy', 'blue'],
+        surfaceDetails: ['wind_storms', 'dark_spots', 'icy_clouds'],
+        gravity: 1.12,
+        temperature: -200,
+        composition: ['hydrogen', 'helium', 'methane']
+    }
+];
+
+export const surfaceGradients = {
+    mercury: 'radial-gradient(circle, #8c7853 0%, #6b5b47 50%, #4a3d3b 100%)',
+    venus: 'radial-gradient(circle, #e6be8a 0%, #d4a574 40%, #b8860b 80%, #8b6914 100%)',
+    earth: 'radial-gradient(circle, #4a90e2 0%, #357abd 40%, #2e5a8a 70%, #1e3a5f 100%)',
+    mars: 'radial-gradient(circle, #c1440e 0%, #a0522d 40%, #8b4513 70%, #654321 100%)',
+    jupiter: 'radial-gradient(circle, #d4af37 0%, #b8860b 30%, #daa520 60%, #cd853f 100%)',
+    saturn: 'radial-gradient(circle, #f4d03f 0%, #f39c12 30%, #e67e22 60%, #d35400 100%)',
+    uranus: 'radial-gradient(circle, #85c1e9 0%, #5dade2 40%, #3498db 70%, #2980b9 100%)',
+    neptune: 'radial-gradient(circle, #5dade2 0%, #3498db 40%, #2980b9 70%, #1f618d 100%)'
+};
+
+export const moonColors = {
+    earth: ['#f5f5dc', '#d3d3d3'],
+    mars: ['#deb887', '#cd853f'],
+    jupiter: ['#f0e68c', '#daa520', '#b8860b', '#cd853f', '#d2691e', '#8b4513', '#f0e68c', '#daa520', '#b8860b', '#cd853f'], // extended
+    saturn: ['#f5deb3', '#deb887', '#d2b48c', '#bc8f8f', '#f5deb3', '#deb887', '#d2b48c', '#bc8f8f'],
+    uranus: ['#e0ffff', '#b0e0e6', '#87ceeb', '#e0ffff', '#b0e0e6', '#87ceeb'],
+    neptune: ['#add8e6', '#87ceeb', '#4682b4', '#add8e6', '#87ceeb', '#4682b4']
+};
+
+export const asteroidColors = ['#8b4513', '#a0522d', '#cd853f', '#d2691e', '#b8860b'];
+
+export const kboColors = ['#e0ffff', '#b0e0e6', '#87ceeb', '#add8e6', '#f0f8ff'];
