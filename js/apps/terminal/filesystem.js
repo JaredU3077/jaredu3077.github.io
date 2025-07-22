@@ -1,6 +1,7 @@
 // js/apps/terminal/commands/filesystem.js
 
 import { loadResume } from './content.js';
+import { AppError, ErrorTypes, eventEmitter } from '../../utils/utils.js';
 
 export function handleCat(terminal, args) {
     const [file] = args;

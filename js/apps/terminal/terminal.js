@@ -549,6 +549,62 @@ export class Terminal {
     }
 
     handleDemoscene() {
-        return handleDemoscene();
+        return handleDemoscene(this);
+    }
+
+    // Missing methods that are referenced in commands
+    showHelp() {
+        return CONFIG.COMMANDS.HELP;
+    }
+
+    handleAlias(args) {
+        return `alias command not implemented yet. args: ${args.join(' ')}`;
+    }
+
+    handleUnalias(args) {
+        return `unalias command not implemented yet. args: ${args.join(' ')}`;
+    }
+
+    handleType(args) {
+        return `type command not implemented yet. args: ${args.join(' ')}`;
+    }
+
+    handleWhich(args) {
+        return `which command not implemented yet. args: ${args.join(' ')}`;
+    }
+
+    handleWhereis(args) {
+        return `whereis command not implemented yet. args: ${args.join(' ')}`;
+    }
+
+    handleMan(args) {
+        return `man command not implemented yet. args: ${args.join(' ')}`;
+    }
+
+    handleInfo(args) {
+        return `info command not implemented yet. args: ${args.join(' ')}`;
+    }
+
+    handleWhatis(args) {
+        return `whatis command not implemented yet. args: ${args.join(' ')}`;
+    }
+
+    handleApropos(args) {
+        return `apropos command not implemented yet. args: ${args.join(' ')}`;
+    }
+
+    handleLogging() {
+        return `logging command not implemented yet.`;
+    }
+
+    handleCat(args) {
+        const [file] = args;
+        if (!file) {
+            return 'cat: missing argument';
+        }
+        if (file === 'resume.txt') {
+            return `cat: displaying ${file}...\nContent would be displayed here.`;
+        }
+        return `cat: ${file}: No such file or directory`;
     }
 }

@@ -294,6 +294,11 @@ export class WindowManager {
         setTimeout(() => {
             windowObj.element.classList.remove('restoring');
         }, 300);
+        
+        // Emit window restore event
+        window.dispatchEvent(new CustomEvent('windowRestore', {
+            detail: { window: windowObj }
+        }));
     }
 
     /**
@@ -383,6 +388,11 @@ export class WindowManager {
         setTimeout(() => {
             windowObj.element.classList.remove('unmaximizing');
         }, 300);
+        
+        // Emit window unmaximize event
+        window.dispatchEvent(new CustomEvent('windowUnmaximize', {
+            detail: { window: windowObj }
+        }));
     }
 
     /**
@@ -436,11 +446,16 @@ export class WindowManager {
             this.activeWindow = null;
         }
 
+        // Emit window close event
+        window.dispatchEvent(new CustomEvent('windowClose', {
+            detail: { window: windowObj }
+        }));
+
         this.notifyStateChange();
     }
 
     /**
-     * Brings a window to the front and sets it as active.
+     * Focuses a window, bringing it to the front and updating the window stack.
      * @param {object} windowObj - The window to focus.
      * @memberof WindowManager
      */
@@ -452,6 +467,12 @@ export class WindowManager {
         this.activeWindow = windowObj;
         this.windowStack = this.windowStack.filter(w => w.id !== windowObj.id);
         this.windowStack.push(windowObj);
+        
+        // Emit window focus event
+        window.dispatchEvent(new CustomEvent('windowFocus', {
+            detail: { window: windowObj }
+        }));
+        
         this.notifyStateChange();
     }
 

@@ -7,6 +7,49 @@ export function setupEventListeners(terminal) {
     terminal.inputElement.addEventListener('compositionstart', () => terminal.isComposing = true, { passive: true });
     terminal.inputElement.addEventListener('compositionend', () => terminal.isComposing = false, { passive: true });
     
+    // Listen for window focus events to restore terminal input focus
+    window.addEventListener('windowFocus', (e) => {
+        if (e.detail.window.id === 'terminalWindow') {
+            setTimeout(() => {
+                if (terminal.inputElement) {
+                    terminal.inputElement.focus();
+                }
+            }, 100);
+        }
+    });
+    
+    // Listen for window restore events
+    window.addEventListener('windowRestore', (e) => {
+        if (e.detail.window.id === 'terminalWindow') {
+            setTimeout(() => {
+                if (terminal.inputElement) {
+                    terminal.inputElement.focus();
+                }
+            }, 150);
+        }
+    });
+    
+    // Listen for window unmaximize events
+    window.addEventListener('windowUnmaximize', (e) => {
+        if (e.detail.window.id === 'terminalWindow') {
+            setTimeout(() => {
+                if (terminal.inputElement) {
+                    terminal.inputElement.focus();
+                }
+            }, 150);
+        }
+    });
+    
+    // Listen for window close events to clean up
+    window.addEventListener('windowClose', (e) => {
+        if (e.detail.window.id === 'terminalWindow') {
+            // Clean up terminal instance
+            if (window.neuOS && window.neuOS.terminalInstance === terminal) {
+                window.neuOS.terminalInstance = null;
+            }
+        }
+    });
+    
     // Optimized resize handling
     terminal.setupOptimizedResizeHandler();
     
@@ -25,9 +68,13 @@ export function setupOptimizedResizeHandler(terminal) {
             resizeStartTime = performance.now();
             
             // Disable all non-essential operations during resize
-            terminal.outputElement.style.pointerEvents = 'none';
-            terminal.outputElement.style.overflow = 'hidden';
-            terminal.inputElement.style.pointerEvents = 'none';
+            if (terminal.outputElement) {
+                terminal.outputElement.style.pointerEvents = 'none';
+                terminal.outputElement.style.overflow = 'hidden';
+            }
+            if (terminal.inputElement) {
+                terminal.inputElement.style.pointerEvents = 'none';
+            }
             
             // Disable status bar updates during resize
             terminal._statusBarDisabled = true;
@@ -35,10 +82,20 @@ export function setupOptimizedResizeHandler(terminal) {
         
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
-            terminal.scrollToBottom();
-            terminal.outputElement.style.pointerEvents = '';
-            terminal.outputElement.style.overflow = '';
-            terminal.inputElement.style.pointerEvents = '';
+            if (terminal.outputElement) {
+                terminal.scrollToBottom();
+                terminal.outputElement.style.pointerEvents = '';
+                terminal.outputElement.style.overflow = '';
+            }
+            if (terminal.inputElement) {
+                terminal.inputElement.style.pointerEvents = '';
+                // Restore focus to terminal input
+                setTimeout(() => {
+                    if (terminal.inputElement) {
+                        terminal.inputElement.focus();
+                    }
+                }, 50);
+            }
             terminal._statusBarDisabled = false;
             isResizing = false;
             
@@ -57,6 +114,25 @@ export function setupOptimizedResizeHandler(terminal) {
                     terminal.handleTerminalResize(e.detail.size);
                 }, 100);
             }
+        }
+    }, { passive: true });
+    
+    // Listen for window resize end events
+    window.addEventListener('windowResizeEnd', (e) => {
+        if (e.detail.window.id === 'terminalWindow') {
+            // Restore terminal functionality after resize
+            setTimeout(() => {
+                if (terminal.inputElement) {
+                    terminal.inputElement.focus();
+                }
+                if (terminal.outputElement) {
+                    terminal.outputElement.style.pointerEvents = '';
+                    terminal.outputElement.style.overflow = '';
+                }
+                if (terminal.inputElement) {
+                    terminal.inputElement.style.pointerEvents = '';
+                }
+            }, 200);
         }
     }, { passive: true });
 }

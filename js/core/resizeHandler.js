@@ -398,6 +398,14 @@ export class ResizeHandler {
     stopResizing() {
         if (!this.isResizing || !this.activeResize) return;
         
+        // Add null check for windowElement to prevent errors
+        if (!this.activeResize.windowElement) {
+            console.warn('ResizeHandler: windowElement is null during stopResizing');
+            this.isResizing = false;
+            this.activeResize = null;
+            return;
+        }
+        
         this.isResizing = false;
         this.activeResize.windowObj._isResizing = false;
         
@@ -417,11 +425,16 @@ export class ResizeHandler {
         
         // Remove resizing class after a short delay to allow smooth transition
         setTimeout(() => {
-            this.activeResize.windowElement.classList.remove('resizing');
-            // Reset transition after removing resizing class
-            setTimeout(() => {
-                this.activeResize.windowElement.style.transition = '';
-            }, 100);
+            // Double-check windowElement still exists
+            if (this.activeResize && this.activeResize.windowElement) {
+                this.activeResize.windowElement.classList.remove('resizing');
+                // Reset transition after removing resizing class
+                setTimeout(() => {
+                    if (this.activeResize && this.activeResize.windowElement) {
+                        this.activeResize.windowElement.style.transition = '';
+                    }
+                }, 100);
+            }
         }, 50);
         
         // Special cleanup for terminal window
@@ -430,13 +443,25 @@ export class ResizeHandler {
             const terminalInput = this.activeResize.windowElement.querySelector('#terminalInput');
             if (terminalOutput) terminalOutput.style.pointerEvents = '';
             if (terminalInput) terminalInput.style.pointerEvents = '';
+            
+            // Ensure terminal input regains focus after resize
+            const inputField = terminalInput?.querySelector('input');
+            if (inputField) {
+                setTimeout(() => {
+                    inputField.focus();
+                }, 150);
+            }
         }
         
         // Re-enable snapping
-        this.manager.snapHandler.isSnappingEnabled = true;
+        if (this.manager && this.manager.snapHandler) {
+            this.manager.snapHandler.isSnappingEnabled = true;
+        }
         
         // Mark window as resized
-        this.activeResize.windowObj._hasBeenResized = true;
+        if (this.activeResize.windowObj) {
+            this.activeResize.windowObj._hasBeenResized = true;
+        }
         
         // Emit resize end event
         window.dispatchEvent(new CustomEvent('windowResizeEnd', {
@@ -446,6 +471,9 @@ export class ResizeHandler {
                 position: { left: finalLeft, top: finalTop }
             }
         }));
+        
+        // Clear active resize state
+        this.activeResize = null;
     }
 
     getResizeConstraints() {
@@ -507,7 +535,39 @@ export class ResizeHandler {
     // Method to cancel resizing (useful for window operations)
     cancelResize() {
         if (this.isResizing) {
-            this.stopResizing();
+            // Restore original state
+            if (this.activeResize && this.activeResize.windowElement) {
+                this.activeResize.windowElement.style.transform = '';
+                this.activeResize.windowElement.classList.remove('resizing');
+                
+                // Special cleanup for terminal window
+                if (this.activeResize.windowElement.id === 'terminalWindow') {
+                    const terminalOutput = this.activeResize.windowElement.querySelector('#terminalOutput');
+                    const terminalInput = this.activeResize.windowElement.querySelector('#terminalInput');
+                    if (terminalOutput) terminalOutput.style.pointerEvents = '';
+                    if (terminalInput) terminalInput.style.pointerEvents = '';
+                    
+                    // Restore terminal input focus
+                    const inputField = terminalInput?.querySelector('input');
+                    if (inputField) {
+                        setTimeout(() => {
+                            inputField.focus();
+                        }, 100);
+                    }
+                }
+            }
+            
+            this.isResizing = false;
+            if (this.activeResize && this.activeResize.windowObj) {
+                this.activeResize.windowObj._isResizing = false;
+            }
+            
+            // Re-enable snapping
+            if (this.manager && this.manager.snapHandler) {
+                this.manager.snapHandler.isSnappingEnabled = true;
+            }
+            
+            this.activeResize = null;
         }
     }
 }

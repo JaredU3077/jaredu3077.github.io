@@ -1,5 +1,7 @@
 // js/apps/terminal/outputUtils.js
 
+import { AppError, ErrorTypes, eventEmitter } from '../../utils/utils.js';
+
 export function writeOutput(terminal, content) {
     if (!content || typeof content !== 'string') return;
     

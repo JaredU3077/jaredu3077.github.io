@@ -8,17 +8,20 @@
 /**
  * Update the terminal environment
  */
-export function updateEnvironment() {
+export function updateEnvironment(terminal) {
+    console.log('updateEnvironment called with terminal:', terminal);
+    console.log('terminal.workingDirectory:', terminal?.workingDirectory);
+    
     // Update current working directory display
     const cwdElement = document.querySelector('.terminal-cwd');
     if (cwdElement) {
-        cwdElement.textContent = this.currentDirectory || '~';
+        cwdElement.textContent = terminal.workingDirectory || '~';
     }
     
     // Update environment variables if needed
-    this.environment = {
-        ...this.environment,
-        PWD: this.currentDirectory || '~',
+    terminal.environment = {
+        ...terminal.environment,
+        PWD: terminal.workingDirectory || '~',
         USER: 'jared',
         HOME: '~',
         TERM: 'xterm-256color'
@@ -29,9 +32,12 @@ export function updateEnvironment() {
  * Get the current prompt string
  * @returns {string} The formatted prompt
  */
-export function getPrompt() {
-    const cwd = this.currentDirectory || '~';
-    const user = this.environment?.USER || 'jared';
+export function getPrompt(terminal) {
+    console.log('getPrompt called with terminal:', terminal);
+    console.log('terminal.workingDirectory:', terminal?.workingDirectory);
+    
+    const cwd = terminal.workingDirectory || '~';
+    const user = terminal.environment?.USER || 'jared';
     const host = window.location.hostname || 'neuOS';
     
     return `${user}@${host}:${cwd}$ `;

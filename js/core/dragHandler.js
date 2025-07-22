@@ -82,13 +82,20 @@ export class DragHandler {
             return;
         }
         
+        // Cancel any active resize operation
+        if (this.manager.resizeHandler && this.manager.resizeHandler.isResizing) {
+            this.manager.resizeHandler.cancelResize();
+        }
+        
         this.isDragging = true;
         this.hasMoved = true;
         this.currentWindow._isDragging = true;
         this.currentWindow._isResizing = false;
         
         // Disable snapping during drag
-        this.manager.snapHandler.isSnappingEnabled = false;
+        if (this.manager.snapHandler) {
+            this.manager.snapHandler.isSnappingEnabled = false;
+        }
         
         // Add dragging class for visual feedback
         this.currentWindow.element.classList.add('dragging');
@@ -155,7 +162,9 @@ export class DragHandler {
         this.currentWindow.element.classList.remove('dragging');
         
         // Re-enable snapping
-        this.manager.snapHandler.isSnappingEnabled = true;
+        if (this.manager.snapHandler) {
+            this.manager.snapHandler.isSnappingEnabled = true;
+        }
         
         // Mark window as moved
         this.currentWindow._hasBeenMoved = true;
@@ -167,6 +176,9 @@ export class DragHandler {
                 position: { left: this.currentWindow.left, top: this.currentWindow.top }
             }
         }));
+        
+        // Clear current window reference
+        this.currentWindow = null;
     }
 
     // Method to cancel dragging (useful for window operations)
@@ -174,5 +186,10 @@ export class DragHandler {
         if (this.isDragging) {
             this.stopDragging();
         }
+        
+        // Clear any pending drag state
+        this.currentWindow = null;
+        this.isDragging = false;
+        this.hasMoved = false;
     }
 }
