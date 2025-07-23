@@ -1,7 +1,7 @@
 /* neuOS modern premium theme - Apple-inspired design system */
 /* Import modular sub-theme files */
 @import url('design-tokens.css');
-@import url('window.css');
+@import url('window-base.css');
 @import url('terminal.css');
 @import url('desktop.css');
 @import url('login.css');

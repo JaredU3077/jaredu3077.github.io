@@ -127,8 +127,6 @@ export const backgroundMixin = {
             this.createAtmosphere(planetElement, planet);
         }
 
-        this.createOrbitRing(planet, parent);
-
         if (planet.ring) {
             this.createPlanetRing(planet, planetElement);
         }
@@ -173,28 +171,7 @@ export const backgroundMixin = {
         `, parent);
     },
 
-    createOrbitRing(planet, parent) {
-        this.createStyledElement('div', 'solar-orbit-ring', `
-            position: fixed !important;
-            top: 50% !important;
-            left: 50% !important;
-            width: ${planet.distance * 2}px !important;
-            height: ${planet.distance * 2}px !important;
-            transform: translate(-50%, -50%) !important;
-            border: 1px solid rgba(255, 255, 255, 0.15) !important;
-            border-radius: 50% !important;
-            pointer-events: none !important;
-            z-index: 100 !important;
-            opacity: 0.6 !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            background: none !important;
-            box-shadow: 
-                0 0 15px rgba(255, 255, 255, 0.08),
-                inset 0 0 15px rgba(255, 255, 255, 0.02) !important;
-            animation: orbitGlow ${planet.speed * 0.1}s linear infinite !important;
-        `, parent);
-    },
+
 
     createPlanetRing(planet, parent) {
         const ringSize = planet.ringSize || 3.5;

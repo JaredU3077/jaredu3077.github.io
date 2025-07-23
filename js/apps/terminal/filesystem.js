@@ -14,24 +14,28 @@ export function handleCat(terminal, args) {
     return `cat: ${file}: No such file or directory`;
 }
 
-export function handleHead(args) {
+export async function handleHead(args) {
     const [file] = args;
     if (!file) {
         return 'head: missing argument';
     }
     if (file === 'resume.txt') {
-        return 'JARED EDUARDO\nSenior Network Engineer\n\nEXPERIENCE\n15+ years in networking...';
+        const content = await loadResume();
+        const lines = content.split('\n');
+        return lines.slice(0, 10).join('\n');
     }
     return `head: ${file}: No such file or directory`;
 }
 
-export function handleTail(args) {
+export async function handleTail(args) {
     const [file] = args;
     if (!file) {
         return 'tail: missing argument';
     }
     if (file === 'resume.txt') {
-        return '...\n\nREFERENCES\nAvailable upon request\n\nCONTACT\njared@example.com';
+        const content = await loadResume();
+        const lines = content.split('\n');
+        return lines.slice(-10).join('\n');
     }
     return `tail: ${file}: No such file or directory`;
 }

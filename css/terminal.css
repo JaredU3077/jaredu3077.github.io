@@ -11,7 +11,7 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
     /* Ensure proper z-index for terminal windows */
     z-index: 1001 !important;
-    overflow: hidden;
+    overflow: visible;
     /* Ensure resize handles are positioned correctly */
     position: relative;
 }
@@ -111,7 +111,9 @@
     display: flex;
     flex-direction: column;
     height: calc(100% - 60px); /* Account for header height */
-    overflow: hidden;
+    overflow: visible !important;
+    /* Ensure content can scroll */
+    min-height: 400px;
 }
 
 /* Terminal Output - Enhanced Design */
@@ -134,10 +136,14 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     /* Improve general readability */
     text-shadow: 0 0 1px var(--terminal-text);
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
     scrollbar-width: thin;
     scrollbar-color: var(--terminal-border) transparent;
+    /* Ensure proper height for scrolling */
+    max-height: none;
+    height: auto;
+    min-height: 200px;
 }
 
 /* Terminal Input - Enhanced Design */
@@ -750,11 +756,76 @@
     gap: 16px;
 }
 
-/* Terminal Output Container */
+/* Terminal Output Container - Force scrolling to work */
 #terminalWindow #terminalOutput {
-    flex: 1;
-    overflow-y: auto;
+    flex: 1 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
     padding-right: 8px;
+    /* Force scrolling to work */
+    max-height: none !important;
+    height: auto !important;
+    min-height: 200px !important;
+    /* Ensure scrollbars are visible */
+    scrollbar-width: thin !important;
+    -ms-overflow-style: auto !important;
+    /* Force the container to be scrollable */
+    display: block !important;
+    position: relative !important;
+    /* Ensure content can overflow */
+    word-wrap: break-word !important;
+    white-space: pre-wrap !important;
+}
+
+/* Force terminal window to have proper height */
+#terminalWindow {
+    min-height: 400px !important;
+    max-height: 80vh !important;
+}
+
+/* Force terminal content to have proper height */
+#terminalWindow .window-content {
+    min-height: 300px !important;
+    max-height: calc(80vh - 60px) !important;
+    overflow: visible !important;
+}
+
+/* Override height constraints when maximized */
+#terminalWindow.maximized {
+    max-height: 100vh !important;
+}
+
+#terminalWindow.maximized .window-content {
+    max-height: calc(100vh - 60px) !important;
+}
+
+/* Ensure scrollbars are visible in terminal */
+#terminalWindow #terminalOutput::-webkit-scrollbar {
+    width: 8px !important;
+    display: block !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+#terminalWindow #terminalOutput::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-radius: 4px !important;
+}
+
+#terminalWindow #terminalOutput::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3) !important;
+    border-radius: 4px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+#terminalWindow #terminalOutput::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Force terminal results to not interfere with scrolling */
+.terminal-result {
+    word-wrap: break-word !important;
+    white-space: pre-wrap !important;
+    overflow-wrap: break-word !important;
 }
 
 /* Terminal Input Container */
@@ -1125,19 +1196,36 @@
 
 /* Terminal-specific scrollbar overrides */
 .window-content [data-scroll-container] {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    scrollbar-width: thin;
+    -ms-overflow-style: auto;
 }
 
 #terminalOutput,
 #terminalInput {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    scrollbar-width: thin;
+    -ms-overflow-style: auto;
 }
 
 #terminalOutput::-webkit-scrollbar,
 #terminalInput::-webkit-scrollbar {
-    display: none;
+    width: 8px;
+}
+
+#terminalOutput::-webkit-scrollbar-track,
+#terminalInput::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+#terminalOutput::-webkit-scrollbar-thumb,
+#terminalInput::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
+#terminalOutput::-webkit-scrollbar-thumb:hover,
+#terminalInput::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
 }
 
 /* Error content */
@@ -1171,4 +1259,383 @@
 .error-content button:hover {
     background: #dc2626;
     transform: translateY(-1px);
+}
+
+/* Resume Content Styles */
+.resume-content {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--terminal-text);
+    padding: 10px;
+    text-align: center;
+}
+
+.resume-container {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    text-align: center;
+}
+
+.resume-header {
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid var(--terminal-border);
+    background: var(--terminal-background);
+    border-radius: 8px;
+}
+
+.resume-name {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--color-primary);
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.resume-title {
+    font-size: 14px;
+    color: var(--terminal-text);
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.resume-contact {
+    font-size: 12px;
+    color: var(--terminal-text);
+    opacity: 0.8;
+    text-align: center;
+}
+
+.resume-content-text {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    line-height: 1.3;
+    text-align: center;
+}
+
+.resume-header-border {
+    text-align: center;
+    color: var(--terminal-border);
+    margin: 10px 0;
+    padding: 15px;
+    border: 1px solid var(--terminal-border);
+    background: var(--terminal-background);
+    border-radius: 8px;
+    text-align: center;
+}
+
+.resume-line {
+    color: var(--terminal-text);
+    margin: 2px 0;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    text-align: center;
+}
+
+.resume-paragraph {
+    color: var(--terminal-text);
+    margin: 8px 0;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    text-align: center;
+    max-width: 100%;
+    padding: 0 10px;
+    line-height: 1.4;
+}
+
+.resume-section-title {
+    font-weight: bold;
+    color: var(--color-primary);
+    text-transform: uppercase;
+    display: block;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.resume-divider {
+    color: var(--terminal-border);
+    margin: 15px 0;
+    text-align: center;
+}
+
+/* Job header styling */
+.resume-job-header {
+    text-align: center;
+    margin: 15px 0 10px 0;
+    padding: 10px;
+    border: 1px solid var(--terminal-border);
+    background: var(--terminal-background);
+    border-radius: 6px;
+}
+
+/* Job entry styling */
+.resume-job-entry {
+    text-align: left;
+    margin: 8px 0 5px 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+}
+
+.resume-job-title {
+    font-size: 15px;
+    font-weight: bold;
+    color: var(--color-primary);
+    margin-bottom: 1px;
+    text-align: left;
+    text-shadow: 0 0 4px var(--color-primary);
+}
+
+.resume-job-company {
+    font-size: 12px;
+    color: var(--terminal-text);
+    margin-bottom: 2px;
+    text-align: left;
+    opacity: 0.9;
+}
+
+/* Bullet points styling */
+.resume-bullet {
+    color: var(--terminal-text);
+    margin: 2px 0;
+    text-align: left;
+    padding-left: 0;
+    position: relative;
+    max-width: 100%;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+/* Skills section styling */
+.resume-skills-category {
+    text-align: left;
+    margin: 2px 0;
+    padding: 0;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    max-width: 100%;
+    text-indent: 0;
+}
+
+.resume-skills-title {
+    font-weight: bold;
+    color: var(--color-primary);
+    text-align: left;
+    margin-bottom: 0;
+    font-size: 12px;
+    display: inline;
+}
+
+.resume-skills-list {
+    color: var(--terminal-text);
+    opacity: 0.9;
+    text-align: left;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    line-height: 1.3;
+    margin-bottom: 4px;
+    display: inline;
+    text-indent: 0;
+    padding-left: 0;
+}
+
+/* Paragraph styling */
+.resume-paragraph {
+    color: var(--terminal-text);
+    margin: 8px 0;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    text-align: left;
+    max-width: 100%;
+    padding: 0;
+    line-height: 1.4;
+}
+
+/* Section titles */
+.resume-section-title {
+    font-weight: bold;
+    color: var(--color-primary);
+    text-transform: uppercase;
+    display: block;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    font-size: 16px;
+    text-align: left;
+    letter-spacing: 0.5px;
+}
+
+/* Responsive adjustments for maximized terminal */
+#terminalWindow.maximized .resume-section-title {
+    margin-top: 35px;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+#terminalWindow.maximized .resume-job-entry {
+    margin: 40px 0 20px 0;
+}
+
+#terminalWindow.maximized .resume-job-title {
+    font-size: 15px;
+    margin-bottom: 5px;
+}
+
+#terminalWindow.maximized .resume-job-company {
+    font-size: 13px;
+    margin-bottom: 18px;
+}
+
+#terminalWindow.maximized .resume-bullet {
+    font-size: 13px;
+    line-height: 1.4;
+    margin: 7px 0;
+}
+
+#terminalWindow.maximized .resume-skills-category {
+    font-size: 13px;
+    margin: 1px 0;
+}
+
+#terminalWindow.maximized .resume-paragraph {
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* Ensure proper text wrapping on smaller screens */
+@media (max-width: 768px) {
+    .resume-section-title {
+        margin-top: 25px;
+        margin-bottom: 10px;
+    }
+    
+    .resume-job-entry {
+        margin: 25px 0 12px 0;
+    }
+    
+    .resume-job-title {
+        font-size: 11px;
+        margin-bottom: 3px;
+    }
+    
+    .resume-job-company {
+        font-size: 9px;
+        margin-bottom: 12px;
+    }
+    
+    .resume-bullet {
+        font-size: 9px;
+        padding-left: 12px;
+        margin: 4px 0;
+    }
+    
+    .resume-skills-category {
+        font-size: 9px;
+        margin: 1px 0;
+    }
+    
+    .resume-paragraph {
+        font-size: 9px;
+        line-height: 1.2;
+    }
+}
+
+/* Ensure resume content doesn't overflow horizontally */
+.resume-content,
+.resume-container,
+.resume-content-text {
+    overflow-x: auto;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    max-width: 100%;
+}
+
+/* Terminal result styling for resume */
+.terminal-result.resume-content {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+.terminal-result.resume-content::before {
+    display: none;
+}
+
+/* Ensure proper spacing in resume content */
+.resume-content-text > div {
+    margin: 0;
+    padding: 0;
+}
+
+.resume-content-text > div:not(:last-child) {
+    margin-bottom: 2px;
+}
+
+/* Center all text content */
+.resume-content-text,
+.resume-content-text > div {
+    text-align: left;
+}
+
+/* Ensure all content uses full width */
+.resume-paragraph,
+.resume-bullet,
+.resume-skills-category,
+.resume-line,
+.resume-job-entry {
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Terminal Output Styling */
+#terminalWindow #terminalOutput {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 20px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--terminal-text);
+    background: var(--terminal-background);
+    border-radius: 0 0 20px 20px;
+    scroll-behavior: smooth;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    max-height: calc(100vh - 200px);
+    min-height: 300px;
+}
+
+/* Ensure proper overflow restoration after resize */
+#terminalWindow #terminalOutput.resizing {
+    overflow: hidden;
+}
+
+#terminalWindow #terminalOutput:not(.resizing) {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+/* Force proper overflow settings */
+#terminalWindow #terminalOutput {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
 }

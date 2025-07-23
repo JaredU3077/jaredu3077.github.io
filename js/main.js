@@ -237,7 +237,7 @@ async function handleAppClick(appId) {
                 width: windowConfig.width,
                 height: windowConfig.height,
                 icon: app.icon,
-                autoScroll: ['terminal'].includes(appId), // Enable auto-scroll for apps that benefit from it
+                autoScroll: false, // Disable auto-scroll for terminal - it handles its own scrolling
                 type: app.type || 'app', // Pass the application type (e.g., 'game' vs 'app')
                 defaultSize: app.defaultSize // Pass the default size for this application
             });
@@ -253,6 +253,13 @@ async function handleAppClick(appId) {
                         );
                         // Expose terminal globally for demoscene access
                         window.neuOS.terminalInstance = terminal;
+                        
+                        // Completely disable auto-scroll for terminal window
+                        const terminalWindow = windowManager.windows.get(windowConfig.id);
+                        if (terminalWindow && terminalWindow.scrollObserver) {
+                            terminalWindow.scrollObserver.disconnect();
+                            delete terminalWindow.scrollObserver;
+                        }
                         break;
                     default:
                         console.warn(`neuOS: No specific initialization for app: ${appId}`);

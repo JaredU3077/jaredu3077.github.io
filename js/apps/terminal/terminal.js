@@ -39,7 +39,6 @@ import {
     scrollToTop,
     isDocumentContent,
     clear,
-    clearInput,
     formatOutput,
     showLoading,
     hideLoading,
@@ -80,8 +79,7 @@ import {
 } from './audio.js';
 import {
     loadResume,
-    handleShow,
-    handleDemoscene
+    handleShow
 } from './content.js';
 
 export class Terminal {
@@ -147,7 +145,39 @@ export class Terminal {
                 <p>working directory: ${this.workingDirectory}</p>
             </div>`);
             this.inputElement.focus();
+            
+            // Force scrolling to work
+            this.forceScrolling();
         }, 100);
+    }
+
+    // Method to force scrolling to work
+    forceScrolling() {
+        if (this.outputElement) {
+            // Force overflow settings
+            this.outputElement.style.overflow = 'auto';
+            this.outputElement.style.overflowY = 'auto';
+            this.outputElement.style.overflowX = 'hidden';
+            
+            // Force scrollbar visibility
+            this.outputElement.style.scrollbarWidth = 'thin';
+            this.outputElement.style.msOverflowStyle = 'auto';
+            
+            // Ensure proper height
+            this.outputElement.style.maxHeight = 'none';
+            this.outputElement.style.height = 'auto';
+            this.outputElement.style.minHeight = '200px';
+            
+            // Force the container to be scrollable
+            this.outputElement.style.display = 'block';
+            this.outputElement.style.position = 'relative';
+            
+            // Ensure content can overflow
+            this.outputElement.style.wordWrap = 'break-word';
+            this.outputElement.style.whiteSpace = 'pre-wrap';
+            
+            console.log('Terminal scrolling forced to work');
+        }
     }
 
     async executeCommand() {
@@ -230,7 +260,7 @@ export class Terminal {
             handleCommandError(this, error);
         } finally {
             this.isProcessing = false;
-            clearInput(this);
+            this.clearInput();
             
             if (this.commandQueue.length) {
                 this.inputElement.value = this.commandQueue.shift();
@@ -425,7 +455,7 @@ export class Terminal {
     }
 
     clearInput() {
-        clearInput(this);
+        this.inputElement.value = '';
     }
 
     formatOutput(output, element) {
@@ -603,8 +633,21 @@ export class Terminal {
             return 'cat: missing argument';
         }
         if (file === 'resume.txt') {
-            return `cat: displaying ${file}...\nContent would be displayed here.`;
+            return loadResume();
         }
         return `cat: ${file}: No such file or directory`;
+    }
+
+    // Method to restore scrolling functionality
+    restoreScrolling() {
+        if (this.outputElement) {
+            // Use the comprehensive forceScrolling method
+            this.forceScrolling();
+            
+            // Force scroll to top to ensure scrolling works
+            this.outputElement.scrollTop = 0;
+            
+            console.log('Terminal scrolling restored with forced settings');
+        }
     }
 }

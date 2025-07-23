@@ -71,6 +71,7 @@ export function setupOptimizedResizeHandler(terminal) {
     let resizeTimeout;
     let isResizing = false;
     let resizeStartTime = 0;
+    let scrollPosition = 0;
     
     // Listen for window resize events
     window.addEventListener('resize', () => {
@@ -78,14 +79,12 @@ export function setupOptimizedResizeHandler(terminal) {
             isResizing = true;
             resizeStartTime = performance.now();
             
-            // Disable output scrolling during resize for performance
+            // Store current scroll position
             if (terminal.outputElement) {
-                terminal.outputElement.style.overflow = 'hidden';
+                scrollPosition = terminal.outputElement.scrollTop;
+                // Don't disable overflow during resize - it breaks scrolling
+                // terminal.outputElement.style.overflow = 'hidden';
             }
-            // Keep input functional - don't disable pointer events
-            // if (terminal.inputElement) {
-            //     terminal.inputElement.style.pointerEvents = 'none';
-            // }
             
             // Disable status bar updates during resize
             terminal._statusBarDisabled = true;
@@ -94,13 +93,22 @@ export function setupOptimizedResizeHandler(terminal) {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
             if (terminal.outputElement) {
-                terminal.scrollToBottom();
-                terminal.outputElement.style.overflow = '';
+                // Restore scroll position or scroll to bottom if at bottom
+                if (scrollPosition === terminal.outputElement.scrollHeight - terminal.outputElement.clientHeight) {
+                    // Was at bottom, stay at bottom
+                    terminal.scrollToBottom();
+                } else {
+                    // Restore previous scroll position
+                    terminal.outputElement.scrollTop = scrollPosition;
+                }
+                
+                // Ensure overflow is properly restored
+                terminal.outputElement.style.overflow = 'auto';
+                terminal.outputElement.style.overflowY = 'auto';
             }
+            
             // Ensure input remains functional
             if (terminal.inputElement) {
-                // terminal.inputElement.style.pointerEvents = '';
-                // Restore focus to terminal input
                 setTimeout(() => {
                     if (terminal.inputElement) {
                         terminal.inputElement.focus();
@@ -137,26 +145,85 @@ export function setupOptimizedResizeHandler(terminal) {
                     terminal.inputElement.focus();
                 }
                 if (terminal.outputElement) {
-                    terminal.outputElement.style.overflow = '';
+                    // Ensure overflow is properly restored
+                    terminal.outputElement.style.overflow = 'auto';
+                    terminal.outputElement.style.overflowY = 'auto';
+                    
+                    // Restore scroll position or scroll to bottom
+                    if (scrollPosition === terminal.outputElement.scrollHeight - terminal.outputElement.clientHeight) {
+                        terminal.scrollToBottom();
+                    } else {
+                        terminal.outputElement.scrollTop = scrollPosition;
+                    }
                 }
-                // Ensure input remains functional
-                // if (terminal.inputElement) {
-                //     terminal.inputElement.style.pointerEvents = '';
-                // }
             }, 200);
         }
     }, { passive: true });
+    
+    // Listen for window maximize events
+    window.addEventListener('windowMaximize', (e) => {
+        if (e.detail.window.id === 'terminalWindow') {
+            setTimeout(() => {
+                if (terminal.inputElement) {
+                    terminal.inputElement.focus();
+                }
+                if (terminal.outputElement) {
+                    terminal.scrollToBottom();
+                }
+            }, 150);
+        }
+    });
+    
+    // Listen for window unmaximize events
+    window.addEventListener('windowUnmaximize', (e) => {
+        if (e.detail.window.id === 'terminalWindow') {
+            setTimeout(() => {
+                if (terminal.inputElement) {
+                    terminal.inputElement.focus();
+                }
+                if (terminal.outputElement) {
+                    terminal.scrollToBottom();
+                }
+            }, 150);
+        }
+    });
+    
+    // Periodic scroll position maintenance
+    setInterval(() => {
+        if (terminal.outputElement && !isResizing) {
+            // Update stored scroll position if not at bottom
+            const currentScroll = terminal.outputElement.scrollTop;
+            const maxScroll = terminal.outputElement.scrollHeight - terminal.outputElement.clientHeight;
+            if (currentScroll < maxScroll) {
+                scrollPosition = currentScroll;
+            }
+        }
+    }, 5000); // Check every 5 seconds
 }
 
 export function handleTerminalResize(terminal, size) {
+    // Store current scroll position before any operations
+    const currentScrollTop = terminal.outputElement.scrollTop;
+    const scrollHeight = terminal.outputElement.scrollHeight;
+    const clientHeight = terminal.outputElement.clientHeight;
+    const wasAtBottom = currentScrollTop >= (scrollHeight - clientHeight - 10); // 10px tolerance
+    
     // Ultra-minimal resize handling for maximum performance
     if (terminal.outputElement.children.length > 50) {
         // Only trim if there's a lot of content
         terminal.trimOutput();
     }
     
-    // Update scroll position
-    terminal.scrollToBottom();
+    // Restore scroll position after resize
+    setTimeout(() => {
+        if (wasAtBottom) {
+            // Was at bottom, scroll to bottom
+            terminal.scrollToBottom();
+        } else {
+            // Restore previous scroll position
+            terminal.outputElement.scrollTop = currentScrollTop;
+        }
+    }, 50);
 }
 
 export function setupMobileEventListeners(terminal) {

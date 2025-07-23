@@ -501,21 +501,7 @@
     }
 }
 
-/* Orbit Glow Animation */
-@keyframes orbitGlow {
-    0%, 100% { 
-        opacity: 0.6;
-        box-shadow: 
-            0 0 15px rgba(255, 255, 255, 0.08),
-            inset 0 0 15px rgba(255, 255, 255, 0.02);
-    }
-    50% { 
-        opacity: 0.8;
-        box-shadow: 
-            0 0 20px rgba(255, 255, 255, 0.12),
-            inset 0 0 20px rgba(255, 255, 255, 0.04);
-    }
-}
+
 
 /* Asteroid Orbit Animation */
 @keyframes asteroidOrbit {

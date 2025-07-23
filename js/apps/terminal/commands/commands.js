@@ -163,7 +163,7 @@ import {
     handleUlimit,
     handleUmask
 } from './environment.js';
-import { handleShow, loadResume, handleDemoscene } from '../content.js';
+import { handleShow, loadResume } from '../content.js';
 import { clear } from '../outputUtils.js';
 import { handleThemes, handleThemeSwitch } from '../theme.js';
 import { 
@@ -205,6 +205,11 @@ function getCoreCommands(terminal) {
         { name: 'show', handler: args => handleShow(terminal, args) },
         { name: 'clear', handler: () => clear(terminal) },
         { name: 'cls', handler: () => clear(terminal) },
+        { name: 'restore-scroll', handler: () => { 
+            terminal.forceScrolling(); 
+            terminal.restoreScrolling(); 
+            return 'Terminal scrolling restored with comprehensive settings'; 
+        } },
         { name: 'tracert', handler: args => handleTracert(args) },
         { name: 'traceroute', handler: args => handleTracert(args) },
         { name: 'nslookup', handler: args => handleNslookup(args) },
@@ -246,8 +251,8 @@ function getCoreCommands(terminal) {
 function getFileSystemCommands(terminal) {
     return [
         { name: 'cat', handler: args => handleCat(terminal, args) },
-        { name: 'head', handler: args => handleHead(args) },
-        { name: 'tail', handler: args => handleTail(args) },
+        { name: 'head', handler: async args => await handleHead(args) },
+        { name: 'tail', handler: async args => await handleTail(args) },
         { name: 'more', handler: args => handleMore(terminal, args) },
         { name: 'less', handler: args => handleLess(terminal, args) },
         { name: 'grep', handler: args => handleGrep(args) },
@@ -314,7 +319,16 @@ function getResumeCommands(terminal) {
         { name: 'jared', handler: async () => await loadResume() },
         { name: 'demoscene', handler: () => handleDemoscene() },
         { name: 'about', handler: async () => await loadResume() },
-        { name: 'bio', handler: async () => await loadResume() }
+        { name: 'bio', handler: async () => await loadResume() },
+        { name: 'test-resume', handler: async () => {
+            const content = await loadResume();
+            console.log('Resume content length:', content.length);
+            console.log('First 200 chars:', content.substring(0, 200));
+            console.log('Contains HTML tags:', /<[^>]*>/.test(content));
+            console.log('Contains span tags:', content.includes('</span>'));
+            console.log('Contains numbers that might be highlighted:', content.match(/\b\d+(?:\.\d+)?\b/g));
+            return `Resume test complete.\nLength: ${content.length}\nContains HTML: ${/<[^>]*>/.test(content)}\nContains span tags: ${content.includes('</span>')}\nSample content: ${content.substring(0, 100)}...`;
+        } }
     ];
 }
 
@@ -429,7 +443,6 @@ function getCiscoCommands(terminal) {
         { name: 'enable', handler: () => handleEnable() },
         { name: 'disable', handler: () => handleDisable() },
         { name: 'end', handler: () => handleEnd() },
-        { name: 'show', handler: args => handleCiscoShow(args) },
         { name: 'sh', handler: args => handleCiscoShow(args) },
         { name: 'no', handler: args => handleNo(args) },
         { name: 'do', handler: args => handleDo(args) }

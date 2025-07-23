@@ -14,7 +14,7 @@ const STATIC_FILES = [
     '/config/manifest.json',
     '/css/design-tokens.css',
     '/css/glass.css',
-    '/css/window.css',
+    '/css/window-base.css',
     '/css/terminal.css',
     '/css/desktop.css',
     '/css/animations.css',
