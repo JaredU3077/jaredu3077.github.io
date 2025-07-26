@@ -119,7 +119,7 @@ export class ParticleSystem {
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 20 !important; /* Lower than terminal window (2000) and neuOS widget (100) */
+            z-index: 15 !important; /* Much lower than terminal window (2000) */
             overflow: hidden;
             background: transparent !important;
             will-change: transform; /* Performance optimization */

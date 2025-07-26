@@ -528,7 +528,7 @@
         top: 50% !important;
         left: 50% !important;
         transform: translate(-50%, -50%) !important;
-        z-index: 500 !important; /* Lower than terminal window (2000) but above background elements */
+        z-index: 50 !important; /* Much lower than terminal window (2000) */
         display: flex !important;
         flex-direction: column !important;
         justify-content: center !important;

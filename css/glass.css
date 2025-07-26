@@ -237,10 +237,10 @@
 /* ===== NEUOS GLASS TITLE ===== */
 .neuos-glass-title {
     font-size: 4rem;
-    font-weight: 900;
-    color: var(--color-primary);
+    font-weight: 300; /* Thinner font weight like the widget */
+    color: var(--color-text-primary); /* White text like the widget */
     margin: 0;
-    text-shadow: 0 0 30px rgba(99, 102, 241, 0.6);
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.3); /* White glow instead of blue */
     letter-spacing: -0.025em;
     font-family: var(--font-family);
     z-index: 2;
@@ -397,7 +397,7 @@
     backdrop-filter: var(--glass-filter-medium);
     -webkit-backdrop-filter: var(--glass-filter-medium);
     box-shadow: var(--glass-shadow-medium), var(--glass-glow-medium);
-    z-index: 100; /* Lower than terminal window (2000) */
+    z-index: 50; /* Much lower than terminal window (2000) */
     border: 1px solid var(--color-border-subtle);
     transition: all var(--transition-normal);
     overflow: hidden;

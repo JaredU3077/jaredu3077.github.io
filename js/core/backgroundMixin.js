@@ -41,7 +41,7 @@ export const backgroundMixin = {
                 #1a0000 100%) !important;
             border-radius: 50% !important;
             pointer-events: none !important;
-            z-index: 10 !important; /* Lower than terminal window (2000) and neuOS widget (100) */
+            z-index: 5 !important; /* Much lower than terminal window (2000) */
             box-shadow: 
                 0 0 60px #ffd700,
                 0 0 120px #ff8c00,
@@ -68,7 +68,7 @@ export const backgroundMixin = {
                 transparent 100%) !important;
             border-radius: 50% !important;
             pointer-events: none !important;
-            z-index: 9 !important; /* Lower than terminal window (2000) and neuOS widget (100) */
+            z-index: 4 !important; /* Much lower than terminal window (2000) */
             animation: coronaPulse 8s ease-in-out infinite !important;
         `, fragment);
 
@@ -115,7 +115,7 @@ export const backgroundMixin = {
             --planet-temperature: ${planet.temperature} !important;
             animation: solarOrbit ${planet.speed}s linear infinite !important;
             pointer-events: auto !important;
-            z-index: 11 !important; /* Lower than terminal window (2000) and neuOS widget (100) */
+            z-index: 6 !important; /* Much lower than terminal window (2000) */
             box-shadow: 
                 0 0 20px ${planet.color},
                 0 0 35px ${planet.color}60,
@@ -201,7 +201,7 @@ export const backgroundMixin = {
             background: ${ringGradient} !important;
             border-radius: 50% !important;
             pointer-events: none !important;
-            z-index: 12 !important; /* Lower than terminal window (2000) and neuOS widget (100) */
+            z-index: 7 !important; /* Much lower than terminal window (2000) */
             animation: planetRingRotate ${planet.speed * 0.4}s linear infinite !important;
             margin: 0 !important;
             padding: 0 !important;
@@ -236,7 +236,7 @@ export const backgroundMixin = {
                 --moon-offset: ${moonOffset}deg !important;
                 animation: moonOrbit ${moonSpeed}s linear infinite !important;
                 pointer-events: none !important;
-                z-index: 13 !important; /* Lower than terminal window (2000) and neuOS widget (100) */
+                z-index: 8 !important; /* Much lower than terminal window (2000) */
                 box-shadow: 
                     0 0 10px rgba(192, 192, 192, 0.9),
                     0 0 15px rgba(192, 192, 192, 0.7),
@@ -272,7 +272,7 @@ export const backgroundMixin = {
                 --asteroid-offset: ${offset}deg !important;
                 animation: asteroidOrbit ${speed}s linear infinite !important;
                 pointer-events: none !important;
-                z-index: 14 !important; /* Lower than terminal window (2000) and neuOS widget (100) */
+                z-index: 9 !important; /* Much lower than terminal window (2000) */
                 box-shadow: 0 0 5px rgba(139, 69, 19, 0.8) !important;
                 margin: 0 !important;
                 padding: 0 !important;
@@ -304,7 +304,7 @@ export const backgroundMixin = {
                 --kbo-offset: ${offset}deg !important;
                 animation: kboOrbit ${speed}s linear infinite !important;
                 pointer-events: none !important;
-                z-index: 15 !important; /* Lower than terminal window (2000) and neuOS widget (100) */
+                z-index: 10 !important; /* Much lower than terminal window (2000) */
                 box-shadow: 0 0 8px rgba(173, 216, 230, 0.6) !important;
                 margin: 0 !important;
                 padding: 0 !important;
@@ -331,7 +331,7 @@ export const backgroundMixin = {
                 transparent 100%) !important;
             border-radius: 50% !important;
             pointer-events: none !important;
-            z-index: 16 !important; /* Lower than terminal window (2000) and neuOS widget (100) */
+            z-index: 11 !important; /* Much lower than terminal window (2000) */
             box-shadow: 
                 0 0 15px rgba(255, 255, 255, 0.8),
                 0 0 25px rgba(173, 216, 230, 0.6),
@@ -354,7 +354,7 @@ export const backgroundMixin = {
                 transparent 100%) !important;
             border-radius: 2px !important;
             pointer-events: none !important;
-            z-index: 15 !important; /* Lower than terminal window (2000) and neuOS widget (100) */
+            z-index: 10 !important; /* Much lower than terminal window (2000) */
             animation: cometTrajectory 120s linear infinite !important;
             margin: 0 !important;
             padding: 0 !important;
