@@ -222,14 +222,19 @@
                 const swPath = window.location.hostname === 'localhost' ? '/sw.js' : './sw.js';
                 navigator.serviceWorker.register(swPath)
                     .then((registration) => {
-                        console.log('neuOS: Service Worker registered successfully:', registration);
+                        // Only log if debug is enabled
+                        if (window.neuOSLogger && window.neuOSLogger.isDebugEnabled) {
+                            console.log('neuOS: Service Worker registered successfully:', registration);
+                        }
                         
                         // Check for updates
                         registration.addEventListener('updatefound', () => {
                             const newWorker = registration.installing;
                             newWorker.addEventListener('statechange', () => {
                                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                    console.log('neuOS: New version available');
+                                    if (window.neuOSLogger && window.neuOSLogger.isDebugEnabled) {
+                                        console.log('neuOS: New version available');
+                                    }
                                 }
                             });
                         });

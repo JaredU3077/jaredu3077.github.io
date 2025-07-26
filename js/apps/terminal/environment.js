@@ -1,3 +1,5 @@
+import { NeuOSLogger } from '../../utils/utils.js';
+
 // js/apps/terminal/environment.js
 
 /**
@@ -9,8 +11,9 @@
  * Update the terminal environment
  */
 export function updateEnvironment(terminal) {
-    console.log('updateEnvironment called with terminal:', terminal);
-    console.log('terminal.workingDirectory:', terminal?.workingDirectory);
+    const logger = NeuOSLogger.getInstance();
+    logger.debug('updateEnvironment called with terminal:', terminal);
+    logger.debug('terminal.workingDirectory:', terminal?.workingDirectory);
     
     // Update current working directory display
     const cwdElement = document.querySelector('.terminal-cwd');
@@ -33,8 +36,9 @@ export function updateEnvironment(terminal) {
  * @returns {string} The formatted prompt
  */
 export function getPrompt(terminal) {
-    console.log('getPrompt called with terminal:', terminal);
-    console.log('terminal.workingDirectory:', terminal?.workingDirectory);
+    const logger = NeuOSLogger.getInstance();
+    logger.debug('getPrompt called with terminal:', terminal);
+    logger.debug('terminal.workingDirectory:', terminal?.workingDirectory);
     
     const cwd = terminal.workingDirectory || '~';
     const user = terminal.environment?.USER || 'jared';

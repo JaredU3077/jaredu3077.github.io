@@ -1,3 +1,5 @@
+import { NeuOSLogger } from '../utils/utils.js';
+
 /**
  * @file Background Music Module - Performance Optimized
  * Handles background music management with improved performance
@@ -52,7 +54,8 @@ export class BackgroundMusic {
     setupBackgroundMusic() {
         this.backgroundMusic = document.getElementById('backgroundMusic');
         if (!this.backgroundMusic) {
-            console.error('Background music element not found - check if audio element exists in HTML');
+            const logger = NeuOSLogger.getInstance();
+            logger.error('Background music element not found - check if audio element exists in HTML');
             return;
         }
 
@@ -63,8 +66,9 @@ export class BackgroundMusic {
         
         // Add error handling for missing audio file
         this.backgroundMusic.addEventListener('error', (e) => {
-            console.error('Background music file not found or cannot be loaded:', e);
-            console.error('Audio error details:', {
+            const logger = NeuOSLogger.getInstance();
+            logger.error('Background music file not found or cannot be loaded:', e);
+            logger.error('Audio error details:', {
                 error: this.backgroundMusic.error,
                 networkState: this.backgroundMusic.networkState,
                 readyState: this.backgroundMusic.readyState
@@ -89,7 +93,8 @@ export class BackgroundMusic {
                 window.audioSystemInstance.audioContext.resume().then(() => {
                     // Audio context resumed
                 }).catch(err => {
-                    console.warn('Failed to resume audio context:', err);
+                    const logger = NeuOSLogger.getInstance();
+                    logger.warn('Failed to resume audio context:', err);
                 });
             }
         });
@@ -124,13 +129,15 @@ export class BackgroundMusic {
         const playMusic = () => {
             this.backgroundMusic.play().then(() => {
                 // Music started successfully
-                console.log('Background music started successfully');
+                const logger = NeuOSLogger.getInstance();
+                logger.debug('Background music started successfully');
             }).catch(error => {
                 // Silently handle autoplay policy errors - this is expected
                 if (error.name === 'NotAllowedError') {
                     // This is normal - music will start on first user interaction
                 } else {
-                    console.warn('Could not start background music:', error);
+                    const logger = NeuOSLogger.getInstance();
+                    logger.warn('Could not start background music:', error);
                 }
             });
         };
@@ -166,14 +173,15 @@ export class BackgroundMusic {
     }
 
     toggleBackgroundMusic() {
-        console.log('toggleBackgroundMusic called', { 
+        const logger = NeuOSLogger.getInstance();
+        logger.debug('toggleBackgroundMusic called', { 
             musicEnabled: this.musicEnabled, 
             toggleInProgress: this.toggleInProgress 
         });
         
         // Prevent rapid clicking
         if (this.toggleInProgress) {
-            console.log('Toggle in progress, ignoring click');
+            logger.debug('Toggle in progress, ignoring click');
             return;
         }
         
@@ -191,7 +199,7 @@ export class BackgroundMusic {
         // Simple toggle logic
         if (this.musicEnabled) {
             // Disable music
-            console.log('Disabling music');
+            logger.debug('Disabling music');
             this.musicEnabled = false;
             this.userManuallyDisabled = true;
             localStorage.setItem('neuos-music', 'false');
@@ -201,16 +209,16 @@ export class BackgroundMusic {
             }
         } else {
             // Enable music
-            console.log('Enabling music');
+            logger.debug('Enabling music');
             this.musicEnabled = true;
             this.userManuallyDisabled = false;
             localStorage.setItem('neuos-music', 'true');
             
             if (this.backgroundMusic && this.backgroundMusic.paused) {
                 this.backgroundMusic.play().then(() => {
-                    console.log('Music resumed successfully');
+                    logger.debug('Music resumed successfully');
                 }).catch(error => {
-                    console.warn('Could not resume background music:', error);
+                    logger.warn('Could not resume background music:', error);
                 });
             }
         }
@@ -226,14 +234,16 @@ export class BackgroundMusic {
     updateAudioControls() {
         const audioToggle = document.getElementById('audioToggle');
         if (!audioToggle) {
-            console.warn('Audio toggle element not found in updateAudioControls');
+            const logger = NeuOSLogger.getInstance();
+            logger.warn('Audio toggle element not found in updateAudioControls');
             return;
         }
         
         const audioOn = audioToggle.querySelector('.audio-on');
         const audioOff = audioToggle.querySelector('.audio-off');
         
-        console.log('updateAudioControls', { 
+        const logger = NeuOSLogger.getInstance();
+        logger.debug('updateAudioControls', { 
             musicEnabled: this.musicEnabled,
             audioOn: !!audioOn,
             audioOff: !!audioOff
@@ -265,7 +275,8 @@ export class BackgroundMusic {
                 console.warn('Could not start background music via terminal:', error);
             });
         } else {
-            console.warn('Background music not available or disabled');
+            const logger = NeuOSLogger.getInstance();
+            logger.warn('Background music not available or disabled');
         }
     }
 
@@ -279,12 +290,14 @@ export class BackgroundMusic {
 
     // Volume slider functionality (optimized)
     setupVolumeSlider() {
+        const logger = NeuOSLogger.getInstance();
+        
         this.volumeSlider = document.querySelector('.volume-slider');
         this.volumeProgress = document.querySelector('.volume-progress');
         this.volumeIndicator = document.querySelector('.volume-indicator');
         this.audioToggle = document.getElementById('audioToggle');
         
-        console.log('setupVolumeSlider - Elements found:', {
+        logger.debug('setupVolumeSlider - Elements found:', {
             volumeSlider: !!this.volumeSlider,
             volumeProgress: !!this.volumeProgress,
             volumeIndicator: !!this.volumeIndicator,
@@ -292,7 +305,7 @@ export class BackgroundMusic {
         });
         
         if (!this.volumeSlider || !this.volumeProgress || !this.volumeIndicator) {
-            console.warn('Volume slider elements not found - audio controls may not be loaded yet');
+            logger.warn('Volume slider elements not found - audio controls may not be loaded yet');
             return;
         }
         
@@ -306,7 +319,7 @@ export class BackgroundMusic {
         
         // Add event listeners for drag functionality using pointerdown for consistency
         this.volumeSlider.addEventListener('pointerdown', (e) => {
-            console.log('Volume slider pointerdown event triggered');
+            logger.debug('Volume slider pointerdown event triggered');
             this.startVolumeDrag(e);
         });
         
@@ -316,7 +329,7 @@ export class BackgroundMusic {
             this.audioToggle.removeEventListener('click', this.boundToggleBackgroundMusic);
             // Add the click listener for toggling music
             this.audioToggle.addEventListener('click', () => {
-                console.log('Audio toggle clicked');
+                logger.debug('Audio toggle clicked');
                 this.toggleBackgroundMusic();
             });
             // Prevent dragging on the audio toggle button
@@ -326,7 +339,7 @@ export class BackgroundMusic {
         // Prevent context menu on right click
         this.volumeSlider.addEventListener('contextmenu', (e) => e.preventDefault());
         
-        console.log('Volume slider setup complete - event listeners added');
+        logger.debug('Volume slider setup complete - event listeners added');
     }
     
     startVolumeDrag(e) {
@@ -526,20 +539,21 @@ export class BackgroundMusic {
     
     // Method to setup volume slider after audio controls are added to DOM
     setupVolumeSliderAfterLogin() {
-        console.log('setupVolumeSliderAfterLogin called');
+        const logger = NeuOSLogger.getInstance();
+        logger.debug('setupVolumeSliderAfterLogin called');
         // Wait a bit for DOM to be ready
         setTimeout(() => {
-            console.log('Attempting to setup volume slider...');
+            logger.debug('Attempting to setup volume slider...');
             this.setupVolumeSlider();
             
             // If elements still not found, retry once more
             if (!this.volumeSlider || !this.volumeProgress || !this.volumeIndicator) {
-                console.log('Elements not found, retrying...');
+                logger.debug('Elements not found, retrying...');
                 setTimeout(() => {
                     this.setupVolumeSlider();
                 }, 200);
             } else {
-                console.log('Volume slider setup successful');
+                logger.debug('Volume slider setup successful');
             }
         }, 100);
     }

@@ -1,3 +1,5 @@
+import { NeuOSLogger } from './utils.js';
+
 /**
  * neuOS Performance Monitor
  * Tracks and reports performance metrics for the application
@@ -49,7 +51,8 @@ export class NeuOSPerformanceMonitor {
         this.monitorFrameRate();
         this.monitorMemoryUsage();
         
-        console.log('neuOS Performance Monitor: Started monitoring');
+        const logger = NeuOSLogger.getInstance();
+        logger.info('Performance Monitor: Started monitoring');
     }
 
     monitorLoadPerformance() {
@@ -239,15 +242,17 @@ export class NeuOSPerformanceMonitor {
     }
 
     reportMetric(name, value) {
+        const logger = NeuOSLogger.getInstance();
+        
         // Log significant performance issues
         if (name === 'longTask' && value > 100) {
-            console.warn(`Performance Monitor: Long task detected - ${value.toFixed(2)}ms`);
+            logger.warn(`Performance Monitor: Long task detected - ${value.toFixed(2)}ms`);
         } else if (name === 'layoutShift' && value > 0.25) {
-            console.warn(`Performance Monitor: Significant layout shift detected - ${value.toFixed(3)}`);
+            logger.warn(`Performance Monitor: Significant layout shift detected - ${value.toFixed(3)}`);
         } else if (name === 'lowFPS' && value < 20) {
-            console.warn(`Performance Monitor: Very low FPS detected - ${value}fps`);
+            logger.warn(`Performance Monitor: Very low FPS detected - ${value}fps`);
         } else if (name === 'highMemoryUsage' && value > 90) {
-            console.warn(`Performance Monitor: Very high memory usage - ${value.toFixed(1)}%`);
+            logger.warn(`Performance Monitor: Very high memory usage - ${value.toFixed(1)}%`);
         }
         
         // Emit custom event for other components to listen to
@@ -288,10 +293,9 @@ export class NeuOSPerformanceMonitor {
 
     logPerformanceReport() {
         const report = this.getPerformanceReport();
-        console.group('neuOS Performance Report');
-        console.log('Summary:', report.summary);
-        console.log('Full Report:', report);
-        console.groupEnd();
+        const logger = NeuOSLogger.getInstance();
+        logger.info('Performance Report Summary:', report.summary);
+        logger.debug('Full Performance Report:', report);
     }
 
                stopMonitoring() {

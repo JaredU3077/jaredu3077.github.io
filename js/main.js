@@ -9,7 +9,7 @@ import { WindowManager } from './core/window.js';
 import { HelpManager } from './utils/help.js';
 import { BootSystem } from './core/boot.js';
 import { CONFIG, createAppButton } from './config.js';
-import { debounce } from './utils/utils.js';
+import { debounce, NeuOSLogger } from './utils/utils.js';
 
 // Import mobile utilities
 import './utils/mobile.js';
@@ -28,6 +28,10 @@ import DraggableSystem from './utils/draggable.js';
 
 // Create namespace for globals to avoid direct window pollution
 window.neuOS = window.neuOS || {};
+
+// Initialize logger early
+const logger = NeuOSLogger.getInstance();
+window.neuOSLogger = logger;
 
 // --- MODULE INITIALIZATION ---
 /** @type {WindowManager} */
@@ -54,13 +58,13 @@ try {
     windowManager = new WindowManager();
     window.neuOS.windowManager = windowManager;
 } catch (error) {
-    console.error('neuOS: Failed to initialize WindowManager:', error);
+    logger.error('Failed to initialize WindowManager:', error);
 }
 
 try {
     helpManager = new HelpManager();
 } catch (error) {
-    console.error('neuOS: Failed to initialize HelpManager:', error);
+    logger.error('Failed to initialize HelpManager:', error);
 }
 
 
@@ -69,21 +73,21 @@ try {
     glassMorphismSystem = new GlassMorphismSystem();
     window.neuOS.glassMorphismSystem = glassMorphismSystem;
 } catch (error) {
-    console.error('neuOS: Failed to initialize GlassMorphismSystem:', error);
+    logger.error('Failed to initialize GlassMorphismSystem:', error);
 }
 
 try {
     glassEffects = new GlassEffects();
     window.neuOS.glassEffects = glassEffects;
 } catch (error) {
-    console.error('neuOS: Failed to initialize GlassEffects:', error);
+    logger.error('Failed to initialize GlassEffects:', error);
 }
 
 try {
     draggableSystem = new DraggableSystem();
     window.neuOS.draggableSystem = draggableSystem;
 } catch (error) {
-    console.error('neuOS: Failed to initialize DraggableSystem:', error);
+    logger.error('Failed to initialize DraggableSystem:', error);
 }
 
 // --- UI INITIALIZATION ---
@@ -96,7 +100,7 @@ function initializeUI() {
     
     // Add null check to prevent errors
     if (!desktopIcons) {
-        console.error('Desktop icons container not found');
+        logger.error('Desktop icons container not found');
         return;
     }
     

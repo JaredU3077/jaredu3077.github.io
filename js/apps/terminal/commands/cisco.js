@@ -32,7 +32,7 @@ export function handleMonitor() {
     return 'Monitoring not available in demo mode.';
 }
 
-export function handleDebug() {
+export function handleCiscoDebug() {
     return 'Debug mode not available in demo mode.';
 }
 

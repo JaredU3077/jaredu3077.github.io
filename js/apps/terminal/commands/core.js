@@ -1,4 +1,5 @@
 // js/apps/terminal/commands/core.js
+import { NeuOSLogger } from '../../../utils/utils.js';
 
 export function handlePwd(terminal) {
     return terminal.workingDirectory;
@@ -99,4 +100,38 @@ export function handleHistory(terminal) {
         return 'No command history available.';
     }
     return terminal.history.map((cmd, index) => `${index + 1}  ${cmd}`).join('\n');
+}
+
+export function handleDebug(terminal, args) {
+    const logger = NeuOSLogger.getInstance();
+    const [action] = args;
+    
+    if (!action || action === 'status') {
+        const debugEnabled = logger.isDebugEnabled;
+        const verboseEnabled = logger.isVerboseEnabled;
+        const logLevel = logger.logLevel;
+        return `debug logging: ${debugEnabled ? 'enabled' : 'disabled'}\nverbose logging: ${verboseEnabled ? 'enabled' : 'disabled'}\nlog level: ${logLevel}`;
+    } else if (action === 'on') {
+        logger.setDebugEnabled(true);
+        return 'debug logging enabled';
+    } else if (action === 'off') {
+        logger.setDebugEnabled(false);
+        return 'debug logging disabled';
+    } else if (action === 'verbose') {
+        logger.setVerboseEnabled(true);
+        return 'verbose logging enabled';
+    } else if (action === 'quiet') {
+        logger.setVerboseEnabled(false);
+        return 'verbose logging disabled';
+    } else if (action === 'level') {
+        const [level] = args.slice(1);
+        if (level && ['error', 'warn', 'info', 'debug', 'verbose'].includes(level)) {
+            logger.setLogLevel(level);
+            return `log level set to: ${level}`;
+        } else {
+            return 'usage: debug level <error|warn|info|debug|verbose>';
+        }
+    } else {
+        return 'usage: debug <on|off|verbose|quiet|level|status>';
+    }
 }

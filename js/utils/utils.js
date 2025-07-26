@@ -428,6 +428,133 @@ export class EventEmitter {
     }
 }
 
+/**
+ * neuOS Logging Utility
+ * Provides controlled logging with different levels and the ability to disable debug logs
+ * @author Jared U.
+ * @tags neu-os
+ */
+export class NeuOSLogger {
+    constructor() {
+        this.isDebugEnabled = localStorage.getItem('neuos-debug-logs') === 'true';
+        this.isVerboseEnabled = localStorage.getItem('neuos-verbose-logs') === 'true';
+        this.logLevel = localStorage.getItem('neuos-log-level') || 'warn'; // error, warn, info, debug, verbose
+        
+        // Set default to warn level to reduce console clutter
+        if (!localStorage.getItem('neuos-log-level')) {
+            this.logLevel = 'warn';
+            localStorage.setItem('neuos-log-level', 'warn');
+        }
+    }
+
+    /**
+     * Log a message with the specified level
+     * @param {string} level - The log level (error, warn, info, debug, verbose)
+     * @param {string} message - The message to log
+     * @param {...any} args - Additional arguments to log
+     */
+    log(level, message, ...args) {
+        const levels = {
+            error: 0,
+            warn: 1,
+            info: 2,
+            debug: 3,
+            verbose: 4
+        };
+
+        const currentLevel = levels[this.logLevel] || 1;
+        const messageLevel = levels[level] || 1;
+
+        // Only log if the message level is at or below the current log level
+        if (messageLevel <= currentLevel) {
+            const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+            const prefix = `[neuOS ${timestamp}]`;
+            
+            switch (level) {
+                case 'error':
+                    console.error(prefix, message, ...args);
+                    break;
+                case 'warn':
+                    console.warn(prefix, message, ...args);
+                    break;
+                case 'info':
+                    console.info(prefix, message, ...args);
+                    break;
+                case 'debug':
+                    if (this.isDebugEnabled) {
+                        console.log(prefix, message, ...args);
+                    }
+                    break;
+                case 'verbose':
+                    if (this.isVerboseEnabled) {
+                        console.log(prefix, message, ...args);
+                    }
+                    break;
+                default:
+                    console.log(prefix, message, ...args);
+            }
+        }
+    }
+
+    error(message, ...args) {
+        this.log('error', message, ...args);
+    }
+
+    warn(message, ...args) {
+        this.log('warn', message, ...args);
+    }
+
+    info(message, ...args) {
+        this.log('info', message, ...args);
+    }
+
+    debug(message, ...args) {
+        this.log('debug', message, ...args);
+    }
+
+    verbose(message, ...args) {
+        this.log('verbose', message, ...args);
+    }
+
+    /**
+     * Enable or disable debug logging
+     * @param {boolean} enabled - Whether to enable debug logging
+     */
+    setDebugEnabled(enabled) {
+        this.isDebugEnabled = enabled;
+        localStorage.setItem('neuos-debug-logs', enabled.toString());
+    }
+
+    /**
+     * Enable or disable verbose logging
+     * @param {boolean} enabled - Whether to enable verbose logging
+     */
+    setVerboseEnabled(enabled) {
+        this.isVerboseEnabled = enabled;
+        localStorage.setItem('neuos-verbose-logs', enabled.toString());
+    }
+
+    /**
+     * Set the log level
+     * @param {string} level - The log level (error, warn, info, debug, verbose)
+     */
+    setLogLevel(level) {
+        this.logLevel = level;
+        localStorage.setItem('neuos-log-level', level);
+    }
+
+    /**
+     * Get the current logger instance
+     * @returns {NeuOSLogger} The logger instance
+     */
+    static getInstance() {
+        if (!window.neuOSLogger) {
+            window.neuOSLogger = new NeuOSLogger();
+        }
+        return window.neuOSLogger;
+    }
+}
+
 // Create global instances
 export const performanceMonitor = new PerformanceMonitor();
 export const eventEmitter = new EventEmitter();

@@ -14,7 +14,8 @@ import {
     handleUname,
     handleHostname,
     handleVersion,
-    handleHistory
+    handleHistory,
+    handleDebug
 } from './core.js';
 import {
     handleCat,
@@ -131,7 +132,7 @@ import {
     handleEigrp,
     handleAccessList,
     handleMonitor,
-    handleDebug,
+    handleCiscoDebug,
     handleReload,
     handleCopy,
     handleWrite,
@@ -244,7 +245,8 @@ function getCoreCommands(terminal) {
         { name: 'man', handler: args => terminal.handleMan(args) },
         { name: 'info', handler: args => terminal.handleInfo(args) },
         { name: 'whatis', handler: args => terminal.handleWhatis(args) },
-        { name: 'apropos', handler: args => terminal.handleApropos(args) }
+        { name: 'apropos', handler: args => terminal.handleApropos(args) },
+        { name: 'debug', handler: args => handleDebug(terminal, args) }
     ];
 }
 
@@ -432,7 +434,7 @@ function getCiscoCommands(terminal) {
         { name: 'acl', handler: () => handleAccessList() },
         { name: 'logging', handler: () => terminal.handleLogging() },
         { name: 'monitor', handler: () => handleMonitor() },
-        { name: 'debug', handler: () => handleDebug() },
+        { name: 'debug', handler: () => handleCiscoDebug() },
         { name: 'reload', handler: () => handleReload() },
         { name: 'copy', handler: () => handleCopy() },
         { name: 'write', handler: () => handleWrite() },

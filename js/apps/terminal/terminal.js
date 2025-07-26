@@ -1,6 +1,6 @@
 // js/apps/terminal/terminal.js
 
-import { AppError, ErrorTypes, eventEmitter } from '../../utils/utils.js';
+import { AppError, ErrorTypes, eventEmitter, NeuOSLogger } from '../../utils/utils.js';
 import { CONFIG } from '../../config.js';
 import { registerCommands } from './commands/commands.js';
 import {
@@ -143,6 +143,7 @@ export class Terminal {
                 <p>use 'theme <name>' to switch themes</p>
                 <p>type 'help' for available commands</p>
                 <p>working directory: ${this.workingDirectory}</p>
+                <p>use 'debug on' to enable debug logging</p>
             </div>`);
             this.inputElement.focus();
             
@@ -176,7 +177,9 @@ export class Terminal {
             this.outputElement.style.wordWrap = 'break-word';
             this.outputElement.style.whiteSpace = 'pre-wrap';
             
-            console.log('Terminal scrolling forced to work');
+            // Use logger instead of console.log
+            const logger = NeuOSLogger.getInstance();
+            logger.debug('Terminal scrolling forced to work');
         }
     }
 
