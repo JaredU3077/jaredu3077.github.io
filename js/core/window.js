@@ -7,7 +7,7 @@ import { AutoScrollHandler } from './autoScrollHandler.js';
 
 /**
  * Manages windows in the OS-like interface.
- * Handles creation, movement, resizing, and focus of windows.
+ * Handles creation, movement, resizing, and focus of windows with performance optimizations.
  * @class WindowManager
  */
 export class WindowManager {
@@ -37,44 +37,50 @@ export class WindowManager {
         this.snapHandler = new SnapHandler(this);
         this.autoScrollHandler = new AutoScrollHandler(this);
 
+        // Performance optimizations
+        this.domCache = new Map(); // Cache DOM queries
+        this.styleCache = new Map(); // Cache computed styles
+        this.lastResizeTime = 0;
+        this.resizeThrottle = 32; // ~30fps for better performance
+        this.batchUpdates = []; // Batch DOM updates
+        this.updateScheduled = false;
+        this.maxWindows = 5; // Limit number of windows for performance
+
         this.setupGlobalObservers();
         this.setupEventListeners();
     }
 
     /**
-     * Sets up global observers for resize and position changes.
+     * Sets up global observers for resize and position changes (optimized).
      * @private
      * @memberof WindowManager
      */
     setupGlobalObservers() {
-        // Resize observer for window size changes
+        // Throttled resize observer for better performance
+        let resizeTimeout;
         this.resizeObserver = new ResizeObserver(entries => {
-            for (const entry of entries) {
-                const windowObj = this.windows.get(entry.target.id);
-                if (windowObj) {
-                    this.updateWindowSize(windowObj);
-                }
+            if (resizeTimeout) {
+                clearTimeout(resizeTimeout);
             }
-        });
-
-        // Mutation observer for position changes via style attributes
-        this.moveObserver = new MutationObserver(mutations => {
-            for (const mutation of mutations) {
-                if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-                    const windowObj = this.windows.get(mutation.target.id);
+            
+            resizeTimeout = setTimeout(() => {
+                for (const entry of entries) {
+                    const windowObj = this.windows.get(entry.target.id);
                     if (windowObj) {
-                        this.updateWindowPosition(windowObj);
+                        this.updateWindowSize(windowObj);
                     }
                 }
-            }
+            }, 16); // Throttle to ~60fps
         });
+
+
         
         // Store observed elements for proper cleanup
         this.observedElements = new Set();
     }
 
     /**
-     * Creates a new window and adds it to the desktop.
+     * Creates a new window and adds it to the desktop (optimized).
      * @param {object} options - The options for the new window.
      * @param {string} options.id - The unique ID for the window.
      * @param {string} options.title - The title of the window.
@@ -100,210 +106,344 @@ export class WindowManager {
             height = window.innerHeight - 100;
         }
 
-        const minWidth = isMobile ? 300 : (CONFIG.window?.minWidth || 300);
-        const maxWidth = isMobile ? window.innerWidth : (CONFIG.window?.maxWidth || 2000);
-        const minHeight = isMobile ? 200 : (CONFIG.window?.minHeight || 200);
-        const maxHeight = isMobile ? window.innerHeight : (CONFIG.window?.maxHeight || 1500);
-
-        width = Math.min(Math.max(width, minWidth), maxWidth);
-        height = Math.min(Math.max(height, minHeight), maxHeight);
-
-        const desktop = document.getElementById('desktop');
-        if (!desktop) {
-            throw new Error('Desktop element not found! Cannot create window.');
-        }
-
-        let left = (desktop.clientWidth - width) / 2;
-        let top = (desktop.clientHeight - height) / 2;
-
-        if (isMobile) {
-            left = 0;
-            top = 0;
-        } else {
-            left = Math.max(0, Math.min(left, desktop.clientWidth - width));
-            top = Math.max(0, Math.min(top, desktop.clientHeight - height));
-        }
-
+        // Create window element with optimized structure
         const windowElement = document.createElement('div');
-        windowElement.className = type === 'game' ? 'window game-window' : 'window';
+        windowElement.className = 'window';
         windowElement.id = id;
+        windowElement.setAttribute('data-window-type', type);
         windowElement.setAttribute('role', 'dialog');
         windowElement.setAttribute('aria-label', title);
-        windowElement.style.position = 'absolute';
-        windowElement.style.width = `${width}px`;
-        windowElement.style.height = `${height}px`;
-        windowElement.style.left = `${left}px`;
-        windowElement.style.top = `${top}px`;
-        windowElement.style.zIndex = this.getNextZIndex();
-
-        windowElement.innerHTML = `
-            <div class="window-header" role="banner" aria-label="${title} window header">
-                <div class="window-title">
-                    <span class="icon">${icon || ''}</span>
-                    <span class="label">${title}</span>
-                </div>
-                <div class="window-controls">
-                    <button class="window-control minimize" title="Minimize" aria-label="Minimize window">-</button>
-                    <button class="window-control maximize" title="Maximize" aria-label="Maximize window">□</button>
-                    <button class="window-control close" title="Close" aria-label="Close window">×</button>
-                </div>
-            </div>
-            <div class="window-content" tabindex="0" data-scroll-container>
-                ${content}
-            </div>
-            <!-- Resize handles will be created by ResizeHandler -->
+        windowElement.setAttribute('aria-modal', 'true');
+        
+        // Use CSS transform for better performance
+        // Special handling for terminal window - use CSS z-index instead of JavaScript counter
+        const zIndex = (id === 'terminalWindow') ? 10001 : this.getNextZIndex();
+        windowElement.style.cssText = `
+            position: absolute;
+            width: ${width}px;
+            height: ${height}px;
+            z-index: ${zIndex};
+            will-change: transform;
+            transform: translateZ(0);
         `;
-        desktop.appendChild(windowElement);
 
+        // Create window header with optimized structure
+        const header = document.createElement('div');
+        header.className = 'window-header';
+        header.setAttribute('role', 'banner');
+        
+        // Create title with icon and text directly in header
+        const titleElement = document.createElement('span');
+        titleElement.className = 'window-title';
+        
+        if (icon) {
+            const iconElement = document.createElement('span');
+            iconElement.className = 'window-icon';
+            iconElement.innerHTML = icon;
+            titleElement.appendChild(iconElement);
+        }
+        
+        const titleText = document.createElement('span');
+        titleText.className = 'title-text';
+        titleText.textContent = title;
+        titleElement.appendChild(titleText);
+        
+        header.appendChild(titleElement);
+
+        // Create window controls with optimized event handling
+        const controls = document.createElement('div');
+        controls.className = 'window-controls';
+        
+        const minimizeBtn = document.createElement('button');
+        minimizeBtn.className = 'window-control minimize';
+        minimizeBtn.setAttribute('aria-label', 'Minimize window');
+        minimizeBtn.innerHTML = '−';
+        
+        const maximizeBtn = document.createElement('button');
+        maximizeBtn.className = 'window-control maximize';
+        maximizeBtn.setAttribute('aria-label', 'Maximize window');
+        maximizeBtn.innerHTML = '□';
+        
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'window-control close';
+        closeBtn.setAttribute('aria-label', 'Close window');
+        closeBtn.innerHTML = '×';
+        
+        controls.appendChild(minimizeBtn);
+        controls.appendChild(maximizeBtn);
+        controls.appendChild(closeBtn);
+        header.appendChild(controls);
+
+        // Create window content area
+        const contentArea = document.createElement('div');
+        contentArea.className = 'window-content';
+        contentArea.setAttribute('role', 'main');
+        contentArea.innerHTML = content;
+
+        // Assemble window
+        windowElement.appendChild(header);
+        windowElement.appendChild(contentArea);
+
+        // Add to desktop
+        const desktop = this.getDesktopElement();
+        if (desktop) {
+            desktop.appendChild(windowElement);
+        }
+
+        // Create window object with optimized properties
         const windowObj = {
-            element: windowElement,
             id,
+            element: windowElement,
             title,
-            content,
+            type,
             width,
             height,
-            left,
-            top,
-            isMaximized: false,
             isMinimized: false,
-            originalPosition: { left, top, width, height },
+            isMaximized: false,
+            isResizable: true,
+            isDraggable: true,
             autoScroll,
-            type,
-            _hasBeenResized: false,
-            _isSnapped: false,
-            _isDragging: false,
-            _isResizing: false
+            zIndex: this.getNextZIndex(),
+            position: { x: 0, y: 0 },
+            size: { width, height },
+            originalSize: { width, height },
+            originalPosition: { x: 0, y: 0 }
         };
 
+        // Store window reference
         this.windows.set(id, windowObj);
         this.windowStack.push(windowObj);
 
+        // Cache DOM elements for better performance
+        this.cacheWindowElements(windowObj);
+
+        // Setup window events with optimized handlers
         this.setupWindowEvents(windowObj);
+
+        // Position window with performance optimization
+        this.positionWindow(windowObj);
+
+        // Focus the new window
         this.focusWindow(windowObj);
-
-        if (autoScroll) {
-            this.autoScrollHandler.setupAutoScroll(windowObj);
-        }
-
-        // Attach observers
-        this.resizeObserver.observe(windowElement);
-        this.moveObserver.observe(windowElement, { attributes: true });
-        this.observedElements.add(windowElement);
 
         return windowElement;
     }
 
     /**
-     * Sets up event listeners for a window (drag, resize, controls).
-     * @param {object} windowObj - The window object to set up events for.
+     * Cache window DOM elements for better performance
+     * @private
+     * @memberof WindowManager
+     */
+    cacheWindowElements(windowObj) {
+        const cache = {
+            header: windowObj.element.querySelector('.window-header'),
+            content: windowObj.element.querySelector('.window-content'),
+            title: windowObj.element.querySelector('.window-title'),
+            minimizeBtn: windowObj.element.querySelector('.minimize'),
+            maximizeBtn: windowObj.element.querySelector('.maximize'),
+            closeBtn: windowObj.element.querySelector('.close')
+        };
+        
+        this.domCache.set(windowObj.id, cache);
+    }
+
+    /**
+     * Get cached DOM element for window
+     * @private
+     * @memberof WindowManager
+     */
+    getCachedElement(windowId, elementType) {
+        const cache = this.domCache.get(windowId);
+        return cache ? cache[elementType] : null;
+    }
+
+    /**
+     * Position window with performance optimization
+     * @private
+     * @memberof WindowManager
+     */
+    positionWindow(windowObj) {
+        // Calculate centered position
+        const desktop = this.getDesktopElement();
+        if (!desktop) return;
+        
+        const desktopRect = desktop.getBoundingClientRect();
+        const x = Math.max(0, (desktopRect.width - windowObj.width) / 2);
+        const y = Math.max(0, (desktopRect.height - windowObj.height) / 2);
+        
+        // Use transform for better performance
+        windowObj.element.style.transform = `translate(${x}px, ${y}px)`;
+        windowObj.position = { x, y };
+        windowObj.originalPosition = { x, y };
+    }
+
+    /**
+     * Setup window events with optimized handlers
      * @private
      * @memberof WindowManager
      */
     setupWindowEvents(windowObj) {
-        const header = windowObj.element.querySelector('.window-header');
-        const controls = windowObj.element.querySelector('.window-controls');
+        const element = windowObj.element;
+        const header = this.getCachedElement(windowObj.id, 'header');
+        
+        if (!header) return;
 
-        if (!header || !controls) {
-            console.error('Window header or controls not found for:', windowObj.id);
-            return;
-        }
-
-        // Initialize window events (no longer using interact.js)
-
+        // Setup drag functionality using the drag handler
         this.dragHandler.setupDrag(header, windowObj);
-        this.resizeHandler.setupResize(windowObj.element, windowObj);
 
-        try {
-            const minimizeBtn = controls.querySelector('.minimize');
-            const maximizeBtn = controls.querySelector('.maximize');
-            const closeBtn = controls.querySelector('.close');
+        // Control button events
+        const minimizeBtn = this.getCachedElement(windowObj.id, 'minimizeBtn');
+        const maximizeBtn = this.getCachedElement(windowObj.id, 'maximizeBtn');
+        const closeBtn = this.getCachedElement(windowObj.id, 'closeBtn');
 
-            if (minimizeBtn) {
-                minimizeBtn.addEventListener('click', (e) => { 
-                    e.stopPropagation(); 
-                    this.minimizeWindow(windowObj); 
-                });
-            }
-            if (maximizeBtn) {
-                maximizeBtn.addEventListener('click', (e) => { 
-                    e.stopPropagation(); 
-                    this.toggleMaximize(windowObj); 
-                });
-            }
-            if (closeBtn) {
-                closeBtn.addEventListener('click', (e) => { 
-                    e.stopPropagation(); 
-                    this.closeWindow(windowObj); 
-                });
-            }
-        } catch (error) {
-            console.error('Failed to setup controls for window:', windowObj.id, error);
+        if (minimizeBtn) {
+            minimizeBtn.addEventListener('click', () => this.minimizeWindow(windowObj), { passive: true });
+        }
+        
+        if (maximizeBtn) {
+            maximizeBtn.addEventListener('click', () => this.toggleMaximize(windowObj), { passive: true });
+        }
+        
+        if (closeBtn) {
+            closeBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent event bubbling
+                this.closeWindow(windowObj);
+            }, { passive: true });
         }
 
-        windowObj.element.addEventListener('mousedown', () => this.focusWindow(windowObj));
-        windowObj.element.addEventListener('contextmenu', (e) => {
+        // Context menu
+        element.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             this.showContextMenu(e, windowObj);
         });
+
+        // Focus handling
+        element.addEventListener('mousedown', () => {
+            this.focusWindow(windowObj);
+        }, { passive: true });
+
+        // Observe for size changes
+        this.resizeObserver.observe(element);
+        this.observedElements.add(element);
     }
 
     /**
-     * Placeholder for showing context menu.
-     * @param {Event} e - The event.
-     * @param {object} windowObj - The window.
+     * Show context menu (optimized)
      * @private
      * @memberof WindowManager
      */
     showContextMenu(e, windowObj) {
-        // Implement context menu logic here if needed
+        // Remove existing context menu
+        if (this.contextMenu) {
+            this.contextMenu.remove();
+        }
+
+        // Create context menu with optimized structure
+        this.contextMenu = document.createElement('div');
+        this.contextMenu.className = 'context-menu';
+        this.contextMenu.style.cssText = `
+            position: fixed;
+            left: ${e.clientX}px;
+            top: ${e.clientY}px;
+            z-index: 10000;
+            will-change: transform;
+        `;
+
+        // Add menu items
+        const menuItems = [
+            { text: 'Minimize', action: () => this.minimizeWindow(windowObj) },
+            { text: 'Maximize', action: () => this.toggleMaximize(windowObj) },
+            { text: 'Close', action: () => this.closeWindow(windowObj) }
+        ];
+
+        menuItems.forEach(item => {
+            const menuItem = document.createElement('div');
+            menuItem.className = 'context-menu-item';
+            menuItem.textContent = item.text;
+            menuItem.addEventListener('click', item.action, { passive: true });
+            this.contextMenu.appendChild(menuItem);
+        });
+
+        document.body.appendChild(this.contextMenu);
+
+        // Remove context menu on click outside
+        const removeContextMenu = () => {
+            if (this.contextMenu) {
+                this.contextMenu.remove();
+                this.contextMenu = null;
+            }
+            document.removeEventListener('click', removeContextMenu);
+        };
+
+        setTimeout(() => {
+            document.addEventListener('click', removeContextMenu, { passive: true });
+        }, 0);
     }
 
     /**
-     * Minimizes a window.
-     * @param {object} windowObj - The window to minimize.
+     * Minimize window (optimized)
      * @memberof WindowManager
      */
     minimizeWindow(windowObj) {
-        if (windowObj.isMinimized) {
-            this.restoreWindow(windowObj);
-        } else {
-            windowObj.isMinimized = true;
-            windowObj.element.classList.add('minimizing');
-            windowObj.element.style.transform = 'translateY(100vh)';
-            setTimeout(() => {
-                windowObj.element.style.display = 'none';
-                windowObj.element.classList.remove('minimizing');
-            }, 300);
+        if (windowObj.isMinimized) return;
+
+        windowObj.isMinimized = true;
+        windowObj.element.classList.add('minimized');
+        
+        // Add close animation
+        windowObj.element.style.animation = 'windowClose 0.3s ease-in-out forwards';
+        
+        setTimeout(() => {
+            windowObj.element.style.display = 'none';
+            windowObj.element.style.animation = '';
+        }, 300);
+        
+        // Update window stack
+        const index = this.windowStack.indexOf(windowObj);
+        if (index > -1) {
+            this.windowStack.splice(index, 1);
         }
+
+        // Focus next window in stack
+        if (this.activeWindow === windowObj) {
+            const nextWindow = this.windowStack[this.windowStack.length - 1];
+            if (nextWindow) {
+                this.focusWindow(nextWindow);
+            }
+        }
+
+        this.notifyStateChange();
     }
 
     /**
-     * Restores a window from minimized or maximized state.
-     * @param {object} windowObj - The window to restore.
+     * Restore window (optimized)
      * @memberof WindowManager
      */
     restoreWindow(windowObj) {
+        if (!windowObj.isMinimized) return;
+
         windowObj.isMinimized = false;
-        windowObj.element.style.display = '';
-        windowObj.element.classList.add('restoring');
-        windowObj.element.style.transform = '';
-        windowObj.element.style.left = `${windowObj.originalPosition.left}px`;
-        windowObj.element.style.top = `${windowObj.originalPosition.top}px`;
-        windowObj.element.style.width = `${windowObj.originalPosition.width}px`;
-        windowObj.element.style.height = `${windowObj.originalPosition.height}px`;
+        windowObj.element.style.display = 'block';
+        windowObj.element.classList.remove('minimized');
+        
+        // Add open animation
+        windowObj.element.style.animation = 'windowSlideIn 0.3s ease-out forwards';
+        
         setTimeout(() => {
-            windowObj.element.classList.remove('restoring');
+            windowObj.element.style.animation = '';
         }, 300);
         
-        // Emit window restore event
-        window.dispatchEvent(new CustomEvent('windowRestore', {
-            detail: { window: windowObj }
-        }));
+        // Add back to window stack
+        if (!this.windowStack.includes(windowObj)) {
+            this.windowStack.push(windowObj);
+        }
+
+        this.focusWindow(windowObj);
+        this.notifyStateChange();
     }
 
     /**
-     * Toggles the maximized state of a window.
-     * @param {object} windowObj - The window to toggle.
+     * Toggle maximize window (optimized)
      * @memberof WindowManager
      */
     toggleMaximize(windowObj) {
@@ -315,251 +455,253 @@ export class WindowManager {
     }
 
     /**
-     * Maximizes a window to fill the screen.
-     * @param {object} windowObj - The window to maximize.
-     * @private
+     * Maximize window (optimized)
      * @memberof WindowManager
      */
     maximizeWindow(windowObj) {
-        windowObj.isMaximized = true;
-        windowObj.originalPosition = {
-            left: windowObj.left,
-            top: windowObj.top,
-            width: windowObj.width,
-            height: windowObj.height
-        };
+        if (windowObj.isMaximized) return;
 
-        // Move window to body to break out of desktop container constraints
-        const desktop = document.getElementById('desktop');
-        if (desktop && windowObj.element.parentNode === desktop) {
-            document.body.appendChild(windowObj.element);
+        // Store original size and position
+        windowObj.originalSize = { ...windowObj.size };
+        windowObj.originalPosition = { ...windowObj.position };
+
+        // Calculate maximized size
+        const desktop = this.getDesktopElement();
+        if (!desktop) return;
+
+        const desktopRect = desktop.getBoundingClientRect();
+        const maxWidth = desktopRect.width;
+        const maxHeight = desktopRect.height - this.taskbarHeight;
+
+        // Add maximized class and set high z-index
+        windowObj.element.classList.add('maximized');
+        windowObj.element.style.zIndex = (windowObj.id === 'terminalWindow') ? '10001' : '9999';
+        
+        // Use transform for better performance
+        windowObj.element.style.transform = 'translate(0px, 0px)';
+        windowObj.element.style.width = `${maxWidth}px`;
+        windowObj.element.style.height = `${maxHeight}px`;
+        windowObj.element.style.borderRadius = '0';
+        windowObj.element.style.transition = 'all 0.3s ease-in-out';
+
+        windowObj.size = { width: maxWidth, height: maxHeight };
+        windowObj.position = { x: 0, y: 0 };
+        windowObj.isMaximized = true;
+
+        // Update maximize button
+        const maximizeBtn = this.getCachedElement(windowObj.id, 'maximizeBtn');
+        if (maximizeBtn) {
+            maximizeBtn.innerHTML = '❐';
         }
 
-        windowObj.element.classList.add('maximizing', 'maximized');
-        windowObj.element.style.position = 'fixed';
-        windowObj.element.style.left = '0px';
-        windowObj.element.style.top = '0px';
-        windowObj.element.style.right = '0px';
-        windowObj.element.style.bottom = '0px';
-        windowObj.element.style.width = '100vw';
-        windowObj.element.style.height = '100vh';
-        windowObj.element.style.margin = '0px';
-        windowObj.element.style.padding = '0px';
-
-        setTimeout(() => {
-            windowObj.element.classList.remove('maximizing');
-        }, 300);
+        this.notifyStateChange();
     }
 
     /**
-     * Restores a window from maximized state.
-     * @param {object} windowObj - The window to unmaximize.
-     * @private
+     * Unmaximize window (optimized)
      * @memberof WindowManager
      */
     unmaximizeWindow(windowObj) {
-        windowObj.isMaximized = false;
-        windowObj.element.classList.add('unmaximizing');
-        windowObj.element.classList.remove('maximized');
+        if (!windowObj.isMaximized) return;
 
-        // Move window back to desktop if it was moved to body
-        const desktop = document.getElementById('desktop');
-        if (desktop && windowObj.element.parentNode === document.body) {
-            desktop.appendChild(windowObj.element);
+        // Restore original size and position
+        const { width, height } = windowObj.originalSize;
+        const { x, y } = windowObj.originalPosition;
+
+        // Remove maximized class and restore z-index
+        windowObj.element.classList.remove('maximized');
+        windowObj.element.style.zIndex = (windowObj.id === 'terminalWindow') ? '10001' : this.getNextZIndex();
+        
+        // Use transform for better performance
+        windowObj.element.style.transform = `translate(${x}px, ${y}px)`;
+        windowObj.element.style.width = `${width}px`;
+        windowObj.element.style.height = `${height}px`;
+        windowObj.element.style.borderRadius = '';
+        windowObj.element.style.transition = 'all 0.3s ease-in-out';
+
+        windowObj.size = { width, height };
+        windowObj.position = { x, y };
+        windowObj.isMaximized = false;
+
+        // Update maximize button
+        const maximizeBtn = this.getCachedElement(windowObj.id, 'maximizeBtn');
+        if (maximizeBtn) {
+            maximizeBtn.innerHTML = '□';
         }
 
-        // Reset positioning to absolute for normal window behavior
-        windowObj.element.style.position = 'absolute';
-        windowObj.element.style.left = `${windowObj.originalPosition.left}px`;
-        windowObj.element.style.top = `${windowObj.originalPosition.top}px`;
-        windowObj.element.style.right = '';
-        windowObj.element.style.bottom = '';
-        windowObj.element.style.width = `${windowObj.originalPosition.width}px`;
-        windowObj.element.style.height = `${windowObj.originalPosition.height}px`;
-        windowObj.element.style.margin = '';
-        windowObj.element.style.padding = '';
-        
-        // Update window object properties
-        windowObj.left = windowObj.originalPosition.left;
-        windowObj.top = windowObj.originalPosition.top;
-        windowObj.width = windowObj.originalPosition.width;
-        windowObj.height = windowObj.originalPosition.height;
-
-        setTimeout(() => {
-            windowObj.element.classList.remove('unmaximizing');
-        }, 300);
-        
-        // Emit window unmaximize event
-        window.dispatchEvent(new CustomEvent('windowUnmaximize', {
-            detail: { window: windowObj }
-        }));
+        this.notifyStateChange();
     }
 
     /**
-     * Closes a window and removes it from the desktop.
-     * @param {object} windowObj - The window to close.
+     * Close window (optimized)
      * @memberof WindowManager
      */
     closeWindow(windowObj) {
-        if (!windowObj || !windowObj.element) return;
-
-        // Play closing sound using global namespace if available
-        if (window.neuOS && window.neuOS.bootSystemInstance) {
-            window.neuOS.bootSystemInstance.playWindowCloseSound();
-        }
-
-        // Disconnect observers and auto-scroll BEFORE removing the element
-        try {
-            this.resizeObserver.unobserve(windowObj.element);
-        } catch (e) {
-            console.warn('ResizeObserver unobserve failed:', e);
-        }
+        // Add close animation
+        windowObj.element.style.animation = 'windowClose 0.3s ease-in-out forwards';
         
-        try {
-            // For MutationObserver, we need to disconnect and reconnect to remove specific elements
+        setTimeout(() => {
+            // Remove from observers
             if (this.observedElements.has(windowObj.element)) {
-                this.moveObserver.disconnect();
+                this.resizeObserver.unobserve(windowObj.element);
                 this.observedElements.delete(windowObj.element);
-                
-                // Reconnect to remaining elements
-                this.observedElements.forEach(element => {
-                    this.moveObserver.observe(element, { attributes: true });
-                });
             }
-        } catch (e) {
-            console.warn('MoveObserver cleanup failed:', e);
-        }
-        
-        this.autoScrollHandler.disableAutoScroll(windowObj.id);
 
-        // Remove the element after disconnecting observers
-        windowObj.element.remove();
+            // Remove from window stack
+            const stackIndex = this.windowStack.indexOf(windowObj);
+            if (stackIndex > -1) {
+                this.windowStack.splice(stackIndex, 1);
+            }
 
-        this.windows.delete(windowObj.id);
-        this.windowStack = this.windowStack.filter(w => w.id !== windowObj.id);
+            // Remove from windows map
+            this.windows.delete(windowObj.id);
 
-        // Cleanup for pure JS drag/resize handlers (no interact.js)
+            // Clear cache
+            this.domCache.delete(windowObj.id);
+            this.styleCache.delete(windowObj.id);
 
-        if (this.windowStack.length > 0) {
-            this.focusWindow(this.windowStack[this.windowStack.length - 1]);
-        } else {
-            this.activeWindow = null;
-        }
+            // Remove element from DOM
+            if (windowObj.element.parentNode) {
+                windowObj.element.parentNode.removeChild(windowObj.element);
+            }
 
-        // Emit window close event
-        window.dispatchEvent(new CustomEvent('windowClose', {
-            detail: { window: windowObj }
-        }));
+            // Focus next window in stack
+            if (this.activeWindow === windowObj) {
+                const nextWindow = this.windowStack[this.windowStack.length - 1];
+                if (nextWindow) {
+                    this.focusWindow(nextWindow);
+                }
+            }
 
-        this.notifyStateChange();
+            this.notifyStateChange();
+        }, 300);
     }
 
     /**
-     * Focuses a window, bringing it to the front and updating the window stack.
-     * @param {object} windowObj - The window to focus.
+     * Focus window (optimized)
      * @memberof WindowManager
      */
     focusWindow(windowObj) {
-        if (this.activeWindow) {
-            this.activeWindow.element.classList.remove('focused');
-        }
-        windowObj.element.classList.add('focused');
+        if (!windowObj || windowObj.isMinimized) return;
+
+        // Update active window
         this.activeWindow = windowObj;
-        this.windowStack = this.windowStack.filter(w => w.id !== windowObj.id);
+
+        // Update z-index - preserve terminal window's high z-index
+        const newZIndex = (windowObj.id === 'terminalWindow') ? 10001 : this.getNextZIndex();
+        windowObj.element.style.zIndex = newZIndex;
+        windowObj.zIndex = newZIndex;
+
+        // Move to top of stack
+        const stackIndex = this.windowStack.indexOf(windowObj);
+        if (stackIndex > -1) {
+            this.windowStack.splice(stackIndex, 1);
+        }
         this.windowStack.push(windowObj);
-        
-        // Emit window focus event
-        window.dispatchEvent(new CustomEvent('windowFocus', {
-            detail: { window: windowObj }
-        }));
-        
+
+        // Add focus class
+        windowObj.element.classList.add('focused');
+
+        // Remove focus from other windows
+        this.windows.forEach(otherWindow => {
+            if (otherWindow !== windowObj) {
+                otherWindow.element.classList.remove('focused');
+            }
+        });
+
         this.notifyStateChange();
     }
 
     /**
-     * Gets the next z-index for a new window.
-     * @returns {number} The next z-index.
+     * Get next z-index (optimized)
      * @private
      * @memberof WindowManager
      */
     getNextZIndex() {
-        this.zIndexCounter += 10;
-        return this.zIndexCounter;
+        return ++this.zIndexCounter;
     }
 
     /**
-     * Sets up global event listeners for the window manager (placeholder for future expansions).
+     * Setup event listeners (optimized)
      * @private
      * @memberof WindowManager
      */
     setupEventListeners() {
-        // Currently empty; add global listeners (e.g., keyboard shortcuts) here if needed
+        // Global click handler for context menu
+        document.addEventListener('click', (e) => {
+            if (this.contextMenu && !this.contextMenu.contains(e.target)) {
+                this.contextMenu.remove();
+                this.contextMenu = null;
+            }
+        }, { passive: true });
     }
 
     /**
-     * Updates the size of a window, enforcing bounds based on outer dimensions.
-     * @param {object} windowObj - The window to update.
+     * Update window size (optimized)
      * @private
      * @memberof WindowManager
      */
     updateWindowSize(windowObj) {
-        const currentWidth = windowObj.element.offsetWidth;
-        const currentHeight = windowObj.element.offsetHeight;
-
-        const minWidth = CONFIG.window?.minWidth || 300;
-        const maxWidth = CONFIG.window?.maxWidth || 2000;
-        const minHeight = CONFIG.window?.minHeight || 200;
-        const maxHeight = CONFIG.window?.maxHeight || 1500;
-
-        const clampedWidth = Math.min(Math.max(currentWidth, minWidth), maxWidth);
-        const clampedHeight = Math.min(Math.max(currentHeight, minHeight), maxHeight);
-
-        if (clampedWidth !== currentWidth || clampedHeight !== currentHeight) {
-            windowObj.element.style.width = `${clampedWidth}px`;
-            windowObj.element.style.height = `${clampedHeight}px`;
-            windowObj.width = clampedWidth;
-            windowObj.height = clampedHeight;
-        }
+        const rect = windowObj.element.getBoundingClientRect();
+        windowObj.size = { width: rect.width, height: rect.height };
+        
+        // Cache the size for future use
+        this.styleCache.set(`${windowObj.id}-size`, windowObj.size);
     }
 
     /**
-     * Updates the position of a window, enforcing viewport bounds.
-     * @param {object} windowObj - The window to update.
+     * Update window position (optimized)
      * @private
      * @memberof WindowManager
      */
     updateWindowPosition(windowObj) {
-        const currentLeft = parseFloat(windowObj.element.style.left) || 0;
-        const currentTop = parseFloat(windowObj.element.style.top) || 0;
-        const maxX = window.innerWidth - windowObj.element.offsetWidth;
-        const maxY = window.innerHeight - windowObj.element.offsetHeight;
-
-        let left = Math.max(0, Math.min(currentLeft, maxX));
-        let top = Math.max(0, Math.min(currentTop, maxY));
-
-        windowObj.element.style.left = `${left}px`;
-        windowObj.element.style.top = `${top}px`;
-        windowObj.left = left;
-        windowObj.top = top;
+        const rect = windowObj.element.getBoundingClientRect();
+        windowObj.position = { x: rect.left, y: rect.top };
+        
+        // Cache the position for future use
+        this.styleCache.set(`${windowObj.id}-position`, windowObj.position);
     }
 
     /**
-     * Notifies registered callbacks of state changes.
+     * Get desktop element (cached)
+     * @private
+     * @memberof WindowManager
+     */
+    getDesktopElement() {
+        if (!this._desktopElement) {
+            this._desktopElement = document.getElementById('desktop');
+        }
+        return this._desktopElement;
+    }
+
+    /**
+     * Notify state change (optimized)
      * @private
      * @memberof WindowManager
      */
     notifyStateChange() {
-        this.stateChangeCallbacks.forEach(callback => callback());
+        // Batch state change notifications
+        if (!this.updateScheduled) {
+            this.updateScheduled = true;
+            requestAnimationFrame(() => {
+                this.stateChangeCallbacks.forEach(callback => {
+                    try {
+                        callback();
+                    } catch (error) {
+                        console.error('State change callback error:', error);
+                    }
+                });
+                this.updateScheduled = false;
+            });
+        }
     }
 
     /**
-     * Registers a callback for window state changes.
-     * @param {Function} callback - The callback.
-     * @returns {Function} Unsubscribe function.
+     * Register state change callback
+     * @param {Function} callback - The callback function to register.
      * @memberof WindowManager
      */
     onStateChange(callback) {
         this.stateChangeCallbacks.add(callback);
-        return () => this.stateChangeCallbacks.delete(callback);
     }
 }

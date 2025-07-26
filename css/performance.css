@@ -1,0 +1,101 @@
+/* neuOS Performance Optimizations */
+
+/* Disable heavy animations for better performance */
+* {
+    animation-duration: 0.1s !important;
+    transition-duration: 0.1s !important;
+}
+
+/* Disable particle animations */
+.particle-container,
+.enhanced-particle,
+.blue-particle,
+.network-particles,
+.data-packet {
+    animation: none !important;
+    transition: none !important;
+}
+
+/* Disable glass effect animations */
+.glass-interactive,
+.glass-container,
+.neuos-widget {
+    animation: none !important;
+    transition: none !important;
+}
+
+/* Disable solar system animations */
+.solar-sun,
+.solar-planet,
+.solar-moon,
+.solar-asteroid,
+.solar-kbo,
+.solar-comet,
+.background-spinner {
+    animation: none !important;
+    transition: none !important;
+}
+
+/* Optimize terminal performance */
+#terminalWindow {
+    will-change: auto !important;
+    transform: none !important;
+}
+
+#terminalOutput {
+    will-change: auto !important;
+    transform: none !important;
+}
+
+/* Disable backdrop filters for better performance */
+* {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Reduce box shadows for better performance */
+* {
+    box-shadow: none !important;
+}
+
+/* Only keep essential shadows */
+.window,
+.neuos-widget,
+.login-container,
+.boot-container {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Disable complex gradients */
+* {
+    background-image: none !important;
+}
+
+/* Use solid colors instead */
+.window,
+.neuos-widget,
+.login-container,
+.boot-container {
+    background: rgba(26, 31, 46, 0.8) !important;
+}
+
+/* Optimize for mobile devices */
+@media (max-width: 768px) {
+    * {
+        animation: none !important;
+        transition: none !important;
+        transform: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        box-shadow: none !important;
+    }
+    
+    /* Keep only essential styling */
+    .window,
+    .neuos-widget,
+    .login-container,
+    .boot-container {
+        background: rgba(26, 31, 46, 0.9) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+} 

@@ -254,24 +254,26 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
                 id: 'terminalWindow',
                 title: 'Terminal',
                 content: `
-                    <div id="terminalOutput" data-scroll-container></div>
-                    <div id="terminalInput">
-                        <span class="prompt">$</span>
-                        <input type="text" autofocus aria-label="Terminal input">
-                    </div>
-                    <div class="terminal-status">
-                        <div class="status-item">
-                            <span class="status-indicator"></span>
-                            <span class="status-text">ready</span>
+                    <div class="terminal-layout">
+                        <div id="terminalOutput" class="terminal-output"></div>
+                        <div id="terminalInput" class="terminal-input">
+                            <span class="prompt">$</span>
+                            <input type="text" autofocus aria-label="Terminal input">
                         </div>
-                        <div class="status-item">
-                            <span class="status-text">theme: default</span>
-                        </div>
-                        <div class="status-item">
-                            <span class="status-text">history: 0</span>
-                        </div>
-                        <div class="status-item">
-                            <span class="status-text">uptime: 00:00:00</span>
+                        <div class="terminal-status">
+                            <div class="status-item">
+                                <span class="status-indicator"></span>
+                                <span class="status-text">ready</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-text">theme: default</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-text">history: 0</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-text">uptime: 00:00:00</span>
+                            </div>
                         </div>
                     </div>
                 `,

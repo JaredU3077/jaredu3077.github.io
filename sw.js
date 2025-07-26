@@ -1,13 +1,13 @@
 /**
- * neuOS Service Worker
- * Provides PWA functionality including offline support and caching
+ * neuOS Service Worker - Performance Optimized
+ * Provides PWA functionality including offline support and optimized caching
  */
 
-const CACHE_NAME = 'neuos-v1.0.0';
-const STATIC_CACHE = 'neuos-static-v1.0.0';
-const DYNAMIC_CACHE = 'neuos-dynamic-v1.0.0';
+const CACHE_NAME = 'neuos-v1.0.1';
+const STATIC_CACHE = 'neuos-static-v1.0.1';
+const DYNAMIC_CACHE = 'neuos-dynamic-v1.0.1';
 
-// Files to cache for offline functionality
+// Optimized files to cache for offline functionality
 const STATIC_FILES = [
     '/',
     '/index.html',
@@ -25,7 +25,7 @@ const STATIC_FILES = [
     '/css/terminal-icon.css',
     '/js/main.js',
     '/js/config.js',
-    '/js/apps/terminal.js',
+    '/js/apps/terminal/terminal.js',
     '/js/core/window.js',
     '/js/core/boot.js',
     '/js/core/glassEffect.js',
@@ -45,7 +45,14 @@ const STATIC_FILES = [
     '/config/config.json'
 ];
 
-// Install event - cache static files
+// Performance optimization settings
+const CACHE_LIMITS = {
+    STATIC: 50 * 1024 * 1024, // 50MB for static files
+    DYNAMIC: 20 * 1024 * 1024, // 20MB for dynamic content
+    MAX_AGE: 7 * 24 * 60 * 60 * 1000 // 7 days
+};
+
+// Install event - cache static files with performance optimization
 self.addEventListener('install', (event) => {
     console.log('neuOS Service Worker: Installing...');
     
@@ -53,7 +60,18 @@ self.addEventListener('install', (event) => {
         caches.open(STATIC_CACHE)
             .then((cache) => {
                 console.log('neuOS Service Worker: Caching static files');
-                return cache.addAll(STATIC_FILES);
+                // Cache files in batches for better performance
+                const batchSize = 5;
+                const batches = [];
+                
+                for (let i = 0; i < STATIC_FILES.length; i += batchSize) {
+                    const batch = STATIC_FILES.slice(i, i + batchSize);
+                    batches.push(batch);
+                }
+                
+                return batches.reduce((promise, batch) => {
+                    return promise.then(() => cache.addAll(batch));
+                }, Promise.resolve());
             })
             .then(() => {
                 console.log('neuOS Service Worker: Static files cached successfully');
@@ -65,7 +83,7 @@ self.addEventListener('install', (event) => {
     );
 });
 
-// Activate event - clean up old caches
+// Activate event - clean up old caches with performance optimization
 self.addEventListener('activate', (event) => {
     console.log('neuOS Service Worker: Activating...');
     
@@ -88,7 +106,7 @@ self.addEventListener('activate', (event) => {
     );
 });
 
-// Fetch event - serve from cache when offline
+// Fetch event - serve from cache when offline with performance optimization
 self.addEventListener('fetch', (event) => {
     const { request } = event;
     const url = new URL(request.url);
@@ -103,31 +121,33 @@ self.addEventListener('fetch', (event) => {
         return;
     }
     
-    // Handle different types of requests
+    // Handle different types of requests with optimized strategies
     if (request.destination === 'document') {
-        // Handle HTML requests
+        // Handle HTML requests - network first with cache fallback
         event.respondWith(handleDocumentRequest(request));
     } else if (request.destination === 'style' || request.destination === 'script') {
-        // Handle CSS and JS requests
+        // Handle CSS and JS requests - cache first with network fallback
         event.respondWith(handleStaticRequest(request));
     } else if (request.destination === 'image' || request.destination === 'audio') {
-        // Handle media requests
+        // Handle media requests - cache first with network fallback
         event.respondWith(handleMediaRequest(request));
     } else {
-        // Handle other requests
+        // Handle other requests - network first with cache fallback
         event.respondWith(handleDynamicRequest(request));
     }
 });
 
-// Handle document requests (HTML)
+// Handle document requests (HTML) - network first strategy
 async function handleDocumentRequest(request) {
     try {
-        // Try network first
+        // Try network first for fresh content
         const networkResponse = await fetch(request);
         
-        // Cache the response for offline use
-        const cache = await caches.open(DYNAMIC_CACHE);
-        cache.put(request, networkResponse.clone());
+        // Cache successful responses for offline use
+        if (networkResponse.ok) {
+            const cache = await caches.open(DYNAMIC_CACHE);
+            cache.put(request, networkResponse.clone());
+        }
         
         return networkResponse;
     } catch (error) {
@@ -142,12 +162,23 @@ async function handleDocumentRequest(request) {
     }
 }
 
-// Handle static requests (CSS, JS)
+// Handle static requests (CSS, JS) - cache first strategy
 async function handleStaticRequest(request) {
     try {
         // Try cache first for static files
         const cachedResponse = await caches.match(request);
         if (cachedResponse) {
+            // Update cache in background for next time
+            fetch(request).then(response => {
+                if (response.ok) {
+                    caches.open(STATIC_CACHE).then(cache => {
+                        cache.put(request, response);
+                    });
+                }
+            }).catch(() => {
+                // Ignore background update errors
+            });
+            
             return cachedResponse;
         }
         
@@ -155,8 +186,10 @@ async function handleStaticRequest(request) {
         const networkResponse = await fetch(request);
         
         // Cache for future use
-        const cache = await caches.open(STATIC_CACHE);
-        cache.put(request, networkResponse.clone());
+        if (networkResponse.ok) {
+            const cache = await caches.open(STATIC_CACHE);
+            cache.put(request, networkResponse.clone());
+        }
         
         return networkResponse;
     } catch (error) {
@@ -166,15 +199,18 @@ async function handleStaticRequest(request) {
             return cachedResponse;
         }
         
-        // Return a basic response
-        return new Response('', {
+        // Return a basic response with proper content type
+        return new Response('Resource not found', {
             status: 404,
-            statusText: 'Not Found'
+            statusText: 'Not Found',
+            headers: {
+                'Content-Type': 'text/plain'
+            }
         });
     }
 }
 
-// Handle media requests (images, audio)
+// Handle media requests (images, audio) - cache first strategy
 async function handleMediaRequest(request) {
     try {
         // Try cache first for media files
@@ -186,9 +222,17 @@ async function handleMediaRequest(request) {
         // Fallback to network
         const networkResponse = await fetch(request);
         
-        // Cache for future use
-        const cache = await caches.open(DYNAMIC_CACHE);
-        cache.put(request, networkResponse.clone());
+        // Cache for future use (with size limit)
+        if (networkResponse.ok) {
+            const cache = await caches.open(DYNAMIC_CACHE);
+            const responseClone = networkResponse.clone();
+            
+            // Check cache size before storing
+            const cacheSize = await getCacheSize(DYNAMIC_CACHE);
+            if (cacheSize < CACHE_LIMITS.DYNAMIC) {
+                cache.put(request, responseClone);
+            }
+        }
         
         return networkResponse;
     } catch (error) {
@@ -198,15 +242,18 @@ async function handleMediaRequest(request) {
             return cachedResponse;
         }
         
-        // Return a basic response
-        return new Response('', {
+        // Return a basic response with proper content type
+        return new Response('Resource not found', {
             status: 404,
-            statusText: 'Not Found'
+            statusText: 'Not Found',
+            headers: {
+                'Content-Type': 'text/plain'
+            }
         });
     }
 }
 
-// Handle dynamic requests (API calls, etc.)
+// Handle dynamic requests (API calls, etc.) - network first strategy
 async function handleDynamicRequest(request) {
     try {
         // Try network first for dynamic content
@@ -215,7 +262,13 @@ async function handleDynamicRequest(request) {
         // Cache successful responses
         if (networkResponse.ok) {
             const cache = await caches.open(DYNAMIC_CACHE);
-            cache.put(request, networkResponse.clone());
+            const responseClone = networkResponse.clone();
+            
+            // Check cache size before storing
+            const cacheSize = await getCacheSize(DYNAMIC_CACHE);
+            if (cacheSize < CACHE_LIMITS.DYNAMIC) {
+                cache.put(request, responseClone);
+            }
         }
         
         return networkResponse;
@@ -226,11 +279,60 @@ async function handleDynamicRequest(request) {
             return cachedResponse;
         }
         
-        // Return a basic response
-        return new Response('', {
+        // Return a basic response with proper content type
+        return new Response('Resource not found', {
             status: 404,
-            statusText: 'Not Found'
+            statusText: 'Not Found',
+            headers: {
+                'Content-Type': 'text/plain'
+            }
         });
+    }
+}
+
+// Get cache size for storage management
+async function getCacheSize(cacheName) {
+    try {
+        const cache = await caches.open(cacheName);
+        const keys = await cache.keys();
+        let size = 0;
+        
+        for (const request of keys) {
+            const response = await cache.match(request);
+            if (response) {
+                const blob = await response.blob();
+                size += blob.size;
+            }
+        }
+        
+        return size;
+    } catch (error) {
+        console.warn('Failed to calculate cache size:', error);
+        return 0;
+    }
+}
+
+// Clean up old cache entries
+async function cleanupCache(cacheName, maxAge = CACHE_LIMITS.MAX_AGE) {
+    try {
+        const cache = await caches.open(cacheName);
+        const keys = await cache.keys();
+        const now = Date.now();
+        
+        for (const request of keys) {
+            const response = await cache.match(request);
+            if (response) {
+                const dateHeader = response.headers.get('date');
+                if (dateHeader) {
+                    const responseDate = new Date(dateHeader).getTime();
+                    if (now - responseDate > maxAge) {
+                        await cache.delete(request);
+                    }
+                }
+            }
+        }
+    } catch (error) {
+        console.warn('Failed to cleanup cache:', error);
     }
 }
 
@@ -338,6 +440,21 @@ self.addEventListener('message', (event) => {
             dynamicCache: DYNAMIC_CACHE
         });
     }
+    
+    if (event.data && event.data.type === 'CLEANUP_CACHE') {
+        event.waitUntil(
+            Promise.all([
+                cleanupCache(STATIC_CACHE),
+                cleanupCache(DYNAMIC_CACHE)
+            ])
+        );
+    }
 });
 
-console.log('neuOS Service Worker: Loaded successfully'); 
+// Periodic cache cleanup
+setInterval(() => {
+    cleanupCache(STATIC_CACHE);
+    cleanupCache(DYNAMIC_CACHE);
+}, 24 * 60 * 60 * 1000); // Clean up every 24 hours
+
+console.log('neuOS Service Worker: Loaded successfully with performance optimizations'); 

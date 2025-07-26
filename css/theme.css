@@ -155,7 +155,7 @@ body:not(.boot-active):not(.login-active) #desktop {
     width: 100%;
     height: 100%;
     pointer-events: none;
-    z-index: 1000;
+    z-index: 20 !important; /* Lower than terminal window (2000) and neuOS widget (100) */
     overflow: hidden;
     display: none; /* Hidden by default, only shown when particle commands are used */
 }
@@ -175,7 +175,7 @@ body:not(.boot-active):not(.login-active) #desktop {
     pointer-events: auto;
     /* Strong fallback for visibility */
     border: 2px solid #4a90e2;
-    z-index: 1001;
+    z-index: 21 !important; /* Lower than terminal window (2000) and neuOS widget (100) */
     display: none; /* Hidden by default, only shown when particle commands are used */
 }
 
@@ -466,7 +466,7 @@ body:not(.boot-active):not(.login-active) #desktop {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     pointer-events: auto;
     border: 2px solid #4a90e2;
-    z-index: 1001;
+    z-index: 101 !important; /* Lower than terminal window (2000) and neuOS widget (500) */
     display: none; /* Hidden by default, only shown when particle commands are used */
 }
 

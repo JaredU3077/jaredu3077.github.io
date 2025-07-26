@@ -60,16 +60,20 @@ class MobileUtils {
      * Optimize performance for mobile devices
      */
     optimizeForMobile() {
-        // Reduce particle count on mobile
+        // Disable particle system on mobile for maximum performance
         if (window.particleSystem) {
-            window.particleSystem.maxParticles = 25;
-            window.particleSystem.particleLimit = 50;
+            window.particleSystem.particleAnimationRunning = false;
+            window.particleSystem.maxParticles = 0;
+            window.particleSystem.particleLimit = 0;
         }
 
-        // Disable heavy animations on mobile
+        // Optimize animations on mobile (but keep glass effects)
         if (window.innerWidth <= 768) {
             document.documentElement.style.setProperty('--animation-duration', '0.1s');
             document.documentElement.style.setProperty('--transition-duration', '0.1s');
+            
+            // Note: Glass effects are kept enabled for visual appeal
+            // They can be manually disabled via terminal command if needed
         }
 
         // Optimize memory usage
@@ -384,11 +388,14 @@ class MobileUtils {
             window.particleSystem.particleLimit = 25;
         }
 
-        // Disable heavy effects
+        // Disable heavy effects (but keep glass effects)
         const heavyEffects = document.querySelectorAll('.enhanced-particle, .network-particles');
         heavyEffects.forEach(effect => {
             effect.style.display = 'none';
         });
+        
+        // Note: Glass effects are kept enabled for visual appeal
+        // They can be manually disabled via terminal command if needed
     }
 
     /**

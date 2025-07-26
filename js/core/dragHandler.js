@@ -29,8 +29,12 @@ export class DragHandler {
             
             this.dragStartX = e.clientX;
             this.dragStartY = e.clientY;
-            this.originalLeft = parseFloat(windowEl.style.left) || 0;
-            this.originalTop = parseFloat(windowEl.style.top) || 0;
+            
+            // Get current position from transform or left/top
+            const rect = windowEl.getBoundingClientRect();
+            this.originalLeft = rect.left;
+            this.originalTop = rect.top;
+            
             this.currentWindow = windowObj;
             this.hasMoved = false;
             
@@ -135,19 +139,17 @@ export class DragHandler {
             newTop = Math.max(minTop, Math.min(newTop, maxTop));
         }
         
-        // Apply position directly using left/top for natural movement
-        this.currentWindow.element.style.left = `${newLeft}px`;
-        this.currentWindow.element.style.top = `${newTop}px`;
+        // Apply position using transform for better performance
+        this.currentWindow.element.style.transform = `translate(${newLeft}px, ${newTop}px)`;
         
         // Update window object
-        this.currentWindow.left = newLeft;
-        this.currentWindow.top = newTop;
+        this.currentWindow.position = { x: newLeft, y: newTop };
         
         // Emit drag update event
         window.dispatchEvent(new CustomEvent('windowDragUpdate', {
             detail: { 
                 window: this.currentWindow,
-                position: { left: newLeft, top: newTop }
+                position: { x: newLeft, y: newTop }
             }
         }));
     }

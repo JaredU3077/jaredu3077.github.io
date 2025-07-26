@@ -401,8 +401,8 @@ function getSystemControlCommands(terminal) {
     return [
         { name: 'system', handler: () => handleSystemControl() },
         { name: 'sys', handler: () => handleSystemControl() },
-        { name: 'performance', handler: () => handlePerformanceControl() },
-        { name: 'perf', handler: () => handlePerformanceControl() },
+        { name: 'performance', handler: args => handlePerformanceControl(args) },
+        { name: 'perf', handler: args => handlePerformanceControl(args) },
         { name: 'screensaver', handler: () => handleScreensaverControl() },
         { name: 'ss', handler: () => handleScreensaverControl() },
         { name: 'shutdown', handler: () => handleShutdown() },

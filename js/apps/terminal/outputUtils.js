@@ -57,18 +57,11 @@ export function writeOutput(terminal, content) {
 }
 
 export function formatOutputWithSyntaxHighlighting(content) {
+    // Performance optimization: simplified highlighting for better performance
     return content
-        .replace(/\b(if|else|for|while|function|return|const|let|var|import|export|class|extends|super|this|new|delete|typeof|instanceof|in|of|try|catch|finally|throw|break|continue|switch|case|default|do|with|debugger|yield|async|await|static|enum|interface|type|namespace|module|require|define|use|strict)\b/g, '<span class="keyword">$1</span>')
-        .replace(/(["'`])((?:\\.|(?!\1)[^\\])*?)\1/g, '<span class="string">$1$2$1</span>')
-        .replace(/\b(\d+(?:\.\d+)?)\b/g, '<span class="number">$1</span>')
-        .replace(/(\/\/.*$|\/\*[\s\S]*?\*\/)/gm, '<span class="comment">$1</span>')
-        .replace(/\b(error|Error|ERROR|failed|Failed|FAILED|exception|Exception|EXCEPTION)\b/gi, '<span class="error">$1</span>')
-        .replace(/\b(success|Success|SUCCESS|completed|Completed|COMPLETED|ok|OK|done|Done|DONE)\b/gi, '<span class="success">$1</span>')
-        .replace(/\b(warning|Warning|WARNING|warn|Warn|WARN|caution|Caution|CAUTION)\b/gi, '<span class="warning">$1</span>')
-        .replace(/\b(info|Info|INFO|information|Information|INFORMATION|note|Note|NOTE)\b/gi, '<span class="info">$1</span>')
-        .replace(/(\/[^\s]+)(?![^<]*<\/a>)/g, '<span class="string">$1</span>')
-        .replace(/(https?:\/\/[^\s]+)(?![^<]*<\/a>)/g, '<a href="$1" target="_blank" class="string">$1</a>')
-        .replace(/\b(ls|cd|pwd|cat|grep|find|chmod|chown|cp|mv|rm|mkdir|rmdir|touch|echo|printf|read|source|exec|eval|shift|getopts|trap|ulimit|umask|env|set|unset|export|alias|unalias|type|which|whereis|man|info|whatis|apropos|head|tail|more|less|sort|uniq|cut|paste|join|split|tr|sed|awk|wc|stat|file|du|df|ps|top|kill|nice|renice|bg|fg|jobs|wait|sleep|date|time|uptime|whoami|who|w|hostname|uname|ping|traceroute|nslookup|arp|route|ssh|telnet|ftp|sftp|scp|rsync|wget|curl|nc|netstat|ss|lsof|tcpdump|nmap|host|whois|ifconfig|ip|iptables|ufw|firewall-cmd|speedtest|netsh)\b/g, '<span class="keyword">$1</span>');
+        .replace(/\b(error|Error|ERROR|failed|Failed|FAILED)\b/gi, '<span class="error">$1</span>')
+        .replace(/\b(success|Success|SUCCESS|connected|Connected)\b/gi, '<span class="success">$1</span>')
+        .replace(/\b(ssh|ping|show|clear|help|exit|launch|apps|close|focus)\b/gi, '<span class="keyword">$1</span>');
 }
 
 export function addInteractiveElements(terminal, outputDiv) {

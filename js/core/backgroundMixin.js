@@ -24,7 +24,7 @@ export const backgroundMixin = {
         const fragment = document.createDocumentFragment();
 
         const sun = this.createStyledElement('div', 'solar-sun', `
-            position: fixed !important;
+            position: absolute !important;
             top: 50% !important;
             left: 50% !important;
             width: 140px !important;
@@ -41,7 +41,7 @@ export const backgroundMixin = {
                 #1a0000 100%) !important;
             border-radius: 50% !important;
             pointer-events: none !important;
-            z-index: 99 !important;
+            z-index: 10 !important; /* Lower than terminal window (2000) and neuOS widget (100) */
             box-shadow: 
                 0 0 60px #ffd700,
                 0 0 120px #ff8c00,
@@ -55,7 +55,7 @@ export const backgroundMixin = {
         `, fragment);
 
         const corona = this.createStyledElement('div', 'solar-corona', `
-            position: fixed !important;
+            position: absolute !important;
             top: 50% !important;
             left: 50% !important;
             width: 200px !important;
@@ -68,7 +68,7 @@ export const backgroundMixin = {
                 transparent 100%) !important;
             border-radius: 50% !important;
             pointer-events: none !important;
-            z-index: 98 !important;
+            z-index: 9 !important; /* Lower than terminal window (2000) and neuOS widget (100) */
             animation: coronaPulse 8s ease-in-out infinite !important;
         `, fragment);
 
@@ -80,7 +80,13 @@ export const backgroundMixin = {
         this.createKuiperBelt(800, 900, fragment);
         this.createComet(fragment);
 
-        document.body.appendChild(fragment);
+        // Append to desktop container instead of body to ensure proper layering
+        const desktop = document.getElementById('desktop');
+        if (desktop) {
+            desktop.appendChild(fragment);
+        } else {
+            document.body.appendChild(fragment);
+        }
 
         // Hide ambient glow overlay if it exists
         const glow = document.querySelector('.ambient-glow');
@@ -97,7 +103,7 @@ export const backgroundMixin = {
 
     createPlanet(planet, parent) {
         const planetElement = this.createStyledElement('div', 'solar-planet', `
-            position: fixed !important;
+            position: absolute !important;
             top: 50% !important;
             left: 50% !important;
             width: ${planet.size}px !important;
@@ -109,7 +115,7 @@ export const backgroundMixin = {
             --planet-temperature: ${planet.temperature} !important;
             animation: solarOrbit ${planet.speed}s linear infinite !important;
             pointer-events: auto !important;
-            z-index: 101 !important;
+            z-index: 11 !important; /* Lower than terminal window (2000) and neuOS widget (100) */
             box-shadow: 
                 0 0 20px ${planet.color},
                 0 0 35px ${planet.color}60,
@@ -165,7 +171,7 @@ export const backgroundMixin = {
             background: ${planet.atmosphereColor} !important;
             border-radius: 50% !important;
             pointer-events: none !important;
-            z-index: 100 !important;
+            z-index: 10 !important; /* Lower than terminal window (2000) and neuOS widget (100) */
             filter: blur(4px) !important;
             animation: atmosphereGlow 6s ease-in-out infinite !important;
         `, parent);
@@ -195,7 +201,7 @@ export const backgroundMixin = {
             background: ${ringGradient} !important;
             border-radius: 50% !important;
             pointer-events: none !important;
-            z-index: 102 !important;
+            z-index: 12 !important; /* Lower than terminal window (2000) and neuOS widget (100) */
             animation: planetRingRotate ${planet.speed * 0.4}s linear infinite !important;
             margin: 0 !important;
             padding: 0 !important;
@@ -230,7 +236,7 @@ export const backgroundMixin = {
                 --moon-offset: ${moonOffset}deg !important;
                 animation: moonOrbit ${moonSpeed}s linear infinite !important;
                 pointer-events: none !important;
-                z-index: 103 !important;
+                z-index: 13 !important; /* Lower than terminal window (2000) and neuOS widget (100) */
                 box-shadow: 
                     0 0 10px rgba(192, 192, 192, 0.9),
                     0 0 15px rgba(192, 192, 192, 0.7),
@@ -255,7 +261,7 @@ export const backgroundMixin = {
             const color = asteroidColors[Math.floor(Math.random() * asteroidColors.length)];
 
             this.createStyledElement('div', 'solar-asteroid', `
-                position: fixed !important;
+                position: absolute !important;
                 top: 50% !important;
                 left: 50% !important;
                 width: ${size}px !important;
@@ -266,7 +272,7 @@ export const backgroundMixin = {
                 --asteroid-offset: ${offset}deg !important;
                 animation: asteroidOrbit ${speed}s linear infinite !important;
                 pointer-events: none !important;
-                z-index: 104 !important;
+                z-index: 14 !important; /* Lower than terminal window (2000) and neuOS widget (100) */
                 box-shadow: 0 0 5px rgba(139, 69, 19, 0.8) !important;
                 margin: 0 !important;
                 padding: 0 !important;
@@ -287,7 +293,7 @@ export const backgroundMixin = {
             const color = kboColors[Math.floor(Math.random() * kboColors.length)];
 
             this.createStyledElement('div', 'solar-kbo', `
-                position: fixed !important;
+                position: absolute !important;
                 top: 50% !important;
                 left: 50% !important;
                 width: ${size}px !important;
@@ -298,7 +304,7 @@ export const backgroundMixin = {
                 --kbo-offset: ${offset}deg !important;
                 animation: kboOrbit ${speed}s linear infinite !important;
                 pointer-events: none !important;
-                z-index: 105 !important;
+                z-index: 15 !important; /* Lower than terminal window (2000) and neuOS widget (100) */
                 box-shadow: 0 0 8px rgba(173, 216, 230, 0.6) !important;
                 margin: 0 !important;
                 padding: 0 !important;
@@ -313,7 +319,7 @@ export const backgroundMixin = {
         const size = 8;
 
         this.createStyledElement('div', 'solar-comet', `
-            position: fixed !important;
+            position: absolute !important;
             top: 50% !important;
             left: 50% !important;
             width: ${size}px !important;
@@ -325,7 +331,7 @@ export const backgroundMixin = {
                 transparent 100%) !important;
             border-radius: 50% !important;
             pointer-events: none !important;
-            z-index: 106 !important;
+            z-index: 16 !important; /* Lower than terminal window (2000) and neuOS widget (100) */
             box-shadow: 
                 0 0 15px rgba(255, 255, 255, 0.8),
                 0 0 25px rgba(173, 216, 230, 0.6),
@@ -336,7 +342,7 @@ export const backgroundMixin = {
         `, parent);
 
         this.createStyledElement('div', 'comet-tail', `
-            position: fixed !important;
+            position: absolute !important;
             top: 50% !important;
             left: 50% !important;
             width: 60px !important;
@@ -348,7 +354,7 @@ export const backgroundMixin = {
                 transparent 100%) !important;
             border-radius: 2px !important;
             pointer-events: none !important;
-            z-index: 105 !important;
+            z-index: 15 !important; /* Lower than terminal window (2000) and neuOS widget (100) */
             animation: cometTrajectory 120s linear infinite !important;
             margin: 0 !important;
             padding: 0 !important;
@@ -362,16 +368,22 @@ export const backgroundMixin = {
         const glow = document.createElement('div');
         glow.className = 'ambient-glow';
         glow.style.cssText = `
-            position: fixed;
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background: transparent;
             pointer-events: none;
-            z-index: 50;
+            z-index: 5;
         `;
-        document.body.appendChild(glow);
+        // Append to desktop container instead of body to ensure proper layering
+        const desktop = document.getElementById('desktop');
+        if (desktop) {
+            desktop.appendChild(glow);
+        } else {
+            document.body.appendChild(glow);
+        }
     },
 
     /**

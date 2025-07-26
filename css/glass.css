@@ -234,6 +234,21 @@
     animation: textGlow 2s ease-in-out infinite alternate;
 }
 
+/* ===== NEUOS GLASS TITLE ===== */
+.neuos-glass-title {
+    font-size: 4rem;
+    font-weight: 900;
+    color: var(--color-primary);
+    margin: 0;
+    text-shadow: 0 0 30px rgba(99, 102, 241, 0.6);
+    letter-spacing: -0.025em;
+    font-family: var(--font-family);
+    z-index: 2;
+    text-align: center;
+    width: 100%;
+    text-transform: lowercase;
+}
+
 @keyframes textGlow {
     0% { text-shadow: 0 0 20px var(--color-primary), 0 0 40px var(--color-primary); }
     100% { text-shadow: 0 0 30px var(--color-primary), 0 0 60px var(--color-primary); }
@@ -293,7 +308,7 @@
 }
 
 .neuos-widget {
-    position: fixed;
+    position: absolute;
     width: 120px;
     height: 120px;
     border-radius: 50%;
@@ -304,7 +319,7 @@
     backdrop-filter: var(--glass-filter-medium);
     -webkit-backdrop-filter: var(--glass-filter-medium);
     box-shadow: var(--glass-shadow-medium), var(--glass-glow-medium);
-    z-index: var(--z-fixed);
+    z-index: 100; /* Lower than terminal window (2000) */
     border: 1px solid var(--color-border-subtle);
     transition: all var(--transition-normal);
     overflow: hidden;

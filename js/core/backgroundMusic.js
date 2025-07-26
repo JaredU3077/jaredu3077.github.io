@@ -1,5 +1,6 @@
 /**
- * @file Background Music Module - Handles background music management
+ * @file Background Music Module - Performance Optimized
+ * Handles background music management with improved performance
  * @author Jared U.
  * @tags neu-os
  */
@@ -33,6 +34,14 @@ export class BackgroundMusic {
         this.sliderRadius = null;
         this.lastDraggingState = false;
         this.animationFrameId = null;
+        
+        // Performance optimizations
+        this.lastVolumeUpdate = 0;
+        this.volumeUpdateThrottle = 16; // ~60fps
+        this.lastDisplayUpdate = 0;
+        this.displayUpdateThrottle = 50; // 20fps for display updates
+        this.cachedCircumference = 314.159; // Pre-calculated 2 * Math.PI * 50
+        this.lastVolume = null; // Cache for comparison
     }
 
     init() {
@@ -237,6 +246,14 @@ export class BackgroundMusic {
             audioOn.style.display = 'none';
             audioOff.style.display = 'block';
         }
+        
+        // Ensure audio controls are visible
+        const audioControls = document.getElementById('audioControls');
+        if (audioControls) {
+            audioControls.classList.add('show');
+            audioControls.style.setProperty('opacity', '1', 'important');
+            audioControls.style.setProperty('visibility', 'visible', 'important');
+        }
     }
 
     // Add play and pause methods for terminal access
@@ -260,7 +277,7 @@ export class BackgroundMusic {
         }
     }
 
-    // Volume slider functionality
+    // Volume slider functionality (optimized)
     setupVolumeSlider() {
         this.volumeSlider = document.querySelector('.volume-slider');
         this.volumeProgress = document.querySelector('.volume-progress');
@@ -345,6 +362,13 @@ export class BackgroundMusic {
         
         e.preventDefault();
         
+        // Throttle volume updates for better performance
+        const now = Date.now();
+        if (now - this.lastVolumeUpdate < this.volumeUpdateThrottle) {
+            return;
+        }
+        this.lastVolumeUpdate = now;
+        
         // Use requestAnimationFrame for smoother updates
         if (!this.animationFrameId) {
             this.animationFrameId = requestAnimationFrame(() => {
@@ -427,6 +451,12 @@ export class BackgroundMusic {
     }
     
     setVolume(volume) {
+        // Only update if volume actually changed
+        if (this.lastVolume === volume) {
+            return;
+        }
+        this.lastVolume = volume;
+        
         this.volume = Math.max(0, Math.min(1, volume));
         
         // Update audio element
@@ -434,20 +464,25 @@ export class BackgroundMusic {
             this.backgroundMusic.volume = this.volume;
         }
         
-        // Save to localStorage
-        localStorage.setItem('neuos-volume', this.volume.toString());
+        // Save to localStorage (throttled)
+        const now = Date.now();
+        if (now - this.lastVolumeUpdate > 100) { // Save every 100ms max
+            localStorage.setItem('neuos-volume', this.volume.toString());
+        }
         
-        // Update visual display
-        this.updateVolumeDisplay();
+        // Update visual display (throttled)
+        if (now - this.lastDisplayUpdate > this.displayUpdateThrottle) {
+            this.updateVolumeDisplay();
+            this.lastDisplayUpdate = now;
+        }
     }
     
     updateVolumeDisplay() {
         if (!this.volumeProgress || !this.volumeIndicator) return;
         
-        // Cache calculations to avoid repeated math operations
-        const circumference = 314.159; // 2 * Math.PI * 50 (pre-calculated)
-        const progressLength = this.volume * circumference;
-        const remainingLength = circumference - progressLength;
+        // Use cached circumference for better performance
+        const progressLength = this.volume * this.cachedCircumference;
+        const remainingLength = this.cachedCircumference - progressLength;
         
         // Update progress circle with faster transition for better responsiveness
         const strokeDasharray = `${progressLength.toFixed(1)} ${remainingLength.toFixed(1)}`;

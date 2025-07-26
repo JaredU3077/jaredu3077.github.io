@@ -304,6 +304,13 @@
         border-color: rgba(239, 68, 68, 0.5) !important;
     }
 
+    /* Ensure close button is always clickable on mobile */
+    #terminalWindow .window-control.close {
+        cursor: pointer !important;
+        pointer-events: auto !important;
+        z-index: 100 !important;
+    }
+
     /* Mobile Codex Optimization - Glass Theme */
     .codex-window {
         min-width: 100% !important;
@@ -369,10 +376,13 @@
         text-shadow: 0 0 5px rgba(255, 255, 255, 0.2) !important;
     }
 
-    /* Mobile Audio Controls - Glass Theme */
+    /* Mobile Audio Controls - Glass Theme - Fixed Bottom Right */
     .audio-controls {
-        bottom: 15px !important;
-        right: 15px !important;
+        position: fixed !important;
+        bottom: 20px !important;
+        right: 20px !important;
+        z-index: 10001 !important;
+        pointer-events: auto !important;
     }
 
     /* Mobile Audio Orb - Simplified */
@@ -504,7 +514,7 @@
         box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 255, 255, 0.1) !important;
     }
 
-    /* Mobile neuOS Widget */
+    /* Mobile neuOS Widget - Fixed Centering */
     .neuos-widget {
         width: 100px !important;
         height: 100px !important;
@@ -518,12 +528,25 @@
         top: 50% !important;
         left: 50% !important;
         transform: translate(-50%, -50%) !important;
-        z-index: 1000 !important;
+        z-index: 500 !important; /* Lower than terminal window (2000) but above background elements */
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
     }
 
     /* Don't apply centering if element has been moved by user */
     .neuos-widget[data-has-been-moved="true"] {
         transform: none !important;
+    }
+
+    /* Mobile Terminal Window - Higher z-index */
+    #terminalWindow {
+        z-index: 10001 !important;
+    }
+
+    #terminalWindow.maximized {
+        z-index: 10001 !important;
     }
 
     .neuos-glass-title {

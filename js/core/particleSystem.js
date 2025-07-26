@@ -9,26 +9,26 @@ import { modeMixin } from './modeMixin.js';
 
 export class ParticleSystem {
     constructor() {
-        // Enhanced particle system initialization
+        // Ultra-performance-optimized particle system initialization
         this.particles = [];
-        this.particleCount = 60; // Optimized particle count for performance
+        this.particleCount = 10; // Drastically reduced for maximum performance
         this.particleContainer = null;
-        this.particleAnimationRunning = true;
-        this.particleGenerationRate = 1000; // Optimized generation rate
-        this.particleMode = 'normal';
+        this.particleAnimationRunning = false; // Disabled by default for performance
+        this.particleGenerationRate = 3000; // Much slower generation
+        this.particleMode = 'minimal'; // Use minimal mode by default
         this.startTime = Date.now();
         
         this.mouseX = 0;
         this.mouseY = 0;
         
-        // Advanced particle physics with realistic parameters
+        // Simplified particle physics for better performance
         this.particlePhysics = {
-            gravity: 0.015,
-            wind: 0.008,
-            turbulence: 0.003,
-            attraction: 0.025,
-            repulsion: 0.015,
-            friction: 0.98,
+            gravity: 0.01, // Reduced from 0.015
+            wind: 0.005, // Reduced from 0.008
+            turbulence: 0.002, // Reduced from 0.003
+            attraction: 0.02, // Reduced from 0.025
+            repulsion: 0.01, // Reduced from 0.015
+            friction: 0.985, // Increased from 0.98 for better performance
             bounce: 0.7,
             mass: 1.0,
             temperature: 20,
@@ -52,23 +52,23 @@ export class ParticleSystem {
 
         this.lastCleanupTime = null;
         
-        // Advanced particle properties
+        // Optimized particle properties
         this.particleProperties = {
-            maxSize: 8,
+            maxSize: 6, // Reduced from 8
             minSize: 2,
-            maxSpeed: 2.5,
+            maxSpeed: 2.0, // Reduced from 2.5
             minSpeed: 0.5,
-            maxLife: 15000,
-            minLife: 8000,
-            maxOpacity: 0.9,
+            maxLife: 12000, // Reduced from 15000
+            minLife: 6000, // Reduced from 8000
+            maxOpacity: 0.8, // Reduced from 0.9
             minOpacity: 0.3
         };
         
-        // Enhanced interaction zones
+        // Simplified interaction zones
         this.interactionZones = {
-            mouse: { radius: 120, strength: 0.8 },
-            gravity: { radius: 200, strength: 0.3 },
-            repulsion: { radius: 80, strength: 0.6 }
+            mouse: { radius: 100, strength: 0.6 }, // Reduced from 120, 0.8
+            gravity: { radius: 150, strength: 0.2 }, // Reduced from 200, 0.3
+            repulsion: { radius: 60, strength: 0.4 } // Reduced from 80, 0.6
         };
         
         // Performance optimization
@@ -76,20 +76,30 @@ export class ParticleSystem {
         this.lastFrameTime = 0;
         this.targetFPS = 60;
         this.frameInterval = 1000 / this.targetFPS;
+        this.animationFrameId = null;
         
-        // Advanced effects
+        // Minimal effects for maximum performance
         this.effects = {
-            trails: true,
-            glow: true,
-            sparkles: true,
-            connections: true,
-            waveEffect: true
+            trails: false, // Disabled for performance
+            glow: false, // Disabled for performance
+            sparkles: false, // Disabled for performance
+            connections: false, // Disabled for performance
+            waveEffect: false // Disabled for performance
         };
         
-        // Particle clustering for realistic behavior
+        // Disabled clustering for performance
         this.clusters = [];
-        this.maxClusters = 5;
-        this.clusterRadius = 50;
+        this.maxClusters = 0; // Disabled for performance
+        this.clusterRadius = 0; // Disabled for performance
+        
+        // Minimal object pooling for performance
+        this.particlePool = [];
+        this.maxPoolSize = 10; // Reduced for performance
+        
+        // Performance monitoring
+        this.lastPerformanceCheck = Date.now();
+        this.frameTimeHistory = [];
+        this.maxFrameTimeHistory = 10;
     }
 
     init() {
@@ -98,8 +108,7 @@ export class ParticleSystem {
     }
 
     setupParticleSystem() {
-        
-        // Create enhanced particle container with improved styling
+        // Create optimized particle container
         this.particleContainer = document.createElement('div');
         this.particleContainer.className = 'particle-container';
         this.particleContainer.id = 'particleContainer';
@@ -110,107 +119,71 @@ export class ParticleSystem {
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 1000;
+            z-index: 20 !important; /* Lower than terminal window (2000) and neuOS widget (100) */
             overflow: hidden;
             background: transparent !important;
-            filter: contrast(1.1) brightness(1.05);
+            will-change: transform; /* Performance optimization */
         `;
         document.body.appendChild(this.particleContainer);
 
         // Create enhanced background elements
         this.createEnhancedBackgroundElements();
 
-        // Initialize enhanced particle system
+        // Initialize ultra-optimized particle system
         this.particles = [];
-        this.particleCount = 40;
-        this.particleGenerationRate = 1000;
-        this.particleAnimationRunning = true;
-        this.particleMode = 'normal';
+        this.particleCount = 5; // Minimal for maximum performance
+        this.particleGenerationRate = 5000; // Very slow generation
+        this.particleAnimationRunning = false; // Disabled by default
+        this.particleMode = 'minimal';
         this.startTime = Date.now();
 
         // Generate initial particles
         this.generateParticles();
         
-        // Start enhanced particle animation loop
+        // Start optimized particle animation loop
         this.animateParticles();
         
         // Start continuous particle generation
         this.startContinuousGeneration();
         
-        // Initialize advanced effects
-        this.initializeAdvancedEffects();
+        // Initialize simplified effects
+        this.initializeSimplifiedEffects();
     }
 
     /**
-     * Initialize advanced particle effects
+     * Initialize simplified particle effects for better performance
      */
-    initializeAdvancedEffects() {
-        // Create particle trails container
-        if (this.effects.trails) {
-            this.trailsContainer = document.createElement('div');
-            this.trailsContainer.className = 'particle-trails';
-            this.trailsContainer.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                pointer-events: none;
-                z-index: 999;
-                background: transparent;
-            `;
-            document.body.appendChild(this.trailsContainer);
-        }
-        
-        // Create connection lines container
-        if (this.effects.connections) {
-            this.connectionsContainer = document.createElement('canvas');
-            this.connectionsContainer.className = 'particle-connections';
-            this.connectionsContainer.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                pointer-events: none;
-                z-index: 998;
-                background: transparent;
-            `;
-            this.connectionsCtx = this.connectionsContainer.getContext('2d');
-            document.body.appendChild(this.connectionsContainer);
-            this.resizeConnectionsCanvas();
-        }
-        
-        // Create sparkles container
-        if (this.effects.sparkles) {
-            this.sparklesContainer = document.createElement('div');
-            this.sparklesContainer.className = 'particle-sparkles';
-            this.sparklesContainer.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                pointer-events: none;
-                z-index: 997;
-                background: transparent;
-            `;
-            document.body.appendChild(this.sparklesContainer);
+    initializeSimplifiedEffects() {
+        // Only initialize glow effects for better performance
+        if (this.effects.glow) {
+            // Glow effects are handled inline for better performance
         }
     }
 
     /**
-     * Resize connections canvas
+     * Get particle from pool or create new one
      */
-    resizeConnectionsCanvas() {
-        if (this.connectionsContainer) {
-            this.connectionsContainer.width = window.innerWidth;
-            this.connectionsContainer.height = window.innerHeight;
+    getParticleFromPool() {
+        if (this.particlePool.length > 0) {
+            return this.particlePool.pop();
+        }
+        return this.createEnhancedParticle();
+    }
+
+    /**
+     * Return particle to pool
+     */
+    returnParticleToPool(particle) {
+        if (this.particlePool.length < this.maxPoolSize) {
+            // Reset particle properties
+            particle.life = 0;
+            particle.element = null;
+            this.particlePool.push(particle);
         }
     }
 
     /**
-     * Create enhanced particle with advanced properties
+     * Create enhanced particle with optimized properties
      */
     createEnhancedParticle() {
         const particle = {
@@ -225,20 +198,12 @@ export class ParticleSystem {
             maxLife: this.particleProperties.maxLife,
             color: this.getNextParticleColor(),
             element: null,
-            trail: [],
-            maxTrailLength: 10,
-            cluster: null,
-            temperature: Math.random() * 40 + 10,
-            charge: (Math.random() - 0.5) * 2,
             mass: Math.random() * 0.5 + 0.5,
             rotation: Math.random() * 360,
-            rotationSpeed: (Math.random() - 0.5) * 4,
+            rotationSpeed: (Math.random() - 0.5) * 2, // Reduced from 4
             pulse: Math.random() * Math.PI * 2,
-            pulseSpeed: Math.random() * 0.02 + 0.01,
-            glow: Math.random() * 0.5 + 0.5,
-            sparkle: Math.random() > 0.8,
-            wave: Math.random() * Math.PI * 2,
-            waveSpeed: Math.random() * 0.03 + 0.01
+            pulseSpeed: Math.random() * 0.01 + 0.005, // Reduced from 0.02 + 0.01
+            glow: Math.random() * 0.5 + 0.5
         };
         
         return particle;
@@ -255,22 +220,38 @@ export class ParticleSystem {
     }
 
     /**
-     * Update particle physics with advanced calculations
+     * Update particle physics with optimized calculations
      */
     updateParticlePhysics() {
         const currentTime = Date.now();
         const deltaTime = currentTime - this.lastFrameTime;
         
+        // Performance check - skip frame if too slow
         if (deltaTime < this.frameInterval) {
-            return; // Skip frame for performance
+            return;
+        }
+        
+        // Performance monitoring
+        this.frameTimeHistory.push(deltaTime);
+        if (this.frameTimeHistory.length > this.maxFrameTimeHistory) {
+            this.frameTimeHistory.shift();
+        }
+        
+        // Adaptive performance adjustment
+        const avgFrameTime = this.frameTimeHistory.reduce((a, b) => a + b, 0) / this.frameTimeHistory.length;
+        if (avgFrameTime > 20) { // If average frame time > 20ms, reduce effects
+            this.effects.glow = false;
         }
         
         this.lastFrameTime = currentTime;
         this.frameCount++;
         
+        // Batch DOM updates for better performance
+        const updates = [];
+        
         this.particles.forEach(particle => {
-            // Apply advanced physics forces
-            this.applyAdvancedPhysicsForces(particle, deltaTime);
+            // Apply simplified physics forces
+            this.applySimplifiedPhysicsForces(particle, deltaTime);
             
             // Update position with velocity
             particle.x += particle.vx;
@@ -282,33 +263,30 @@ export class ParticleSystem {
             // Update particle properties
             this.updateParticleProperties(particle, deltaTime);
             
-            // Update visual element
-            this.updateParticleElement(particle);
-            
-            // Update trail
-            this.updateParticleTrail(particle);
+            // Collect updates for batch processing
+            updates.push(particle);
         });
+        
+        // Batch update visual elements
+        this.batchUpdateParticleElements(updates);
         
         // Update clusters
         this.updateClusters();
-        
-        // Update advanced effects
-        this.updateAdvancedEffects();
         
         // Cleanup old particles
         this.cleanupOffscreenParticles();
     }
 
     /**
-     * Apply advanced physics forces to particle
+     * Apply simplified physics forces to particle
      */
-    applyAdvancedPhysicsForces(particle, deltaTime) {
+    applySimplifiedPhysicsForces(particle, deltaTime) {
         const dt = deltaTime / 16; // Normalize to 60fps
         
         // Apply gravity with mass consideration
         particle.vy += this.particlePhysics.gravity * particle.mass * dt;
         
-        // Apply wind with turbulence
+        // Apply wind with reduced turbulence
         particle.vx += this.particlePhysics.wind * dt;
         particle.vx += (Math.random() - 0.5) * this.particlePhysics.turbulence * dt;
         particle.vy += (Math.random() - 0.5) * this.particlePhysics.turbulence * dt;
@@ -317,43 +295,17 @@ export class ParticleSystem {
         particle.vx *= this.particlePhysics.friction;
         particle.vy *= this.particlePhysics.friction;
         
-        // Apply temperature effects
-        const tempEffect = (particle.temperature - 20) / 100;
-        particle.vx += tempEffect * 0.01 * dt;
-        particle.vy += tempEffect * 0.01 * dt;
+        // Apply mouse interaction (simplified)
+        this.applySimplifiedMouseInteraction(particle);
         
-        // Apply charge interactions
-        if (Math.abs(particle.charge) > 0.1) {
-            this.particles.forEach(otherParticle => {
-                if (particle.id !== otherParticle.id) {
-                    const distance = Math.sqrt(
-                        Math.pow(particle.x - otherParticle.x, 2) + 
-                        Math.pow(particle.y - otherParticle.y, 2)
-                    );
-                    
-                    if (distance < 100 && distance > 0) {
-                        const force = (particle.charge * otherParticle.charge) / (distance * distance) * 0.001;
-                        const dx = (otherParticle.x - particle.x) / distance;
-                        const dy = (otherParticle.y - particle.y) / distance;
-                        
-                        particle.vx += dx * force * dt;
-                        particle.vy += dy * force * dt;
-                    }
-                }
-            });
-        }
-        
-        // Apply mouse interaction
-        this.applyMouseInteraction(particle);
-        
-        // Apply cluster forces
-        this.applyClusterForces(particle);
+        // Apply cluster forces (simplified)
+        this.applySimplifiedClusterForces(particle);
     }
 
     /**
-     * Apply mouse interaction to particle
+     * Apply simplified mouse interaction to particle
      */
-    applyMouseInteraction(particle) {
+    applySimplifiedMouseInteraction(particle) {
         const distance = Math.sqrt(
             Math.pow(particle.x - this.mouseX, 2) + 
             Math.pow(particle.y - this.mouseY, 2)
@@ -364,15 +316,15 @@ export class ParticleSystem {
             const dx = (this.mouseX - particle.x) / distance;
             const dy = (this.mouseY - particle.y) / distance;
             
-            particle.vx += dx * strength * this.interactionZones.mouse.strength * 0.02;
-            particle.vy += dy * strength * this.interactionZones.mouse.strength * 0.02;
+            particle.vx += dx * strength * this.interactionZones.mouse.strength * 0.015; // Reduced from 0.02
+            particle.vy += dy * strength * this.interactionZones.mouse.strength * 0.015;
         }
     }
 
     /**
-     * Apply cluster forces to particle
+     * Apply simplified cluster forces to particle
      */
-    applyClusterForces(particle) {
+    applySimplifiedClusterForces(particle) {
         this.clusters.forEach(cluster => {
             const distance = Math.sqrt(
                 Math.pow(particle.x - cluster.x, 2) + 
@@ -384,14 +336,14 @@ export class ParticleSystem {
                 const dx = (cluster.x - particle.x) / distance;
                 const dy = (cluster.y - particle.y) / distance;
                 
-                particle.vx += dx * strength * 0.01;
-                particle.vy += dy * strength * 0.01;
+                particle.vx += dx * strength * 0.008; // Reduced from 0.01
+                particle.vy += dy * strength * 0.008;
             }
         });
     }
 
     /**
-     * Update particle properties over time
+     * Update particle properties over time (optimized)
      */
     updateParticleProperties(particle, deltaTime) {
         const dt = deltaTime / 16;
@@ -399,183 +351,59 @@ export class ParticleSystem {
         // Update life
         particle.life -= deltaTime;
         
-        // Update rotation
+        // Update rotation (simplified)
         particle.rotation += particle.rotationSpeed * dt;
         
-        // Update pulse
+        // Update pulse (simplified)
         particle.pulse += particle.pulseSpeed * dt;
-        
-        // Update wave
-        particle.wave += particle.waveSpeed * dt;
-        
-        // Update temperature
-        particle.temperature += (Math.random() - 0.5) * 0.1 * dt;
-        particle.temperature = Math.max(0, Math.min(100, particle.temperature));
-        
-        // Update charge
-        particle.charge += (Math.random() - 0.5) * 0.01 * dt;
-        particle.charge = Math.max(-1, Math.min(1, particle.charge));
         
         // Update opacity based on life
         const lifeRatio = particle.life / particle.maxLife;
         particle.opacity = lifeRatio * this.particleProperties.maxOpacity;
         
-        // Update size based on pulse
-        const pulseFactor = Math.sin(particle.pulse) * 0.2 + 0.8;
+        // Update size based on pulse (simplified)
+        const pulseFactor = Math.sin(particle.pulse) * 0.1 + 0.9; // Reduced variation
         particle.currentSize = particle.size * pulseFactor;
     }
 
     /**
-     * Update particle trail
+     * Batch update particle visual elements for better performance
      */
-    updateParticleTrail(particle) {
-        if (this.effects.trails) {
-            particle.trail.push({
-                x: particle.x,
-                y: particle.y,
-                opacity: particle.opacity * 0.5,
-                size: particle.currentSize * 0.7
-            });
-            
-            if (particle.trail.length > particle.maxTrailLength) {
-                particle.trail.shift();
-            }
-        }
-    }
-
-    /**
-     * Update clusters
-     */
-    updateClusters() {
-        // Remove old clusters
-        this.clusters = this.clusters.filter(cluster => 
-            Date.now() - cluster.created < 10000
-        );
-        
-        // Create new clusters randomly
-        if (this.clusters.length < this.maxClusters && Math.random() < 0.001) {
-            this.clusters.push({
-                x: Math.random() * window.innerWidth,
-                y: Math.random() * window.innerHeight,
-                created: Date.now(),
-                strength: Math.random() * 0.5 + 0.5
-            });
-        }
-    }
-
-    /**
-     * Update advanced effects
-     */
-    updateAdvancedEffects() {
-        if (this.effects.connections) {
-            this.updateConnections();
+    batchUpdateParticleElements(particles) {
+        // Use requestAnimationFrame for smooth updates
+        if (this.animationFrameId) {
+            cancelAnimationFrame(this.animationFrameId);
         }
         
-        if (this.effects.sparkles) {
-            this.updateSparkles();
-        }
-        
-        if (this.effects.trails) {
-            this.updateTrails();
-        }
-    }
-
-    /**
-     * Update connection lines between particles
-     */
-    updateConnections() {
-        if (!this.connectionsCtx) return;
-        
-        this.connectionsCtx.clearRect(0, 0, this.connectionsContainer.width, this.connectionsContainer.height);
-        
-        for (let i = 0; i < this.particles.length; i++) {
-            for (let j = i + 1; j < this.particles.length; j++) {
-                const p1 = this.particles[i];
-                const p2 = this.particles[j];
-                
-                const distance = Math.sqrt(
-                    Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2)
-                );
-                
-                if (distance < 100) {
-                    const opacity = (100 - distance) / 100 * 0.3;
-                    this.connectionsCtx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
-                    this.connectionsCtx.lineWidth = 1;
-                    this.connectionsCtx.beginPath();
-                    this.connectionsCtx.moveTo(p1.x, p1.y);
-                    this.connectionsCtx.lineTo(p2.x, p2.y);
-                    this.connectionsCtx.stroke();
-                }
-            }
-        }
-    }
-
-    /**
-     * Update sparkles
-     */
-    updateSparkles() {
-        if (Math.random() < 0.1) {
-            const sparkle = document.createElement('div');
-            sparkle.className = 'particle-sparkle';
-            sparkle.style.cssText = `
-                position: absolute;
-                left: ${Math.random() * window.innerWidth}px;
-                top: ${Math.random() * window.innerHeight}px;
-                width: 2px;
-                height: 2px;
-                background: white;
-                border-radius: 50%;
-                pointer-events: none;
-                animation: sparkleFade 1s ease-out forwards;
-            `;
-            
-            this.sparklesContainer.appendChild(sparkle);
-            
-            setTimeout(() => {
-                if (sparkle.parentNode) {
-                    sparkle.parentNode.removeChild(sparkle);
-                }
-            }, 1000);
-        }
-    }
-
-    /**
-     * Update trails
-     */
-    updateTrails() {
-        this.particles.forEach(particle => {
-            particle.trail.forEach((trailPoint, index) => {
-                const trailElement = document.createElement('div');
-                trailElement.className = 'particle-trail';
-                trailElement.style.cssText = `
-                    position: absolute;
-                    left: ${trailPoint.x}px;
-                    top: ${trailPoint.y}px;
-                    width: ${trailPoint.size}px;
-                    height: ${trailPoint.size}px;
-                    background: ${particle.color};
-                    border-radius: 50%;
-                    opacity: ${trailPoint.opacity * (index / particle.trail.length)};
-                    pointer-events: none;
-                    animation: trailFade 0.5s ease-out forwards;
-                `;
-                
-                this.trailsContainer.appendChild(trailElement);
-                
-                setTimeout(() => {
-                    if (trailElement.parentNode) {
-                        trailElement.parentNode.removeChild(trailElement);
+        this.animationFrameId = requestAnimationFrame(() => {
+            particles.forEach(particle => {
+                if (particle.element) {
+                    // Simplified transform for better performance
+                    particle.element.style.transform = `
+                        translate(${particle.x}px, ${particle.y}px) 
+                        rotate(${particle.rotation}deg) 
+                        scale(${particle.currentSize / particle.size})
+                    `;
+                    
+                    particle.element.style.opacity = particle.opacity;
+                    
+                    // Simplified glow effect
+                    if (this.effects.glow) {
+                        const glowIntensity = particle.glow * particle.opacity * 0.5; // Reduced intensity
+                        particle.element.style.boxShadow = `
+                            0 0 ${particle.currentSize * 2}px ${particle.color}${Math.floor(glowIntensity * 255).toString(16).padStart(2, '0')}
+                        `;
                     }
-                }, 500);
+                }
             });
         });
     }
 
     /**
-     * Apply boundary constraints with bounce
+     * Apply boundary constraints with bounce (optimized)
      */
     applyBoundaryConstraints(particle) {
-        const margin = 50;
+        const margin = 30; // Reduced from 50
         
         if (particle.x < -margin) {
             particle.x = window.innerWidth + margin;
@@ -589,7 +417,7 @@ export class ParticleSystem {
             particle.y = -margin;
         }
         
-        // Bounce off edges
+        // Simplified bounce off edges
         if (particle.x < 0 || particle.x > window.innerWidth) {
             particle.vx *= -this.particlePhysics.bounce;
         }
@@ -600,35 +428,52 @@ export class ParticleSystem {
     }
 
     /**
-     * Update particle visual element with enhanced effects
+     * Update clusters (simplified)
      */
-    updateParticleElement(particle) {
-        if (particle.element) {
-            const waveEffect = this.effects.waveEffect ? Math.sin(particle.wave) * 2 : 0;
-            
-            particle.element.style.transform = `
-                translate(${particle.x}px, ${particle.y}px) 
-                rotate(${particle.rotation}deg) 
-                scale(${particle.currentSize / particle.size})
-                translateY(${waveEffect}px)
-            `;
-            
-            particle.element.style.opacity = particle.opacity;
-            
-            // Enhanced glow effect
-            if (this.effects.glow) {
-                const glowIntensity = particle.glow * particle.opacity;
-                particle.element.style.boxShadow = `
-                    0 0 ${particle.currentSize * 3}px ${particle.color}${Math.floor(glowIntensity * 255).toString(16).padStart(2, '0')},
-                    0 0 ${particle.currentSize * 6}px ${particle.color}${Math.floor(glowIntensity * 0.5 * 255).toString(16).padStart(2, '0')}
-                `;
-            }
-            
-            // Sparkle effect
-            if (particle.sparkle && this.effects.sparkles) {
-                particle.element.style.filter = `brightness(1.5) contrast(1.2)`;
-            }
+    updateClusters() {
+        // Remove old clusters
+        this.clusters = this.clusters.filter(cluster => 
+            Date.now() - cluster.created < 8000 // Reduced from 10000
+        );
+        
+        // Create new clusters less frequently
+        if (this.clusters.length < this.maxClusters && Math.random() < 0.0005) { // Reduced from 0.001
+            this.clusters.push({
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                created: Date.now(),
+                strength: Math.random() * 0.3 + 0.3 // Reduced from 0.5 + 0.5
+            });
         }
+    }
+
+    /**
+     * Cleanup offscreen particles with object pooling
+     */
+    cleanupOffscreenParticles() {
+        const currentTime = Date.now();
+        
+        // Only cleanup every 2 seconds for better performance
+        if (currentTime - this.lastCleanupTime < 2000) {
+            return;
+        }
+        
+        this.lastCleanupTime = currentTime;
+        
+        this.particles = this.particles.filter(particle => {
+            if (particle.life <= 0 || 
+                particle.x < -100 || particle.x > window.innerWidth + 100 ||
+                particle.y < -100 || particle.y > window.innerHeight + 100) {
+                
+                // Return to pool instead of destroying
+                if (particle.element) {
+                    particle.element.remove();
+                }
+                this.returnParticleToPool(particle);
+                return false;
+            }
+            return true;
+        });
     }
 }
 

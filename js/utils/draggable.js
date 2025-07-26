@@ -39,25 +39,17 @@ class DraggableSystem {
         const bootContainer = document.querySelector('#bootSequence .boot-container');
         const loginContainer = document.querySelector('#loginScreen .login-container');
         
-        console.log('DraggableSystem: Found containers:', { bootContainer: !!bootContainer, loginContainer: !!loginContainer });
-        
         if (bootContainer) {
-            // CSS centering is now handled by CSS, just make it draggable
-            console.log('DraggableSystem: Making boot container draggable');
             this.dragElement(bootContainer);
         }
         
         if (loginContainer) {
-            // CSS centering is now handled by CSS, just make it draggable
-            console.log('DraggableSystem: Making login container draggable');
             this.dragElement(loginContainer);
         }
         
         // Handle neuOS widget specifically with enhanced interaction
         const neuosWidget = document.getElementById('neuosWidget');
         if (neuosWidget) {
-            // CSS centering is now handled by CSS, just make it draggable
-            console.log('DraggableSystem: Making neuOS widget draggable');
             this.dragElement(neuosWidget);
             this.addInteractiveEffects(neuosWidget);
         }
@@ -93,6 +85,9 @@ class DraggableSystem {
             elmnt.style.setProperty('transform', 'none', 'important'); // Remove any transform
             elmnt.style.setProperty('transition', 'none', 'important'); // Disable transitions during drag
             elmnt.style.setProperty('cursor', 'grabbing', 'important'); // Show grabbing cursor
+
+            // Mark element as moved
+            elmnt.setAttribute('data-has-been-moved', 'true');
 
             // Store initial positions
             initialX = e.clientX;
@@ -215,14 +210,10 @@ class DraggableSystem {
         const loginContainer = document.querySelector('#loginScreen .login-container');
         
         if (bootContainer) {
-            // CSS centering is now handled by CSS, just make it draggable
-            console.log('DraggableSystem: Refreshing boot container');
             this.dragElement(bootContainer);
         }
         
         if (loginContainer) {
-            // CSS centering is now handled by CSS, just make it draggable
-            console.log('DraggableSystem: Refreshing login container');
             this.dragElement(loginContainer);
         }
     }
@@ -231,8 +222,16 @@ class DraggableSystem {
     refreshNeuOSWidget() {
         const neuosWidget = document.getElementById('neuosWidget');
         if (neuosWidget) {
-            // CSS centering is now handled by CSS, just make it draggable
-            console.log('DraggableSystem: Refreshing neuOS widget');
+            // Ensure proper centering before making draggable
+            neuosWidget.style.setProperty('position', 'fixed', 'important');
+            neuosWidget.style.setProperty('top', '50%', 'important');
+            neuosWidget.style.setProperty('left', '50%', 'important');
+            neuosWidget.style.setProperty('transform', 'translate(-50%, -50%)', 'important');
+            neuosWidget.style.setProperty('display', 'flex', 'important');
+            neuosWidget.style.setProperty('flex-direction', 'column', 'important');
+            neuosWidget.style.setProperty('justify-content', 'center', 'important');
+            neuosWidget.style.setProperty('align-items', 'center', 'important');
+            
             this.dragElement(neuosWidget);
             this.addInteractiveEffects(neuosWidget);
         }
@@ -242,8 +241,6 @@ class DraggableSystem {
     enableBootBoxDragging() {
         const bootContainer = document.querySelector('#bootSequence .boot-container');
         if (bootContainer) {
-            // CSS centering is now handled by CSS, just make it draggable
-            console.log('DraggableSystem: Enabling boot box dragging');
             this.dragElement(bootContainer);
         }
     }

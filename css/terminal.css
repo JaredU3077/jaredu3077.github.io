@@ -1,201 +1,226 @@
-/* Terminal Window Styles - Standardized Glass Design */
+/* Terminal Window Styles - Clean and Modern */
 #terminalWindow {
-    background: var(--terminal-bg) !important;
-    backdrop-filter: var(--terminal-filter) !important;
-    -webkit-backdrop-filter: var(--terminal-filter) !important;
-    border: 1px solid var(--terminal-border) !important;
-    border-radius: var(--radius-2xl) !important;
-    box-shadow: var(--terminal-shadow), var(--glass-glow-medium) !important;
-    /* Ensure proper z-index for terminal windows */
-    z-index: 1001 !important;
-    overflow: visible;
-    /* Ensure resize handles are positioned correctly */
+    background: var(--window-bg-content);
+    backdrop-filter: var(--window-filter-content);
+    -webkit-backdrop-filter: var(--window-filter-content);
+    border: 1px solid var(--window-border-default);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--window-shadow-default);
+    z-index: 10001 !important; /* Highest z-index - above everything */
+    overflow: hidden;
     position: relative;
+    min-width: 600px;
+    min-height: 400px;
 }
 
-/* Maximized terminal window - remove border radius and adjust styling */
+/* Terminal window states */
 #terminalWindow.maximized {
-    border-radius: 0 !important;
-    border: none !important;
-    box-shadow: none !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    z-index: 9999 !important;
-    transform: none !important;
-}
-
-/* Ensure maximized windows break out of any container constraints */
-.window.maximized {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    z-index: 9999 !important;
-    transform: none !important;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    z-index: 10001 !important; /* Highest z-index - above everything */
+    transform: none;
 }
 
 #terminalWindow.maximized .window-header {
-    border-radius: 0 !important;
+    border-radius: 0;
 }
 
 #terminalWindow:focus-within {
-    border-color: var(--terminal-prompt) !important;
-    box-shadow: var(--glass-shadow-heavy), var(--glass-glow-heavy), 0 0 0 1px var(--terminal-prompt) !important;
-    transition: all var(--transition-normal) !important;
+    border-color: var(--color-primary);
+    box-shadow: var(--window-shadow-focused);
 }
 
-/* Ensure terminal window follows dragging rules */
 #terminalWindow.dragging {
-    transition: none !important;
+    transition: none;
     will-change: transform;
 }
 
-/* Override general window border-radius for terminal */
-#terminalWindow.window {
-    border-radius: var(--radius-2xl) !important;
-}
-
-/* Terminal window header - Standardized Glass Design */
+/* Terminal window header */
 #terminalWindow .window-header {
-    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0 !important;
-    background: var(--glass-bg-light) !important;
-    backdrop-filter: var(--window-filter-header) !important;
-    -webkit-backdrop-filter: var(--window-filter-header) !important;
-    border-bottom: 1px solid var(--terminal-border) !important;
-    padding: 16px 20px !important; /* Fixed padding */
-    min-height: 60px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 16px !important; /* Fixed gap */
-    width: 100% !important;
-    box-sizing: border-box !important;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    background: var(--window-bg-header);
+    backdrop-filter: var(--window-filter-header);
+    -webkit-backdrop-filter: var(--window-filter-header);
+    border-bottom: 1px solid var(--window-border-default);
+    padding: 16px 20px;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+    box-sizing: border-box;
+    cursor: grab;
 }
 
 #terminalWindow .window-header:active {
     cursor: grabbing;
 }
 
-/* Terminal window content - Standardized Glass Design */
+/* Ensure terminal window can be dragged */
+#terminalWindow {
+    cursor: default;
+}
+
+#terminalWindow .window-header * {
+    cursor: inherit;
+}
+
+/* Override cursor for window controls to ensure they're clickable */
+#terminalWindow .window-header .window-controls,
+#terminalWindow .window-header .window-controls * {
+    cursor: pointer !important;
+}
+
+/* Terminal window content */
 #terminalWindow .window-content {
-    border-radius: 0 0 var(--radius-2xl) var(--radius-2xl) !important;
-    background: var(--window-bg-content) !important;
-    backdrop-filter: var(--window-filter-content) !important;
-    -webkit-backdrop-filter: var(--window-filter-content) !important;
-    color: var(--terminal-text);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    background: var(--window-bg-content);
+    backdrop-filter: var(--window-filter-content);
+    -webkit-backdrop-filter: var(--window-filter-content);
+    color: var(--color-text-primary);
     font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Cascadia Code', monospace;
     font-size: 14px;
     line-height: 1.6;
-    padding: 24px;
-    scrollbar-width: thin;
-    -ms-overflow-style: none;
-    scrollbar-color: var(--color-primary) transparent;
-    position: relative;
-    /* Ensure proper layout for terminal content */
+    padding: 0;
+    overflow: hidden;
+}
+
+/* Terminal layout */
+.terminal-layout {
     display: flex;
     flex-direction: column;
-    height: calc(100% - 60px); /* Account for header height */
-    overflow: visible !important;
-    /* Ensure content can scroll */
-    min-height: 400px;
+    height: 100%;
+    width: 100%;
 }
 
-/* Terminal Output - Enhanced Design */
-#terminalWindow #terminalOutput {
-    background: var(--window-background-content) !important;
-    color: var(--terminal-text);
-    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Cascadia Code', monospace;
-    font-size: 14px;
-    line-height: 1.6;
+/* Terminal output area */
+.terminal-output {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
     padding: 20px;
-    margin: 0;
-    border: none;
-    outline: none;
-    resize: none;
-    backdrop-filter: var(--window-backdrop-content) !important;
-    -webkit-backdrop-filter: var(--window-backdrop-content) !important;
-    box-shadow: 
-        0 4px 12px rgba(0, 0, 0, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    /* Improve general readability */
-    text-shadow: 0 0 1px var(--terminal-text);
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    scrollbar-width: thin;
-    scrollbar-color: var(--terminal-border) transparent;
-    /* Ensure proper height for scrolling */
-    max-height: none;
-    height: auto;
-    min-height: 200px;
-}
-
-/* Terminal Input - Enhanced Design */
-#terminalWindow #terminalInput {
-    background: var(--window-background-control) !important;
-    color: var(--terminal-text);
+    background: var(--window-bg-content);
+    color: var(--color-text-primary);
     font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Cascadia Code', monospace;
     font-size: 14px;
     line-height: 1.6;
-    padding: 16px 20px;
-    margin: 0;
-    border: 1px solid var(--terminal-border);
-    border-radius: 12px;
-    outline: none;
-    resize: none;
-    backdrop-filter: var(--window-backdrop-control) !important;
-    -webkit-backdrop-filter: var(--window-backdrop-control) !important;
-    box-shadow: 
-        0 4px 12px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-primary) transparent;
+}
+
+/* Terminal input area */
+.terminal-input {
     display: flex;
     align-items: center;
     gap: 12px;
-    /* Ensure input stays at bottom */
-    flex-shrink: 0;
+    padding: 16px 20px;
+    background: var(--window-bg-control);
+    border-top: 1px solid var(--window-border-default);
     min-height: 60px;
-    /* Ensure proper pointer events and cursor */
-    cursor: text;
-    pointer-events: auto;
-    /* Ensure proper positioning */
-    position: relative;
+    flex-shrink: 0;
 }
 
-#terminalWindow #terminalInput:focus-within {
-    border-color: var(--terminal-prompt) !important;
-    box-shadow: 
-        0 8px 24px rgba(0, 0, 0, 0.3),
-        0 0 0 1px var(--terminal-prompt),
-        inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
-    background: var(--window-background-focused) !important;
-    transform: translateY(-1px);
-}
-
-/* Terminal Prompt - Enhanced Design */
-#terminalInput .prompt {
-    color: var(--terminal-prompt);
+.terminal-input .prompt {
+    color: var(--color-primary);
     font-weight: 700;
     font-size: 16px;
-    margin-right: 0;
-    animation: terminalPulse 2s infinite;
-    text-shadow: 0 0 8px var(--terminal-prompt);
     user-select: none;
+}
+
+.terminal-input input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--color-text-primary);
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Cascadia Code', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.terminal-input input::placeholder {
+    color: var(--color-text-muted);
+}
+
+/* Terminal status bar */
+.terminal-status {
     display: flex;
     align-items: center;
-    position: relative;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: var(--window-bg-control);
+    border-top: 1px solid var(--window-border-default);
+    font-size: 12px;
+    color: var(--color-text-muted);
+    min-height: 40px;
+    flex-shrink: 0;
+}
+
+.terminal-status .status-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.terminal-status .status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-success);
+    animation: statusPulse 2s infinite;
+}
+
+@keyframes statusPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Terminal command and result styling */
+.terminal-command {
+    margin: 8px 0;
+    padding: 8px 12px;
+    background: rgba(99, 102, 241, 0.1);
+    border-radius: 6px;
+    border-left: 3px solid var(--color-primary);
+}
+
+.terminal-result {
+    margin: 8px 0 16px 0;
+    padding: 12px 16px;
+    background: rgba(15, 23, 42, 0.3);
+    border-radius: 6px;
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    line-height: 1.6;
+}
+
+.terminal-welcome {
+    margin: 16px 0;
+    padding: 20px;
+    background: rgba(99, 102, 241, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.terminal-welcome h3 {
+    color: var(--color-primary);
+    margin-bottom: 12px;
+    font-size: 1.2em;
+}
+
+.terminal-welcome p {
+    margin: 4px 0;
+    color: var(--color-text-primary);
 }
 
 #terminalInput .prompt::after {
@@ -773,6 +798,13 @@
 #terminalWindow .window-control.close:hover {
     background: var(--color-accent-red) !important;
     border-color: var(--color-accent-red) !important;
+}
+
+/* Ensure close button is always clickable */
+#terminalWindow .window-control.close {
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    z-index: 100 !important;
 }
 
 /* Terminal Content Area - Enhanced Spacing */

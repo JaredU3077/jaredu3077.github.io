@@ -17,6 +17,9 @@ import './utils/mobile.js';
 // Import screensaver
 import './core/screensaver.js';
 
+// Import performance monitor
+import './utils/performanceMonitor.js';
+
 // Import glass effect system
 import './core/glassEffect.js';
 import { GlassMorphismSystem } from './core/glassEffect.js';
@@ -165,6 +168,37 @@ function refreshDesktopIconHandlers() {
 // --- APPLICATION LAUNCHER ---
 
 /**
+ * Enables performance mode by disabling heavy features
+ */
+function enablePerformanceMode() {
+    // Disable particle system
+    if (window.particleSystemInstance) {
+        window.particleSystemInstance.particleAnimationRunning = false;
+        window.particleSystemInstance.maxParticles = 0;
+        window.particleSystemInstance.particleCount = 0;
+    }
+    
+    // Optionally disable glass effects for performance (commented out by default)
+    // Uncomment the lines below if you need to disable glass effects for performance
+    /*
+    if (window.neuOS && window.neuOS.glassMorphismSystem) {
+        window.neuOS.glassMorphismSystem.enableReflections = false;
+        window.neuOS.glassMorphismSystem.enableBreathingAnimations = false;
+        window.neuOS.glassMorphismSystem.enableDistortion = false;
+    }
+    */
+    
+    // Reduce animation durations
+    document.documentElement.style.setProperty('--animation-duration', '0.1s');
+    document.documentElement.style.setProperty('--transition-duration', '0.1s');
+    
+    console.log('neuOS: Performance mode enabled');
+}
+
+// Make performance mode globally available
+window.enablePerformanceMode = enablePerformanceMode;
+
+/**
  * Displays a temporary error notification to the user.
  * @param {string} title - The error title.
  * @param {string} message - The error message.
@@ -247,6 +281,15 @@ async function handleAppClick(appId) {
             try {
                 switch (appId) {
                     case 'terminal':
+                        // Clean up existing terminal instance if it exists
+                        if (terminal) {
+                            terminal = null;
+                        }
+                        if (window.neuOS.terminalInstance) {
+                            window.neuOS.terminalInstance = null;
+                        }
+                        
+                        // Create new terminal instance
                         terminal = new Terminal(
                             winElem.querySelector('#terminalInput input'),
                             winElem.querySelector('#terminalOutput')
@@ -408,24 +451,37 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         
         // Initialize starfield background globally
-        new window.StarfieldBackground();
+        try {
+            new window.StarfieldBackground();
+        } catch (error) {
+            console.warn('Starfield background initialization failed:', error);
+        }
         
         // Ensure draggable system is properly initialized for boot and login
-        if (window.neuOS && window.neuOS.draggableSystem) {
-            // Immediate positioning
-            window.neuOS.draggableSystem.refreshBootAndLogin();
-            
-            // Also try after a short delay to ensure DOM is ready
-            setTimeout(() => {
+        try {
+            if (window.neuOS && window.neuOS.draggableSystem) {
+                // Immediate positioning
                 window.neuOS.draggableSystem.refreshBootAndLogin();
-            }, 100);
+                
+                // Also try after a short delay to ensure DOM is ready
+                setTimeout(() => {
+                    window.neuOS.draggableSystem.refreshBootAndLogin();
+                }, 100);
+            }
+        } catch (error) {
+            console.warn('Draggable system initialization failed:', error);
         }
+        
+        // Performance optimizations - only enable if needed
+        // Glass effects are now enabled by default for better visual experience
+        // Performance mode can be manually enabled via terminal command if needed
         
         // GitHub Pages specific optimizations
         if (window.location.hostname.includes('github.io')) {
             // Disable heavy features on GitHub Pages to improve performance
             if (window.particleSystemInstance) {
-                window.particleSystemInstance.maxParticles = 50; // Reduce particle count
+                window.particleSystemInstance.particleAnimationRunning = false;
+                window.particleSystemInstance.maxParticles = 0;
             }
         }
         
@@ -446,8 +502,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         // Global event listeners
-        document.addEventListener('click', handleGlobalClick);
-        document.addEventListener('keydown', handleGlobalKeydown);
+        try {
+            document.addEventListener('click', handleGlobalClick);
+            document.addEventListener('keydown', handleGlobalKeydown);
+        } catch (error) {
+            console.warn('Global event listener setup failed:', error);
+        }
         
         // Add window resize listener for responsive desktop icons
         window.addEventListener('resize', debounce(() => {
@@ -480,6 +540,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             // Add to body
             document.body.appendChild(widget);
+            
+            // Ensure proper centering before making draggable
+            widget.style.setProperty('position', 'fixed', 'important');
+            widget.style.setProperty('top', '50%', 'important');
+            widget.style.setProperty('left', '50%', 'important');
+            widget.style.setProperty('transform', 'translate(-50%, -50%)', 'important');
+            widget.style.setProperty('display', 'flex', 'important');
+            widget.style.setProperty('flex-direction', 'column', 'important');
+            widget.style.setProperty('justify-content', 'center', 'important');
+            widget.style.setProperty('align-items', 'center', 'important');
             
             // Let the DraggableSystem handle the dragging
             // The widget will be automatically picked up by the draggable system
@@ -593,7 +663,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const loginScreen = document.getElementById('loginScreen');
         if (loginScreen) {
             const loginObserver = new MutationObserver(() => {
-                if (loginScreen.style.display === 'none' && !document.getElementById('neuosWidget')) {
+                if (loginScreen.style.display === 'none') {
                     // Ensure desktop is visible
                     const desktop = document.getElementById('desktop');
                     if (desktop) {
@@ -601,8 +671,36 @@ document.addEventListener('DOMContentLoaded', async () => {
                         desktop.style.visibility = 'visible';
                     }
                     
-                    addNeuOSWidget();
+                    // Show the existing neuOS widget with proper centering
+                    const neuosWidget = document.getElementById('neuosWidget');
+                    if (neuosWidget) {
+                        // Move widget to desktop container for proper layering
+                        const desktop = document.getElementById('desktop');
+                        if (desktop && neuosWidget.parentElement !== desktop) {
+                            desktop.appendChild(neuosWidget);
+                        }
+                        
+                        neuosWidget.style.setProperty('display', 'flex', 'important');
+                        neuosWidget.style.setProperty('position', 'absolute', 'important');
+                        neuosWidget.style.setProperty('top', '50%', 'important');
+                        neuosWidget.style.setProperty('left', '50%', 'important');
+                        neuosWidget.style.setProperty('transform', 'translate(-50%, -50%)', 'important');
+                        neuosWidget.style.setProperty('flex-direction', 'column', 'important');
+                        neuosWidget.style.setProperty('justify-content', 'center', 'important');
+                        neuosWidget.style.setProperty('align-items', 'center', 'important');
+                    }
+                    
                     addAudioControls(); // Add audio controls after login
+            
+            // Ensure audio controls are visible
+            setTimeout(() => {
+                const audioControls = document.getElementById('audioControls');
+                if (audioControls) {
+                    audioControls.classList.add('show');
+                    audioControls.style.setProperty('opacity', '1', 'important');
+                    audioControls.style.setProperty('visibility', 'visible', 'important');
+                }
+            }, 100);
                     // Refresh desktop icon handlers after login
                     refreshDesktopIconHandlers();
                     // Refresh draggable system to ensure all widgets are draggable

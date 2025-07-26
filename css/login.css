@@ -425,15 +425,16 @@
     opacity: 1;
 }
 
-/* Enhanced Audio Controls */
+/* Enhanced Audio Controls - Fixed Bottom Right */
 .audio-controls {
-    position: fixed;
-    bottom: 15px;
-    right: 15px;
-    z-index: 10000;
+    position: fixed !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    z-index: 10000 !important;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+    pointer-events: auto !important;
 }
 
 .audio-controls.show {

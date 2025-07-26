@@ -47,68 +47,85 @@ export class BootSequence {
 
     startProgressAnimation() {
         return new Promise((resolve) => {
-            const progressFill = document.querySelector('.progress-fill');
+            // Wait for DOM to be ready with timeout
+            let retryCount = 0;
+            const maxRetries = 50; // 5 seconds max wait
             
-            if (!progressFill) {
-                console.error('Progress fill element not found');
-                resolve();
-                return;
-            }
-
-            // Reset progress bar to 0
-            progressFill.style.width = '0%';
-
-            let currentProgress = 0;
-            const targetProgress = 100;
-            const pauseAt = 85;
-            const pauseDuration = 300;
-            let isPaused = false;
-            let hasPaused = false;
-            
-            // Simple, direct animation
-            const totalDuration = 3000; // 3 seconds
-            const activeDuration = totalDuration - pauseDuration; // 2.7 seconds
-            const updateInterval = 16; // 60fps
-            const totalUpdates = activeDuration / updateInterval;
-            const progressPerUpdate = targetProgress / totalUpdates;
-
-            const updateProgress = () => {
-                // Handle pause at 85%
-                if (currentProgress >= pauseAt && !isPaused && !hasPaused) {
-                    isPaused = true;
-                    hasPaused = true;
-                    
-                    setTimeout(() => {
-                        isPaused = false;
-                        updateProgress();
-                    }, pauseDuration);
+            const waitForElement = () => {
+                const progressFill = document.querySelector('.progress-fill');
+                
+                if (!progressFill) {
+                    retryCount++;
+                    if (retryCount >= maxRetries) {
+                        console.warn('Progress fill element not found after timeout, skipping animation');
+                        resolve();
+                        return;
+                    }
+                    console.warn(`Progress fill element not found, retrying... (${retryCount}/${maxRetries})`);
+                    setTimeout(waitForElement, 100);
                     return;
                 }
                 
-                if (!isPaused) {
-                    currentProgress += progressPerUpdate;
-                    if (currentProgress > targetProgress) {
-                        currentProgress = targetProgress;
-                    }
-                }
-                
-                // Update the progress bar immediately
-                progressFill.style.width = `${currentProgress}%`;
-                
-
-                
-                if (currentProgress < targetProgress) {
-                    setTimeout(updateProgress, updateInterval);
-                } else {
-                    setTimeout(() => {
-                        resolve();
-                    }, 200);
-                }
+                // Continue with animation once element is found
+                this.animateProgress(progressFill, resolve);
             };
-
-            // Start the animation
-            updateProgress();
+            
+            waitForElement();
         });
+    }
+    
+    animateProgress(progressFill, resolve) {
+        // Reset progress bar to 0
+        progressFill.style.width = '0%';
+
+        let currentProgress = 0;
+        const targetProgress = 100;
+        const pauseAt = 85;
+        const pauseDuration = 300;
+        let isPaused = false;
+        let hasPaused = false;
+        
+        // Simple, direct animation
+        const totalDuration = 3000; // 3 seconds
+        const activeDuration = totalDuration - pauseDuration; // 2.7 seconds
+        const updateInterval = 16; // 60fps
+        const totalUpdates = activeDuration / updateInterval;
+        const progressPerUpdate = targetProgress / totalUpdates;
+
+        const updateProgress = () => {
+            // Handle pause at 85%
+            if (currentProgress >= pauseAt && !isPaused && !hasPaused) {
+                isPaused = true;
+                hasPaused = true;
+                
+                setTimeout(() => {
+                    isPaused = false;
+                    updateProgress();
+                }, pauseDuration);
+                return;
+            }
+            
+            if (!isPaused) {
+                currentProgress += progressPerUpdate;
+                if (currentProgress > targetProgress) {
+                    currentProgress = targetProgress;
+                }
+            }
+            
+            // Update the progress bar immediately
+            progressFill.style.width = `${currentProgress}%`;
+            
+            if (currentProgress < targetProgress) {
+                setTimeout(updateProgress, updateInterval);
+            } else {
+                setTimeout(() => {
+                    resolve();
+                }, 200);
+            }
+        };
+
+        // Start the animation
+        updateProgress();
     }
 
     cycleBootMessages() {

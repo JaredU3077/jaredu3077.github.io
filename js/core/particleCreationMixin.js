@@ -46,7 +46,7 @@ export const particleCreationMixin = {
             border-radius: 50%;
             opacity: ${particle.opacity};
             pointer-events: none;
-            z-index: 1001;
+            z-index: 101 !important; /* Lower than terminal window (2000) and neuOS widget (500) */
             box-shadow: 0 0 ${particle.size * 2}px ${particle.color};
             transition: all 0.3s ease;
         `;

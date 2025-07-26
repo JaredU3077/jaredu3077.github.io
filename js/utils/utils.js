@@ -1,5 +1,6 @@
 /**
  * @file Provides common utility functions, classes, and singletons for the application.
+ * Performance optimized utilities for better application performance.
  * @author Jared U.
  */
 
@@ -44,6 +45,25 @@ export function throttle(func, limit) {
 }
 
 /**
+ * Creates a memoized function that caches results for better performance.
+ * @param {Function} func The function to memoize.
+ * @param {Function} resolver The function to resolve the cache key.
+ * @returns {Function} Returns the new memoized function.
+ */
+export function memoize(func, resolver) {
+    const cache = new Map();
+    return function memoized(...args) {
+        const key = resolver ? resolver.apply(this, args) : args[0];
+        if (cache.has(key)) {
+            return cache.get(key);
+        }
+        const result = func.apply(this, args);
+        cache.set(key, result);
+        return result;
+    };
+}
+
+/**
  * Custom error class for application-specific errors.
  * @class AppError
  * @extends {Error}
@@ -78,8 +98,6 @@ export const ErrorTypes = {
     FILE_LOAD: 'FILE_LOAD_ERROR'
 };
 
-
-
 /**
  * Validates a command input. (Currently a placeholder).
  * @param {string} command - The command to validate.
@@ -99,147 +117,374 @@ export function validateCommand(command, args) {
  * @class PerformanceMonitor
  */
 export class PerformanceMonitor {
+    /**
+     * Creates an instance of PerformanceMonitor.
+     * @memberof PerformanceMonitor
+     */
     constructor() {
-        /** @private @type {Map<string, number[]>} */
         this.metrics = new Map();
-        /** @private @type {Map<string, number>} */
         this.marks = new Map();
+        this.measures = new Map();
+        this.observers = new Map();
+        this.isEnabled = true;
     }
 
     /**
-     * Starts a performance measurement.
-     * @param {string} name - The name of the measurement.
+     * Start measuring a performance metric.
+     * @param {string} name - The name of the metric.
      * @memberof PerformanceMonitor
      */
     startMeasure(name) {
-        if (!this.marks.has(name)) {
-            this.marks.set(name, performance.now());
+        if (!this.isEnabled) return;
+        
+        const startTime = performance.now();
+        this.marks.set(name, startTime);
+        
+        // Also use native performance API
+        if (performance.mark) {
+            performance.mark(`${name}-start`);
         }
     }
 
     /**
-     * Ends a performance measurement and records the duration.
-     * @param {string} name - The name of the measurement to end.
-     * @returns {?number} The duration in milliseconds, or null if the start mark was not found.
+     * End measuring a performance metric.
+     * @param {string} name - The name of the metric.
+     * @param {object} [metadata={}] - Additional metadata about the measurement.
      * @memberof PerformanceMonitor
      */
-    endMeasure(name) {
-        if (this.marks.has(name)) {
-            const startTime = this.marks.get(name);
-            const duration = performance.now() - startTime;
-            this.marks.delete(name);
-            
-            if (!this.metrics.has(name)) {
-                this.metrics.set(name, []);
-            }
-            this.metrics.get(name).push(duration);
-            
-            // Keep only last 100 measurements
-            if (this.metrics.get(name).length > 100) {
-                this.metrics.get(name).shift();
-            }
-            
-            return duration;
+    endMeasure(name, metadata = {}) {
+        if (!this.isEnabled) return;
+        
+        const startTime = this.marks.get(name);
+        if (!startTime) {
+            console.warn(`PerformanceMonitor: No start time found for measure "${name}"`);
+            return;
         }
-        return null;
+        
+        const endTime = performance.now();
+        const duration = endTime - startTime;
+        
+        // Store metric
+        this.metrics.set(name, {
+            duration,
+            startTime,
+            endTime,
+            metadata,
+            timestamp: Date.now()
+        });
+        
+        // Use native performance API
+        if (performance.mark && performance.measure) {
+            performance.mark(`${name}-end`);
+            performance.measure(name, `${name}-start`, `${name}-end`);
+        }
+        
+        // Log if duration is significant
+        if (duration > 16) { // Longer than one frame at 60fps
+            console.warn(`PerformanceMonitor: Slow operation detected - "${name}" took ${duration.toFixed(2)}ms`);
+        }
+        
+        // Clean up marks
+        this.marks.delete(name);
     }
 
     /**
-     * Gets performance metrics for a given measurement.
-     * @param {string} name - The name of the measurement.
-     * @returns {?{average: number, min: number, max: number, count: number}} The metrics object, or null if not found.
+     * Get performance metrics for a specific measurement.
+     * @param {string} name - The name of the metric.
+     * @returns {object|null} The performance metric data.
      * @memberof PerformanceMonitor
      */
     getMetrics(name) {
-        if (!this.metrics.has(name)) return null;
-        
-        const measurements = this.metrics.get(name);
-        return {
-            average: measurements.reduce((a, b) => a + b, 0) / measurements.length,
-            min: Math.min(...measurements),
-            max: Math.max(...measurements),
-            count: measurements.length
-        };
+        return this.metrics.get(name) || null;
     }
 
     /**
-     * Clears all recorded performance metrics and marks.
+     * Get all performance metrics.
+     * @returns {Map} All stored metrics.
+     * @memberof PerformanceMonitor
+     */
+    getAllMetrics() {
+        return new Map(this.metrics);
+    }
+
+    /**
+     * Clear all performance metrics.
      * @memberof PerformanceMonitor
      */
     clearMetrics() {
         this.metrics.clear();
         this.marks.clear();
-    }
-}
-
-
-
-/**
- * A simple event emitter for pub/sub-style event handling.
- * @class EventEmitter
- */
-export class EventEmitter {
-    constructor() {
-        /** @private @type {Map<string, Set<Function>>} */
-        this.events = new Map();
+        this.measures.clear();
     }
 
     /**
-     * Registers an event handler for the given event.
-     * @param {string} event - The name of the event to listen for.
-     * @param {Function} callback - The function to call when the event is emitted.
-     * @returns {Function} A function to unregister the event handler.
+     * Enable or disable performance monitoring.
+     * @param {boolean} enabled - Whether to enable monitoring.
+     * @memberof PerformanceMonitor
+     */
+    setEnabled(enabled) {
+        this.isEnabled = enabled;
+    }
+
+    /**
+     * Monitor frame rate using requestAnimationFrame.
+     * @param {Function} callback - Callback function with FPS data.
+     * @memberof PerformanceMonitor
+     */
+    monitorFrameRate(callback) {
+        let frameCount = 0;
+        let lastTime = performance.now();
+        
+        const measureFPS = (currentTime) => {
+            frameCount++;
+            
+            if (currentTime - lastTime >= 1000) { // Every second
+                const fps = Math.round((frameCount * 1000) / (currentTime - lastTime));
+                callback(fps, currentTime - lastTime);
+                
+                frameCount = 0;
+                lastTime = currentTime;
+            }
+            
+            requestAnimationFrame(measureFPS);
+        };
+        
+        requestAnimationFrame(measureFPS);
+    }
+
+    /**
+     * Monitor memory usage (if available).
+     * @returns {object|null} Memory usage information.
+     * @memberof PerformanceMonitor
+     */
+    getMemoryUsage() {
+        if (performance.memory) {
+            return {
+                usedJSHeapSize: performance.memory.usedJSHeapSize,
+                totalJSHeapSize: performance.memory.totalJSHeapSize,
+                jsHeapSizeLimit: performance.memory.jsHeapSizeLimit
+            };
+        }
+        return null;
+    }
+
+    /**
+     * Monitor long tasks using PerformanceObserver.
+     * @param {Function} callback - Callback function for long tasks.
+     * @memberof PerformanceMonitor
+     */
+    monitorLongTasks(callback) {
+        if (!PerformanceObserver) return;
+        
+        try {
+            const observer = new PerformanceObserver((list) => {
+                for (const entry of list.getEntries()) {
+                    if (entry.duration > 50) { // Tasks longer than 50ms
+                        callback(entry);
+                    }
+                }
+            });
+            
+            observer.observe({ entryTypes: ['longtask'] });
+            this.observers.set('longtask', observer);
+        } catch (error) {
+            console.warn('PerformanceMonitor: Long task monitoring not supported');
+        }
+    }
+
+    /**
+     * Monitor layout shifts using PerformanceObserver.
+     * @param {Function} callback - Callback function for layout shifts.
+     * @memberof PerformanceMonitor
+     */
+    monitorLayoutShifts(callback) {
+        if (!PerformanceObserver) return;
+        
+        try {
+            const observer = new PerformanceObserver((list) => {
+                for (const entry of list.getEntries()) {
+                    if (entry.value > 0.1) { // Layout shifts greater than 0.1
+                        callback(entry);
+                    }
+                }
+            });
+            
+            observer.observe({ entryTypes: ['layout-shift'] });
+            this.observers.set('layout-shift', observer);
+        } catch (error) {
+            console.warn('PerformanceMonitor: Layout shift monitoring not supported');
+        }
+    }
+
+    /**
+     * Cleanup all observers.
+     * @memberof PerformanceMonitor
+     */
+    cleanup() {
+        this.observers.forEach(observer => {
+            if (observer.disconnect) {
+                observer.disconnect();
+            }
+        });
+        this.observers.clear();
+    }
+}
+
+/**
+ * Event emitter for application-wide event handling.
+ * @class EventEmitter
+ */
+export class EventEmitter {
+    /**
+     * Creates an instance of EventEmitter.
+     * @memberof EventEmitter
+     */
+    constructor() {
+        this.events = new Map();
+        this.onceEvents = new Map();
+    }
+
+    /**
+     * Register an event listener.
+     * @param {string} event - The event name.
+     * @param {Function} callback - The callback function.
      * @memberof EventEmitter
      */
     on(event, callback) {
         if (!this.events.has(event)) {
-            this.events.set(event, new Set());
+            this.events.set(event, []);
         }
-        this.events.get(event).add(callback);
-        return () => this.off(event, callback);
+        this.events.get(event).push(callback);
     }
 
     /**
-     * Unregisters an event handler for the given event.
-     * @param {string} event - The name of the event.
-     * @param {Function} callback - The handler to remove.
+     * Register a one-time event listener.
+     * @param {string} event - The event name.
+     * @param {Function} callback - The callback function.
+     * @memberof EventEmitter
+     */
+    once(event, callback) {
+        if (!this.onceEvents.has(event)) {
+            this.onceEvents.set(event, []);
+        }
+        this.onceEvents.get(event).push(callback);
+    }
+
+    /**
+     * Remove an event listener.
+     * @param {string} event - The event name.
+     * @param {Function} callback - The callback function to remove.
      * @memberof EventEmitter
      */
     off(event, callback) {
         if (this.events.has(event)) {
-            this.events.get(event).delete(callback);
+            const callbacks = this.events.get(event);
+            const index = callbacks.indexOf(callback);
+            if (index > -1) {
+                callbacks.splice(index, 1);
+            }
         }
     }
 
     /**
-     * Emits an event, calling all registered handlers.
-     * @param {string} event - The name of the event to emit.
-     * @param {...*} args - Arguments to pass to the event handlers.
+     * Emit an event.
+     * @param {string} event - The event name.
+     * @param {...any} args - Arguments to pass to the callback functions.
      * @memberof EventEmitter
      */
     emit(event, ...args) {
+        // Emit regular events
         if (this.events.has(event)) {
             this.events.get(event).forEach(callback => {
                 try {
                     callback(...args);
                 } catch (error) {
-                    console.error(`Error in event handler for ${event}:`, error);
+                    console.error(`EventEmitter: Error in event handler for "${event}":`, error);
                 }
             });
+        }
+        
+        // Emit once events and remove them
+        if (this.onceEvents.has(event)) {
+            const callbacks = this.onceEvents.get(event);
+            callbacks.forEach(callback => {
+                try {
+                    callback(...args);
+                } catch (error) {
+                    console.error(`EventEmitter: Error in once event handler for "${event}":`, error);
+                }
+            });
+            this.onceEvents.delete(event);
         }
     }
 
     /**
-     * Clears all registered event handlers.
+     * Clear all event listeners.
      * @memberof EventEmitter
      */
     clear() {
         this.events.clear();
+        this.onceEvents.clear();
     }
 }
 
-// --- SINGLETON EXPORTS ---
-/** @type {PerformanceMonitor} */
+// Create global instances
 export const performanceMonitor = new PerformanceMonitor();
-/** @type {EventEmitter} */
-export const eventEmitter = new EventEmitter(); 
+export const eventEmitter = new EventEmitter();
+
+// Performance optimization utilities
+export const performanceUtils = {
+    /**
+     * Batch DOM updates for better performance.
+     * @param {Function} updateFunction - Function containing DOM updates.
+     */
+    batchDOMUpdates(updateFunction) {
+        requestAnimationFrame(() => {
+            updateFunction();
+        });
+    },
+
+    /**
+     * Debounce DOM queries by caching results.
+     * @param {Function} queryFunction - Function that performs DOM query.
+     * @param {number} cacheTime - How long to cache the result (ms).
+     * @returns {Function} Cached query function.
+     */
+    cacheDOMQuery(queryFunction, cacheTime = 1000) {
+        let cache = null;
+        let lastCacheTime = 0;
+        
+        return function(...args) {
+            const now = Date.now();
+            if (!cache || now - lastCacheTime > cacheTime) {
+                cache = queryFunction.apply(this, args);
+                lastCacheTime = now;
+            }
+            return cache;
+        };
+    },
+
+    /**
+     * Optimize CSS animations by using transform and opacity.
+     * @param {HTMLElement} element - Element to optimize.
+     */
+    optimizeAnimations(element) {
+        element.style.willChange = 'transform, opacity';
+        element.style.transform = 'translateZ(0)';
+    },
+
+    /**
+     * Check if element is in viewport for lazy loading.
+     * @param {HTMLElement} element - Element to check.
+     * @returns {boolean} Whether element is in viewport.
+     */
+    isInViewport(element) {
+        const rect = element.getBoundingClientRect();
+        return (
+            rect.top >= 0 &&
+            rect.left >= 0 &&
+            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+        );
+    }
+}; 
