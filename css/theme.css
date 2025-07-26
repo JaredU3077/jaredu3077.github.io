@@ -486,9 +486,16 @@ body:not(.boot-active):not(.login-active) #desktop {
     display: block;
 }
 
-.boot-sequence, .login-screen, .boot-container, .login-container {
-    /* background: none !important; */
-    /* box-shadow: none !important; */
-    /* backdrop-filter: none !important; */
-    /* -webkit-backdrop-filter: none !important; */
+/* Ensure glass effects are preserved for boot and login containers */
+.boot-sequence, .login-screen {
+    /* Keep glass effects enabled */
+}
+
+.boot-container.neuos-glass-box, .login-container.neuos-glass-box {
+    /* Preserve glass morphism effects */
+    background: var(--glass-bg-medium) !important;
+    backdrop-filter: var(--glass-filter-medium) !important;
+    -webkit-backdrop-filter: var(--glass-filter-medium) !important;
+    box-shadow: var(--glass-shadow-medium), var(--glass-glow-medium) !important;
+    border: 1px solid var(--color-border-subtle) !important;
 }

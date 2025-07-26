@@ -418,15 +418,15 @@
     }
 
     /* Mobile Login Screen - Glass Theme */
-    .login-container {
+    .login-container.neuos-glass-box {
         width: 90% !important;
         max-width: 400px !important;
         padding: 24px !important;
-        background: rgba(255, 255, 255, 0.05) !important;
-        backdrop-filter: blur(12px) saturate(160%) brightness(120%) !important;
-        -webkit-backdrop-filter: blur(12px) saturate(160%) brightness(120%) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 255, 255, 0.1) !important;
+        background: var(--glass-bg-medium) !important;
+        backdrop-filter: var(--glass-filter-medium) !important;
+        -webkit-backdrop-filter: var(--glass-filter-medium) !important;
+        border: 1px solid var(--color-border-subtle) !important;
+        box-shadow: var(--glass-shadow-medium), var(--glass-glow-medium) !important;
         /* Ensure proper centering on mobile */
         position: fixed !important;
         top: 50% !important;
@@ -455,15 +455,15 @@
     }
 
     /* Mobile Boot Sequence - Glass Theme */
-    .boot-container {
+    .boot-container.neuos-glass-box {
         width: 90% !important;
         max-width: 400px !important;
         padding: 24px !important;
-        background: rgba(255, 255, 255, 0.05) !important;
-        backdrop-filter: blur(12px) saturate(160%) brightness(120%) !important;
-        -webkit-backdrop-filter: blur(12px) saturate(160%) brightness(120%) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 255, 255, 0.1) !important;
+        background: var(--glass-bg-medium) !important;
+        backdrop-filter: var(--glass-filter-medium) !important;
+        -webkit-backdrop-filter: var(--glass-filter-medium) !important;
+        border: 1px solid var(--color-border-subtle) !important;
+        box-shadow: var(--glass-shadow-medium), var(--glass-glow-medium) !important;
         /* Ensure proper centering on mobile */
         position: fixed !important;
         top: 50% !important;
@@ -518,11 +518,11 @@
     .neuos-widget {
         width: 100px !important;
         height: 100px !important;
-        background: rgba(255, 255, 255, 0.05) !important;
-        backdrop-filter: blur(12px) saturate(160%) brightness(120%) !important;
-        -webkit-backdrop-filter: blur(12px) saturate(160%) brightness(120%) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 255, 255, 0.1) !important;
+        background: var(--glass-bg-medium) !important;
+        backdrop-filter: var(--glass-filter-medium) !important;
+        -webkit-backdrop-filter: var(--glass-filter-medium) !important;
+        border: 1px solid var(--color-border-subtle) !important;
+        box-shadow: var(--glass-shadow-medium), var(--glass-glow-medium) !important;
         /* Ensure proper centering on mobile */
         position: fixed !important;
         top: 50% !important;

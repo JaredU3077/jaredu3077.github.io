@@ -302,11 +302,89 @@
     text-align: center;
 }
 
+.neuos-glass-box::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--glass-inner-medium);
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.neuos-glass-box::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, 
+        var(--glass-reflection-primary) 0%, 
+        var(--glass-reflection-secondary) 25%, 
+        transparent 50%, 
+        var(--glass-reflection-quaternary) 75%, 
+        transparent 100%);
+    opacity: var(--glass-reflection-opacity);
+    mix-blend-mode: screen;
+    z-index: 3;
+    transform: translateZ(25px);
+    border-radius: inherit;
+    pointer-events: none;
+    animation: glassReflectionShift 8s ease-in-out infinite;
+}
+
 .neuos-glass-box:hover {
     /* Removed scale transform to prevent positioning conflicts */
     box-shadow: var(--glass-hover-medium), var(--glass-glow-medium);
 }
 
+/* ===== BOOT AND LOGIN ORBS - ENHANCED GLASS THEME ===== */
+.boot-container.neuos-glass-box,
+.login-container.neuos-glass-box {
+    /* Ensure proper centering only if not moved */
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 1000 !important;
+    /* Enhanced glass effects to match neuOS widget */
+    background: var(--glass-bg-medium);
+    backdrop-filter: var(--glass-filter-medium);
+    -webkit-backdrop-filter: var(--glass-filter-medium);
+    border: 1px solid var(--color-border-subtle);
+    box-shadow: var(--glass-shadow-medium), var(--glass-glow-medium);
+    transition: all var(--transition-normal);
+    overflow: hidden;
+    isolation: isolate;
+    will-change: transform, box-shadow;
+    contain: layout style;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+
+/* Don't apply centering if element has been moved by user */
+.boot-container.neuos-glass-box[data-has-been-moved="true"],
+.login-container.neuos-glass-box[data-has-been-moved="true"] {
+    transform: none !important;
+}
+
+.boot-container.neuos-glass-box:hover,
+.login-container.neuos-glass-box:hover {
+    box-shadow: var(--glass-hover-medium), var(--glass-glow-medium);
+    background: var(--glass-bg-heavy);
+    border-color: var(--color-border-light);
+}
+
+.boot-container.neuos-glass-box:active,
+.login-container.neuos-glass-box:active {
+    cursor: grabbing;
+    box-shadow: var(--glass-shadow-heavy), var(--glass-glow-heavy);
+}
+
+/* ===== NEUOS WIDGET ===== */
 .neuos-widget {
     position: absolute;
     width: 120px;
