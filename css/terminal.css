@@ -1,14 +1,11 @@
-/* Terminal Window Styles - Enhanced Design */
+/* Terminal Window Styles - Standardized Glass Design */
 #terminalWindow {
-    background: var(--terminal-background) !important;
-    backdrop-filter: var(--terminal-backdrop) !important;
-    -webkit-backdrop-filter: var(--terminal-backdrop) !important;
+    background: var(--terminal-bg) !important;
+    backdrop-filter: var(--terminal-filter) !important;
+    -webkit-backdrop-filter: var(--terminal-filter) !important;
     border: 1px solid var(--terminal-border) !important;
-    border-radius: 20px !important;
-    box-shadow: 
-        0px 8px 32px rgba(0, 0, 0, 0.3), 
-        0 0 20px var(--color-primary-glow),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    border-radius: var(--radius-2xl) !important;
+    box-shadow: var(--terminal-shadow), var(--glass-glow-medium) !important;
     /* Ensure proper z-index for terminal windows */
     z-index: 1001 !important;
     overflow: visible;
@@ -55,12 +52,8 @@
 
 #terminalWindow:focus-within {
     border-color: var(--terminal-prompt) !important;
-    box-shadow: 
-        0px 12px 40px rgba(0, 0, 0, 0.4), 
-        0 0 30px var(--color-primary-glow),
-        0 0 0 1px var(--terminal-prompt),
-        inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: var(--glass-shadow-heavy), var(--glass-glow-heavy), 0 0 0 1px var(--terminal-prompt) !important;
+    transition: all var(--transition-normal) !important;
 }
 
 /* Ensure terminal window follows dragging rules */
@@ -71,33 +64,36 @@
 
 /* Override general window border-radius for terminal */
 #terminalWindow.window {
-    border-radius: 20px !important;
+    border-radius: var(--radius-2xl) !important;
 }
 
-/* Terminal window header - Enhanced Design */
+/* Terminal window header - Standardized Glass Design */
 #terminalWindow .window-header {
-    border-radius: 20px 20px 0 0 !important;
-    background: linear-gradient(135deg, 
-        var(--color-primary-glow) 0%, 
-        var(--color-primary-glow) 50%, 
-        var(--color-background-dark) 100%) !important;
-    backdrop-filter: var(--window-backdrop-header) !important;
-    -webkit-backdrop-filter: var(--window-backdrop-header) !important;
+    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0 !important;
+    background: var(--glass-bg-light) !important;
+    backdrop-filter: var(--window-filter-header) !important;
+    -webkit-backdrop-filter: var(--window-filter-header) !important;
     border-bottom: 1px solid var(--terminal-border) !important;
-    padding: 16px 20px !important;
+    padding: 16px 20px !important; /* Fixed padding */
     min-height: 60px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 16px !important; /* Fixed gap */
+    width: 100% !important;
+    box-sizing: border-box !important;
 }
 
 #terminalWindow .window-header:active {
     cursor: grabbing;
 }
 
-/* Terminal window content - Enhanced Design */
+/* Terminal window content - Standardized Glass Design */
 #terminalWindow .window-content {
-    border-radius: 0 0 20px 20px !important;
-    background: var(--window-background-content) !important;
-    backdrop-filter: var(--window-backdrop-content) !important;
-    -webkit-backdrop-filter: var(--window-backdrop-content) !important;
+    border-radius: 0 0 var(--radius-2xl) var(--radius-2xl) !important;
+    background: var(--window-bg-content) !important;
+    backdrop-filter: var(--window-filter-content) !important;
+    -webkit-backdrop-filter: var(--window-filter-content) !important;
     color: var(--terminal-text);
     font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Cascadia Code', monospace;
     font-size: 14px;
@@ -704,26 +700,57 @@
     background: var(--terminal-prompt);
 }
 
-/* Terminal Window Title - Enhanced Design */
-#terminalWindow .window-title {
-    color: var(--terminal-text);
-    font-weight: 600;
-    font-size: 16px;
-    text-shadow: 0 0 8px var(--color-primary-glow);
-    display: flex;
-    align-items: center;
-    gap: 8px;
+/* Terminal Window Title - Fixed Layout with High Specificity */
+#terminalWindow .window-header .window-title {
+    color: var(--terminal-text) !important;
+    font-weight: 600 !important;
+    font-size: 16px !important;
+    text-shadow: 0 0 8px var(--color-primary-glow) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important; /* Reduced gap for better spacing */
+    min-width: 0 !important;
+    overflow: hidden !important;
+    flex: 1 !important; /* Take available space */
+    max-width: calc(100% - 120px) !important; /* Leave space for controls */
 }
 
-#terminalWindow .window-title .icon {
-    width: 24px;
-    height: 24px;
-    filter: drop-shadow(0 0 8px var(--color-primary-glow));
+#terminalWindow .window-header .window-title .icon {
+    width: 16px !important; /* Smaller icon size */
+    height: 16px !important;
+    filter: drop-shadow(0 0 8px var(--color-primary-glow)) !important;
+    flex-shrink: 0 !important;
+    margin-right: 0 !important; /* Remove extra margin since we have gap */
+    display: inline-block !important;
+    vertical-align: middle !important;
+}
+
+#terminalWindow .window-header .window-title .icon svg {
+    width: 16px !important;
+    height: 16px !important;
+    max-width: 16px !important;
+    max-height: 16px !important;
+}
+
+#terminalWindow .window-header .window-title .label {
+    flex: 1 !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+    margin-left: 0 !important; /* Ensure no left margin */
 }
 
 /* Terminal Window Controls - Enhanced Design */
-#terminalWindow .window-controls {
-    gap: 6px;
+#terminalWindow .window-header .window-controls {
+    gap: 6px !important;
+    flex-shrink: 0 !important;
+    margin-left: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    min-width: 80px !important; /* Ensure minimum space for controls */
 }
 
 #terminalWindow .window-control {
@@ -1638,4 +1665,56 @@
 #terminalWindow #terminalOutput {
     overflow-y: auto !important;
     overflow-x: hidden !important;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 480px) {
+    #terminalWindow .window-header .window-title {
+        font-size: 14px !important;
+        gap: 6px !important;
+        max-width: calc(100% - 80px) !important;
+    }
+    
+    #terminalWindow .window-header .window-title .icon {
+        width: 14px !important;
+        height: 14px !important;
+        margin-right: 0 !important;
+    }
+    
+    #terminalWindow .window-header .window-title .icon svg {
+        width: 14px !important;
+        height: 14px !important;
+        max-width: 14px !important;
+        max-height: 14px !important;
+    }
+    
+    #terminalWindow .window-header {
+        padding: 12px 16px !important;
+        min-height: 50px !important;
+        gap: 12px !important;
+    }
+    
+    #terminalWindow .window-header .window-controls {
+        gap: 4px !important;
+        min-width: 60px !important;
+    }
+    
+    #terminalWindow .window-control {
+        width: 16px !important;
+        height: 16px !important;
+        font-size: 8px !important;
+    }
+}
+
+/* ===== REDUCED MOTION SUPPORT ===== */
+@media (prefers-reduced-motion: reduce) {
+    #terminalWindow .window-title,
+    #terminalWindow .window-controls,
+    #terminalWindow .window-control {
+        transition: none !important;
+    }
+    
+    #terminalWindow .window-control:hover {
+        transform: none !important;
+    }
 }

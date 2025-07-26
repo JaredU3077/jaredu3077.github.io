@@ -80,7 +80,8 @@ docs/
 js/
 ├── main.js              # Application entry point
 ├── config.js            # Configuration management
-├── core/                # Core system modules
+├── howler.min.js        # Audio library
+├── core/                # Core system modules (20 files)
 │   ├── boot.js          # Boot sequence management
 │   ├── window.js        # Window management system
 │   ├── glassEffect.js   # Glassmorphic effects
@@ -88,13 +89,44 @@ js/
 │   ├── audioSystem.js   # Audio management
 │   ├── themeManager.js  # Theme management
 │   ├── screensaver.js   # Screensaver functionality
-│   └── ...              # Additional core modules
+│   ├── backgroundMusic.js # Background music system
+│   ├── resizeHandler.js # Window resize handling
+│   ├── dragHandler.js   # Drag and drop handling
+│   ├── snapHandler.js   # Window snapping
+│   ├── autoScrollHandler.js # Auto-scroll functionality
+│   ├── bootSequence.js  # Boot sequence logic
+│   ├── animationMixin.js # Animation mixin
+│   ├── backgroundMixin.js # Background mixin
+│   ├── controlMixin.js  # Control mixin
+│   ├── generationMixin.js # Generation mixin
+│   ├── interactionMixin.js # Interaction mixin
+│   ├── mouseMixin.js    # Mouse mixin
+│   ├── modeMixin.js     # Mode mixin
+│   ├── particleCreationMixin.js # Particle creation mixin
+│   └── data/            # Data files
+│       └── solarSystemData.js # Solar system data
 ├── apps/                # Application modules
-│   └── terminal/        # Terminal application
+│   └── terminal/        # Terminal application (11 files)
 │       ├── terminal.js  # Main terminal logic
-│       ├── commands/    # Command implementations
-│       └── ...          # Terminal utilities
-└── utils/               # Utility modules
+│       ├── content.js   # Content management
+│       ├── eventHandlers.js # Event handling
+│       ├── outputUtils.js # Output formatting
+│       ├── filesystem.js # File system simulation
+│       ├── environment.js # Environment variables
+│       ├── history.js   # Command history
+│       ├── audio.js     # Terminal audio
+│       ├── theme.js     # Terminal theming
+│       ├── statusBar.js # Status bar functionality
+│       └── commands/    # Command implementations (8 files)
+│           ├── commands.js # Main command system
+│           ├── core.js   # Core commands
+│           ├── network.js # Network commands
+│           ├── cisco.js  # Cisco-specific commands
+│           ├── system.js # System commands
+│           ├── effects.js # Visual effects commands
+│           ├── appControl.js # Application control
+│           └── environment.js # Environment commands
+└── utils/               # Utility modules (6 files)
     ├── draggable.js     # Drag and drop functionality
     ├── mobile.js        # Mobile utilities
     ├── mechvibes.js     # Mechanical keyboard sounds
@@ -221,7 +253,7 @@ index.html → main.js → core modules → utility modules
 
 ### CSS Dependencies
 ```
-design-tokens.css → glass.css → window-base.css → terminal.css → desktop.css → animations.css → responsive.css → mobile.css → apps.css → theme.css → terminal-icon.css
+design-tokens.css → glass.css → window-base.css → terminal.css → desktop.css → animations.css → responsive.css → mobile.css → apps.css → theme.css → terminal-icon.css → login.css
 ```
 
 ### JavaScript Dependencies

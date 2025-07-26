@@ -9,9 +9,7 @@
     width: 100%;
     height: 100%;
     background: transparent !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: block;
     z-index: 9999;
     opacity: 1;
     transition: opacity 0.5s ease-in-out;
@@ -45,6 +43,17 @@
     cursor: grab;
     user-select: none;
     touch-action: none;
+    /* Ensure proper centering only if not moved */
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 1000 !important;
+}
+
+/* Don't apply centering if element has been moved by user */
+.boot-container[data-has-been-moved="true"] {
+    transform: none !important;
 }
 
 .boot-container:active {
@@ -65,11 +74,19 @@
     font-family: var(--font-family);
     /* Glass text effect handled by _glass.css */
     z-index: 2;
+    /* Ensure perfect centering */
+    text-align: center;
+    width: 100%;
 }
 
 .boot-progress {
     width: 100%;
     max-width: 400px;
+    /* Ensure perfect centering */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
 }
 
 /* Enhanced Progress Container */
@@ -198,8 +215,6 @@
     height: 100%;
     background: transparent !important;
     display: none;
-    align-items: center;
-    justify-content: center;
     z-index: 9999;
     opacity: 1;
     /* Remove animation to prevent blur differences */
@@ -234,6 +249,17 @@
     cursor: grab;
     user-select: none;
     touch-action: none;
+    /* Ensure proper centering only if not moved */
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 1000 !important;
+}
+
+/* Don't apply centering if element has been moved by user */
+.login-container[data-has-been-moved="true"] {
+    transform: none !important;
 }
 
 .login-container:active {
@@ -254,6 +280,9 @@
     font-family: var(--font-family);
     /* Glass text effect handled by _glass.css */
     z-index: 2;
+    /* Ensure perfect centering */
+    text-align: center;
+    width: 100%;
 }
 
 .login-form {
@@ -261,6 +290,10 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    /* Ensure perfect centering */
+    margin: 0;
+    padding: 0;
 }
 
 /* Enhanced Login Button */
@@ -892,13 +925,13 @@
     }
 }
 
-/* Apply enhanced animations */
+/* Apply enhanced animations - removed to prevent positioning conflicts */
 .boot-sequence {
-    animation: bootFadeIn 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    /* animation: bootFadeIn 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; */
 }
 
 .login-screen {
-    animation: loginSlideIn 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    /* animation: loginSlideIn 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; */
 }
 
 .audio-orb-glass {

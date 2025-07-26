@@ -1,5 +1,5 @@
-// neuOS Glass Effects - Essential glass morphism from test1
-// Implements only the core glass effects without breathing or tilt
+// neuOS Glass Effects - Standardized Implementation
+// Uses new design tokens for consistent glass effects
 
 class GlassEffects {
     constructor() {
@@ -8,19 +8,18 @@ class GlassEffects {
 
     init() {
         this.setupGlassDistortion();
-        this.setupGlassParameters();
     }
 
     setupGlassDistortion() {
-        // Update SVG distortion filter parameters to match test1
+        // Update SVG distortion filter parameters to match standardized system
         const updateDistortion = () => {
             const turbulence = document.querySelector('feTurbulence');
             const displacementMap = document.querySelector('feDisplacementMap');
             
             if (turbulence && displacementMap) {
-                // Set glassier values from JSON
-                const frequency = 0.01;
-                const scale = 33;
+                // Set optimized values for better performance
+                const frequency = 0.006;
+                const scale = 20;
                 
                 turbulence.setAttribute('baseFrequency', `${frequency} ${frequency}`);
                 displacementMap.setAttribute('scale', scale);
@@ -31,23 +30,9 @@ class GlassEffects {
         updateDistortion();
     }
 
-    setupGlassParameters() {
-        // Set glass parameters to match JSON exactly
-        const updateGlassParameters = () => {
-            document.documentElement.style.setProperty('--shadow-blur', '9px');
-            document.documentElement.style.setProperty('--shadow-spread', '-5px');
-            document.documentElement.style.setProperty('--shadow-color', '#ffffff');
-            document.documentElement.style.setProperty('--tint-opacity', '0.03');
-            document.documentElement.style.setProperty('--frost-blur', '2px');
-        };
-
-        updateGlassParameters();
-    }
-
     // Method to refresh glass effects when new elements are added
     refresh() {
         this.setupGlassDistortion();
-        this.setupGlassParameters();
     }
 }
 

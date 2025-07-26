@@ -178,33 +178,7 @@
     <!-- Live region for screen reader announcements -->
     <div id="announcements" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
-    <!-- Immediate draggable initialization to prevent visual jumps -->
-    <script>
-        // Immediately position boot and login containers when DOM is ready
-        document.addEventListener('DOMContentLoaded', () => {
-            const bootContainer = document.querySelector('#bootSequence .boot-container');
-            const loginContainer = document.querySelector('#loginScreen .login-container');
-            
-            function positionContainer(container) {
-                if (container) {
-                    const viewportWidth = window.innerWidth;
-                    const viewportHeight = window.innerHeight;
-                    const centerX = (viewportWidth - 400) / 2;
-                    const centerY = (viewportHeight - 400) / 2;
-                    
-                    container.style.setProperty('position', 'fixed', 'important');
-                    container.style.setProperty('left', centerX + 'px', 'important');
-                    container.style.setProperty('top', centerY + 'px', 'important');
-                    container.style.setProperty('transform', 'none', 'important');
-                    container.style.setProperty('z-index', '1000', 'important');
-                }
-            }
-            
-            // Position immediately
-            positionContainer(bootContainer);
-            positionContainer(loginContainer);
-        });
-    </script>
+
     
     <!-- Scripts -->
     <script type="module" src="js/main.js"></script>

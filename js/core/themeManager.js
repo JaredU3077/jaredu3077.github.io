@@ -435,7 +435,7 @@ export class ThemeManager {
     extractGlassColor(color) {
         // Handle rgba values
         if (color.startsWith('rgba')) {
-            const match = color.match(/rgba?\(([^)]+)\)/);
+            const match = color.match(/rgba?$$ ([^)]+) $$/);
             if (match) {
                 const parts = match[1].split(',').map(p => p.trim());
                 const r = parseInt(parts[0]);
@@ -447,7 +447,7 @@ export class ThemeManager {
         
         // Handle rgb values
         if (color.startsWith('rgb')) {
-            const match = color.match(/rgb\(([^)]+)\)/);
+            const match = color.match(/rgb$$ ([^)]+) $$/);
             if (match) {
                 return match[1];
             }

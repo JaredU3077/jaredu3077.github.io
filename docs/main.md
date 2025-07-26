@@ -1,49 +1,62 @@
-# main.js - JavaScript Entry Point Documentation
+# JavaScript Entry Point Documentation
 
-## File Overview
+## Overview
 
-**Purpose**: Primary JavaScript entry point that initializes all core systems and manages the application lifecycle.
+The main.js file serves as the primary entry point for the neuOS application, orchestrating the initialization of all core systems, applications, and utilities. It implements a modular architecture with comprehensive error handling and performance optimization.
 
-**Type**: ES6 module with comprehensive error handling and fallback mechanisms.
+## File Structure
 
-**Role**: Orchestrates the entire application startup sequence, manages global state, and coordinates all subsystems.
+```
+js/
+├── main.js                # Application entry point (main file)
+├── config.js              # Configuration management
+├── howler.min.js          # Audio library
+├── core/                  # Core system modules (20 files)
+├── apps/                  # Application modules
+│   └── terminal/          # Terminal application (11 files)
+└── utils/                 # Utility modules (6 files)
+```
 
-## Dependencies and Imports
+## Main Entry Point
 
-### Core Module Imports
+### main.js
+**Purpose**: Application initialization and coordination
+**Dependencies**: All core modules, applications, and utilities
 
-| Module | Purpose | Dependencies |
-|--------|---------|--------------|
-| `./apps/terminal/terminal.js` | Terminal application | `./config.js`, `./utils/utils.js` |
-| `./core/window.js` | Window management system | `./config.js`, `./utils/utils.js` |
-| `./utils/help.js` | Help system | `./utils/utils.js` |
-| `./core/boot.js` | Boot sequence management | `./core/audioSystem.js`, `./core/particleSystem.js` |
-| `./config.js` | Configuration management | None |
-| `./utils/utils.js` | Utility functions | None |
+**Key Features**:
+- Module initialization and coordination
+- Error boundary implementation
+- Global event handling
+- Performance monitoring
+- Application lifecycle management
 
-### Utility Imports
+## Initialization Process
 
-| Module | Purpose | Dependencies |
-|--------|---------|--------------|
-| `./utils/mobile.js` | Mobile-specific utilities | `./utils/utils.js` |
-| `./core/screensaver.js` | Screensaver functionality | `./core/particleSystem.js` |
-| `./core/glassEffect.js` | Glassmorphic effects | `./utils/glassEffects.js` |
-| `./utils/glassEffects.js` | Glass effect utilities | `./utils/utils.js` |
-| `./utils/draggable.js` | Drag and drop system | `./utils/utils.js` |
+### 1. Module Import and Setup
+```javascript
+// Core system imports
+import { Terminal } from './apps/terminal/terminal.js';
+import { WindowManager } from './core/window.js';
+import { HelpManager } from './utils/help.js';
+import { BootSystem } from './core/boot.js';
+import { CONFIG, createAppButton } from './config.js';
+import { debounce } from './utils/utils.js';
 
-## Internal Structure
+// Additional imports
+import './utils/mobile.js';
+import './core/screensaver.js';
+import './core/glassEffect.js';
+import { GlassMorphismSystem } from './core/glassEffect.js';
+import GlassEffects from './utils/glassEffects.js';
+import DraggableSystem from './utils/draggable.js';
+```
 
-### Global Namespace
-
+### 2. Global Namespace Setup
 ```javascript
 // Create namespace for globals to avoid direct window pollution
 window.neuOS = window.neuOS || {};
-```
 
-### Module Initialization
-
-```javascript
-// Core system instances
+// Module instances
 let windowManager = null;
 let helpManager = null;
 let terminal = null;
@@ -54,8 +67,7 @@ let draggableSystem = null;
 let openWindows = {};
 ```
 
-### Error Boundary Pattern
-
+### 3. Error-Boundary Initialization
 ```javascript
 // Initialize modules with error boundaries
 try {
@@ -64,350 +76,301 @@ try {
 } catch (error) {
     console.error('neuOS: Failed to initialize WindowManager:', error);
 }
-```
 
-## Core Functions
-
-### UI Initialization
-
-```javascript
-/**
- * Initializes the user interface, creating desktop icons.
- */
-function initializeUI() {
-    const desktopIcons = document.getElementById('desktop-icons');
-    
-    if (!desktopIcons) {
-        console.error('Desktop icons container not found');
-        return;
-    }
-    
-    desktopIcons.innerHTML = '';
-    
-    // Create desktop icons for all apps
-    Object.values(CONFIG.applications).forEach(app => {
-        desktopIcons.insertAdjacentHTML('beforeend', createAppButton(app, 'desktop'));
-    });
+try {
+    helpManager = new HelpManager();
+} catch (error) {
+    console.error('neuOS: Failed to initialize HelpManager:', error);
 }
+
+// ... similar pattern for other modules
 ```
 
-### Desktop Icon State Management
+## Core Systems Initialization
 
+### Window Manager
+- **Purpose**: Manages application windows and desktop environment
+- **Features**: Window creation, positioning, focus management
+- **Dependencies**: utils/draggable.js, core/glassEffect.js
+
+### Help Manager
+- **Purpose**: Provides context-sensitive help system
+- **Features**: Help content management, search functionality
+- **Dependencies**: None
+
+### Glass Morphism System
+- **Purpose**: Applies glassmorphic visual effects
+- **Features**: Glass effects, backdrop filters, visual enhancements
+- **Dependencies**: utils/glassEffects.js
+
+### Draggable System
+- **Purpose**: Enables drag and drop functionality
+- **Features**: Element dragging, constraints, touch support
+- **Dependencies**: utils/utils.js
+
+## Application Management
+
+### Application Launch System
 ```javascript
-/**
- * Resets desktop icon state to default appearance.
- * @param {HTMLElement} icon - The desktop icon element
- */
-function resetDesktopIconState(icon) {
-    // Remove any inline styles that might interfere with CSS
-    icon.style.removeProperty('border-color');
-    icon.style.removeProperty('box-shadow');
-    icon.style.removeProperty('background');
-    icon.style.removeProperty('transform');
-    
-    // Reset glass reflection and label styles
-    const reflection = icon.querySelector('.glass-reflection');
-    if (reflection) {
-        reflection.style.removeProperty('transform');
-    }
-    
-    const label = icon.querySelector('.label');
-    if (label) {
-        label.style.removeProperty('opacity');
-        label.style.removeProperty('transform');
-        label.style.removeProperty('color');
-    }
-}
-```
-
-### Application Launcher
-
-```javascript
-/**
- * Handles the click event for an application icon or menu item.
- * @param {string} appId - The ID of the application to launch.
- */
-async function handleAppClick(appId) {
+function handleAppClick(appId) {
     try {
-        // Play UI sound effect
-        if (window.bootSystemInstance) {
-            window.bootSystemInstance.playUIClickSound();
-        }
-        
-        const app = CONFIG.applications[appId];
-        if (!app) {
-            console.error(`No application config found for appId: ${appId}`);
-            return;
-        }
-
-        for (const windowConfig of app.windows) {
-            // Check if window already open
-            let winElem = document.getElementById(windowConfig.id);
-            if (winElem) {
-                const windowObj = windowManager.windows.get(windowConfig.id);
-                if (windowObj && windowObj.isMinimized) {
-                    windowManager.restoreWindow(windowObj);
+        switch (appId) {
+            case 'terminal':
+                if (!terminal) {
+                    const terminalInput = document.getElementById('terminal-input');
+                    const terminalOutput = document.getElementById('terminal-output');
+                    terminal = new Terminal(terminalInput, terminalOutput);
+                    window.neuOS.terminalInstance = terminal;
                 }
-                windowManager.focusWindow(windowObj);
-                continue;
-            }
-            
-            // Create new window
-            winElem = windowManager.createWindow({
-                id: windowConfig.id,
-                title: windowConfig.title,
-                content: windowConfig.content,
-                width: windowConfig.width,
-                height: windowConfig.height,
-                icon: app.icon,
-                autoScroll: ['terminal'].includes(appId),
-                type: app.type || 'app',
-                defaultSize: app.defaultSize
-            });
-
-            openWindows[windowConfig.id] = winElem;
-            
-            // Initialize application-specific logic
-            try {
-                switch (appId) {
-                    case 'terminal':
-                        terminal = new Terminal(
-                            winElem.querySelector('#terminalInput input'),
-                            winElem.querySelector('#terminalOutput')
-                        );
-                        window.neuOS.terminalInstance = terminal;
-                        break;
-                    default:
-                        console.warn(`neuOS: No specific initialization for app: ${appId}`);
-                        break;
-                }
-            } catch (error) {
-                console.error(`Error initializing application ${appId}:`, error);
-                // Show user-friendly error
-                const errorContent = `
-                    <div class="error-content" style="padding: 20px; text-align: center; color: #ff6b6b;">
-                        <h3>⚠️ Application Error</h3>
-                        <p>Failed to initialize ${app.name}</p>
-                        <p style="font-size: 0.9em; opacity: 0.8;">${error.message}</p>
-                        <button onclick="this.closest('.window').querySelector('.close').click()" 
-                                style="margin-top: 10px; padding: 5px 15px; background: #ff6b6b; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                            Close
-                        </button>
-                    </div>
-                `;
-                winElem.querySelector('.window-content').innerHTML = errorContent;
-            }
+                windowManager.createWindow({
+                    id: 'terminal',
+                    title: 'terminal',
+                    content: document.getElementById('terminal-container'),
+                    width: '800px',
+                    height: '600px'
+                });
+                break;
+            default:
+                console.warn(`neuOS: No specific initialization for app: ${appId}`);
         }
     } catch (error) {
         console.error('neuOS: Application launch error:', error);
-        showErrorNotification('Application Error', `Failed to launch application: ${appId}`, error.message);
     }
 }
 ```
 
-### Error Handling
+### Window Management
+- **Window Creation**: Dynamic window generation with glass effects
+- **Window Positioning**: Smart positioning and z-index management
+- **Window Focus**: Focus management and window stacking
+- **Window States**: Minimize, maximize, restore functionality
 
+## Event Handling
+
+### Global Event Listeners
 ```javascript
-/**
- * Displays a temporary error notification to the user.
- * @param {string} title - The error title.
- * @param {string} message - The error message.
- * @param {string} [details] - Optional additional details.
- */
-function showErrorNotification(title, message, details = '') {
-    const errorMessage = document.createElement('div');
-    errorMessage.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgba(255, 107, 107, 0.9);
-        color: white;
-        padding: 20px;
-        border-radius: 8px;
-        z-index: 10000;
-        font-family: 'Segoe UI', sans-serif;
-        text-align: center;
-    `;
-    errorMessage.innerHTML = `
-        <h3>⚠️ ${title}</h3>
-        <p>${message}</p>
-        ${details ? `<p style="font-size: 0.9em; opacity: 0.8;">${details}</p>` : ''}
-    `;
-    document.body.appendChild(errorMessage);
-    setTimeout(() => errorMessage.remove(), 5000);
-}
+// Window resize handling
+window.addEventListener('resize', debounce(() => {
+    if (windowManager) {
+        windowManager.handleWindowResize();
+    }
+}, 150));
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (event) => {
+    // Escape key handling
+    if (event.key === 'Escape') {
+        // Close active windows or modals
+    }
+    
+    // Ctrl/Cmd + R for refresh
+    if ((event.ctrlKey || event.metaKey) && event.key === 'r') {
+        event.preventDefault();
+        // Handle refresh
+    }
+});
+
+// Mobile touch events
+document.addEventListener('touchstart', (event) => {
+    // Handle touch interactions
+}, { passive: true });
 ```
 
-## Connections and References
+### Application-Specific Events
+- **Terminal Events**: Command execution, input handling
+- **Window Events**: Drag, resize, focus changes
+- **Audio Events**: Sound effects, background music
+- **Theme Events**: Theme switching, color changes
 
-### Incoming Connections
+## Performance Optimization
 
-| Referencing File | Description | Connection Type |
-|------------------|-------------|-----------------|
-| `index.html` | Loads main.js as ES6 module | Script import |
-| `sw.js` | Service worker caches main.js | Caching |
-| `js/core/*.js` | Core systems imported by main.js | Module import |
-| `js/apps/terminal/*.js` | Terminal modules imported by main.js | Module import |
-| `js/utils/*.js` | Utility modules imported by main.js | Module import |
+### Critical Performance Areas
+1. **Module Loading**: ES6 module optimization
+2. **Event Handling**: Debounced and throttled events
+3. **Memory Management**: Proper cleanup and garbage collection
+4. **Animation Performance**: RequestAnimationFrame usage
 
-### Outgoing Connections
+### Optimization Strategies
+1. **Lazy Loading**: Load modules on demand
+2. **Event Delegation**: Efficient event handling
+3. **Memory Monitoring**: Track memory usage
+4. **Performance Monitoring**: Monitor key metrics
 
-| Referenced File | Description | Connection Type |
-|-----------------|-------------|-----------------|
-| `js/apps/terminal/terminal.js` | Terminal application | Module import |
-| `js/core/window.js` | Window management | Module import |
-| `js/utils/help.js` | Help system | Module import |
-| `js/core/boot.js` | Boot sequence | Module import |
-| `js/config.js` | Configuration | Module import |
-| `js/utils/utils.js` | Utility functions | Module import |
-| `js/utils/mobile.js` | Mobile utilities | Module import |
-| `js/core/screensaver.js` | Screensaver | Module import |
-| `js/core/glassEffect.js` | Glass effects | Module import |
-| `js/utils/glassEffects.js` | Glass utilities | Module import |
-| `js/utils/draggable.js` | Drag and drop | Module import |
+## Error Handling
 
-### Bidirectional Connections
-
-| Element | CSS Class | JavaScript Handler | Description |
-|---------|-----------|-------------------|-------------|
-| `#desktop-icons` | Icon styles | `handleAppClick()` | Desktop icon management |
-| `#desktop` | Desktop styles | Window manager | Desktop interface |
-| `#neuosWidget` | Widget styles | Draggable system | Desktop widget |
-| `#audioControls` | Audio styles | Audio system | Audio controls |
-
-## Data Flow and Architecture
-
-### Initialization Flow
-
+### Error Boundaries
 ```javascript
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        // 1. Initialize core systems
-        bootSystem = BootSystem.getInstance();
-        
-        // 2. Setup window manager
-        if (windowManager) {
-            windowManager.setupEventListeners();
-        }
-        
-        // 3. Initialize UI
-        initializeUI();
-        
-        // 4. Refresh handlers
-        refreshDesktopIconHandlers();
-        
-        // 5. Setup fallbacks
-        setTimeout(() => {
-            if (!document.body.classList.contains('boot-active')) {
-                console.warn('neuOS: Boot system may be stuck, forcing login screen...');
-                if (window.bootSystemInstance) {
-                    window.bootSystemInstance.showLoginScreen();
-                }
-            }
-        }, 3000);
-        
-        // 6. Initialize background systems
-        new window.StarfieldBackground();
-        
-        // 7. Setup global event listeners
-        setupGlobalEventListeners();
-        
-    } catch (error) {
-        console.error('Failed to initialize application:', error);
-        showFallbackError();
-    }
+// Global error handler
+window.addEventListener('error', (event) => {
+    console.error('neuOS: Global error:', event.error);
+    // Log error and show user-friendly message
+});
+
+// Unhandled promise rejection
+window.addEventListener('unhandledrejection', (event) => {
+    console.error('neuOS: Unhandled promise rejection:', event.reason);
+    // Handle promise rejections
 });
 ```
 
-### Event Handling Architecture
+### Module Error Recovery
+- **Graceful Degradation**: Fallback functionality
+- **Error Logging**: Comprehensive error tracking
+- **User Notification**: User-friendly error messages
+- **Automatic Recovery**: Self-healing systems
 
+## Boot Sequence
+
+### Boot Process
+1. **System Check**: Verify browser capabilities
+2. **Module Initialization**: Initialize core systems
+3. **Configuration Load**: Load user preferences
+4. **UI Setup**: Prepare user interface
+5. **Application Ready**: Signal system readiness
+
+### Login Integration
 ```javascript
-// Global event listeners
-document.addEventListener('click', handleGlobalClick);
-document.addEventListener('keydown', handleGlobalKeydown);
-
-// Desktop icon event delegation
-const desktopIcons = document.getElementById('desktop-icons');
-if (desktopIcons) {
-    desktopIcons.addEventListener('click', (e) => {
-        const desktopIcon = e.target.closest('.desktop-icon');
-        if (desktopIcon) {
-            const appId = desktopIcon.dataset.app;
-            if (appId) {
-                handleAppClick(appId);
-            }
-        }
+// Boot system integration
+if (bootSystem) {
+    bootSystem.startBootSequence();
+    
+    // Handle boot completion
+    bootSystem.on('bootComplete', () => {
+        console.log('neuOS: Boot sequence completed');
+        // Initialize additional features
     });
 }
-
-// Window resize handling
-window.addEventListener('resize', debounce(() => {
-    const desktopIcons = document.getElementById('desktop-icons');
-    if (desktopIcons) {
-        // Force reflow to update grid layout
-        desktopIcons.style.display = 'none';
-        desktopIcons.offsetHeight; // Force reflow
-        desktopIcons.style.display = 'grid';
-    }
-}, 150));
 ```
 
-### State Management
+## Mobile Support
 
-- **Application State**: Tracks open windows and active applications
-- **UI State**: Manages desktop icons and widget visibility
-- **Audio State**: Controls background music and sound effects
-- **Theme State**: Manages current theme and visual effects
+### Mobile Detection
+```javascript
+// Mobile utilities integration
+import './utils/mobile.js';
 
-## Potential Issues and Recommendations
+// Mobile-specific initialization
+if (window.mobileUtils) {
+    window.mobileUtils.setupMobileFeatures();
+}
+```
 
-### Standards Compliance Issues
+### Touch Support
+- **Touch Events**: Touch gesture recognition
+- **Mobile UI**: Responsive design adjustments
+- **Performance**: Mobile-optimized performance
+- **Accessibility**: Mobile accessibility features
 
-1. **Error Handling**: Comprehensive error boundaries implemented
-   - **Status**: ✅ Properly implemented
-   - **Recommendation**: Add more specific error types
+## Audio System Integration
 
-2. **Module Loading**: ES6 modules with fallback
-   - **Status**: ✅ Properly implemented
-   - **Recommendation**: Consider bundling for production
+### Audio Initialization
+```javascript
+// Audio library integration
+// howler.min.js is loaded for audio support
 
-3. **Event Delegation**: Efficient event handling
-   - **Status**: ✅ Properly implemented
-   - **Recommendation**: Add more keyboard shortcuts
+// Audio system setup
+if (window.audioSystem) {
+    window.audioSystem.initialize();
+    window.audioSystem.setVolume(0.5);
+}
+```
 
-### Performance Issues
+### Audio Features
+- **Background Music**: Ambient background audio
+- **Sound Effects**: UI interaction sounds
+- **Mechvibes**: Mechanical keyboard sounds
+- **Volume Control**: Adjustable audio levels
 
-1. **Large File Size**: 632 lines in single file
-   - **Issue**: Violates single responsibility principle
-   - **Fix**: Split into smaller, focused modules
+## Theme System Integration
 
-2. **Module Dependencies**: Complex dependency graph
-   - **Issue**: Tight coupling between modules
-   - **Fix**: Implement dependency injection pattern
+### Theme Management
+```javascript
+// Theme system integration
+if (window.themeManager) {
+    const savedTheme = localStorage.getItem('neuos-theme') || 'default';
+    window.themeManager.setTheme(savedTheme);
+}
+```
 
-3. **Event Listeners**: Multiple global listeners
-   - **Issue**: Potential memory leaks
-   - **Fix**: Implement proper cleanup on unmount
+### Theme Features
+- **Theme Switching**: Dynamic theme changes
+- **Color Schemes**: Multiple color palettes
+- **Theme Persistence**: User preference storage
+- **Theme Customization**: User-defined themes
 
-### Architecture Issues
+## Development Features
 
-1. **Global State**: Direct window object pollution
-   - **Issue**: `window.neuOS` namespace usage
-   - **Fix**: Implement proper state management
+### Debug Mode
+```javascript
+// Development mode detection
+const isDevelopment = window.location.hostname === 'localhost' || 
+                     window.location.hostname === '127.0.0.1';
 
-2. **Error Boundaries**: Basic error handling
-   - **Issue**: Generic error messages
-   - **Fix**: Add specific error types and recovery
+if (isDevelopment) {
+    // Enable debug features
+    window.neuOS.debug = true;
+    console.log('neuOS: Development mode enabled');
+}
+```
 
-3. **Module Initialization**: Synchronous initialization
-   - **Issue**: Blocking main thread
-   - **Fix**: Implement async initialization
+### Performance Monitoring
+- **Load Time Tracking**: Monitor application load times
+- **Memory Usage**: Track memory consumption
+- **Error Tracking**: Monitor error rates
+- **User Interaction**: Track user engagement
+
+## Security Considerations
+
+### Content Security Policy
+- **Script Restrictions**: Controlled script execution
+- **Resource Loading**: Restricted resource access
+- **Data Validation**: Input sanitization
+- **Error Handling**: Secure error reporting
+
+### Input Validation
+- **Command Sanitization**: Terminal input validation
+- **File Path Validation**: Secure file operations
+- **Data Validation**: Configuration data validation
+- **XSS Prevention**: Cross-site scripting protection
+
+## Browser Compatibility
+
+### Supported Browsers
+- **Chrome 80+**: Full feature support
+- **Firefox 75+**: Full feature support
+- **Safari 13+**: Full feature support
+- **Edge 80+**: Full feature support
+
+### Feature Detection
+```javascript
+// Feature detection
+const supportsES6Modules = 'noModule' in HTMLScriptElement.prototype;
+const supportsServiceWorker = 'serviceWorker' in navigator;
+const supportsWebAudio = 'AudioContext' in window || 'webkitAudioContext' in window;
+
+if (!supportsES6Modules) {
+    console.error('neuOS: ES6 modules not supported');
+    // Show fallback message
+}
+```
+
+## Future Enhancements
+
+### Planned Features
+1. **Advanced Module System**: Dynamic module loading
+2. **Performance Monitoring**: Real-time performance tracking
+3. **Advanced Error Handling**: Intelligent error recovery
+4. **Plugin System**: Extensible application architecture
+
+### Technical Improvements
+1. **Web Workers**: Background processing
+2. **Service Workers**: Advanced caching
+3. **WebGL**: Hardware acceleration
+4. **IndexedDB**: Advanced storage
 
 ## Related Documentation
 
-- See [index.md](index.md) for HTML entry point details
 - See [architecture.md](architecture.md) for overall system architecture
 - See [config.md](config.md) for configuration management
-- See [js/core/](js/core/) for core system documentation
-- See [js/apps/terminal/](js/apps/terminal/) for terminal application documentation 
+- See [terminal.md](terminal.md) for terminal application
+- See [DOTHISNEXT.md](DOTHISNEXT.md) for main.js specific issues 

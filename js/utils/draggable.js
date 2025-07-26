@@ -39,52 +39,25 @@ class DraggableSystem {
         const bootContainer = document.querySelector('#bootSequence .boot-container');
         const loginContainer = document.querySelector('#loginScreen .login-container');
         
+        console.log('DraggableSystem: Found containers:', { bootContainer: !!bootContainer, loginContainer: !!loginContainer });
+        
         if (bootContainer) {
-            // Start with absolute pixel positioning to avoid any center magnetism
-            const viewportWidth = window.innerWidth;
-            const viewportHeight = window.innerHeight;
-            const centerX = (viewportWidth - 400) / 2; // 400px is the orb width
-            const centerY = (viewportHeight - 400) / 2; // 400px is the orb height
-            
-            bootContainer.style.setProperty('position', 'fixed', 'important');
-            bootContainer.style.setProperty('left', centerX + 'px', 'important');
-            bootContainer.style.setProperty('top', centerY + 'px', 'important');
-            bootContainer.style.setProperty('transform', 'none', 'important'); // No transform
-            bootContainer.style.setProperty('z-index', '1000', 'important');
+            // CSS centering is now handled by CSS, just make it draggable
+            console.log('DraggableSystem: Making boot container draggable');
             this.dragElement(bootContainer);
         }
         
         if (loginContainer) {
-            // Start with absolute pixel positioning to avoid any center magnetism
-            const viewportWidth = window.innerWidth;
-            const viewportHeight = window.innerHeight;
-            const centerX = (viewportWidth - 400) / 2; // 400px is the orb width
-            const centerY = (viewportHeight - 400) / 2; // 400px is the orb height
-            
-            loginContainer.style.setProperty('position', 'fixed', 'important');
-            loginContainer.style.setProperty('left', centerX + 'px', 'important');
-            loginContainer.style.setProperty('top', centerY + 'px', 'important');
-            loginContainer.style.setProperty('transform', 'none', 'important'); // No transform
-            loginContainer.style.setProperty('z-index', '1000', 'important');
+            // CSS centering is now handled by CSS, just make it draggable
+            console.log('DraggableSystem: Making login container draggable');
             this.dragElement(loginContainer);
         }
         
         // Handle neuOS widget specifically with enhanced interaction
         const neuosWidget = document.getElementById('neuosWidget');
         if (neuosWidget) {
-            // Set initial centered position using absolute positioning instead of CSS transform
-            const viewportWidth = window.innerWidth;
-            const viewportHeight = window.innerHeight;
-            const widgetSize = 120; // neuOS widget size
-            const centerX = (viewportWidth - widgetSize) / 2;
-            const centerY = (viewportHeight - widgetSize) / 2;
-            
-            neuosWidget.style.setProperty('position', 'fixed', 'important');
-            neuosWidget.style.setProperty('left', centerX + 'px', 'important');
-            neuosWidget.style.setProperty('top', centerY + 'px', 'important');
-            neuosWidget.style.setProperty('transform', 'none', 'important'); // Remove CSS transform
-            neuosWidget.style.setProperty('z-index', '1000', 'important');
-            
+            // CSS centering is now handled by CSS, just make it draggable
+            console.log('DraggableSystem: Making neuOS widget draggable');
             this.dragElement(neuosWidget);
             this.addInteractiveEffects(neuosWidget);
         }
@@ -113,7 +86,7 @@ class DraggableSystem {
             const viewportLeft = rect.left;
             const viewportTop = rect.top;
             
-            // Override CSS positioning completely for free movement
+            // Convert from CSS transform-based centering to absolute positioning for dragging
             elmnt.style.setProperty('position', 'fixed', 'important');
             elmnt.style.setProperty('left', viewportLeft + 'px', 'important');
             elmnt.style.setProperty('top', viewportTop + 'px', 'important');
@@ -171,10 +144,14 @@ class DraggableSystem {
             document.removeEventListener('pointermove', onPointerMove);
             
             // Re-enable transitions after dragging
-            elmnt.style.setProperty('transition', '', 'important');
+            elmnt.style.setProperty('transition', 'all 0.3s ease-in-out', 'important');
             
-            // Ensure cursor is correct after dragging
+            // Keep the element in its current absolute position - don't reset to CSS centering
+            // The element should stay exactly where the user dropped it
             elmnt.style.setProperty('cursor', 'grab', 'important');
+            
+            // Store that this element has been moved from its initial position
+            elmnt.dataset.hasBeenMoved = 'true';
         };
 
         elmnt.addEventListener('pointerdown', onPointerDown);
@@ -238,32 +215,14 @@ class DraggableSystem {
         const loginContainer = document.querySelector('#loginScreen .login-container');
         
         if (bootContainer) {
-            // Start with absolute pixel positioning to avoid any center magnetism
-            const viewportWidth = window.innerWidth;
-            const viewportHeight = window.innerHeight;
-            const centerX = (viewportWidth - 400) / 2; // 400px is the orb width
-            const centerY = (viewportHeight - 400) / 2; // 400px is the orb height
-            
-            bootContainer.style.setProperty('position', 'fixed', 'important');
-            bootContainer.style.setProperty('left', centerX + 'px', 'important');
-            bootContainer.style.setProperty('top', centerY + 'px', 'important');
-            bootContainer.style.setProperty('transform', 'none', 'important'); // No transform
-            bootContainer.style.setProperty('z-index', '1000', 'important');
+            // CSS centering is now handled by CSS, just make it draggable
+            console.log('DraggableSystem: Refreshing boot container');
             this.dragElement(bootContainer);
         }
         
         if (loginContainer) {
-            // Start with absolute pixel positioning to avoid any center magnetism
-            const viewportWidth = window.innerWidth;
-            const viewportHeight = window.innerHeight;
-            const centerX = (viewportWidth - 400) / 2; // 400px is the orb width
-            const centerY = (viewportHeight - 400) / 2; // 400px is the orb height
-            
-            loginContainer.style.setProperty('position', 'fixed', 'important');
-            loginContainer.style.setProperty('left', centerX + 'px', 'important');
-            loginContainer.style.setProperty('top', centerY + 'px', 'important');
-            loginContainer.style.setProperty('transform', 'none', 'important'); // No transform
-            loginContainer.style.setProperty('z-index', '1000', 'important');
+            // CSS centering is now handled by CSS, just make it draggable
+            console.log('DraggableSystem: Refreshing login container');
             this.dragElement(loginContainer);
         }
     }
@@ -272,19 +231,8 @@ class DraggableSystem {
     refreshNeuOSWidget() {
         const neuosWidget = document.getElementById('neuosWidget');
         if (neuosWidget) {
-            // Set initial centered position using absolute positioning instead of CSS transform
-            const viewportWidth = window.innerWidth;
-            const viewportHeight = window.innerHeight;
-            const widgetSize = 120; // neuOS widget size
-            const centerX = (viewportWidth - widgetSize) / 2;
-            const centerY = (viewportHeight - widgetSize) / 2;
-            
-            neuosWidget.style.setProperty('position', 'fixed', 'important');
-            neuosWidget.style.setProperty('left', centerX + 'px', 'important');
-            neuosWidget.style.setProperty('top', centerY + 'px', 'important');
-            neuosWidget.style.setProperty('transform', 'none', 'important'); // Remove CSS transform
-            neuosWidget.style.setProperty('z-index', '1000', 'important');
-            
+            // CSS centering is now handled by CSS, just make it draggable
+            console.log('DraggableSystem: Refreshing neuOS widget');
             this.dragElement(neuosWidget);
             this.addInteractiveEffects(neuosWidget);
         }
@@ -294,17 +242,8 @@ class DraggableSystem {
     enableBootBoxDragging() {
         const bootContainer = document.querySelector('#bootSequence .boot-container');
         if (bootContainer) {
-            // Start with absolute pixel positioning to avoid any center magnetism
-            const viewportWidth = window.innerWidth;
-            const viewportHeight = window.innerHeight;
-            const centerX = (viewportWidth - 400) / 2; // 400px is the orb width
-            const centerY = (viewportHeight - 400) / 2; // 400px is the orb height
-            
-            bootContainer.style.setProperty('position', 'fixed', 'important');
-            bootContainer.style.setProperty('left', centerX + 'px', 'important');
-            bootContainer.style.setProperty('top', centerY + 'px', 'important');
-            bootContainer.style.setProperty('transform', 'none', 'important'); // No transform
-            bootContainer.style.setProperty('z-index', '1000', 'important');
+            // CSS centering is now handled by CSS, just make it draggable
+            console.log('DraggableSystem: Enabling boot box dragging');
             this.dragElement(bootContainer);
         }
     }
@@ -320,15 +259,14 @@ class DraggableSystem {
         // Check if element is outside viewport
         if (rect.right < 0 || rect.bottom < 0 || 
             rect.left > viewportWidth || rect.top > viewportHeight) {
-            // Reset to center of viewport using absolute positioning
-            const centerX = (viewportWidth - 400) / 2; // 400px is the orb width
-            const centerY = (viewportHeight - 400) / 2; // 400px is the orb height
-            
+            // Reset to CSS-based centering
             element.style.setProperty('position', 'fixed', 'important');
-            element.style.setProperty('left', centerX + 'px', 'important');
-            element.style.setProperty('top', centerY + 'px', 'important');
-            element.style.setProperty('transform', 'none', 'important'); // No transform
+            element.style.setProperty('top', '50%', 'important');
+            element.style.setProperty('left', '50%', 'important');
+            element.style.setProperty('transform', 'translate(-50%, -50%)', 'important');
             element.style.setProperty('transition', 'all 0.5s ease-in-out', 'important');
+            // Clear the moved flag so CSS centering works again
+            element.removeAttribute('data-has-been-moved');
         }
     }
 
@@ -341,6 +279,26 @@ class DraggableSystem {
         this.resetElementPosition(bootContainer);
         this.resetElementPosition(loginContainer);
         this.resetElementPosition(neuosWidget);
+    }
+
+    // Method to reset elements back to center
+    resetToCenter() {
+        const bootContainer = document.querySelector('#bootSequence .boot-container');
+        const loginContainer = document.querySelector('#loginScreen .login-container');
+        const neuosWidget = document.getElementById('neuosWidget');
+        
+        // Reset to CSS-based centering for all elements
+        [bootContainer, loginContainer, neuosWidget].forEach(element => {
+            if (element) {
+                element.style.setProperty('position', 'fixed', 'important');
+                element.style.setProperty('top', '50%', 'important');
+                element.style.setProperty('left', '50%', 'important');
+                element.style.setProperty('transform', 'translate(-50%, -50%)', 'important');
+                element.style.setProperty('transition', 'all 0.5s ease-in-out', 'important');
+                // Clear the moved flag so CSS centering works again
+                element.removeAttribute('data-has-been-moved');
+            }
+        });
     }
 
     // Cleanup method

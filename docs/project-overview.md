@@ -64,7 +64,7 @@ neuOS is an interactive web-based operating system interface that serves as a po
 ```
 
 ### Module Organization
-- **Core Systems**: Window management, audio, theming, particles
+- **Core Systems**: Window management, audio, theming, particles, mixins
 - **Applications**: Terminal with network engineering commands
 - **Utilities**: Helper functions, drag-and-drop, mobile support
 - **Configuration**: Centralized settings and constants
@@ -94,7 +94,7 @@ neuOS is an interactive web-based operating system interface that serves as a po
 - **Audio Visualization**: Visual audio feedback
 
 ### Visual Effects
-- **Particle System**: Dynamic background particles
+- **Particle System**: Dynamic background particles with advanced physics
 - **Animations**: Smooth transitions and keyframe animations
 - **Glass Effects**: Backdrop filters and reflections
 - **Screensaver**: Space-themed idle screensaver
@@ -118,6 +118,7 @@ jaredu3077.github.io/
 ├── js/                        # JavaScript modules
 │   ├── main.js               # Application entry point
 │   ├── config.js             # Configuration management
+│   ├── howler.min.js         # Audio library
 │   ├── core/                 # Core systems (20 modules)
 │   ├── apps/                 # Applications
 │   │   └── terminal/         # Terminal application (11 modules)
@@ -163,8 +164,8 @@ main.js → config.js → core/*.js → apps/terminal/*.js → utils/*.js
 - **Customization**: Extensible theme framework
 
 ### Particle System
-- **Background Particles**: Dynamic particle generation
-- **Performance Optimization**: Efficient rendering
+- **Background Particles**: Dynamic particle generation with advanced physics
+- **Performance Optimization**: Efficient rendering with mixins
 - **Mobile Adaptation**: Touch-optimized particles
 - **Customization**: Configurable particle properties
 - **Visual Effects**: Enhanced visual appeal

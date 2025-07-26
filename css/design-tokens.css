@@ -1,17 +1,16 @@
-/* neuOS Design Tokens - Single Source of Truth */
-/* All theme variables consolidated and standardized */
+/* neuOS Design Tokens - Single Source of Truth for Design System */
+/* Consolidated and standardized variables for consistency across themes */
 
 :root {
     /* ===== COLOR SYSTEM ===== */
-    
-    /* Primary Colors - Consistent across all themes */
+    /* Primary Colors - Base interactive elements */
     --color-primary: #6366f1;
     --color-primary-hover: #4f46e5;
     --color-primary-light: #818cf8;
     --color-primary-dark: #4338ca;
     --color-primary-glow: rgba(99, 102, 241, 0.15);
     
-    /* Background Colors - Ultra Dark Theme */
+    /* Background Colors - Ultra Dark Theme Base */
     --color-background-dark: #030712;
     --color-background-light: #0a0f1a;
     --color-background-medium: #1a1f2e;
@@ -19,19 +18,19 @@
     --color-background-glass: rgba(26, 31, 46, 0.8);
     --color-background-glass-strong: rgba(26, 31, 46, 0.95);
     
-    /* UI Colors - Apple-inspired Contrast */
+    /* Text Colors - High Contrast for Readability */
     --color-text-primary: #f8fafc;
     --color-text-secondary: #cbd5e1;
     --color-text-muted: #94a3b8;
     --color-text-accent: #e2e8f0;
     
-    /* Border Colors */
+    /* Border Colors - Subtle Separators */
     --color-border-primary: #475569;
     --color-border-light: #64748b;
     --color-border-subtle: rgba(255, 255, 255, 0.08);
     --color-border-strong: rgba(255, 255, 255, 0.12);
     
-    /* Accent Colors - Vibrant but Calm */
+    /* Accent Colors - Status and Highlights */
     --color-accent-green: #10b981;
     --color-accent-orange: #f59e0b;
     --color-accent-purple: #8b5cf6;
@@ -40,130 +39,135 @@
     --color-accent-yellow: #fbbf24;
     --color-accent-blue: #3b82f6;
     
-    /* ===== UNIFIED GLASS MORPHISM SYSTEM ===== */
-    
-    /* Glass Background - Standardized across all themes */
-    --glass-background: rgba(255, 255, 255, 0.08);
-    --glass-background-light: rgba(255, 255, 255, 0.04);
-    --glass-background-medium: rgba(255, 255, 255, 0.08);
-    --glass-background-heavy: rgba(255, 255, 255, 0.12);
-    --glass-background-ultra: rgba(255, 255, 255, 0.16);
-    
-    /* Glass Effects - Standardized blur and saturation */
-    --glass-backdrop-blur: 8px;
-    --glass-backdrop-blur-light: 4px;
-    --glass-backdrop-blur-medium: 8px;
-    --glass-backdrop-blur-heavy: 12px;
-    --glass-backdrop-blur-ultra: 16px;
-    --glass-saturation: 140%;
-    --glass-brightness: 110%;
-    --glass-reflection-opacity: 0.2;
-    
-    /* Standardized Gaussian blur presets */
-    --glass-blur-light: blur(4px) saturate(140%) brightness(110%);
-    --glass-blur-medium: blur(8px) saturate(140%) brightness(110%);
-    --glass-blur-heavy: blur(12px) saturate(140%) brightness(110%);
-    --glass-blur-ultra: blur(16px) saturate(140%) brightness(110%);
-    
-    /* Standardized glass backgrounds */
+    /* ===== GLASS MORPHISM SYSTEM - STANDARDIZED ===== */
+    /* Glass Backgrounds - Consistent Transparency Levels */
+    --glass-bg-minimal: rgba(255, 255, 255, 0.02);
     --glass-bg-light: rgba(255, 255, 255, 0.04);
     --glass-bg-medium: rgba(255, 255, 255, 0.08);
     --glass-bg-heavy: rgba(255, 255, 255, 0.12);
     --glass-bg-ultra: rgba(255, 255, 255, 0.16);
     
-    /* Unified Glass Shadows */
-    --glass-shadow-blur: 32px;
-    --glass-outer-shadow-blur: var(--glass-shadow-blur);
-    --outer-shadow-blur: var(--glass-shadow-blur);
-    --glass-edge-glow: 0 0 8px rgba(255, 255, 255, 0.05);
+    /* Glass Effects - Optimized Blur and Enhancement */
+    --glass-blur-minimal: 2px;
+    --glass-blur-light: 4px;
+    --glass-blur-medium: 8px;
+    --glass-blur-heavy: 12px;
+    --glass-blur-ultra: 16px;
+    --glass-saturation: 140%;
+    --glass-brightness: 110%;
+    --glass-reflection-opacity: 0.15;
     
-    /* Standardized Glass Shadows */
-    --glass-shadow-offset: 0;
-    --glass-shadow-spread: -4px;
-    --glass-shadow-color: rgba(255, 255, 255, 0.9);
-    --glass-outer-shadow: 0 12px 40px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.08);
-    --glass-hover-shadow: 0 16px 50px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.12);
-    --glass-inner-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    /* Glass Blur Presets - Precomputed for Performance */
+    --glass-filter-minimal: blur(2px) saturate(140%) brightness(110%);
+    --glass-filter-light: blur(4px) saturate(140%) brightness(110%);
+    --glass-filter-medium: blur(8px) saturate(140%) brightness(110%);
+    --glass-filter-heavy: blur(12px) saturate(140%) brightness(110%);
+    --glass-filter-ultra: blur(16px) saturate(140%) brightness(110%);
     
-    /* Glass Tint and Frost */
-    --glass-tint-color: 255, 255, 255;
-    --glass-tint-opacity: 0.02;
-    --glass-frost-blur: 6px;
-    --glass-noise-frequency: 0.006;
-    --glass-distortion-strength: 30;
-    --glass-reflection-intensity: 0.4;
-    --glass-edge-glow-intensity: 0.2;
+    /* Glass Shadows - Standardized Depth System */
+    --glass-shadow-minimal: 0 2px 8px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.02);
+    --glass-shadow-light: 0 4px 12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.04);
+    --glass-shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.06);
+    --glass-shadow-heavy: 0 12px 32px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.08);
+    --glass-shadow-ultra: 0 16px 40px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
     
-    /* Theme-aware Glass Reflection Colors */
-    --glass-reflection-light: rgba(255, 255, 255, 0.4);
-    --glass-reflection-medium: rgba(255, 255, 255, 0.2);
-    --glass-reflection-subtle: rgba(255, 255, 255, 0.1);
-    --glass-reflection-faint: rgba(255, 255, 255, 0.05);
+    /* Glass Hover States - Consistent Interaction */
+    --glass-hover-minimal: 0 4px 12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.04);
+    --glass-hover-light: 0 6px 16px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.06);
+    --glass-hover-medium: 0 10px 28px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.08);
+    --glass-hover-heavy: 0 14px 36px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    --glass-hover-ultra: 0 18px 44px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.12);
     
-    /* ===== WINDOW SYSTEM ===== */
+    /* Glass Inner Shadows - Consistent Depth */
+    --glass-inner-minimal: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    --glass-inner-light: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    --glass-inner-medium: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    --glass-inner-heavy: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    --glass-inner-ultra: inset 0 1px 0 rgba(255, 255, 255, 0.2);
     
-    /* Window Backgrounds - Unified with glass system */
-    --window-background: var(--glass-background);
-    --window-background-focused: var(--glass-background-medium);
-    --window-background-header: var(--glass-background-light);
-    --window-background-control: var(--glass-background-light);
-    --window-background-content: var(--glass-background-light);
+    /* Glass Edge Glow - Consistent Lighting */
+    --glass-glow-minimal: 0 0 4px rgba(255, 255, 255, 0.02);
+    --glass-glow-light: 0 0 6px rgba(255, 255, 255, 0.03);
+    --glass-glow-medium: 0 0 8px rgba(255, 255, 255, 0.04);
+    --glass-glow-heavy: 0 0 12px rgba(255, 255, 255, 0.06);
+    --glass-glow-ultra: 0 0 16px rgba(255, 255, 255, 0.08);
     
-    /* Window Effects - Unified with glass system */
-    --window-backdrop: var(--glass-blur-medium);
-    --window-backdrop-header: var(--glass-blur-light);
-    --window-backdrop-control: var(--glass-blur-light);
-    --window-backdrop-content: var(--glass-blur-light);
+    /* Glass Reflections - Standardized Gradient Stops */
+    --glass-reflection-primary: rgba(255, 255, 255, 0.3);
+    --glass-reflection-secondary: rgba(255, 255, 255, 0.15);
+    --glass-reflection-tertiary: rgba(255, 255, 255, 0.08);
+    --glass-reflection-quaternary: rgba(255, 255, 255, 0.04);
     
-    /* Window Borders */
-    --window-border: var(--color-border-subtle);
+    /* ===== WINDOW SYSTEM - DERIVED FROM GLASS ===== */
+    /* Window Backgrounds - Consistent with Glass System */
+    --window-bg-default: var(--glass-bg-medium);
+    --window-bg-focused: var(--glass-bg-heavy);
+    --window-bg-header: var(--glass-bg-light);
+    --window-bg-control: var(--glass-bg-light);
+    --window-bg-content: var(--glass-bg-minimal);
+    
+    /* Window Effects - Consistent with Glass System */
+    --window-filter-default: var(--glass-filter-medium);
+    --window-filter-header: var(--glass-filter-light);
+    --window-filter-control: var(--glass-filter-light);
+    --window-filter-content: var(--glass-filter-minimal);
+    
+    /* Window Shadows - Consistent with Glass System */
+    --window-shadow-default: var(--glass-shadow-medium);
+    --window-shadow-focused: var(--glass-shadow-heavy);
+    --window-shadow-hover: var(--glass-hover-medium);
+    
+    /* Window Borders - Consistent with Glass System */
+    --window-border-default: var(--color-border-subtle);
     --window-border-focused: var(--color-primary);
     
-    /* ===== TERMINAL SYSTEM ===== */
-    
-    /* Terminal Colors - Unified with window system */
-    --terminal-background: var(--window-background);
-    --terminal-backdrop: var(--window-backdrop);
-    --terminal-border: var(--window-border);
+    /* ===== TERMINAL SYSTEM - DERIVED FROM WINDOW ===== */
+    /* Terminal - Consistent with Window System */
+    --terminal-bg: var(--window-bg-default);
+    --terminal-filter: var(--window-filter-default);
+    --terminal-shadow: var(--window-shadow-default);
+    --terminal-border: var(--window-border-default);
     --terminal-text: var(--color-text-primary);
     --terminal-prompt: var(--color-primary);
     --terminal-error: var(--color-accent-red);
     --terminal-success: var(--color-accent-green);
     --terminal-warning: var(--color-accent-orange);
     
-    /* ===== SHADOW SYSTEM ===== */
-    
-    /* Elevation Shadows - Apple-style depth */
-    --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    /* ===== SHADOW SYSTEM - STANDARDIZED ===== */
+    /* Elevation Shadows - Consistent Depth */
+    --shadow-minimal: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    --shadow-light: 0 2px 4px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
     --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
-    --shadow-strong: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.1);
-    --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.3);
-    --shadow-glow-strong: 0 0 40px rgba(99, 102, 241, 0.4);
+    --shadow-heavy: 0 8px 16px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1);
+    --shadow-ultra: 0 12px 24px rgba(0, 0, 0, 0.2), 0 6px 12px rgba(0, 0, 0, 0.12);
+    
+    /* Glow Shadows - Consistent with Primary Color */
+    --shadow-glow-light: 0 0 20px rgba(99, 102, 241, 0.2);
+    --shadow-glow-medium: 0 0 30px rgba(99, 102, 241, 0.3);
+    --shadow-glow-heavy: 0 0 40px rgba(99, 102, 241, 0.4);
     
     /* ===== TYPOGRAPHY SYSTEM ===== */
-    
-    /* Font Families */
+    /* Font Families - System Optimized */
     --font-family-primary: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', 'Segoe UI', 'Roboto', sans-serif;
     --font-family-mono: 'SF Mono', 'JetBrains Mono', 'Fira Code', 'Monaco', 'Inconsolata', monospace;
     
-    /* Font Sizes - Consistent Scale */
-    --font-size-xs: 0.75rem;    /* 12px */
-    --font-size-sm: 0.875rem;   /* 14px */
-    --font-size-base: 1rem;     /* 16px */
-    --font-size-lg: 1.125rem;   /* 18px */
-    --font-size-xl: 1.25rem;    /* 20px */
-    --font-size-2xl: 1.5rem;    /* 24px */
-    --font-size-3xl: 1.875rem;  /* 30px */
-    --font-size-4xl: 2.25rem;   /* 36px */
+    /* Font Sizes - Rem-based Scale */
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 1.875rem;
+    --font-size-4xl: 2.25rem;
     
-    /* Line Heights */
+    /* Line Heights - Readability Presets */
     --line-height-tight: 1.25;
     --line-height-normal: 1.5;
     --line-height-relaxed: 1.75;
     
     /* ===== SPACING SYSTEM ===== */
-    
-    /* Spacing Scale - Consistent 4px base */
+    /* Spacing - 4px Base Scale */
     --spacing-xs: 4px;
     --spacing-sm: 8px;
     --spacing-md: 16px;
@@ -174,8 +178,7 @@
     --spacing-4xl: 80px;
     
     /* ===== BORDER RADIUS SYSTEM ===== */
-    
-    /* Border Radius - Consistent Scale */
+    /* Radius - Consistent Curves */
     --radius-sm: 4px;
     --radius-md: 8px;
     --radius-lg: 12px;
@@ -185,16 +188,14 @@
     --radius-full: 50%;
     
     /* ===== TRANSITION SYSTEM ===== */
-    
-    /* Transitions - Smooth and Responsive */
+    /* Transitions - Easing Presets */
     --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     
     /* ===== Z-INDEX SYSTEM ===== */
-    
-    /* Z-index Scale - Consistent layering */
+    /* Layering - Consistent Stacking */
     --z-dropdown: 1000;
     --z-sticky: 1020;
     --z-fixed: 1030;
@@ -206,60 +207,43 @@
     --z-maximized: 9999;
 }
 
-/* ===== LEGACY COMPATIBILITY ===== */
-/* Maintain backward compatibility with existing variable names */
+/* ===== LEGACY COMPATIBILITY LAYER ===== */
+/* Maps legacy variables to new tokens for backward compatibility */
 
 :root {
-    /* Primary Colors - Legacy Names */
-    --primary-color: var(--color-primary);
-    --primary-hover: var(--color-primary-hover);
-    --primary-light: var(--color-primary-light);
-    --primary-dark: var(--color-primary-dark);
-    --primary-glow: var(--color-primary-glow);
+    /* Legacy Glass Variables */
+    --glass-background: var(--glass-bg-medium);
+    --glass-background-light: var(--glass-bg-light);
+    --glass-background-medium: var(--glass-bg-medium);
+    --glass-background-heavy: var(--glass-bg-heavy);
+    --glass-background-ultra: var(--glass-bg-ultra);
+    --glass-blur-light: var(--glass-filter-light);
+    --glass-blur-medium: var(--glass-filter-medium);
+    --glass-blur-heavy: var(--glass-filter-heavy);
+    --glass-blur-ultra: var(--glass-filter-ultra);
+    --glass-outer-shadow: var(--glass-shadow-medium);
+    --glass-hover-shadow: var(--glass-hover-medium);
+    --glass-inner-shadow: var(--glass-inner-medium);
+    --glass-edge-glow: var(--glass-glow-medium);
+    --glass-reflection-light: var(--glass-reflection-primary);
+    --glass-reflection-subtle: var(--glass-reflection-secondary);
+    --glass-reflection-faint: var(--glass-reflection-quaternary);
     
-    /* Background Colors - Legacy Names */
-    --background-dark: var(--color-background-dark);
-    --background-light: var(--color-background-light);
-    --background-medium: var(--color-background-medium);
-    --background-elevated: var(--color-background-elevated);
-    --background-glass: var(--color-background-glass);
-    --background-glass-strong: var(--color-background-glass-strong);
+    /* Legacy Window Variables */
+    --window-background: var(--window-bg-default);
+    --window-background-focused: var(--window-bg-focused);
+    --window-background-header: var(--window-bg-header);
+    --window-background-control: var(--window-bg-control);
+    --window-background-content: var(--window-bg-content);
+    --window-backdrop: var(--window-filter-default);
+    --window-backdrop-header: var(--window-filter-header);
+    --window-backdrop-control: var(--window-filter-control);
+    --window-backdrop-content: var(--window-filter-content);
+    --window-border: var(--window-border-default);
     
-    /* Text Colors - Legacy Names */
-    --text-color: var(--color-text-primary);
-    --text-secondary: var(--color-text-secondary);
-    --text-muted: var(--color-text-muted);
-    --text-accent: var(--color-text-accent);
-    
-    /* Border Colors - Legacy Names */
-    --border-color: var(--color-border-primary);
-    --border-light: var(--color-border-light);
-    --border-subtle: var(--color-border-subtle);
-    --border-strong: var(--color-border-strong);
-    
-    /* Accent Colors - Legacy Names */
-    --accent-green: var(--color-accent-green);
-    --accent-orange: var(--color-accent-orange);
-    --accent-purple: var(--color-accent-purple);
-    --accent-red: var(--color-accent-red);
-    --accent-cyan: var(--color-accent-cyan);
-    --accent-yellow: var(--color-accent-yellow);
-    --accent-blue: var(--color-accent-blue);
-    
-    /* Window Variables - Legacy Names */
-    --window-bg: var(--window-background);
-    --window-bg-focused: var(--window-background-focused);
-    --window-header-bg: var(--window-background-header);
-    --window-control-bg: var(--window-background-control);
-    --window-backdrop: var(--window-backdrop);
-    --window-header-backdrop: var(--window-backdrop-header);
-    --window-control-backdrop: var(--window-backdrop-control);
-    --window-border: var(--window-border);
-    --window-control-border: var(--window-border);
-    
-    /* Terminal Variables - Legacy Names */
-    --terminal-bg: var(--terminal-background);
-    --terminal-backdrop: var(--terminal-backdrop);
+    /* Legacy Terminal Variables */
+    --terminal-background: var(--terminal-bg);
+    --terminal-backdrop: var(--terminal-filter);
     --terminal-border: var(--terminal-border);
     --terminal-text: var(--terminal-text);
     --terminal-prompt: var(--terminal-prompt);
@@ -267,27 +251,37 @@
     --terminal-success: var(--terminal-success);
     --terminal-warning: var(--terminal-warning);
     
-    /* Typography - Legacy Names */
+    /* Legacy Shadow Variables */
+    --shadow-subtle: var(--shadow-minimal);
+    --shadow-medium: var(--shadow-medium);
+    --shadow-strong: var(--shadow-heavy);
+    --shadow-glow: var(--shadow-glow-medium);
+    --shadow-glow-strong: var(--shadow-glow-heavy);
+    
+    /* Legacy Color Variables */
+    --primary-color: var(--color-primary);
+    --primary-hover: var(--color-primary-hover);
+    --primary-light: var(--color-primary-light);
+    --primary-dark: var(--color-primary-dark);
+    --primary-glow: var(--color-primary-glow);
+    --background-dark: var(--color-background-dark);
+    --background-light: var(--color-background-light);
+    --background-medium: var(--color-background-medium);
+    --background-elevated: var(--color-background-elevated);
+    --background-glass: var(--color-background-glass);
+    --background-glass-strong: var(--color-background-glass-strong);
+    --text-color: var(--color-text-primary);
+    --text-secondary: var(--color-text-secondary);
+    --text-muted: var(--color-text-muted);
+    --border-color: var(--color-border-primary);
+    --border-light: var(--color-border-light);
+    --accent-green: var(--color-accent-green);
+    --accent-orange: var(--color-accent-orange);
+    --accent-purple: var(--color-accent-purple);
+    --accent-red: var(--color-accent-red);
+    --accent-cyan: var(--color-accent-cyan);
+    --accent-yellow: var(--color-accent-yellow);
+    --accent-blue: var(--color-accent-blue);
     --font-family: var(--font-family-primary);
-    --font-family-mono: var(--font-family-mono);
-    --text-xs: var(--font-size-xs);
-    --text-sm: var(--font-size-sm);
     --text-base: var(--font-size-base);
-    --text-md: var(--font-size-base);
-    --text-lg: var(--font-size-lg);
-    --text-xl: var(--font-size-xl);
-    --text-2xl: var(--font-size-2xl);
-    --text-3xl: var(--font-size-3xl);
-    --text-4xl: var(--font-size-4xl);
-    
-    /* Spacing - Legacy Names */
-    --spacing: var(--spacing-md);
-    
-    /* Border Radius - Legacy Names */
-    --radius: var(--radius-md);
-    
-    /* Transitions - Legacy Names */
-    --transition: var(--transition-normal);
-    --transition-fast: var(--transition-fast);
-    --transition-slow: var(--transition-slow);
-} 
+}

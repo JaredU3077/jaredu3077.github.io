@@ -17,7 +17,7 @@ neuOS is an interactive web-based operating system interface that serves as a po
 jaredu3077.github.io/
 ├── index.html                 # Main entry point
 ├── sw.js                      # Service Worker for PWA
-├── css/                       # Stylesheets
+├── css/                       # Stylesheets (12 files)
 │   ├── design-tokens.css      # Design system tokens
 │   ├── glass.css              # Glassmorphic effects
 │   ├── window-base.css        # Window management styles
@@ -34,7 +34,7 @@ jaredu3077.github.io/
 │   ├── main.js                # Application entry point
 │   ├── config.js              # Configuration management
 │   ├── howler.min.js          # Audio library
-│   ├── core/                  # Core system modules
+│   ├── core/                  # Core system modules (20 files)
 │   │   ├── boot.js            # Boot sequence management
 │   │   ├── window.js          # Window management system
 │   │   ├── glassEffect.js     # Glassmorphic effects
@@ -48,11 +48,18 @@ jaredu3077.github.io/
 │   │   ├── snapHandler.js     # Window snapping
 │   │   ├── autoScrollHandler.js # Auto-scroll functionality
 │   │   ├── bootSequence.js    # Boot sequence logic
-│   │   ├── data/              # Data files
-│   │   │   └── solarSystemData.js # Solar system data
-│   │   └── ...                # Additional core modules
+│   │   ├── animationMixin.js  # Animation mixin
+│   │   ├── backgroundMixin.js # Background mixin
+│   │   ├── controlMixin.js    # Control mixin
+│   │   ├── generationMixin.js # Generation mixin
+│   │   ├── interactionMixin.js # Interaction mixin
+│   │   ├── mouseMixin.js      # Mouse mixin
+│   │   ├── modeMixin.js       # Mode mixin
+│   │   ├── particleCreationMixin.js # Particle creation mixin
+│   │   └── data/              # Data files
+│   │       └── solarSystemData.js # Solar system data
 │   ├── apps/                  # Application modules
-│   │   └── terminal/          # Terminal application
+│   │   └── terminal/          # Terminal application (11 files)
 │   │       ├── terminal.js    # Main terminal logic
 │   │       ├── content.js     # Terminal content management
 │   │       ├── eventHandlers.js # Terminal event handling
@@ -63,7 +70,7 @@ jaredu3077.github.io/
 │   │       ├── audio.js       # Terminal audio
 │   │       ├── theme.js       # Terminal theming
 │   │       ├── statusBar.js   # Status bar functionality
-│   │       └── commands/      # Command implementations
+│   │       └── commands/      # Command implementations (8 files)
 │   │           ├── commands.js # Main command system
 │   │           ├── core.js     # Core commands
 │   │           ├── network.js  # Network commands
@@ -72,7 +79,7 @@ jaredu3077.github.io/
 │   │           ├── effects.js  # Visual effects commands
 │   │           ├── appControl.js # Application control
 │   │           └── environment.js # Environment commands
-│   └── utils/                 # Utility modules
+│   └── utils/                 # Utility modules (6 files)
 │       ├── draggable.js       # Drag and drop functionality
 │       ├── mobile.js          # Mobile utilities
 │       ├── mechvibes.js       # Mechanical keyboard sounds

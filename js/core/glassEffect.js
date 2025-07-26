@@ -1,6 +1,6 @@
 /**
- * neuOS True test1 Glass Morphism System - Enhanced Transparency & Shine
- * Exact implementation of the test1 theme with improved glass effects
+ * neuOS Glass Morphism System - Standardized Implementation
+ * Uses new design tokens for consistent glass effects across all components
  */
 
 export class GlassMorphismSystem {
@@ -29,17 +29,16 @@ export class GlassMorphismSystem {
 
     setup() {
         this.setupInteractiveElements();
-        this.setupFocusedMouseTracking(); // Changed from setupMouseTracking
+        this.setupFocusedMouseTracking();
         this.setupBreathingAnimations();
         this.setupGlassDistortion();
-        this.setupDynamicGlassParameters();
         this.setupEnhancedReflections();
         this.setupMutationObserver();
         this.enhanceExistingElements();
     }
 
     /**
-     * Setup interactive 3D tilt effects for glass containers from test1
+     * Setup interactive 3D tilt effects for glass containers
      */
     setupInteractiveElements() {
         // Apply tilting to glass containers, but NOT to application windows or desktop icons
@@ -57,7 +56,7 @@ export class GlassMorphismSystem {
     }
 
     /**
-     * Make an element interactive with 3D tilt effects from test1
+     * Make an element interactive with 3D tilt effects
      */
     makeInteractive(element) {
         if (!element || this.interactiveElements.has(element)) return;
@@ -72,8 +71,8 @@ export class GlassMorphismSystem {
             const x = (e.clientX - centerX) / (rect.width / 2);
             const y = (e.clientY - centerY) / (rect.height / 2);
             
-            // Enhanced rotation from test1 with better limits
-            const maxRotation = 20; // Reduced for more subtle effect
+            // Enhanced rotation with better limits
+            const maxRotation = 15; // Reduced for more subtle effect
             const rotateX = -y * maxRotation;
             const rotateY = x * maxRotation;
             
@@ -122,7 +121,7 @@ export class GlassMorphismSystem {
     }
 
     /**
-     * Update glass reflection based on mouse position from test1
+     * Update glass reflection based on mouse position
      */
     updateGlassReflection() {
         // Only update reflections for the focused element
@@ -133,15 +132,15 @@ export class GlassMorphismSystem {
         const windowHeight = window.innerHeight;
         
         reflections.forEach(reflection => {
-            const x = (this.mousePosition.x / windowWidth - 0.5) * 30; // Increased movement
-            const y = (this.mousePosition.y / windowHeight - 0.5) * 30; // Increased movement
+            const x = (this.mousePosition.x / windowWidth - 0.5) * 20; // Reduced movement for subtlety
+            const y = (this.mousePosition.y / windowHeight - 0.5) * 20; // Reduced movement for subtlety
             
             reflection.style.transform = `translateZ(25px) translateX(${x}px) translateY(${y}px)`;
         });
     }
 
     /**
-     * Setup breathing animations for titles from test1
+     * Setup breathing animations for titles
      */
     setupBreathingAnimations() {
         const titles = document.querySelectorAll('.glass-title, .boot-title, .login-title');
@@ -154,7 +153,7 @@ export class GlassMorphismSystem {
     }
 
     /**
-     * Setup dynamic glass distortion effects from test1
+     * Setup dynamic glass distortion effects
      */
     setupGlassDistortion() {
         // Update SVG distortion filter parameters
@@ -163,9 +162,9 @@ export class GlassMorphismSystem {
             const displacementMap = document.querySelector('feDisplacementMap');
             
             if (turbulence && displacementMap) {
-                // Set enhanced values for better transparency
-                const frequency = 0.008; // Reduced for smoother effect
-                const scale = 25; // Reduced for subtler effect
+                // Set optimized values for better performance
+                const frequency = 0.006; // Reduced for smoother effect
+                const scale = 20; // Reduced for subtler effect
                 
                 turbulence.setAttribute('baseFrequency', `${frequency} ${frequency}`);
                 displacementMap.setAttribute('scale', scale);
@@ -174,23 +173,6 @@ export class GlassMorphismSystem {
 
         // Update distortion immediately
         updateDistortion();
-    }
-
-    /**
-     * Setup dynamic glass parameters from test1
-     */
-    setupDynamicGlassParameters() {
-        // Set Theme 5 ultra-transparent glass parameters
-        const updateGlassParameters = () => {
-            document.documentElement.style.setProperty('--glass-background', 'rgba(255, 255, 255, 0.001)');
-            document.documentElement.style.setProperty('--glass-backdrop-blur', '8px');
-            document.documentElement.style.setProperty('--glass-saturation', '140%');
-            document.documentElement.style.setProperty('--glass-brightness', '110%');
-            document.documentElement.style.setProperty('--glass-reflection-opacity', '0.2');
-            document.documentElement.style.setProperty('--glass-edge-glow', '0 0 8px rgba(255, 255, 255, 0.05)');
-        };
-
-        updateGlassParameters();
     }
 
     /**
@@ -270,8 +252,8 @@ export class GlassMorphismSystem {
         if (hasGlassClass) {
             this.addReflectionLayer(element);
             
-                    // Only apply interactive effects to glass containers, NOT application windows or desktop icons
-        const shouldBeInteractive = element.classList.contains('glass-container') ||
+            // Only apply interactive effects to glass containers, NOT application windows or desktop icons
+            const shouldBeInteractive = element.classList.contains('glass-container') ||
                                    element.classList.contains('neuos-glass-box') ||
                                    element.classList.contains('neuos-widget') ||
                                    element.classList.contains('glass-login-btn');
@@ -358,15 +340,6 @@ export class GlassMorphismSystem {
     }
 
     /**
-     * Update glass parameters dynamically
-     */
-    updateGlassParameters(parameters = {}) {
-        Object.entries(parameters).forEach(([property, value]) => {
-            document.documentElement.style.setProperty(`--${property}`, value);
-        });
-    }
-
-    /**
      * Apply enhanced glass effects to all matching elements
      */
     enhanceAllGlassElements() {
@@ -420,4 +393,4 @@ if (typeof module !== 'undefined' && module.exports) {
 if (typeof window !== 'undefined') {
     window.GlassMorphismSystem = GlassMorphismSystem;
     window.glassSystem = glassSystem;
-} 
+}

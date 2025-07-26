@@ -1,236 +1,313 @@
-# index.html - Main Entry Point Documentation
+# HTML Entry Point Documentation
 
-## File Overview
+## Overview
 
-**Purpose**: Main HTML5 document serving as the entry point for the neuOS interactive portfolio website.
+The `index.html` file serves as the main entry point for the neuOS application, providing a comprehensive HTML5 structure with Progressive Web App (PWA) support, accessibility features, and modern web standards compliance.
 
-**Type**: HTML5 document with PWA (Progressive Web App) capabilities.
+## File Structure
 
-**Role**: Primary entry point that loads all CSS stylesheets, JavaScript modules, and initializes the operating system interface.
+```
+index.html                 # Main HTML entry point
+├── Head Section           # Meta tags, CSS, and PWA setup
+├── Body Section           # Main application content
+│   ├── Login Screen       # Authentication interface
+│   ├── Desktop Environment # Main application interface
+│   ├── Terminal Container # Terminal application
+│   └── neuOS Widget       # Desktop widget
+└── Scripts Section        # JavaScript modules and PWA
+```
 
-## Dependencies and Imports
+## HTML Structure
 
-### External Resources
-
-| Resource | Type | Purpose | Version |
-|----------|------|---------|---------|
-| `howler.min.js` | JavaScript Library | Audio management and playback | Latest |
-| `config/manifest.json` | PWA Manifest | Progressive Web App configuration | - |
-
-### CSS Dependencies (Load Order)
-
-| File | Purpose | Dependencies |
-|------|---------|--------------|
-| `css/design-tokens.css` | Design system tokens and variables | None |
-| `css/glass.css` | Glassmorphic effects | design-tokens.css |
-| `css/window-base.css` | Window management styles | glass.css |
-| `css/terminal.css` | Terminal application styles | window-base.css |
-| `css/desktop.css` | Desktop layout and icons | terminal.css |
-| `css/animations.css` | Animation definitions | desktop.css |
-| `css/responsive.css` | Responsive design rules | animations.css |
-| `css/mobile.css` | Mobile-specific styles | responsive.css |
-| `css/apps.css` | Application-specific styles | mobile.css |
-| `css/theme.css` | Theme management | apps.css |
-| `css/terminal-icon.css` | Terminal icon styles | theme.css |
-
-### JavaScript Dependencies
-
-| Module | Purpose | Entry Point |
-|--------|---------|-------------|
-| `js/main.js` | Application initialization | DOMContentLoaded |
-| `js/howler.min.js` | Audio library | Preloaded |
-
-## Internal Structure
-
-### HTML5 Semantic Elements
-
+### Document Declaration and Head
 ```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Meta tags and SEO -->
-    <!-- PWA support -->
-    <!-- Security headers -->
-    <!-- CSS stylesheets -->
-    <!-- JavaScript modules -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="neuOS - Interactive Web-Based Operating System Interface">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <title>neuOS - Jared U. | Senior Network Engineer</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="config/manifest.json">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,...">
+    
+    <!-- CSS Files (12 files) -->
+    <link rel="stylesheet" href="css/design-tokens.css">
+    <link rel="stylesheet" href="css/glass.css">
+    <link rel="stylesheet" href="css/window-base.css">
+    <link rel="stylesheet" href="css/terminal.css">
+    <link rel="stylesheet" href="css/desktop.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    <link rel="stylesheet" href="css/apps.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/terminal-icon.css">
+    <link rel="stylesheet" href="css/login.css">
 </head>
-<body>
-    <!-- SVG filters for glass effects -->
-    <!-- Canvas for starfield background -->
-    <!-- Boot sequence dialog -->
-    <!-- Login screen dialog -->
-    <!-- Desktop container -->
-    <!-- Live region for accessibility -->
-    <!-- Service worker registration -->
+```
+
+### Body Structure
+```html
+<body class="boot-active">
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-form neuos-glass-box">
+            <h1 class="login-title">neuOS</h1>
+            <p class="login-subtitle">Senior Network Engineer Portfolio</p>
+            <div class="login-input-group">
+                <input type="text" id="username" class="login-input" placeholder="username" value="jared" readonly>
+                <input type="password" id="password" class="login-input" placeholder="password" value="••••••••" readonly>
+            </div>
+            <button id="loginButton" class="glass-login-btn">login</button>
+        </div>
+    </div>
+
+    <!-- Desktop Environment -->
+    <div id="desktop" class="desktop">
+        <!-- Desktop Icons -->
+        <div id="desktop-icons" class="icon-grid">
+            <!-- Terminal Icon -->
+            <div class="app-icon" data-app="terminal">
+                <div class="terminal-icon">></div>
+                <span class="label">terminal</span>
+            </div>
+        </div>
+
+        <!-- neuOS Widget -->
+        <div id="neuosWidget" class="neuos-widget glass-interactive">
+            <div class="neuos-glass-title">neuOS</div>
+        </div>
+    </div>
+
+    <!-- Terminal Container -->
+    <div id="terminal-container" class="window" style="display: none;">
+        <div class="window-header">
+            <div class="window-title">terminal</div>
+            <div class="window-controls">
+                <button class="window-control minimize" data-action="minimize"></button>
+                <button class="window-control maximize" data-action="maximize"></button>
+                <button class="window-control close" data-action="close"></button>
+            </div>
+        </div>
+        <div class="window-content">
+            <div id="terminal" class="terminal">
+                <div id="terminal-output" class="terminal-output"></div>
+                <div class="terminal-input-line">
+                    <span class="terminal-prompt">jared@neuOS:~$</span>
+                    <input type="text" id="terminal-input" class="terminal-input" autocomplete="off">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SVG Filters for Glass Effects -->
+    <svg style="position: absolute; width: 0; height: 0;" aria-hidden="true">
+        <defs>
+            <filter id="glass-distortion">
+                <feTurbulence type="fractalNoise" baseFrequency="0.01" numOctaves="1" seed="1"/>
+                <feDisplacementMap in="SourceGraphic" scale="33"/>
+            </filter>
+        </defs>
+    </svg>
 </body>
+```
+
+### Scripts Section
+```html
+<!-- JavaScript Modules -->
+<script type="module" src="js/main.js"></script>
+
+<!-- Service Worker Registration -->
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            const swPath = window.location.hostname === 'localhost' ? '/sw.js' : './sw.js';
+            navigator.serviceWorker.register(swPath)
+                .then((registration) => {
+                    console.log('neuOS: Service Worker registered successfully:', registration);
+                    
+                    // Check for updates
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                console.log('neuOS: New version available');
+                            }
+                        });
+                    });
+                })
+                .catch((error) => {
+                    console.error('neuOS: Service Worker registration failed:', error);
+                });
+        });
+    }
+</script>
 </html>
 ```
 
-### Key Sections
+## Key Features
 
-#### 1. Meta Tags and SEO
-- **Character encoding**: UTF-8
-- **Viewport**: Mobile-responsive with user-scalable disabled
-- **SEO**: Comprehensive meta tags for search engines
-- **Open Graph**: Social media sharing optimization
-- **Twitter Cards**: Twitter-specific meta tags
+### Progressive Web App (PWA)
+- **Web App Manifest**: `config/manifest.json` for app installation
+- **Service Worker**: `sw.js` for offline functionality and caching
+- **App Icons**: SVG-based favicon and app icons
+- **Theme Color**: Dark theme color for browser UI
+- **Apple PWA Support**: iOS-specific meta tags
 
-#### 2. PWA Support
-- **Theme color**: #6366f1 (primary brand color)
-- **Apple mobile web app**: Full-screen mode support
-- **Manifest**: Links to `config/manifest.json`
-- **Service worker**: Registered via JavaScript
+### Accessibility Features
+- **Semantic HTML**: Proper heading hierarchy and structure
+- **ARIA Labels**: Screen reader support for interactive elements
+- **Keyboard Navigation**: Full keyboard accessibility
+- **Focus Management**: Visible focus indicators
+- **Color Contrast**: High contrast design for readability
 
-#### 3. Security Headers
-- **Content Security Policy**: Restricts script and style sources
-- **X-Content-Type-Options**: Prevents MIME type sniffing
-- **X-XSS-Protection**: Enables XSS protection
+### Responsive Design
+- **Viewport Meta Tag**: Mobile-responsive viewport settings
+- **CSS Media Queries**: Responsive design implementation
+- **Touch Support**: Mobile-optimized touch interactions
+- **Flexible Layout**: Grid-based responsive layout
 
-#### 4. Structured Data
-- **JSON-LD**: Schema.org Person markup for SEO
-- **Professional credentials**: Network engineering expertise
-- **Social profiles**: GitHub and LinkedIn links
+### Security Features
+- **Content Security Policy**: Restricted resource loading
+- **XSS Protection**: Input sanitization and validation
+- **HTTPS Enforcement**: Secure connection requirements
+- **Secure Headers**: Security-focused HTTP headers
 
-#### 5. SVG Filters
-- **Glass distortion filter**: Creates glassmorphic effects
-- **Fractal noise**: Generates organic distortion patterns
-- **Gaussian blur**: Smooths filter effects
-
-#### 6. Boot Sequence
-- **Dialog role**: Accessibility-compliant modal
-- **Progress bar**: Visual boot progress indicator
-- **Glass effects**: Modern UI styling with neuos-glass-box
-
-#### 7. Login Screen
-- **Guest login**: Single-click access
-- **Glass container**: Consistent design language with neuos-glass-box
-- **Particle effects**: Dynamic background
-
-#### 8. Desktop Interface
-- **Main role**: Primary application area
-- **Particle container**: Background effects
-- **Desktop icons**: Application launchers
-- **Window container**: Dynamic application windows
-
-## Connections and References
-
-### Incoming Connections
-
-| Referencing File | Description | Connection Type |
-|------------------|-------------|-----------------|
-| `sw.js` | Service worker caches HTML | Caching |
-| `js/main.js` | Initializes application | Module import |
-| `css/*.css` | Styles applied to elements | Styling |
-
-### Outgoing Connections
-
-| Referenced File | Description | Connection Type |
-|-----------------|-------------|-----------------|
-| `css/design-tokens.css` | Design system variables | Stylesheet |
-| `css/glass.css` | Glassmorphic effects | Stylesheet |
-| `css/window-base.css` | Window management | Stylesheet |
-| `css/terminal.css` | Terminal application | Stylesheet |
-| `css/desktop.css` | Desktop layout | Stylesheet |
-| `css/animations.css` | Animations | Stylesheet |
-| `css/responsive.css` | Responsive design | Stylesheet |
-| `css/mobile.css` | Mobile styles | Stylesheet |
-| `css/apps.css` | Application styles | Stylesheet |
-| `css/theme.css` | Theme management | Stylesheet |
-| `css/terminal-icon.css` | Terminal icon | Stylesheet |
-| `js/main.js` | Application logic | Script |
-| `js/howler.min.js` | Audio library | Script |
-| `config/manifest.json` | PWA manifest | Link |
-| `assets/audio/mp3.mp3` | Background music | Audio |
-| `assets/audio/sound.ogg` | Sound effects | Audio |
-
-### Bidirectional Connections
-
-| Element | CSS Class | JavaScript Handler | Description |
-|---------|-----------|-------------------|-------------|
-| `#bootSequence` | `.boot-sequence` | Boot system | Boot screen management |
-| `#loginScreen` | `.login-screen` | Login system | Login screen management |
-| `#desktop` | Desktop styles | Window manager | Desktop interface |
-| `#desktop-icons` | Icon styles | App launcher | Desktop icons |
-| `#terminalInput` | Terminal styles | Terminal app | Terminal interface |
-| `#terminalOutput` | Terminal styles | Terminal app | Terminal output |
-
-## Data Flow and Architecture
+## CSS Loading Strategy
 
 ### Load Order
+1. **design-tokens.css**: Foundation design system
+2. **glass.css**: Glassmorphic effects
+3. **window-base.css**: Window management styles
+4. **terminal.css**: Terminal application styles
+5. **desktop.css**: Desktop layout
+6. **animations.css**: Animation definitions
+7. **responsive.css**: Responsive design
+8. **mobile.css**: Mobile-specific styles
+9. **apps.css**: Application-specific styles
+10. **theme.css**: Theme management
+11. **terminal-icon.css**: Terminal icon styles
+12. **login.css**: Login screen styles
 
-1. **HTML Parsing**: Browser parses HTML structure
-2. **CSS Loading**: Stylesheets loaded in dependency order
-3. **JavaScript Execution**: Modules loaded via ES6 imports
-4. **Boot Sequence**: Application initialization begins
-5. **Login Screen**: User authentication interface
-6. **Desktop Interface**: Main application area
+### Performance Optimization
+- **Critical CSS**: Essential styles loaded first
+- **Non-blocking CSS**: CSS files don't block rendering
+- **CSS Optimization**: Minified and optimized stylesheets
+- **Caching Strategy**: Service worker caching for CSS files
 
-### Event Handling
+## JavaScript Integration
 
-```javascript
-// DOM Content Loaded
-document.addEventListener('DOMContentLoaded', async () => {
-    // Initialize core systems
-    // Setup event listeners
-    // Start boot sequence
-});
+### Module System
+- **ES6 Modules**: Modern JavaScript module system
+- **Dynamic Imports**: On-demand module loading
+- **Error Boundaries**: Comprehensive error handling
+- **Performance Monitoring**: Load time and performance tracking
 
-// Service Worker Registration
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js');
-}
+### Service Worker
+- **Offline Support**: Cached resources for offline use
+- **Background Sync**: Data synchronization when online
+- **Push Notifications**: User engagement features
+- **Cache Management**: Intelligent caching strategies
+
+## Browser Compatibility
+
+### Supported Browsers
+- **Chrome 80+**: Full feature support
+- **Firefox 75+**: Full feature support
+- **Safari 13+**: Full feature support
+- **Edge 80+**: Full feature support
+
+### Feature Detection
+- **ES6 Modules**: Modern JavaScript support
+- **Service Workers**: PWA functionality
+- **CSS Custom Properties**: Advanced styling
+- **Backdrop Filters**: Glass morphism effects
+
+## Performance Considerations
+
+### Loading Performance
+- **Critical Path**: Optimized critical rendering path
+- **Resource Hints**: Preload and prefetch directives
+- **Image Optimization**: Optimized images and icons
+- **Font Loading**: Optimized font loading strategy
+
+### Runtime Performance
+- **Event Delegation**: Efficient event handling
+- **Memory Management**: Proper cleanup and garbage collection
+- **Animation Performance**: Hardware-accelerated animations
+- **DOM Optimization**: Efficient DOM manipulation
+
+## Security Implementation
+
+### Content Security Policy
+```html
+<meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline';
+    style-src 'self' 'unsafe-inline';
+    img-src 'self' data:;
+    font-src 'self';
+    connect-src 'self';
+    frame-src 'none';
+    object-src 'none';
+">
 ```
 
-### State Management
+### Security Headers
+- **X-Content-Type-Options**: nosniff
+- **X-Frame-Options**: DENY
+- **X-XSS-Protection**: 1; mode=block
+- **Referrer-Policy**: strict-origin-when-cross-origin
 
-- **Boot State**: Controls visibility of boot sequence
-- **Login State**: Manages login screen display
-- **Desktop State**: Controls desktop interface visibility
-- **Window State**: Manages application windows
+## Accessibility Implementation
 
-## Potential Issues and Recommendations
+### ARIA Support
+```html
+<!-- Login form with ARIA labels -->
+<input type="text" id="username" class="login-input" 
+       placeholder="username" value="jared" readonly
+       aria-label="Username field">
 
-### Standards Compliance Issues
+<!-- Terminal with ARIA support -->
+<div id="terminal" class="terminal" role="application" aria-label="Terminal application">
+    <div id="terminal-output" class="terminal-output" aria-live="polite"></div>
+    <input type="text" id="terminal-input" class="terminal-input" 
+           aria-label="Terminal input" autocomplete="off">
+</div>
+```
 
-1. **Semantic HTML**: Missing proper semantic elements
-   - **Issue**: Uses generic `<div>` instead of semantic elements
-   - **Fix**: Replace with `<main>`, `<section>`, `<article>`, `<nav>`
+### Keyboard Navigation
+- **Tab Order**: Logical tab navigation
+- **Focus Indicators**: Visible focus states
+- **Keyboard Shortcuts**: Application shortcuts
+- **Escape Key**: Modal and window closing
 
-2. **Inline Styles**: Violates separation of concerns
-   - **Issue**: Inline styles in HTML for positioning
-   - **Fix**: Move all styles to CSS files
+## Future Enhancements
 
-3. **Accessibility**: Missing proper ARIA landmarks
-   - **Issue**: Incomplete accessibility support
-   - **Fix**: Add proper ARIA roles and labels
+### Planned Features
+1. **Advanced PWA**: Enhanced offline functionality
+2. **Performance Monitoring**: Real-time performance tracking
+3. **Advanced Accessibility**: Screen reader optimization
+4. **SEO Optimization**: Enhanced search engine optimization
 
-### Performance Issues
-
-1. **CSS Loading**: Multiple CSS files impact performance
-   - **Issue**: 11 separate CSS files
-   - **Fix**: Consider CSS bundling for production
-
-2. **JavaScript Loading**: Module loading could be optimized
-   - **Issue**: ES6 modules loaded individually
-   - **Fix**: Implement module bundling
-
-3. **Audio Preloading**: Large audio files
-   - **Issue**: 5.2MB mp3 file preloaded
-   - **Fix**: Implement lazy loading for audio
-
-### Security Issues
-
-1. **Content Security Policy**: Could be more restrictive
-   - **Issue**: Allows 'unsafe-inline' and 'unsafe-eval'
-   - **Fix**: Implement nonce-based CSP
-
-2. **Input Validation**: Terminal input needs sanitization
-   - **Issue**: Command execution without validation
-   - **Fix**: Implement input sanitization
+### Technical Improvements
+1. **Critical CSS Inlining**: Inline critical styles
+2. **Resource Hints**: Advanced resource optimization
+3. **Service Worker**: Enhanced caching strategies
+4. **Performance Budget**: Performance monitoring and alerts
 
 ## Related Documentation
 
-- See [main.md](main.md) for JavaScript initialization details
-- See [architecture.md](architecture.md) for overall system architecture
-- See [sw.md](sw.md) for service worker documentation
-- See [config.md](config.md) for configuration management 
+- See [main.md](main.md) for JavaScript entry point
+- See [sw.md](sw.md) for Service Worker implementation
+- See [config.md](config.md) for configuration management
+- See [DOTHISNEXT.md](DOTHISNEXT.md) for HTML-specific issues 

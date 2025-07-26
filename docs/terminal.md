@@ -18,7 +18,7 @@ js/apps/terminal/
 ├── audio.js                 # Terminal audio effects
 ├── theme.js                 # Terminal theming system
 ├── statusBar.js             # Status bar functionality
-└── commands/                # Command implementations
+└── commands/                # Command implementations (8 files)
     ├── commands.js          # Main command system and routing
     ├── core.js              # Core system commands
     ├── network.js           # Network engineering commands

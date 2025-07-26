@@ -253,15 +253,36 @@
         font-size: 13px !important;
     }
 
-    #terminalWindow .window-title {
+    #terminalWindow .window-header .window-title {
         font-size: 14px !important;
         text-shadow: 0 0 6px rgba(99, 102, 241, 0.4) !important;
+        gap: 8px !important;
+        min-width: 0 !important;
+        overflow: hidden !important;
+        max-width: calc(100% - 90px) !important;
     }
 
-    #terminalWindow .window-title .icon {
-        width: 20px !important;
-        height: 20px !important;
+    #terminalWindow .window-header .window-title .icon {
+        width: 16px !important;
+        height: 16px !important;
         filter: drop-shadow(0 0 6px rgba(99, 102, 241, 0.6)) !important;
+        flex-shrink: 0 !important;
+        margin-right: 0 !important;
+    }
+    
+    #terminalWindow .window-header .window-title .icon svg {
+        width: 16px !important;
+        height: 16px !important;
+        max-width: 16px !important;
+        max-height: 16px !important;
+    }
+
+    #terminalWindow .window-header .window-title .label {
+        flex: 1 !important;
+        min-width: 0 !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
     }
 
     #terminalWindow .window-control {
@@ -396,6 +417,17 @@
         -webkit-backdrop-filter: blur(12px) saturate(160%) brightness(120%) !important;
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
         box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 255, 255, 0.1) !important;
+        /* Ensure proper centering on mobile */
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        z-index: 1000 !important;
+    }
+
+    /* Don't apply centering if element has been moved by user */
+    .login-container[data-has-been-moved="true"] {
+        transform: none !important;
     }
 
     .login-btn {
@@ -422,6 +454,17 @@
         -webkit-backdrop-filter: blur(12px) saturate(160%) brightness(120%) !important;
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
         box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 255, 255, 0.1) !important;
+        /* Ensure proper centering on mobile */
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        z-index: 1000 !important;
+    }
+
+    /* Don't apply centering if element has been moved by user */
+    .boot-container[data-has-been-moved="true"] {
+        transform: none !important;
     }
 
     /* Mobile Performance Optimizations */
@@ -459,6 +502,28 @@
         -webkit-backdrop-filter: blur(12px) saturate(160%) brightness(120%) !important;
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
         box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 255, 255, 0.1) !important;
+    }
+
+    /* Mobile neuOS Widget */
+    .neuos-widget {
+        width: 100px !important;
+        height: 100px !important;
+        background: rgba(255, 255, 255, 0.05) !important;
+        backdrop-filter: blur(12px) saturate(160%) brightness(120%) !important;
+        -webkit-backdrop-filter: blur(12px) saturate(160%) brightness(120%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 255, 255, 0.1) !important;
+        /* Ensure proper centering on mobile */
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        z-index: 1000 !important;
+    }
+
+    /* Don't apply centering if element has been moved by user */
+    .neuos-widget[data-has-been-moved="true"] {
+        transform: none !important;
     }
 
     .neuos-glass-title {

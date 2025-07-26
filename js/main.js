@@ -353,7 +353,14 @@ function handleGlobalClick(e) {
  * @param {Event} e - The keydown event.
  */
 function handleGlobalKeydown(e) {
-    // Reserved for future global keyboard shortcuts
+    // Reset draggable elements to center with Ctrl+Shift+R
+    if (e.ctrlKey && e.shiftKey && e.key === 'R') {
+        e.preventDefault();
+        if (window.neuOS && window.neuOS.draggableSystem) {
+            window.neuOS.draggableSystem.resetToCenter();
+            console.log('neuOS: Reset draggable elements to center');
+        }
+    }
 }
 
 // --- INITIALIZATION ---
@@ -405,9 +412,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Ensure draggable system is properly initialized for boot and login
         if (window.neuOS && window.neuOS.draggableSystem) {
+            // Immediate positioning
+            window.neuOS.draggableSystem.refreshBootAndLogin();
+            
+            // Also try after a short delay to ensure DOM is ready
             setTimeout(() => {
                 window.neuOS.draggableSystem.refreshBootAndLogin();
-            }, 200);
+            }, 100);
         }
         
         // GitHub Pages specific optimizations
