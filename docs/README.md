@@ -2,23 +2,33 @@
 
 ## Overview
 
-This directory contains comprehensive documentation for the neuOS web application project. The documentation follows web development standards and provides detailed information about the project's architecture, file relationships, and implementation details.
+This directory contains comprehensive documentation for the neuOS web application project. neuOS is an interactive web-based operating system interface that serves as a portfolio for Jared U., a senior network engineer. The project implements a modern, glassmorphic UI design with advanced audio-visual effects, particle systems, and a terminal-based interface.
 
 ## Documentation Structure
 
 ```
 docs/
 ├── README.md                    # This file - Documentation overview
+├── project-overview.md          # Comprehensive project overview
 ├── architecture.md              # Overall project architecture
 ├── index.md                     # Main HTML entry point documentation
 ├── main.md                      # JavaScript entry point documentation
 ├── sw.md                        # Service Worker documentation
 ├── config.md                    # Configuration system documentation
+├── terminal.md                  # Terminal application documentation
+├── core-systems.md              # Core system modules documentation
+├── utils.md                     # Utility modules documentation
+├── css-system.md                # CSS system documentation
+├── DOTHISNEXT.md               # Issues requiring attention
+├── THEMING_STANDARDIZATION.md  # Theming system documentation
 └── config/
     └── manifest.md              # PWA manifest documentation
 ```
 
 ## Quick Navigation
+
+### Project Overview
+- **[project-overview.md](project-overview.md)** - Comprehensive project overview and architecture
 
 ### Core Files
 - **[architecture.md](architecture.md)** - Complete project overview, dependency graph, and system architecture
@@ -26,47 +36,44 @@ docs/
 - **[main.md](main.md)** - JavaScript module system and application initialization
 - **[sw.md](sw.md)** - Service Worker for offline functionality and caching
 
+### Applications
+- **[terminal.md](terminal.md)** - Terminal application documentation and command system
+
+### Core Systems
+- **[core-systems.md](core-systems.md)** - Core system modules and functionality
+
+### Utilities
+- **[utils.md](utils.md)** - Utility modules and helper functions
+
+### Styling
+- **[css-system.md](css-system.md)** - CSS system and design framework
+
 ### Configuration
 - **[config.md](config.md)** - Configuration management system and application settings
 - **[config/manifest.md](config/manifest.md)** - PWA manifest and installation features
 
-## Documentation Standards
-
-### File Documentation Format
-Each documentation file follows a consistent structure:
-
-1. **File Overview** - Purpose, type, and role in the project
-2. **Dependencies and Imports** - External resources and module relationships
-3. **Internal Structure** - Detailed breakdown of file contents
-4. **Connections and References** - Inter-file relationships and dependencies
-5. **Data Flow and Architecture** - How the file fits into the overall system
-6. **Standards Compliance** - HTML5, CSS3, and JavaScript ES6+ compliance
-7. **Potential Issues and Recommendations** - Current implementation analysis
-8. **Cross-References** - Links to related documentation
-
-### Connection Tables
-Each file includes detailed connection tables showing:
-- **Incoming Connections** - Files that reference this file
-- **Outgoing Connections** - Resources this file references
-- **Bidirectional Connections** - Mutual dependencies
+### Development
+- **[DOTHISNEXT.md](DOTHISNEXT.md)** - Issues requiring attention and refactoring needs
+- **[THEMING_STANDARDIZATION.md](THEMING_STANDARDIZATION.md)** - Theming system implementation
 
 ## Project Architecture
 
 ### Technology Stack
 - **Frontend**: HTML5, CSS3, JavaScript ES6+
-- **Audio**: Howler.js library
+- **Audio**: Howler.js library for audio management
 - **PWA**: Service Worker for offline functionality
 - **Graphics**: Canvas API for starfield background
 - **Effects**: CSS filters, SVG filters, custom animations
 
 ### Core Systems
-1. **Boot System** - Application startup sequence
-2. **Window Manager** - Application window management
-3. **Glass Effect System** - Glassmorphic UI effects
-4. **Particle System** - Background particle animations
-5. **Audio System** - Sound effects and background music
-6. **Theme Manager** - UI theme management
-7. **Draggable System** - Drag and drop functionality
+1. **Boot System** - Application startup sequence with glassmorphic effects
+2. **Window Manager** - Application window management with drag and drop
+3. **Glass Effect System** - Glassmorphic UI effects and animations
+4. **Particle System** - Background particle animations and effects
+5. **Audio System** - Sound effects and background music with mechvibes
+6. **Theme Manager** - UI theme management with design tokens
+7. **Terminal System** - Command-line interface with network engineering commands
+8. **Draggable System** - Drag and drop functionality for windows and elements
 
 ### Module Organization
 ```
@@ -74,14 +81,32 @@ js/
 ├── main.js              # Application entry point
 ├── config.js            # Configuration management
 ├── core/                # Core system modules
+│   ├── boot.js          # Boot sequence management
+│   ├── window.js        # Window management system
+│   ├── glassEffect.js   # Glassmorphic effects
+│   ├── particleSystem.js # Particle system
+│   ├── audioSystem.js   # Audio management
+│   ├── themeManager.js  # Theme management
+│   ├── screensaver.js   # Screensaver functionality
+│   └── ...              # Additional core modules
 ├── apps/                # Application modules
+│   └── terminal/        # Terminal application
+│       ├── terminal.js  # Main terminal logic
+│       ├── commands/    # Command implementations
+│       └── ...          # Terminal utilities
 └── utils/               # Utility modules
+    ├── draggable.js     # Drag and drop functionality
+    ├── mobile.js        # Mobile utilities
+    ├── mechvibes.js     # Mechanical keyboard sounds
+    ├── utils.js         # General utilities
+    ├── glassEffects.js  # Glass effect utilities
+    └── help.js          # Help system
 ```
 
 ## Standards Compliance
 
 ### HTML5 Standards
-- ✅ Semantic HTML elements
+- ✅ Semantic HTML elements (`<main>`, `<section>`, `<nav>`)
 - ✅ ARIA attributes for accessibility
 - ✅ Meta tags for SEO and PWA
 - ✅ Content Security Policy headers
@@ -93,6 +118,7 @@ js/
 - ✅ Media queries for responsive design
 - ✅ CSS animations and transitions
 - ✅ CSS filters and transforms
+- ✅ Design tokens system
 
 ### JavaScript ES6+ Standards
 - ✅ ES6 modules (import/export)
@@ -112,7 +138,7 @@ js/
 ## Performance Considerations
 
 ### Loading Optimization
-- CSS files loaded in dependency order
+- CSS files loaded in dependency order with design tokens first
 - JavaScript modules use ES6 imports for tree-shaking
 - Audio files preloaded for immediate playback
 - Service Worker for caching and offline functionality
@@ -195,12 +221,12 @@ index.html → main.js → core modules → utility modules
 
 ### CSS Dependencies
 ```
-design-tokens.css → variables.css → glass.css → window.css → desktop.css → animations.css → responsive.css → mobile.css → apps.css → theme.css → terminal-icon.css → login.css
+design-tokens.css → glass.css → window-base.css → terminal.css → desktop.css → animations.css → responsive.css → mobile.css → apps.css → theme.css → terminal-icon.css
 ```
 
 ### JavaScript Dependencies
 ```
-main.js → config.js → core/*.js → apps/*.js → utils/*.js
+main.js → config.js → core/*.js → apps/terminal/*.js → utils/*.js
 ```
 
 ## Cross-References
@@ -214,8 +240,27 @@ main.js → config.js → core/*.js → apps/*.js → utils/*.js
 - See [config.md](config.md) for configuration management
 - See [config/manifest.md](config/manifest.md) for PWA manifest details
 
+### Application Documentation
+- See [terminal.md](terminal.md) for terminal application and command system
+
+### Core System Documentation
+- See [core-systems.md](core-systems.md) for core system modules and functionality
+
+### Utility Documentation
+- See [utils.md](utils.md) for utility modules and helper functions
+
+### Styling Documentation
+- See [css-system.md](css-system.md) for CSS system and design framework
+
+### Project Documentation
+- See [project-overview.md](project-overview.md) for comprehensive project overview
+
 ### Service Documentation
 - See [sw.md](sw.md) for Service Worker and offline functionality
+
+### Development Documentation
+- See [DOTHISNEXT.md](DOTHISNEXT.md) for issues requiring attention
+- See [THEMING_STANDARDIZATION.md](THEMING_STANDARDIZATION.md) for theming system
 
 ## Contributing to Documentation
 

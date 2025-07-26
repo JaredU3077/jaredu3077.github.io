@@ -22,17 +22,16 @@
 | File | Purpose | Dependencies |
 |------|---------|--------------|
 | `css/design-tokens.css` | Design system tokens and variables | None |
-| `css/variables.css` | CSS custom properties | design-tokens.css |
-| `css/glass.css` | Glassmorphic effects | variables.css |
-| `css/window.css` | Window management styles | glass.css |
-| `css/desktop.css` | Desktop layout and icons | window.css |
+| `css/glass.css` | Glassmorphic effects | design-tokens.css |
+| `css/window-base.css` | Window management styles | glass.css |
+| `css/terminal.css` | Terminal application styles | window-base.css |
+| `css/desktop.css` | Desktop layout and icons | terminal.css |
 | `css/animations.css` | Animation definitions | desktop.css |
 | `css/responsive.css` | Responsive design rules | animations.css |
 | `css/mobile.css` | Mobile-specific styles | responsive.css |
 | `css/apps.css` | Application-specific styles | mobile.css |
 | `css/theme.css` | Theme management | apps.css |
 | `css/terminal-icon.css` | Terminal icon styles | theme.css |
-| `css/login.css` | Login screen styles | terminal-icon.css |
 
 ### JavaScript Dependencies
 
@@ -100,11 +99,11 @@
 #### 6. Boot Sequence
 - **Dialog role**: Accessibility-compliant modal
 - **Progress bar**: Visual boot progress indicator
-- **Glass effects**: Modern UI styling
+- **Glass effects**: Modern UI styling with neuos-glass-box
 
 #### 7. Login Screen
 - **Guest login**: Single-click access
-- **Glass container**: Consistent design language
+- **Glass container**: Consistent design language with neuos-glass-box
 - **Particle effects**: Dynamic background
 
 #### 8. Desktop Interface
@@ -128,9 +127,9 @@
 | Referenced File | Description | Connection Type |
 |-----------------|-------------|-----------------|
 | `css/design-tokens.css` | Design system variables | Stylesheet |
-| `css/variables.css` | CSS custom properties | Stylesheet |
 | `css/glass.css` | Glassmorphic effects | Stylesheet |
-| `css/window.css` | Window management | Stylesheet |
+| `css/window-base.css` | Window management | Stylesheet |
+| `css/terminal.css` | Terminal application | Stylesheet |
 | `css/desktop.css` | Desktop layout | Stylesheet |
 | `css/animations.css` | Animations | Stylesheet |
 | `css/responsive.css` | Responsive design | Stylesheet |
@@ -138,7 +137,6 @@
 | `css/apps.css` | Application styles | Stylesheet |
 | `css/theme.css` | Theme management | Stylesheet |
 | `css/terminal-icon.css` | Terminal icon | Stylesheet |
-| `css/login.css` | Login screen | Stylesheet |
 | `js/main.js` | Application logic | Script |
 | `js/howler.min.js` | Audio library | Script |
 | `config/manifest.json` | PWA manifest | Link |
@@ -199,7 +197,7 @@ if ('serviceWorker' in navigator) {
    - **Fix**: Replace with `<main>`, `<section>`, `<article>`, `<nav>`
 
 2. **Inline Styles**: Violates separation of concerns
-   - **Issue**: Inline styles in HTML
+   - **Issue**: Inline styles in HTML for positioning
    - **Fix**: Move all styles to CSS files
 
 3. **Accessibility**: Missing proper ARIA landmarks
@@ -209,12 +207,16 @@ if ('serviceWorker' in navigator) {
 ### Performance Issues
 
 1. **CSS Loading**: Multiple CSS files impact performance
-   - **Issue**: 12 separate CSS files
+   - **Issue**: 11 separate CSS files
    - **Fix**: Consider CSS bundling for production
 
 2. **JavaScript Loading**: Module loading could be optimized
    - **Issue**: ES6 modules loaded individually
    - **Fix**: Implement module bundling
+
+3. **Audio Preloading**: Large audio files
+   - **Issue**: 5.2MB mp3 file preloaded
+   - **Fix**: Implement lazy loading for audio
 
 ### Security Issues
 

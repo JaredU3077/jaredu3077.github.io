@@ -14,7 +14,7 @@
 
 | Module | Purpose | Dependencies |
 |--------|---------|--------------|
-| `./apps/terminal.js` | Terminal application | `./config.js`, `./utils/utils.js` |
+| `./apps/terminal/terminal.js` | Terminal application | `./config.js`, `./utils/utils.js` |
 | `./core/window.js` | Window management system | `./config.js`, `./utils/utils.js` |
 | `./utils/help.js` | Help system | `./utils/utils.js` |
 | `./core/boot.js` | Boot sequence management | `./core/audioSystem.js`, `./core/particleSystem.js` |
@@ -248,14 +248,14 @@ function showErrorNotification(title, message, details = '') {
 | `index.html` | Loads main.js as ES6 module | Script import |
 | `sw.js` | Service worker caches main.js | Caching |
 | `js/core/*.js` | Core systems imported by main.js | Module import |
-| `js/apps/*.js` | Application modules imported by main.js | Module import |
+| `js/apps/terminal/*.js` | Terminal modules imported by main.js | Module import |
 | `js/utils/*.js` | Utility modules imported by main.js | Module import |
 
 ### Outgoing Connections
 
 | Referenced File | Description | Connection Type |
 |-----------------|-------------|-----------------|
-| `js/apps/terminal.js` | Terminal application | Module import |
+| `js/apps/terminal/terminal.js` | Terminal application | Module import |
 | `js/core/window.js` | Window management | Module import |
 | `js/utils/help.js` | Help system | Module import |
 | `js/core/boot.js` | Boot sequence | Module import |
@@ -378,7 +378,7 @@ window.addEventListener('resize', debounce(() => {
 
 ### Performance Issues
 
-1. **Large File Size**: 625 lines in single file
+1. **Large File Size**: 632 lines in single file
    - **Issue**: Violates single responsibility principle
    - **Fix**: Split into smaller, focused modules
 
@@ -410,4 +410,4 @@ window.addEventListener('resize', debounce(() => {
 - See [architecture.md](architecture.md) for overall system architecture
 - See [config.md](config.md) for configuration management
 - See [js/core/](js/core/) for core system documentation
-- See [js/apps/](js/apps/) for application documentation 
+- See [js/apps/terminal/](js/apps/terminal/) for terminal application documentation 

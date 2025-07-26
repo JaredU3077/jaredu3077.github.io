@@ -19,9 +19,9 @@ jaredu3077.github.io/
 ├── sw.js                      # Service Worker for PWA
 ├── css/                       # Stylesheets
 │   ├── design-tokens.css      # Design system tokens
-│   ├── variables.css          # CSS custom properties
 │   ├── glass.css              # Glassmorphic effects
-│   ├── window.css             # Window management styles
+│   ├── window-base.css        # Window management styles
+│   ├── terminal.css           # Terminal application styles
 │   ├── desktop.css            # Desktop layout
 │   ├── animations.css         # Animation definitions
 │   ├── responsive.css         # Responsive design
@@ -42,10 +42,36 @@ jaredu3077.github.io/
 │   │   ├── audioSystem.js     # Audio management
 │   │   ├── themeManager.js    # Theme management
 │   │   ├── screensaver.js     # Screensaver functionality
+│   │   ├── backgroundMusic.js # Background music system
+│   │   ├── resizeHandler.js   # Window resize handling
+│   │   ├── dragHandler.js     # Drag and drop handling
+│   │   ├── snapHandler.js     # Window snapping
+│   │   ├── autoScrollHandler.js # Auto-scroll functionality
+│   │   ├── bootSequence.js    # Boot sequence logic
+│   │   ├── data/              # Data files
+│   │   │   └── solarSystemData.js # Solar system data
 │   │   └── ...                # Additional core modules
 │   ├── apps/                  # Application modules
-│   │   ├── terminal.js        # Terminal application
-│   │   └── commands.js        # Terminal commands
+│   │   └── terminal/          # Terminal application
+│   │       ├── terminal.js    # Main terminal logic
+│   │       ├── content.js     # Terminal content management
+│   │       ├── eventHandlers.js # Terminal event handling
+│   │       ├── outputUtils.js # Output formatting utilities
+│   │       ├── filesystem.js  # File system simulation
+│   │       ├── environment.js # Environment variables
+│   │       ├── history.js     # Command history
+│   │       ├── audio.js       # Terminal audio
+│   │       ├── theme.js       # Terminal theming
+│   │       ├── statusBar.js   # Status bar functionality
+│   │       └── commands/      # Command implementations
+│   │           ├── commands.js # Main command system
+│   │           ├── core.js     # Core commands
+│   │           ├── network.js  # Network commands
+│   │           ├── cisco.js    # Cisco-specific commands
+│   │           ├── system.js   # System commands
+│   │           ├── effects.js  # Visual effects commands
+│   │           ├── appControl.js # Application control
+│   │           └── environment.js # Environment commands
 │   └── utils/                 # Utility modules
 │       ├── draggable.js       # Drag and drop functionality
 │       ├── mobile.js          # Mobile utilities
@@ -69,6 +95,7 @@ jaredu3077.github.io/
     ├── sw.md                  # Service worker documentation
     ├── architecture.md        # This file - overall architecture
     ├── DOTHISNEXT.md         # Issues requiring attention
+    ├── THEMING_STANDARDIZATION.md # Theming system documentation
     └── README.md              # Project overview
 ```
 
@@ -86,7 +113,7 @@ graph TD
     B --> G[core/particleSystem.js]
     B --> H[core/audioSystem.js]
     B --> I[core/themeManager.js]
-    B --> J[apps/terminal.js]
+    B --> J[apps/terminal/terminal.js]
     B --> K[utils/draggable.js]
     B --> L[utils/mobile.js]
     B --> M[utils/mechvibes.js]
@@ -94,42 +121,59 @@ graph TD
     B --> O[utils/glassEffects.js]
     B --> P[utils/help.js]
     
-    J --> Q[apps/commands.js]
+    J --> Q[apps/terminal/commands/commands.js]
+    J --> R[apps/terminal/content.js]
+    J --> S[apps/terminal/eventHandlers.js]
+    J --> T[apps/terminal/outputUtils.js]
+    J --> U[apps/terminal/filesystem.js]
+    J --> V[apps/terminal/environment.js]
+    J --> W[apps/terminal/history.js]
+    J --> X[apps/terminal/audio.js]
+    J --> Y[apps/terminal/theme.js]
+    J --> Z[apps/terminal/statusBar.js]
     
-    A --> R[css/design-tokens.css]
-    A --> S[css/variables.css]
-    A --> T[css/glass.css]
-    A --> U[css/window.css]
-    A --> V[css/desktop.css]
-    A --> W[css/animations.css]
-    A --> X[css/responsive.css]
-    A --> Y[css/mobile.css]
-    A --> Z[css/apps.css]
-    A --> AA[css/theme.css]
-    A --> BB[css/terminal-icon.css]
-    A --> CC[css/login.css]
+    Q --> AA[apps/terminal/commands/core.js]
+    Q --> BB[apps/terminal/commands/network.js]
+    Q --> CC[apps/terminal/commands/cisco.js]
+    Q --> DD[apps/terminal/commands/system.js]
+    Q --> EE[apps/terminal/commands/effects.js]
+    Q --> FF[apps/terminal/commands/appControl.js]
+    Q --> GG[apps/terminal/commands/environment.js]
     
-    A --> DD[config/manifest.json]
-    A --> EE[config/config.json]
-    A --> FF[assets/audio/mp3.mp3]
-    A --> GG[assets/audio/sound.ogg]
-    A --> HH[assets/content/resume.txt]
+    A --> HH[css/design-tokens.css]
+    A --> II[css/glass.css]
+    A --> JJ[css/window-base.css]
+    A --> KK[css/terminal.css]
+    A --> LL[css/desktop.css]
+    A --> MM[css/animations.css]
+    A --> NN[css/responsive.css]
+    A --> OO[css/mobile.css]
+    A --> PP[css/apps.css]
+    A --> QQ[css/theme.css]
+    A --> RR[css/terminal-icon.css]
+    A --> SS[css/login.css]
     
-    A --> II[sw.js]
-    II --> JJ[Browser Cache API]
+    A --> TT[config/manifest.json]
+    A --> UU[config/config.json]
+    A --> VV[assets/audio/mp3.mp3]
+    A --> WW[assets/audio/sound.ogg]
+    A --> XX[assets/content/resume.txt]
+    
+    A --> YY[sw.js]
+    YY --> ZZ[Browser Cache API]
 ```
 
 ## Load Order and Initialization
 
 ### 1. HTML Document Loading
 - Browser parses `index.html`
-- CSS files loaded in sequence (design-tokens → variables → glass → window → desktop → animations → responsive → mobile → apps → theme → terminal-icon → login)
+- CSS files loaded in sequence (design-tokens → glass → window-base → terminal → desktop → animations → responsive → mobile → apps → theme → terminal-icon → login)
 - JavaScript modules loaded via ES6 imports
 
 ### 2. JavaScript Module Initialization
 ```javascript
 // Main entry point (main.js)
-import { Terminal } from './apps/terminal.js';
+import { Terminal } from './apps/terminal/terminal.js';
 import { WindowManager } from './core/window.js';
 import { HelpManager } from './utils/help.js';
 import { BootSystem } from './core/boot.js';
@@ -158,6 +202,11 @@ User Action → Event Listener → Handler Function → State Update → UI Upda
 Desktop Icon Click → handleAppClick() → WindowManager.createWindow() → App Initialization → Window Display
 ```
 
+### Terminal Command Flow
+```
+User Input → Terminal Event Handler → Command Parser → Command Execution → Output Formatting → Display
+```
+
 ### Audio System Flow
 ```
 Audio Event → AudioSystem → Howler.js → Browser Audio API → Audio Output
@@ -182,7 +231,7 @@ Network Request → Service Worker → Cache Check → Network Request → Cache
 - **ParticleSystem** depends on: `core/backgroundMixin.js`, `core/generationMixin.js`
 
 ### Application Dependencies
-- **Terminal** depends on: `apps/commands.js`, `utils/help.js`
+- **Terminal** depends on: `apps/terminal/commands/*.js`, `utils/help.js`
 - **All Apps** depend on: `core/window.js`, `config.js`
 
 ### Utility Dependencies
@@ -228,7 +277,7 @@ Network Request → Service Worker → Cache Check → Network Request → Cache
 ## Performance Considerations
 
 ### Loading Optimization
-- CSS files loaded in dependency order
+- CSS files loaded in dependency order with design tokens first
 - JavaScript modules use ES6 imports for tree-shaking
 - Audio files preloaded for immediate playback
 - Service Worker for caching and offline functionality
@@ -339,4 +388,5 @@ See [DOTHISNEXT.md](DOTHISNEXT.md) for a comprehensive list of issues requiring 
 - [main.md](main.md) - JavaScript entry point documentation
 - [config.md](config.md) - Configuration system documentation
 - [sw.md](sw.md) - Service worker documentation
-- [DOTHISNEXT.md](DOTHISNEXT.md) - Issues requiring attention 
+- [DOTHISNEXT.md](DOTHISNEXT.md) - Issues requiring attention
+- [THEMING_STANDARDIZATION.md](THEMING_STANDARDIZATION.md) - Theming system documentation 
